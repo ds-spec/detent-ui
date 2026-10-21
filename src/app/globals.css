@@ -1,26 +1,1102 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-geist), -apple-system, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-danger: var(--danger);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-warn-ink: var(--warn-ink);
+  --color-surface-3: var(--surface-3);
+  --color-plate: var(--plate);
+  --color-quiet: var(--quiet);
+  --color-ai-1: var(--ai-ink-1);
+  --color-ai-2: var(--ai-ink-2);
+  --color-ai-3: var(--ai-ink-3);
+  --color-ai-4: var(--ai-ink-4);
+  --color-agents: var(--agents);
+  --color-data: var(--data);
+  --color-inputs: var(--inputs);
+  --color-feedback: var(--feedback);
+  --color-essentials: var(--essentials);
+  --color-marketing: var(--marketing);
+  --color-accent: var(--accent);
+  --color-card: var(--card);
+
+  /* Elevation: a 1px ring stands in for a border, soft layers underneath do the lifting. */
+  --shadow-border: var(--elev-border);
+  --shadow-raised: var(--elev-raised);
+  --shadow-float: var(--elev-float);
+  --shadow-modal: var(--elev-modal);
+  --shadow-field: var(--elev-field);
+  --shadow-field-error: var(--elev-field-error);
+
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Radii and type are real variables, so a scope can redefine them: the Pro apps run a denser scale (see .pro-app). */
+@theme {
+  /* ── The default ──────────────────────────────────────────────
+     Radii are concentric: an inner radius is the outer one minus the padding between them
+     (menu 14 − 4 padding = item 10; card 22 − 8 = row 14). */
+  --radius-chip: 6px;
+  --radius-control: 10px;
+  --radius-row: 14px;
+  --radius-menu: 14px;
+  --radius-card: 22px;
+  --radius-panel: 28px;
+
+  /* ── The type scale ──────────────────────────────────────────
+     Eight sizes and no others. Each carries its own line height, weight and tracking, and
+     tracking tightens as size grows. Big type is regular: the step in size is the emphasis,
+     so nothing needs to be bold. Titles and headlines are medium. Caption is the floor: nothing that must be read is smaller. Glyphs that stand
+     in for an image (card brand marks, favicon discs, initials in a 24px avatar) are drawn, not read. */
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-caption--letter-spacing: 0em;
+  --text-footnote: 13px;
+  --text-footnote--line-height: 18px;
+  --text-callout: 14px;
+  --text-callout--line-height: 20px;
+  --text-callout--letter-spacing: -0.003em;
+  --text-body: 15px;
+  --text-body--line-height: 23px;
+  --text-body--letter-spacing: -0.01em;
+  /* Pages only: the one lead paragraph under a hero headline. Never inside a component. */
+  --text-lead: 17px;
+  --text-lead--line-height: 27px;
+  --text-lead--letter-spacing: -0.015em;
+  --text-headline: 15px;
+  --text-headline--line-height: 20px;
+  --text-headline--letter-spacing: -0.01em;
+  --text-headline--font-weight: 500;
+  --text-title: 20px;
+  --text-title--line-height: 26px;
+  --text-title--letter-spacing: -0.022em;
+  --text-title--font-weight: 500;
+  --text-large: 28px;
+  --text-large--line-height: 32px;
+  --text-large--letter-spacing: -0.032em;
+  --text-large--font-weight: 400;
+  --text-display: 40px;
+  --text-display--line-height: 44px;
+  --text-display--letter-spacing: -0.04em;
+  --text-display--font-weight: 400;
+
+  /* Older names, kept as aliases of the scale above. */
+  --text-label-12: 12px;
+  --text-label-12--line-height: 16px;
+  --text-label-13: 13px;
+  --text-label-13--line-height: 18px;
+  --text-label-14: 14px;
+  --text-label-14--line-height: 20px;
+  --text-copy-13: 13px;
+  --text-copy-13--line-height: 20px;
+  --text-copy-14: 14px;
+  --text-copy-14--line-height: 22px;
+  --text-heading-16: 16px;
+  --text-heading-16--line-height: 22px;
+  --text-heading-16--letter-spacing: -0.012em;
+  --text-heading-16--font-weight: 600;
+  --text-heading-20: 20px;
+  --text-heading-20--line-height: 26px;
+  --text-heading-20--letter-spacing: -0.02em;
+  --text-heading-20--font-weight: 600;
+  --text-heading-24: 24px;
+  --text-heading-24--line-height: 30px;
+  --text-heading-24--letter-spacing: -0.025em;
+  --text-heading-24--font-weight: 600;
+  --text-heading-32: 32px;
+  --text-heading-32--line-height: 38px;
+  --text-heading-32--letter-spacing: -0.03em;
+  --text-heading-32--font-weight: 600;
+}
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f4f4f5;
+  --line: rgb(0 0 0 / 0.07);
+  --line-strong: rgb(0 0 0 / 0.12);
+  --ink: #18181b;
+  /* Secondary and tertiary text both pass WCAG AA on every surface. */
+  --ink-2: #52525b;
+  --ink-3: #6e6e76;
+  /* Intelligence: light for glows (the same in both themes) and deeper inks for text, AA on white. */
+  --ai-1: #3ec6ff;
+  --ai-2: #6a7bff;
+  --ai-3: #c46bff;
+  --ai-4: #ff7a9c;
+  --ai-5: #ffc86b;
+  --ai-ink-1: #0a72bf;
+  --ai-ink-2: #4f5bea;
+  --ai-ink-3: #9b45d8;
+  --ai-ink-4: #c43563;
+  --ai-halo: 0.32;
+  /* The second line of a page headline: an aside, quieter than ink-3. Large type only (3.3:1). */
+  --quiet: #8e8e93;
+  /* Family tints, for tags that name a family. Text in these passes AA on its own 12% tint. */
+  --agents: #5b4fe0;
+  --data: #135fc8;
+  --inputs: #127541;
+  --feedback: #a8530b;
+  --essentials: #0e6f73;
+  --marketing: #b4236e;
+  --danger: #e5484d;
+  --ok: #30a46c;
+  /* Waiting and nearly full. --warn fills and strokes; --warn-ink is for icons and text on a warn tint. */
+  --warn: #f5a524;
+  --warn-ink: #b26a00;
+  --surface-3: #ebebed;
+  /* A plate is what slides inside a well: a selected segment, a pressed stepper. */
+  --plate: #ffffff;
+  --accent: #3d6dff;
+  /* The accent as text: a touch deeper, so a hovered link still reads at AA on white. */
+  --accent-ink: #2f5be6;
+  --focus: color-mix(in oklch, var(--accent) 70%, transparent);
+  --trace: rgb(0 0 0 / 0.22);
+  --pulse: var(--accent);
+  --elev-border: 0 0 0 1px rgb(0 0 0 / 0.08);
+  /* Materials. Base is the page or a card on it. Raised: a hairline and a tight shadow.
+     Floating: a hairline, a near shadow and a long ambient one. Pressed: see .sink. */
+  --elev-raised: 0 0 0 1px rgb(0 0 0 / 0.07), 0 1px 2px rgb(0 0 0 / 0.06), 0 2px 6px -2px rgb(0 0 0 / 0.05);
+  --elev-raised-hover: 0 0 0 1px rgb(0 0 0 / 0.12), 0 1px 3px rgb(0 0 0 / 0.07);
+  --elev-float: 0 0 0 1px rgb(0 0 0 / 0.06), 0 1px 2px rgb(0 0 0 / 0.04), 0 6px 12px -6px rgb(0 0 0 / 0.08), 0 20px 36px -14px rgb(0 0 0 / 0.16), 0 0 0 1px var(--bg);
+  --elev-modal: 0 0 0 1px rgb(0 0 0 / 0.06), 0 2px 4px rgb(0 0 0 / 0.04), 0 12px 24px -8px rgb(0 0 0 / 0.1), 0 32px 64px -16px rgb(0 0 0 / 0.24), 0 0 0 1px var(--bg);
+  --elev-field: 0 0 0 1px var(--line-strong), 0 0 0 4px color-mix(in oklch, var(--accent) 16%, transparent);
+  --elev-field-error: 0 0 0 1px color-mix(in oklch, var(--danger) 70%, transparent), 0 0 0 4px color-mix(in oklch, var(--danger) 14%, transparent);
+  --folder-back: #d8d5ce;
+  --folder-front: #eae8e3;
+  --folder-ink: #8b8880;
+  --sheet: #ffffff;
+  --sheet-line: #e9e7e2;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  /* Midnight: true black, finished with light. Page and stage are black; a component sits a small
+     step above at #0d0d0d, and what makes it stand is its edge: one crisp ring of white laid over a
+     ring of black, a faint lit top edge like light catching a rim, and a shadow deep enough to
+     read on the stage. Fills step up in plain neutral greys. */
+  --bg: #000000;
+  --surface: #0d0d0d;
+  --surface-2: #191919;
+  --surface-3: #242424;
+  /* In dark a plate must be lighter than the well it sits in, never darker. */
+  --plate: #2a2a2a;
+  --line: rgb(255 255 255 / 0.1);
+  --line-strong: rgb(255 255 255 / 0.145);
+  --ink: #ededed;
+  --ink-2: #a1a1a1;
+  --ink-3: #8f8f8f;
+  --quiet: #6b6b6b;
+  --ai-1: #3ec6ff;
+  --ai-2: #6a7bff;
+  --ai-3: #c46bff;
+  --ai-4: #ff7a9c;
+  --ai-5: #ffc86b;
+  --ai-ink-1: #6cc8ff;
+  --ai-ink-2: #9aa3ff;
+  --ai-ink-3: #d29bff;
+  --ai-ink-4: #ff8fb1;
+  --ai-halo: 0.5;
+  --agents: #a49bff;
+  --data: #6ea8ff;
+  --inputs: #4fcf8a;
+  --feedback: #ffad5c;
+  --essentials: #4fd2d2;
+  --marketing: #ff7ab8;
+  --danger: #ff6166;
+  --ok: #45d483;
+  --warn: #f5a524;
+  --warn-ink: #f7b955;
+  --accent: #5b8cff;
+  --accent-ink: #84a8ff;
+  --focus: color-mix(in oklch, var(--accent) 80%, transparent);
+  --trace: rgb(255 255 255 / 0.4);
+  --pulse: #ffffff;
+  /* Each ring sits on a second ring of page colour, so the hairline reads the same over lines, images or gradients. */
+  --elev-border: 0 0 0 1px rgb(255 255 255 / 0.145), 0 0 0 1px var(--bg);
+  --elev-raised: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 0 0 1px rgb(255 255 255 / 0.145), 0 1px 2px rgb(0 0 0 / 0.5), 0 0 0 1px var(--bg);
+  --elev-raised-hover: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 0 0 1px rgb(255 255 255 / 0.22), 0 1px 2px rgb(0 0 0 / 0.5), 0 0 0 1px var(--bg);
+  --elev-float: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 0 0 1px rgb(255 255 255 / 0.145), 0 8px 24px -8px rgb(0 0 0 / 0.8), 0 0 0 1px var(--bg);
+  --elev-modal: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 0 0 1px rgb(255 255 255 / 0.145), 0 16px 40px -12px rgb(0 0 0 / 0.9), 0 0 0 1px var(--bg);
+  --elev-field: 0 0 0 1px rgb(255 255 255 / 0.32), 0 0 0 4px color-mix(in oklch, var(--accent) 22%, transparent);
+  --elev-field-error: 0 0 0 1px color-mix(in oklch, var(--danger) 70%, transparent), 0 0 0 4px color-mix(in oklch, var(--danger) 18%, transparent);
+  --folder-back: #141414;
+  --folder-front: #1f1f1f;
+  --folder-ink: #a1a1a1;
+  --sheet: #ececec;
+  --sheet-line: #d6d6d6;
+}
+
+/* ── Pro app material ───────────────────────────────────────────
+   Whole app screens run denser and quieter than components on a page: 13px UI type, tighter
+   spacing and smaller radii, a warm paper palette, hairlines instead of cards inside cards, and
+   shadows only on what truly floats. Every value is set with light-dark(), so the scope follows
+   whichever theme it sits in. */
+.pro-app {
+  --spacing: 0.225rem;
+  --radius-chip: 5px;
+  --radius-control: 7px;
+  --radius-row: 9px;
+  --radius-menu: 10px;
+  --radius-card: 12px;
+  --radius-panel: 16px;
+  --text-caption: 11.5px;
+  --text-caption--line-height: 15px;
+  --text-footnote: 12px;
+  --text-footnote--line-height: 17px;
+  --text-callout: 13px;
+  --text-callout--line-height: 18px;
+  --text-body: 14px;
+  --text-body--line-height: 21px;
+  --text-headline: 13.5px;
+  --text-headline--line-height: 18px;
+  --text-title: 16px;
+  --text-title--line-height: 21px;
+  --text-large: 22px;
+  --text-large--line-height: 27px;
+  --text-display: 30px;
+  --text-display--line-height: 34px;
+
+  /* Light is warm paper. Dark is Midnight, finished the way the page is: the app sits at #0d0d0d,
+     wells and sidebars drop to true black beneath it, fills step up in neutral greys, and every
+     edge is one crisp ring of white with a faint lit top edge on anything raised. The order of
+     depth is the same in both: wells below the page, anything raised above what it rests on. */
+  --surface: light-dark(#fdfdfc, #0d0d0d);
+  --surface-2: light-dark(#f2f1ee, #161616);
+  --surface-3: light-dark(#e7e5e1, #232323);
+  --card: light-dark(#f6f5f2, #000000);
+  --plate: light-dark(#ffffff, #262626);
+  --line: light-dark(rgb(40 32 16 / 0.075), rgb(255 255 255 / 0.09));
+  --line-strong: light-dark(rgb(40 32 16 / 0.13), rgb(255 255 255 / 0.145));
+  --ink: light-dark(#1c1b19, #ededed);
+  --ink-2: light-dark(#54514c, #a1a1a1);
+  --ink-3: light-dark(#6f6b65, #8f8f8f);
+  --elev-border: 0 0 0 1px light-dark(rgb(40 32 16 / 0.09), rgb(255 255 255 / 0.145));
+  --elev-raised: inset 0 1px 0 light-dark(rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.04)), 0 0 0 1px light-dark(rgb(40 32 16 / 0.09), rgb(255 255 255 / 0.12)), 0 1px 1px light-dark(rgb(40 32 16 / 0.05), rgb(0 0 0 / 0.5));
+  --elev-float: inset 0 1px 0 light-dark(rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.05)), 0 0 0 1px light-dark(rgb(40 32 16 / 0.09), rgb(255 255 255 / 0.13)), 0 1px 2px light-dark(rgb(40 32 16 / 0.05), rgb(0 0 0 / 0.5)), 0 6px 14px -6px light-dark(rgb(40 32 16 / 0.1), rgb(0 0 0 / 0.75));
+  --elev-field: 0 0 0 1px var(--line-strong), 0 1px 1px light-dark(rgb(40 32 16 / 0.04), rgb(0 0 0 / 0.3));
+  font-size: 13px;
+  background: var(--app-root, var(--surface));
+  color: var(--ink);
+}
+/* Icons in the apps draw finer: the 2px default reads heavy at 13px. Icons that ask for a weight keep it. */
+.pro-app svg[stroke-width="2"] {
+  stroke-width: 1.65px;
+}
+/* One accent per app, and only for what it means: where you are, what has focus, what's a link,
+   what you've selected. Everything else stays monochrome. */
+.pro-app {
+  --accent: light-dark(#3a5bf6, #7090ff);
+  --accent-ink: light-dark(#2846d8, #a8b8ff);
+  --focus: color-mix(in oklch, var(--accent) 60%, transparent);
+}
+.pro-app ::selection {
+  background: color-mix(in oklch, var(--accent) 22%, transparent);
+}
+/* Inside an app the intelligence keeps to the accent's family: one hue, from its palest tint to
+   the accent itself, instead of the full spectrum. The comet still runs and the halo still
+   breathes, but it reads as the product's own light. Everything derives from --accent, so an app
+   that sets its own accent gets its own glow with it. */
+.pro-app {
+  --ai-1: color-mix(in oklch, var(--accent) 52%, white);
+  --ai-2: var(--accent);
+  --ai-3: color-mix(in oklch, var(--accent) 78%, white);
+  --ai-4: color-mix(in oklch, var(--accent) 34%, white);
+  --ai-5: color-mix(in oklch, var(--accent) 16%, white);
+  --ai-ink-1: var(--accent-ink);
+  --ai-ink-2: var(--accent);
+  --ai-ink-3: color-mix(in oklch, var(--accent) 66%, white);
+  --ai-ink-4: var(--accent-ink);
+  --ai-halo: 0.2;
+}
+[data-theme="dark"] .pro-app,
+.pro-app[data-theme="dark"] {
+  --ai-halo: 0.34;
+}
+/* A light desk on a dark page. */
+[data-theme="dark"] [data-theme="light"] .pro-app {
+  --ai-halo: 0.2;
+}
+/* Light catches the top edge of anything raised or filled, and a breath of shade sits under it. */
+.lit {
+  box-shadow: inset 0 1px 0 light-dark(rgb(255 255 255 / 0.75), rgb(255 255 255 / 0.04)), inset 0 -1px 0 light-dark(rgb(40 32 16 / 0.04), transparent);
+}
+/* Rows give a little under the finger, like a key. */
+.pro-app [data-row] {
+  transition: transform 160ms cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+.pro-app [data-row]:active {
+  transform: scale(0.985);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pro-app [data-row]:active { transform: none; }
+}
+/* A sidebar: tinted paper, or the window's vibrancy when it sits in a unified window. */
+.pro-side {
+  background: var(--app-side, var(--card));
+  -webkit-backdrop-filter: var(--app-blur, none);
+  backdrop-filter: var(--app-blur, none);
+}
+/* A unified window: the block's root goes clear and its sidebar lets the wallpaper through. */
+.pro-vibrant {
+  --app-root: transparent;
+  --app-side: light-dark(rgb(244 242 238 / 0.74), rgb(0 0 0 / 0.72));
+  --app-blur: blur(30px) saturate(1.8);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Titles break into even lines; paragraphs never leave a lone word behind. Only the *style*
+   longhands, and in the base layer: the `text-wrap` shorthand would also turn wrapping back on and
+   beat utilities like `truncate`. */
+@layer base {
+  h1, h2, h3, h4 {
+    text-wrap-style: balance;
+  }
+  p {
+    text-wrap-style: pretty;
+  }
+  /* Images get a hairline so light ones don't melt into the page. */
+  img {
+    outline: 1px solid color-mix(in oklch, var(--ink) 10%, transparent);
+    outline-offset: -1px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+::selection {
+  background: color-mix(in oklch, var(--accent) 22%, transparent);
 }
+
+/* The default focus: a gap, then the accent ring. Only for keyboard focus. */
+@utility ring-focus {
+  outline: none;
+  &:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+}
+
+/* ───────────── Materials ───────────── */
+
+.material {
+  background: rgb(248 248 250 / 0.7);
+  -webkit-backdrop-filter: blur(28px) saturate(1.9);
+  backdrop-filter: blur(28px) saturate(1.9);
+  box-shadow:
+    inset 0 0 0 0.5px rgb(255 255 255 / 0.65),
+    0 0 0 0.5px rgb(0 0 0 / 0.07),
+    0 14px 34px -14px rgb(20 20 40 / 0.3),
+    0 2px 6px -2px rgb(20 20 40 / 0.1);
+  color: var(--ink);
+}
+/* A coloured chip: a status, a delta, a plan tag, a count. In light it's a soft wash of its colour.
+   In dark the wash deepens and a ring of the same colour draws its edge, so it stays crisp on black
+   instead of going muddy. Set --chip to the colour; --chip-wash changes the light wash. A plain
+   chip is grey, and in dark it takes a ring of line. */
+.chip {
+  background: var(--chip-bg, light-dark(color-mix(in oklch, var(--chip) var(--chip-wash, 12%), transparent), color-mix(in oklch, var(--chip) 16%, transparent)));
+  box-shadow: inset 0 0 0 1px light-dark(transparent, var(--chip-edge, color-mix(in oklch, var(--chip) 38%, transparent)));
+}
+.chip-plain {
+  --chip-bg: var(--surface-2);
+  --chip-edge: var(--line-strong);
+}
+
+[data-theme="dark"] .material {
+  background: rgb(13 13 13 / 0.82);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.05),
+    0 0 0 1px rgb(255 255 255 / 0.145),
+    0 0 0 1px #000,
+    0 14px 34px -14px rgb(0 0 0 / 0.7);
+}
+
+.wallpaper {
+  background:
+    radial-gradient(55% 75% at 12% 18%, #ffd2ae 0%, transparent 62%),
+    radial-gradient(50% 70% at 88% 22%, #cbbcff 0%, transparent 62%),
+    radial-gradient(60% 70% at 62% 100%, #a5d9ff 0%, transparent 62%),
+    radial-gradient(40% 50% at 30% 85%, #ffc1d9 0%, transparent 60%),
+    #f3eee8;
+}
+/* By night, Midnight: no colour in the glass, only a faint grey light pooling on black. */
+[data-theme="dark"] .wallpaper {
+  background:
+    radial-gradient(55% 75% at 14% 16%, #1a1a1a 0%, transparent 62%),
+    radial-gradient(60% 70% at 86% 100%, #141414 0%, transparent 62%),
+    #050505;
+}
+
+@keyframes march {
+  to {
+    stroke-dashoffset: -11;
+  }
+}
+
+/* A caret that blinks like a native one: hard on and off, not a fade. */
+@keyframes caret {
+  0%, 55% { opacity: 1; }
+  56%, 100% { opacity: 0; }
+}
+
+/* Light passing through text, for "working" labels. */
+@keyframes sheen {
+  from { background-position: 150% 0; }
+  to { background-position: -50% 0; }
+}
+.sheen {
+  background: linear-gradient(90deg, var(--ink-3) 0%, var(--ink-3) 35%, var(--ink) 50%, var(--ink-3) 65%, var(--ink-3) 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sheen 1.6s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheen { animation: none; color: var(--ink-3); }
+}
+
+/* The stage every demo sits on: the page colour with a faint dot grid. */
+.stage-dots {
+  background-color: var(--bg);
+  background-image: radial-gradient(circle at 1px 1px, color-mix(in oklch, var(--ink) 10%, transparent) 1px, transparent 0);
+  background-size: 18px 18px;
+  background-position: -9px -9px;
+}
+
+/* Streamed words come into focus as they land; citations pop in. Each runs once, when the element mounts. */
+@keyframes word-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+}
+@keyframes cite-in {
+  from { opacity: 0; transform: scale(0.6); }
+}
+.word-in {
+  animation: word-in 600ms cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+.cite-in {
+  animation: cite-in 320ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+
+/* Heard words fade in plainly; they firm up by colour once recognition commits them. */
+@keyframes heard-in {
+  from { opacity: 0; filter: blur(3px); }
+}
+.heard-in {
+  animation: heard-in 360ms cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word-in, .cite-in, .heard-in { animation: none; }
+}
+
+/* Headlines arrive a word at a time, in CSS, so they animate before any script loads. */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(0.35em); filter: blur(8px); }
+}
+.rise {
+  animation: rise 900ms cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+/* The headline focuses in from a blur at full opacity: visible from the first paint, so it
+   counts as the page's largest paint straight away instead of waiting for scripts. */
+@keyframes focus-in {
+  from { transform: translateY(0.28em); filter: blur(10px); }
+}
+.focus-in {
+  animation: focus-in 900ms cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise, .focus-in { animation: none; }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* ───────────── The site ───────────── */
+
+
+/* Highlighted source (Shiki, dual theme): each token carries both colours; the theme picks one. */
+.code .shiki,
+.code .shiki span {
+  color: var(--shiki-light);
+  background: transparent !important;
+}
+[data-theme="dark"] .code .shiki,
+[data-theme="dark"] .code .shiki span {
+  color: var(--shiki-dark);
+}
+.code pre {
+  counter-reset: line;
+}
+.code .line::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 2.5em;
+  margin-right: 1.5em;
+  text-align: right;
+  color: var(--ink-3);
+  opacity: 0.6;
+}
+
+/* A theme set on an inner element (the stage) beats the page's: the nearest theme wins. */
+[data-theme] [data-theme="light"] .code .shiki,
+[data-theme] [data-theme="light"] .code .shiki span {
+  color: var(--shiki-light);
+}
+[data-theme] [data-theme="dark"] .code .shiki,
+[data-theme] [data-theme="dark"] .code .shiki span {
+  color: var(--shiki-dark);
+}
+
+/* Gallery cards: a flat, barely-there step off a white page, and the light that follows the pointer. */
+:root,
+[data-theme="light"] {
+  --card: #f7f7f8;
+  --card-light: rgb(255 255 255 / 0.85);
+}
+[data-theme="dark"] {
+  /* The stage is black like the page: its edge is a hairline, and what stands on it carries the depth. */
+  --card: #000000;
+  --card-light: rgb(255 255 255 / 0.04);
+}
+
+/* The headline's last word drops into its slot and settles with a little give, like a detent. */
+.slot {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding: 0 0.04em 0.12em;
+  margin: 0 -0.04em -0.12em;
+}
+@keyframes click-in {
+  0% { transform: translateY(-105%); }
+  62% { transform: translateY(5%); }
+  80% { transform: translateY(-1.5%); }
+  100% { transform: translateY(0); }
+}
+.click-in {
+  display: inline-block;
+  animation: click-in 760ms cubic-bezier(0.3, 0.8, 0.3, 1) 420ms both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .click-in { animation: none; }
+}/* The living orb's colours turning slowly inside it. */
+@keyframes orb-turn {
+  to { rotate: 360deg; }
+}
+
+
+
+
+
+
+
+/* Pressed surfaces sink: a little inner shadow while held, so a press has depth as well as scale. */
+.sink {
+  transition: box-shadow 120ms ease-out;
+}
+.sink:active {
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.22), inset 0 0 0 1px rgb(0 0 0 / 0.06) !important;
+}
+[data-theme="dark"] .sink:active {
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.65), inset 0 0 0 1px rgb(255 255 255 / 0.07) !important;
+}
+
+
+/* A placeholder line with a light passing through it, for content that's on its way. */
+@keyframes sheen-bar {
+  from { background-position: 150% 0; }
+  to { background-position: -50% 0; }
+}
+.sheen-bar {
+  background: linear-gradient(90deg, var(--surface-2) 0%, var(--surface-2) 35%, var(--surface-3) 50%, var(--surface-2) 65%, var(--surface-2) 100%);
+  background-size: 250% 100%;
+  animation: sheen-bar 1.4s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheen-bar { animation: none; }
+}
+
+/* Floating material: popovers and menus are glass. A translucent surface and a strong blur
+   keep them clearly above what they cover without hiding it completely. Only short-lived
+   surfaces use it, so the blur never runs for long. */
+.glass {
+  background: color-mix(in oklch, var(--surface) 80%, transparent) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(1.7);
+  backdrop-filter: blur(24px) saturate(1.7);
+}
+/* On black, anything light behind the glass glows through the blur as a smudge (the 404's mark
+   under the search, a white card under a menu), so in dark the glass is solid: its edge and
+   shadow carry the depth, as they do everywhere else in dark. */
+[data-theme="dark"] .glass {
+  background: var(--surface) !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+
+
+
+
+
+
+
+
+
+/* ── Intelligence ────────────────────────────────────────────
+   The fifth material, and the only one with colour of its own. It means the AI is alive:
+   thinking, listening, streaming, working. A comet of light runs round the edge over a faint
+   full spectrum, a soft halo breathes behind, text shimmers through the inks, and when the
+   work ends it all cools back to ink. Nothing else in Detent uses it. */
+@property --ai-turn {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes ai-turn {
+  to { --ai-turn: 360deg; }
+}
+@keyframes ai-breathe {
+  50% { opacity: calc(var(--ai-halo) * 0.65); }
+}
+/* The edge: a 1.5px ring. The bright comet travels; the faint spectrum under it turns the other way. */
+.ai-ring {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  padding: 1.5px;
+  background:
+    conic-gradient(from var(--ai-turn), transparent 0deg 170deg, var(--ai-1) 220deg, var(--ai-2) 265deg, var(--ai-3) 305deg, var(--ai-4) 340deg, transparent 360deg),
+    conic-gradient(from calc(0deg - var(--ai-turn)), color-mix(in oklch, var(--ai-1) 40%, transparent), color-mix(in oklch, var(--ai-3) 40%, transparent), color-mix(in oklch, var(--ai-5) 40%, transparent), color-mix(in oklch, var(--ai-1) 40%, transparent));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: ai-turn 2.8s linear infinite;
+}
+/* The halo: the whole spectrum, blurred, behind the surface. It only breathes: re-blurring a
+   turning gradient every frame is expensive, and the comet on the edge already carries the motion. */
+.ai-halo {
+  position: absolute;
+  inset: 2px;
+  pointer-events: none;
+  background: conic-gradient(from 200deg, var(--ai-1), var(--ai-2), var(--ai-3), var(--ai-4), var(--ai-5), var(--ai-1));
+  filter: blur(22px);
+  opacity: var(--ai-halo);
+  will-change: opacity;
+  animation: ai-breathe 3.2s ease-in-out infinite;
+}
+/* Text that's working: it flows through the inks. */
+@keyframes ai-flow {
+  to { background-position: -200% 0; }
+}
+.ai-text {
+  background: linear-gradient(90deg, var(--ai-ink-1), var(--ai-ink-2), var(--ai-ink-3), var(--ai-ink-4), var(--ai-ink-1)) 0 0 / 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: ai-flow 2.6s linear infinite;
+}
+/* A word that just arrived: it lands in colour and cools to the text's own ink. */
+@keyframes ai-warm {
+  from { color: var(--ai-word, var(--ai-ink-2)); }
+}
+.ai-warm {
+  animation: ai-warm 1100ms cubic-bezier(0.4, 0, 0.6, 1) both;
+}
+/* Streamed words fade in and cool at once. */
+.word-in.ai-warm {
+  animation: word-in 600ms cubic-bezier(0.2, 0.9, 0.25, 1) both, ai-warm 1100ms cubic-bezier(0.4, 0, 0.6, 1) both;
+}
+/* Quiet: the same motion in ink. After the first time a surface comes alive, colour would only
+   be noise, so the comet runs grey round the edge and working text shimmers like a sheen. The
+   halo isn't drawn at all. */
+.ai-ring.ai-quiet {
+  background: conic-gradient(from var(--ai-turn), transparent 0deg 190deg, color-mix(in oklch, var(--ink) 34%, transparent) 300deg, transparent 360deg);
+}
+.ai-text.ai-quiet {
+  background: linear-gradient(90deg, var(--ink-3) 0%, var(--ink-3) 35%, var(--ink) 50%, var(--ink-3) 65%, var(--ink-3) 100%) 0 0 / 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: sheen 1.8s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ai-ring, .ai-halo, .ai-text { animation: none; }
+  .ai-text.ai-quiet { animation: none; color: var(--ink-3); }
+  .ai-warm, .word-in.ai-warm { animation: none; }
+}
+
+
+
+
+
+/* Outcomes: one band of light leaves a surface when something consequential lands, then it's calm. */
+@keyframes bloom {
+  from { box-shadow: 0 0 0 0 color-mix(in oklch, var(--bloom) 55%, transparent), 0 0 0 0 color-mix(in oklch, var(--bloom) 30%, transparent); }
+  to { box-shadow: 0 0 0 var(--bloom-spread) color-mix(in oklch, var(--bloom) 0%, transparent), 0 0 calc(var(--bloom-spread) * 2) calc(var(--bloom-spread) / 2) color-mix(in oklch, var(--bloom) 0%, transparent); }
+}
+.bloom {
+  animation: bloom 720ms cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bloom { animation: none; }
+}
+
+
+/* Landing pages: a sheet of paper on a slightly deeper ground, with type set for reading at length. */
+.landing {
+  /* The ground sits below the sheet in both themes: deeper paper in light, true black in dark. */
+  --ground: light-dark(#f2f1ed, #000000);
+  --sheet: var(--surface);
+  background: var(--ground);
+  font-size: 15px;
+}
+/* A section scrolled out of view holds still: every CSS animation inside it pauses until it's back. */
+.landing [data-play="off"],
+.landing [data-play="off"] * {
+  animation-play-state: paused !important;
+}
+
+/* The mark's click: on the first load the half-disc slides home, passes its seat by a hair and
+   springs back. Units are the mark's own 24-unit grid. */
+@keyframes mark-seat {
+  0% { transform: translateX(5.5px); opacity: 0.25; }
+  52% { transform: translateX(-0.7px); opacity: 1; }
+  72% { transform: translateX(0.22px); }
+  86% { transform: translateX(-0.06px); }
+  100% { transform: none; }
+}
+.mark-seat {
+  animation: mark-seat 760ms cubic-bezier(0.3, 0.6, 0.25, 1) 160ms backwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mark-seat { animation: none; }
+}
+
+
+@keyframes tty-blink {
+  50% { opacity: 0; }
+}
+/* A spark passing along the handoff from the issue to the pull request. */
+@keyframes kiln-pass {
+  from { transform: translate(0, -50%); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  to { transform: translate(48px, -50%); opacity: 0; }
+}
+
+/* The footer mark's seat: the half-disc lands in the accent and cools to ink. */
+@keyframes seat-flash {
+  from { color: var(--accent); }
+}
+.seat-flash {
+  animation: seat-flash 1100ms cubic-bezier(0.4, 0, 0.6, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .seat-flash { animation: none; }
+}
+
+
+
+/* The footer mark's glint: a band of light parked off the mark, crossing it every few seconds
+   while the footer is on screen. A whisper on ink in light mode, a cool glint on white in dark. */
+.glint-stop { stop-color: color-mix(in oklch, var(--accent) 30%, white); }
+.glint-edge { stop-opacity: 0; }
+.glint-half { stop-opacity: 0.09; }
+.glint-peak { stop-opacity: 0.3; }
+[data-theme="dark"] .glint-stop { stop-color: color-mix(in oklch, var(--accent) 60%, white); }
+[data-theme="dark"] .glint-half { stop-opacity: 0.28; }
+[data-theme="dark"] .glint-peak { stop-opacity: 0.85; }
+.glint { transform: translateX(-12px); }
+@keyframes glint {
+  0% { transform: translateX(-12px); }
+  26%, 100% { transform: translateX(36px); }
+}
+.glint-on .glint {
+  animation: glint 6.5s cubic-bezier(0.45, 0, 0.25, 1) 1.2s infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .glint-on .glint { animation: none; }
+}
+
+
+
+
+/* On the footer wordmark the glint travels the whole word. */
+@keyframes glint-wide {
+  0% { transform: translateX(0); }
+  30%, 100% { transform: translateX(1300px); }
+}
+.glint-on .glint-wide {
+  animation: glint-wide 7.5s cubic-bezier(0.45, 0, 0.25, 1) 2.2s infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .glint-on .glint-wide { animation: none; }
+}
+/* The plan with everything: a slow glint of light crosses it now and then. */
+.pro-sheen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 38%, color-mix(in oklch, var(--accent) 20%, rgb(255 255 255 / 0.22)) 50%, transparent 62%);
+  transform: translateX(-110%);
+  animation: pro-sheen 7s cubic-bezier(0.45, 0, 0.25, 1) 1.6s infinite;
+}
+@keyframes pro-sheen {
+  0% { transform: translateX(-110%); }
+  28%, 100% { transform: translateX(110%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pro-sheen::after { animation: none; opacity: 0; }
+}
+
+
+/* Kiln: white paper and true neutral greys. The colour on the page comes from its paintings and
+   one oxblood, with two glazes a potter would know for status: celadon for done, cobalt for
+   merged. Night, where a stretch of the page is always dark, is plain black like ink. The app's
+   tokens resolve their light-dark() where they're declared, so a dark stretch declares them again. */
+.landing.kiln {
+  --page: light-dark(#ffffff, #000000);
+  --ground: var(--page);
+  --sheet: light-dark(#ffffff, #0a0a0a);
+  --surface-2: light-dark(#f3f3f2, #1a1a1a);
+  --ink: light-dark(#111111, #ededed);
+  --ink-2: light-dark(#4a4a4a, #a1a1a1);
+  --ink-3: light-dark(#8c8c8c, #8f8f8f);
+  --line: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.1));
+  --line-strong: light-dark(rgb(0 0 0 / 0.14), rgb(255 255 255 / 0.145));
+  --glaze: light-dark(#4f7d69, #8db7a3);
+  --glaze-tint: light-dark(#dfe9e2, #1f2d27);
+  --ok: var(--glaze);
+  --danger: light-dark(#b0473a, #d97a6c);
+  --cobalt: light-dark(#3d5f94, #8ea9da);
+  --font-mono: var(--font-kiln-mono), ui-monospace, SFMono-Regular, monospace;
+  background: var(--page);
+}
+.landing.kiln .night {
+  color-scheme: dark;
+  --page: #000000;
+  --ground: #000000;
+  --sheet: #0d0d0d;
+  --surface: #0d0d0d;
+  --surface-2: #161616;
+  --surface-3: #232323;
+  --card: #000000;
+  --line: rgb(255 255 255 / 0.09);
+  --line-strong: rgb(255 255 255 / 0.145);
+  --ink: #ededed;
+  --ink-2: #a1a1a1;
+  --ink-3: #8f8f8f;
+  --glaze: #8db7a3;
+  --glaze-tint: #1f2d27;
+  --ok: #8db7a3;
+  --danger: #d97a6c;
+  --cobalt: #8ea9da;
+  --accent-ink: #e3907a;
+  --elev-border: 0 0 0 1px rgb(255 255 255 / 0.145), 0 0 0 1px #000;
+  color: var(--ink);
+}
+
+/* Kiln's firewall: a request along its lane, through a gate or into the wall, and the spark where it lands. */
+@keyframes kiln-allow {
+  from { transform: translateX(0); opacity: 0; }
+  6%, 94% { opacity: 1; }
+  to { transform: translateX(calc(100cqw - 8px)); opacity: 0; }
+}
+@keyframes kiln-deny {
+  0% { transform: translateX(0); opacity: 0; }
+  6% { opacity: 1; }
+  62% { transform: translateX(calc(56cqw - 10px)); opacity: 1; }
+  66%, 100% { transform: translateX(calc(56cqw - 10px)); opacity: 0; }
+}
+@keyframes kiln-spark {
+  0%, 60% { opacity: 0; transform: scale(0.4); }
+  64% { opacity: 1; transform: scale(1); }
+  80%, 100% { opacity: 0; transform: scale(1.6); }
+}
+
+
+
+/* Kiln's paper and its sun: the ground the ink pictures are painted on, and the red disc over
+   them. By night the paper is dark and the disc is the moon. */
+.landing.kiln {
+  --paper: light-dark(#fbfbf9, #111111);
+  --sun: light-dark(rgb(176 58 40 / 0.88), rgb(233 230 220 / 0.92));
+}
+
+/* Work travelling along a path: into the kiln, or out of it. */
+@keyframes kiln-along {
+  from { offset-distance: 0%; opacity: 0; }
+  12%, 88% { opacity: 1; }
+  to { offset-distance: 100%; opacity: 0; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* The Overlays family's tint: an olive, clear of every other family's hue. Text in it passes AA on its own 12% tint. */
+:root,
+[data-theme="light"] {
+  --overlays: #5a6400;
+}
+[data-theme="dark"] {
+  --overlays: #c6d45a;
+}
+@theme inline {
+  --color-overlays: var(--overlays);
+}
+
+
+/* The index's detents: on a wide screen, the page settles each name onto the reading line. */
+@media (min-width: 1024px) {
+  html:has(.index-detents) {
+    scroll-snap-type: y proximity;
+  }
+}
+
+
+
+
+
+/* The neutral app material: pure white and cool greys, the finish of a quiet desktop tool, with
+   hairlines doing the work shadows would. In the dark, depth is light: the sidebar is a well, the
+   page sits above it, cards and the composer rise a step, and menus and dialogs rise again. */
+.pro-app.neutral {
+  --surface: light-dark(#ffffff, #171717);
+  --surface-2: light-dark(#f3f3f3, #232323);
+  --surface-3: light-dark(#e9e9e9, #2e2e2e);
+  --card: light-dark(#ffffff, #000000);
+  --plate: light-dark(#ffffff, #2a2a2a);
+  --line: light-dark(rgb(0 0 0 / 0.07), rgb(255 255 255 / 0.075));
+  --line-strong: light-dark(rgb(0 0 0 / 0.11), rgb(255 255 255 / 0.13));
+  --ink: light-dark(#0d0d0d, #ececec);
+  --ink-2: light-dark(#5d5d5d, #a3a3a3);
+  --ink-3: light-dark(#8f8f8f, #7b7b7b);
+  /* The well under the page: the rail and the sessions. */
+  --well: light-dark(#ffffff, #111111);
+  /* A step up: cards in the thread, the composer's tray. */
+  --raised: light-dark(#ffffff, #1d1d1d);
+  --tray: light-dark(#f3f3f3, #1d1d1d);
+  /* Another: the composer's card. */
+  --field: light-dark(#ffffff, #252525);
+  /* The top: menus, popovers and dialogs. */
+  --overlay: light-dark(#ffffff, #212121);
+  --overlay-2: light-dark(#f3f3f3, #2c2c2c);
+  --elev-card: 0 0 0 1px var(--line), 0 1px 2px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.3));
+  --elev-overlay: 0 0 0 1px light-dark(rgb(0 0 0 / 0.07), rgb(255 255 255 / 0.1)), 0 4px 8px -2px light-dark(rgb(0 0 0 / 0.05), rgb(0 0 0 / 0.35)), 0 18px 40px -10px light-dark(rgb(0 0 0 / 0.16), rgb(0 0 0 / 0.6));
+}
+/* Menus, popovers and dialogs of a neutral app render into its layer and wear the overlay surface. */
+.pro-app.neutral .app-layers {
+  --surface: var(--overlay);
+  --surface-2: var(--overlay-2);
+  --elev-modal: var(--elev-overlay);
+  --shadow-modal: var(--elev-overlay);
+}
+
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
+
+
+@keyframes sheen {
+  from { background-position: 150% 0; }
+  to { background-position: -50% 0; }
+}
+
+
+/* Dark styles for the neutral app. Dark mirrors light rather than inverting it: light is one
+   white plane where hairlines and soft grey fills do the work, so dark is one near-black plane
+   where faint hairlines and soft grey fills do the same. No glowing outlines, no lit edges, and
+   the accent stays a true blue instead of drifting to periwinkle. */
+:root[data-theme="dark"] .pro-app.neutral {
+  --accent: #3d7bff;
+  --accent-ink: #6aa1ff;
+  --elev-card: 0 0 0 1px var(--line);
+  --elev-overlay: 0 0 0 1px rgb(255 255 255 / 0.08), 0 16px 40px -8px rgb(0 0 0 / 0.7);
+}
+/* Midnight: near-black, the page and its panels on one plane, told apart by hairlines and fills. */
+:root[data-theme="dark"] .pro-app.neutral[data-dark="midnight"] {
+  --surface: #0f0f0f;
+  --surface-2: #1c1c1c;
+  --surface-3: #262626;
+  --well: #0f0f0f;
+  --raised: #121212;
+  --tray: #181818;
+  --field: #121212;
+  --overlay: #171717;
+  --overlay-2: #222222;
+  --plate: #2a2a2a;
+  --line: rgb(255 255 255 / 0.065);
+  --line-strong: rgb(255 255 255 / 0.1);
+  --ink: #e8e8e8;
+  --ink-2: #9e9e9e;
+  --ink-3: #6b6b6b;
+}
+/* Dusk: a cool, blue-black night, a touch of the accent in every grey. */
+:root[data-theme="dark"] .pro-app.neutral[data-dark="dusk"] {
+  --surface: #121318;
+  --surface-2: #1f2129;
+  --surface-3: #2a2c36;
+  --well: #0d0e12;
+  --raised: #181a21;
+  --tray: #181a21;
+  --field: #1e2029;
+  --overlay: #1c1e26;
+  --overlay-2: #272a34;
+  --plate: #2c2f3a;
+  --line: rgb(200 210 255 / 0.075);
+  --line-strong: rgb(200 210 255 / 0.13);
+  --ink: #e8eaf1;
+  --ink-2: #a0a4b3;
+  --ink-3: #727789;
+  --elev-card: inset 0 1px 0 rgb(220 228 255 / 0.045), 0 0 0 1px var(--line), 0 1px 2px rgb(0 0 8 / 0.35);
+  --elev-overlay: inset 0 1px 0 rgb(220 228 255 / 0.06), 0 0 0 1px rgb(200 210 255 / 0.11), 0 4px 8px -2px rgb(0 0 8 / 0.4), 0 18px 40px -10px rgb(0 0 8 / 0.65);
+}
+
+
+
+
+
+
