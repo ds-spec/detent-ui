@@ -1,0 +1,570 @@
+/**
+ * Pro blocks: whole screens built from Detent components, playing live. Plain data, safe for
+ * the server; the blocks themselves are looked up by id in ./registry.
+ */
+export type BlockKind = 'app' | 'flow' | 'section'
+
+/** One prop, as the block page documents it. */
+export type Prop = { name: string; type: string; default?: string; note: string }
+
+export type Block = {
+  id: string
+  name: string
+  /** The component's export name, for the usage line. */
+  component: string
+  kind: BlockKind
+  /** The app's name in the window's title bar. */
+  window: string
+  /** How the window around it looks: an app with a sidebar, a titled window, or a browser. */
+  chrome?: 'app' | 'titled' | 'browser'
+  /** Three to six words for the page's title, under the name. */
+  short: string
+  /** One sentence: what it is. */
+  line: string
+  /** What makes it, for the detail page. */
+  details: string[]
+  keys?: [string, string][]
+  /** What it takes, beyond the props every block takes. */
+  props: Prop[]
+}
+
+export const KINDS: Record<BlockKind, string> = {
+  app: 'App screen',
+  flow: 'Flow',
+  section: 'Marketing section',
+}
+
+/** Every block takes these. */
+export const COMMON: Prop[] = [
+  { name: 'accent', type: 'string', default: "'#3a5bf6'", note: 'The one accent colour. Selection, focus, links and the AI’s glow all derive from it.' },
+  { name: 'autoplay', type: 'boolean', default: 'true', note: 'Plays the scripted demo. It hands over for good the moment someone touches the block.' },
+  { name: 'className', type: 'string', note: 'Added to the root. The block fills its container and lays itself out by its width.' },
+]
+
+const assistant: Prop = { name: 'assistant', type: 'string', default: "'Detent'", note: 'What the AI is called, everywhere the screen names it.' }
+const product: Prop = { name: 'product', type: 'string', default: "'Detent'", note: 'The product’s name beside its mark.' }
+
+export const BLOCKS: Block[] = [
+  {
+    id: 'feature-bento',
+    name: 'Feature bento',
+    short: 'Five features, each one working',
+    component: 'FeatureBento',
+    kind: 'section',
+    window: 'detentui.com',
+    chrome: 'browser',
+    line: 'The features section of an AI product’s landing page: a heading and five tiles, each one the feature working rather than a picture of it.',
+    details: [
+      'Every tile is live and on its own loop, so the section never moves all at once: a ticket resolves step by step, replies change language, a handover happens, a chart ticks over, a reply changes its tone.',
+      'The agent tile shows the part buyers worry about: the refund waits on a card that says exactly what will happen, and only moves once it’s approved.',
+      'Language and tone are real controls. Pick one and that tile is yours; the other tiles keep playing.',
+      'The chart’s bars grow from the floor by scale and every changing label holds its place, so nothing around a tile ever shifts.',
+      'It tells the same story as the rest of an AI product’s landing page, so the sections sit together and read as one product.',
+      'One column on a phone, two on a tablet, the full bento from 1024px. The agent tile drops its approval card when it’s too narrow for it.',
+    ],
+    keys: [['← →', 'Move along a tile’s choices']],
+    props: [
+      { ...product, default: "'Detent'", note: 'The product’s name, in the eyebrow, the heading’s sentence and the tiles.' },
+      { name: 'eyebrow', type: 'string', default: "'Why Detent'", note: 'The small accent line above the heading.' },
+      { name: 'title', type: '[string, string]', note: 'The heading: the claim, then its turn, set in two tones.' },
+      { name: 'subline', type: 'string', note: 'One sentence beside the heading, or under it on narrow screens.' },
+      { name: 'features', type: '{ title: string; line: string }[]', note: 'The words on the five tiles, in order. The live part of each tile stays as it is.' },
+    ],
+  },
+  {
+    id: 'pricing',
+    name: 'Usage pricing',
+    short: 'Plans priced by your usage',
+    component: 'Pricing',
+    kind: 'section',
+    window: 'detentui.com/pricing',
+    chrome: 'browser',
+    line: 'Pricing for a product that charges by use: slide to your volume and every plan prices itself, with the cheapest one lifting as the best fit.',
+    details: [
+      'The sums are real. Each plan is a base price, what it includes and what it charges after, and the slider works out all of them at once.',
+      'Under the slider, a mark where each plan starts to cost least. Switch to yearly and the base prices fall, so the marks slide to where the maths now puts them.',
+      'The slider runs on a log scale, so 300 conversations and 30,000 are both a short drag away. Arrow keys nudge it, Page keys jump, Home and End go to the ends.',
+      'Past the top of the range the estimate turns into Let’s talk, and Enterprise lifts instead.',
+      'Every number counts to its new value in a fixed slot, and the thumb and fill move by transform, so dragging never moves anything around them.',
+      'Plans sit side by side from 896px and stack below. Pass your own plans and the slider, the marks and the best fit follow them.',
+    ],
+    keys: [
+      ['← →', 'Nudge the volume'],
+      ['Page Up / Down', 'Jump the volume'],
+      ['Home / End', 'Lowest, highest'],
+    ],
+    props: [
+      { name: 'plans', type: 'Plan[]', note: 'Cheapest first. Each has a name, blurb, price a month, included conversations, a price for each one after (or null to stop at the limit), features and its button.' },
+      { name: 'conversations', type: 'number', default: '1200', note: 'Where the slider starts, in conversations a month.' },
+      { name: 'discount', type: 'number', default: '0.2', note: 'Taken off the base price when billed yearly. The toggle shows it as a percentage.' },
+      { name: 'eyebrow', type: 'string', default: "'Pricing'", note: 'The small accent line above the heading.' },
+      { name: 'title', type: '[string, string]', note: 'The heading: the model, then what it isn’t, set in two tones.' },
+      { name: 'subline', type: 'string', note: 'One sentence under the heading.' },
+      { name: 'onSelect', type: '(plan: string, choice: { yearly: boolean; conversations: number }) => void', note: 'Called when a person picks a plan, with the billing and volume they set.' },
+      { name: 'onContact', type: '() => void', note: 'Called when a person presses Talk to us.' },
+    ],
+  },
+  {
+    id: 'testimonials',
+    name: 'Testimonials',
+    short: 'Quotes with the numbers behind them',
+    component: 'Testimonials',
+    kind: 'section',
+    window: 'detentui.com/customers',
+    chrome: 'browser',
+    line: 'Testimonials with receipts: one customer at a time writes their quote in, with the number that moved beside it, over a wall of short quotes that each carry a result.',
+    details: [
+      'The featured quote streams in the way an answer does. Every word lands in the accent and cools to ink, and the line that matters gets a highlighter pass once it’s written.',
+      'Every claim has its receipt. Beside the quote, what moved and by how much, before and with the product. On the wall, each short quote ends in its result.',
+      'A ring fills round the current customer while their quote is up, then hands to the next. Pick someone and the rotation stops for good; the arrow keys move along them.',
+      'All the quotes share one cell, so the tallest sets the card’s height and turning never resizes it. The highlight is a painted background, so it moves nothing either.',
+      'The wall flows into one, two or three columns by width, and the featured card’s receipt moves under the quote below 896px.',
+    ],
+    keys: [['← →', 'Next or previous customer']],
+    props: [
+      { ...product, default: "'Detent'", note: 'The product’s name, on the after side of each receipt.' },
+      { name: 'stories', type: 'Story[]', note: 'The featured customers: name, role, company, hue, quote, and the metric with its before and after. In a quote, {braces} mark the phrase to highlight.' },
+      { name: 'quotes', type: 'Short[]', note: 'The wall: name, role, company, hue, a short quote and its result.' },
+      { name: 'eyebrow', type: 'string', default: "'Customers'", note: 'The small accent line above the heading.' },
+      { name: 'title', type: '[string, string]', note: 'The heading, set in two tones.' },
+    ],
+  },
+  {
+    id: 'faq',
+    name: 'FAQ',
+    short: 'Answers, searched as you type',
+    component: 'FAQ',
+    kind: 'section',
+    window: 'detentui.com/faq',
+    chrome: 'browser',
+    line: 'The questions people ask before they start: search as you type with matches marked in place, topics, answers that open without moving the page, and a person to ask when it isn’t there.',
+    details: [
+      'Type and the list narrows letter by letter, with every match marked where it is. When a question only matched in its answer, a line of that answer comes up under it, so you can see why it’s there.',
+      'Nothing found turns into a way forward: Ask the team carries the search with it.',
+      'Answers open by their own height and the list stacks its rows by transform, so opening one, filtering or switching topic never moves anything else on the page.',
+      'Every answer asks whether it helped, and the reply takes the same place the question did.',
+      'It behaves like an accordion should: up and down move between questions, Home and End go to the ends, Escape clears the search.',
+      'On wide screens the heading, search and contact card stay put beside the list. Below 896px they sit above it.',
+    ],
+    keys: [
+      ['↑ ↓', 'Move between questions'],
+      ['Esc', 'Clear the search'],
+    ],
+    props: [
+      { ...product, note: 'The product’s name, wherever the default questions name it.' },
+      { name: 'questions', type: '{ id, topic, q, a }[]', note: 'The questions. Topics come from them, in the order they first appear.' },
+      { name: 'multiple', type: 'boolean', default: 'false', note: 'Let more than one answer be open at once.' },
+      { name: 'eyebrow', type: 'string', default: "'Questions'", note: 'The small accent line above the heading.' },
+      { name: 'title', type: '[string, string]', note: 'The heading, set in two tones.' },
+      { name: 'subline', type: 'string', note: 'One sentence under the heading.' },
+      { name: 'onAsk', type: '(query: string) => void', note: 'Called with what a person searched for when nothing answers it.' },
+      { name: 'onContact', type: '() => void', note: 'Called when a person asks to talk to someone.' },
+      { name: 'onFeedback', type: '(id: string, helpful: boolean) => void', note: 'Called when a person says whether an answer helped. The script doesn’t call it.' },
+    ],
+  },
+  {
+    id: 'cta',
+    name: 'Call to action',
+    short: 'One line, and an email to start',
+    component: 'CTA',
+    kind: 'section',
+    window: 'detentui.com',
+    chrome: 'browser',
+    line: 'The closing call to action: one line to want it, an email to start with, and the queue it promises to clear, resolving beside it.',
+    details: [
+      'Tickets rise through the assistant’s line and turn resolved as they cross: answered with how long it took, refunded, or handed to a person. Today’s count ticks over with each one.',
+      'The queue is drawn twice, waiting below the line and resolved above it, each clipped to its side and moved by one transform. A ticket changes as it crosses, with no state changing at all, and it pauses off screen.',
+      'The button folds into a spinner, then the whole field becomes where to look next, in the same place. A mistyped email shakes the field and says so under it.',
+      'The form, its confirmation and the line under it each hold their place, so sending never moves the page.',
+      'Below 896px the queue sits under the form. With reduced motion it holds still.',
+    ],
+    props: [
+      { ...product, default: "'Detent'", note: 'The product’s name, on its line through the queue and in the sentence under the heading.' },
+      { name: 'title', type: '[string, string]', note: 'The heading, set in two tones.' },
+      { name: 'subline', type: 'string', note: 'One sentence under the heading.' },
+      { name: 'action', type: 'string', default: "'Start free'", note: 'The button’s words.' },
+      { name: 'placeholder', type: 'string', default: "'you@company.com'", note: 'Shown in the field while it’s empty.' },
+      { name: 'note', type: 'string', note: 'The small line under the field.' },
+      { name: 'tickets', type: '{ from, hue, text, outcome, handed? }[]', note: 'The tickets in the queue: who, what they asked, and how it ended.' },
+      { name: 'onSubmit', type: '(email: string) => Promise<void> | void', note: 'Called with the email a person starts with. Return a promise to keep the button busy until it settles.' },
+    ],
+  },
+  {
+    id: 'calendar',
+    name: 'Calendar',
+    short: 'A week that finds the time',
+    component: 'Calendar',
+    kind: 'app',
+    window: 'Detent Calendar',
+    line: 'A week calendar with an assistant that finds the time. Ask for “45 minutes with Maya and Jonas before the weekend” and it works out when you’re all free, offers the best few, and books the one you pick.',
+    details: [
+      'The finding is real. It reads how long, with whom and when from your sentence, lays their busy time over your week, and searches working hours from now on for every stretch where you’re all free for the whole length.',
+      'Suggestions are drawn where they’d go, dashed, and light up with the list as you point at either. Booking drops the event in with everyone on it, and Undo is right there.',
+      'The rest is a calendar that works. Click an empty slot to add an event and name it in place. Drag an event to another time or day, or focus it and use the arrow keys, a quarter hour or a day at a time.',
+      'Overlapping events share their hour side by side. Calendars toggle on and off, the month jumps between weeks, and the line for now sits across today.',
+      'Events move by transform while dragged and land on release; overlays and suggestions are their own layers, so nothing moves the page.',
+      'Below 1024px the sidebar folds away, and below 768px it shows the three days from yesterday to tomorrow.',
+    ],
+    keys: [
+      ['↵', 'Ask for a time'],
+      ['↑ ↓', 'Move an event a quarter hour'],
+      ['← →', 'Move an event a day'],
+      ['Esc', 'Put the suggestions away'],
+    ],
+    props: [
+      assistant,
+      product,
+      { name: 'events', type: 'CalEvent[]', note: 'This week’s events: title, day from Monday, start and end in minutes, calendar, and who’s invited. Standups repeat every week.' },
+      { name: 'people', type: '{ name, hue }[]', note: 'Who you can ask for time with. Their names are what the assistant listens for.' },
+      { name: 'busy', type: '{ who, day, start, end }[]', note: 'When those people are busy. The assistant schedules around it.' },
+      { name: 'onBook', type: '(event: CalEvent) => void', note: 'Called with the event a person books from a suggestion.' },
+      { name: 'onEventChange', type: '(event: CalEvent) => void', note: 'Called with an event a person adds, renames or moves. The script doesn’t call it.' },
+      { name: 'onAsk', type: '(text: string) => void', note: 'Called with what a person asks the assistant.' },
+    ],
+  },
+  {
+    id: 'data-table',
+    name: 'Data table',
+    short: 'A table you can ask',
+    component: 'ConversationTable',
+    kind: 'app',
+    window: 'Detent',
+    line: 'A table you can ask. Say what you’re after in plain words and it becomes filters you can see and take apart, with views, sorting, paging, bulk actions and a summary of any row.',
+    details: [
+      'Type “refunds over $50 this week that need approval” and it reads the sentence into chips: topic, amount, when, status. It knows names and unhappy customers too, and anything it doesn’t recognise becomes a text match, so nothing typed is ignored.',
+      'Every chip comes off on its own. Chips sit in a fixed row, so adding them never moves the table.',
+      'Rows sit at their index and glide to new places when you sort, filter or page. The body is always a page tall, so the footer never jumps.',
+      'Select rows and a bar rises with what you can do. Approved rows stay a beat with a sweep of green, so you see what happened before the filter takes them.',
+      'Open a row and the assistant’s summary of it writes itself in, with the action it’s waiting on.',
+      'Views carry their counts. Up and down move between rows, Space selects, Enter opens. Narrow, it keeps the columns that matter and tucks the subject under the name.',
+    ],
+    keys: [
+      ['↵', 'Turn the sentence into filters'],
+      ['↑ ↓', 'Move between rows'],
+      ['Space', 'Select a row'],
+      ['Esc', 'Close the summary'],
+    ],
+    props: [
+      { ...product, default: "'Detent'", note: 'The product’s name, in the sidebar, the ask bar and the summaries.' },
+      { name: 'conversations', type: 'Conversation[]', note: 'The rows: who, subject, topic, status, amount, minutes since the last message, rating and a summary.' },
+      { name: 'pageSize', type: 'number', default: '8', note: 'Rows on a page. The body is always this many rows tall.' },
+      { name: 'onOpen', type: '(id: string) => void', note: 'Called with a conversation a person opens.' },
+      { name: 'onAction', type: "(action: 'approve' | 'resolve' | 'assign', ids: string[]) => void", note: 'Called when a person runs an action on rows. The script doesn’t call it.' },
+    ],
+  },
+  {
+    id: 'analytics',
+    name: 'Agent analytics',
+    short: 'What the agent did, and how well',
+    component: 'Analytics',
+    kind: 'app',
+    window: 'Detent',
+    line: 'The home screen of an AI support product: what it handled and how well, the actions waiting for a yes, and conversations as they come in.',
+    details: [
+      'It’s live. A request gets approved and folds away while the next one arrives, a conversation comes in and gets answered, and the range changes with every number following it.',
+      'The chart stacks what the assistant resolved under what went to your team. Point at a bar, or use the arrow keys, and a reading follows it from bar to bar.',
+      'Every number counts to its new value in a slot that holds its place, and the line under each one swaps whole, so changing the range never moves the page.',
+      'The queue and the feed stack their rows by transform. Rows arrive and leave by their own height and everything else glides, without the layout moving.',
+      'The sidebar’s usage card is billed the way the Usage pricing block prices it, so the two read as one product.',
+      'Sized by its container: the sidebar folds away below 768px, the side column drops under the main one below 896px, and the feed drops its topic and handler columns when it’s narrow.',
+    ],
+    keys: [
+      ['← →', 'Read the chart bar by bar'],
+      ['Esc', 'Put the reading away'],
+    ],
+    props: [
+      { ...product, default: "'Detent'", note: 'The product’s name, in the sidebar, the chart and the feed.' },
+      { name: 'range', type: "'24h' | '7d' | '30d'", default: "'7d'", note: 'The range it opens on.' },
+      { name: 'onRangeChange', type: '(range: string) => void', note: 'Called when a person changes the range. The script doesn’t call it.' },
+      { name: 'onApprove', type: '(id: string) => void', note: 'Called with the request a person approves.' },
+      { name: 'onDeny', type: '(id: string) => void', note: 'Called with the request a person denies.' },
+    ],
+  },
+  {
+    id: 'prompt-playground',
+    name: 'Prompt playground',
+    short: 'Three models, one prompt',
+    component: 'Playground',
+    kind: 'app',
+    window: 'Detent Playground',
+    chrome: 'titled',
+    line: 'One prompt, run on up to three models side by side, each answering at its own pace, with what it took and what it cost, and a race beneath them.',
+    details: [
+      'The prompt’s {{variables}} show as tokens with a dashed underline, and take their values just below it. The caret never drifts: the marks change nothing about the text’s metrics.',
+      'Press Run and every model answers at once, at its own pace, each column ending with how soon the first word came, how long it took, the tokens and the cost.',
+      'Under the answers, the race: a fine timeline where each model’s lane fills as it answers, a hollow mark at its first word and a solid one at its last, while one line in the accent sweeps across.',
+      'Temperature sits on a ruler from Precise to Creative; the length is three choices.',
+      'Change the prompt, a variable or a setting and the answers dim, with a line saying to run again.',
+      'Prefer an answer, swap or remove a model, add one back, and save the prompt as a new version.',
+      'Below 768px the prompt sits above the answers, and the answers scroll sideways.',
+    ],
+    keys: [['⌘ ↵', 'Run']],
+    props: [
+      { name: 'prompt', type: 'string', note: 'The system prompt. {{name}} marks a variable.' },
+      { name: 'variables', type: 'Record<string, string>', note: 'Each variable’s value, and the person’s message under "message".' },
+      { name: 'models', type: 'PlayModel[]', note: 'The models to choose from.' },
+      { name: 'runs', type: 'Record<string, Run>', note: 'What each model answers, keyed by model id. Swap in your own runs.' },
+      { name: 'version', type: 'number', default: '13', note: 'The version the prompt is on now.' },
+      { name: 'onRun', type: '(run: { prompt; variables; models; temperature }) => void', note: 'Called with the models and settings when a person presses Run.' },
+      { name: 'onSave', type: '(version: number, prompt: string) => void', note: 'Called when a person saves the prompt as a new version.' },
+    ],
+  },
+  {
+    id: 'agent-run',
+    name: 'Agent run',
+    short: 'From plan to merged pull request',
+    component: 'AgentRun',
+    kind: 'app',
+    window: 'Detent Agents',
+    line: 'A task from plan to merged pull request, in the open. The plan, every step, the diff, the tests, one approval and the checks.',
+    details: [
+      'The whole plan is there from the start and checks itself off, so you always know what’s next as well as what’s happening.',
+      'Every step reads like a log: the verb is quiet and the file, command or issue it touched is in ink. Each one keeps its own clock.',
+      'The side pane follows the work. The diff writes itself a line at a time while the agent edits, and the terminal takes over while it tests.',
+      'Failure is shown, not hidden: the first test run fails, the agent says why, fixes it and runs the tests again.',
+      'Deploying waits for a person. The card says exactly what will ship and where, with Enter to approve and Escape to deny.',
+      'The pull request’s checks fill in one segment at a time, and Merge only wakes up once every one is green.',
+    ],
+    keys: [
+      ['Enter', 'Approve the deploy'],
+      ['Esc', 'Deny it'],
+    ],
+    props: [
+      assistant,
+      { name: 'onDecide', type: '(approved: boolean) => void', note: 'Called when a person approves or denies the deploy.' },
+      { name: 'onMerge', type: '() => void', note: 'Called when a person merges the pull request.' },
+      { name: 'onSteer', type: '(text: string) => void', note: 'Called with each message a person sends while it works.' },
+    ],
+  },
+  {
+    id: 'voice-mode',
+    name: 'Voice mode',
+    short: 'A call with a ball of light',
+    component: 'VoiceMode',
+    kind: 'app',
+    window: 'Detent Voice',
+    chrome: 'titled',
+    line: 'A call with the assistant as a ball of light. It listens, thinks and speaks in its own colours, stops when you talk over it, and shows what it changed with a way to undo it.',
+    details: [
+      'The orb’s colours pool and turn inside it: cooler while it listens, swirling while it thinks, warmer while it speaks, and it swells with whoever is talking.',
+      'Captions hold every word’s place before it’s said, so the lines never re-wrap as they’re spoken.',
+      'Talk over it and it stops mid-sentence, marks the line as interrupted, and listens.',
+      'When it changes something, a card says exactly what, with Undo, and the transcript keeps it in line with the conversation.',
+      'Mute, end and captions sit under your thumb. Everything that moves is a transform or an opacity, so the orb stays smooth at any size.',
+      'Below 1152px the transcript folds into a sheet; below 768px the orb and captions shrink to fit a phone.',
+    ],
+    keys: [
+      ['M', 'Mute or unmute'],
+      ['Esc', 'End the call'],
+    ],
+    props: [
+      assistant,
+      { name: 'call', type: 'Turn[]', note: 'The call to play: what each side says, where the person interrupts, and what the assistant changes.' },
+      { name: 'onEnd', type: '(summary: { seconds: number; actions: VoiceAction[] }) => void', note: 'Called when the call ends, with how long it ran and what changed.' },
+      { name: 'onUndo', type: '(action: VoiceAction) => void', note: 'Called with an action a person undoes.' },
+    ],
+  },
+  {
+    id: 'evals',
+    name: 'Evals',
+    short: 'Test a prompt before it ships',
+    component: 'Evals',
+    kind: 'app',
+    window: 'Detent Evals',
+    chrome: 'titled',
+    line: 'A candidate prompt against the one in production, case by case, before it ships. Regressions open side by side, and shipping waits for a person to decide each one.',
+    details: [
+      'Each result lands in its row as the run goes, and the pass rate, time and cost count with it, each beside production’s figure.',
+      'Above the table, every case as a pair of scores: a hollow dot where production stood, a solid one where the candidate lands, and the line between them drawn as its result comes in. A column opens its case.',
+      'What got better is marked Fixed, what got worse Regressed, and an undecided regression keeps a red wash on its row; a tab narrows the table to just the regressions.',
+      'A case opens side by side: what the customer wrote, what a good answer does, both versions’ answers and why the grader marked one down.',
+      'A person decides each regression: accept it if the grader was too strict, or block the ship.',
+      'The Ship button waits until every regression is decided, and a blocked one keeps it shut with the reason written under the header.',
+      'Below 1152px the case opens in a sheet over the table; below 768px the totals stack.',
+    ],
+    props: [
+      { name: 'cases', type: 'EvalCase[]', note: 'The suite: each case’s input, what’s expected, and both versions’ results.' },
+      { name: 'baseline', type: 'string', default: "'v12'", note: 'The version in production.' },
+      { name: 'candidate', type: 'string', default: "'v13'", note: 'The version being tested.' },
+      { name: 'name', type: 'string', default: "'Refund agent'", note: 'What’s being evaluated, in the header.' },
+      { name: 'threshold', type: 'number', default: '0.7', note: 'The score a case needs to pass, drawn across the chart.' },
+      { name: 'onReview', type: "(caseId: string, verdict: 'accept' | 'block') => void", note: 'Called when a person accepts or blocks a regression.' },
+      { name: 'onShip', type: '(candidate: string) => void', note: 'Called when a person ships the candidate.' },
+    ],
+  },
+  {
+    id: 'support-inbox',
+    name: 'Support inbox',
+    short: 'An inbox the AI went through first',
+    component: 'Inbox',
+    kind: 'app',
+    window: 'Detent Inbox',
+    line: 'A support inbox the AI has already been through. Everything sorted, replies drafted with their sources, and nothing in the list ever moves.',
+    details: [
+      'New conversations are sorted as you watch: each takes its label in turn, and the one line above the list says what the assistant did.',
+      'Wherever a reply is needed there’s one waiting, written from what the assistant looked up, with those sources named under it.',
+      'The draft streams in with every word already holding its place, so the lines never re-wrap while it writes. Then it’s yours to edit.',
+      'Shorter rewrites it in place. Send, and the reply lands in the thread while the box says it’s done.',
+      'A thank-you gets no draft, only a suggestion to close it. Rows never move: sorting, drafting and finishing all happen inside a row’s own space.',
+      'Below 1152px the views fold away; below 768px the conversation opens over the list, with a way back.',
+    ],
+    keys: [
+      ['⌘ ↵', 'Send the reply'],
+      ['E', 'Mark done'],
+      ['J K', 'Next and previous'],
+    ],
+    props: [
+      assistant,
+      product,
+      { name: 'conversations', type: 'Conversation[]', note: 'What to work through, newest first: sender, message, label, and the draft or the reason to close.' },
+      { name: 'onSend', type: '(conversation: Conversation, text: string) => void', note: 'Called with the conversation and the reply a person sends.' },
+      { name: 'onDone', type: '(conversation: Conversation) => void', note: 'Called when a person closes a conversation without replying.' },
+    ],
+  },
+  {
+    id: 'onboarding',
+    name: 'Onboarding',
+    short: 'Four steps to a real workspace',
+    component: 'Onboarding',
+    kind: 'flow',
+    window: 'Detent',
+    line: 'A new workspace in four steps, each leaving something real behind: tools connected, the team invited, a first agent created and watched doing its first job.',
+    details: [
+      'Connecting a tool says what it’s waiting for, then names the account it joined.',
+      'Teammates already in your GitHub organization are suggested, each with their orb; one press adds them, one more sends the invites.',
+      'Templates show which of their tools you’ve connected and fade the ones you haven’t, so the right first agent is obvious.',
+      'The new agent does its first job in front of you, step by step, before you hand it anything real.',
+      'The checklist ticks itself off around a progress ring that turns green when it closes; every step is one size, so moving between them moves nothing else.',
+      'Beside the steps, the workspace takes shape: each tool, teammate and the first agent lands in a place already held for it, so the preview never reflows.',
+      'Below 1152px the preview folds away; below 768px the checklist folds into a progress line above the step.',
+    ],
+    props: [
+      { ...product, note: 'The product being set up.' },
+      { ...assistant, note: 'What the first agent is called.' },
+      { name: 'workspace', type: 'string', default: "'Harbor'", note: 'The workspace being set up, named in the preview.' },
+      { name: 'tools', type: 'Tool[]', note: 'The tools on offer, each with the account it connects to.' },
+      { name: 'teammates', type: 'Teammate[]', note: 'People suggested for an invite, e.g. from the GitHub organization.' },
+      { name: 'onConnect', type: '(tool: App) => void', note: 'Called with a tool’s id when a person connects it.' },
+      { name: 'onInvite', type: '(emails: string[]) => void', note: 'Called with the addresses a person invites.' },
+      { name: 'onComplete', type: '(setup: { tools: App[]; invited: string[]; agent: string }) => void', note: 'Called when setup finishes, with what was connected, who was invited and the agent created.' },
+    ],
+  },
+  {
+    id: 'sign-in',
+    name: 'Sign in',
+    short: 'One press, or a code by email',
+    component: 'SignIn',
+    kind: 'flow',
+    window: 'Detent',
+    chrome: 'titled',
+    line: 'Google or GitHub in one press, or a code by email. Then pick a workspace and you’re in.',
+    details: [
+      'Google and GitHub sit first, with their real marks. GitHub asks for consent the way GitHub does: who’s asking, exactly what they’ll see, and one green button.',
+      'The email code arrives the way it does on a phone: a notification you can tap, and a suggestion under the field that fills it in.',
+      'Every stage holds the same place and crossfades, so nothing on the page moves between them.',
+      'The line under the email field is held for the hint or the error, so the button below it never jumps.',
+      'A wrong code shakes and clears from the end; a right one fuses the cells and sweeps green.',
+      'Beside the form, what’s waiting on the other side keeps its shape with its words redacted. Once you’re in, the rows come into focus one by one, each in the space it already had.',
+      'Below 896px the form has the window to itself. The providers, the product, the workspaces and what’s waiting are all props.',
+    ],
+    keys: [
+      ['Enter', 'Continue'],
+      ['⌘ V', 'Paste a code'],
+    ],
+    props: [
+      { ...product, note: 'The product being signed in to: the heading, the mark’s label, the email and the consent sheet.' },
+      { name: 'providers', type: "('google' | 'github')[]", default: "['google', 'github']", note: 'The one-press providers, in order. An empty list leaves email on its own.' },
+      { name: 'workspaces', type: 'Workspace[]', note: 'The workspaces to choose from once you’re in: a name, a line under it and a hue.' },
+      { name: 'waiting', type: 'Waiting[]', note: 'What’s waiting on the other side, beside the form and redacted until a person is in. An empty list gives the form the whole window.' },
+      { name: 'onComplete', type: '(workspace: Workspace) => void', note: 'Called with the workspace a person picks.' },
+    ],
+  },
+  {
+    id: 'billing',
+    name: 'Billing',
+    short: 'Plans, usage and a spend cap',
+    component: 'Billing',
+    kind: 'flow',
+    window: 'Detent · Settings',
+    line: 'Plans, live usage, a spend cap and the card on file, in one settings page. Every change shows its price before it charges.',
+    details: [
+      'Switch between monthly and yearly and every price rolls to its new figure instead of blinking.',
+      'Usage is live: spend so far, where it’s heading, and a cap you drag that names the day you’d reach it.',
+      'Changing plan shows what you’ll pay today, with credit for the rest of the old plan, before anything is charged.',
+      'The plan you’re on sits on a soft plate. When you switch, it glides to the new one and the card blooms once.',
+      'The new invoice slides in at the top of the list, and a quiet note says where the receipt went.',
+      'Below 768px the settings menu folds away; the plans and usage stack, and the meter scales rather than crops.',
+    ],
+    keys: [
+      ['↑ ↓', 'Move the spend cap'],
+      ['Esc', 'Close the summary'],
+    ],
+    props: [
+      { name: 'plans', type: 'Plan[]', note: 'The plans to offer, cheapest first, priced per seat for monthly and yearly billing.' },
+      { name: 'current', type: 'string', default: "'team'", note: 'The id of the plan the workspace is on.' },
+      { name: 'seats', type: 'number', default: '8', note: 'Seats on the workspace. Every total is worked out from it.' },
+      { name: 'currency', type: 'string', default: "'USD'", note: 'An ISO 4217 code. Every price, total and invoice is written in it.' },
+      { ...assistant, note: 'What the AI is called in the default plans and the usage meter.' },
+      { name: 'onPlanChange', type: "(plan: Plan, period: 'month' | 'year') => void", note: 'Called once a person confirms a change and pays.' },
+    ],
+  },
+  {
+    id: 'settings',
+    name: 'Settings',
+    short: 'Keys, members and a danger zone',
+    component: 'Settings',
+    kind: 'app',
+    window: 'Detent · Settings',
+    line: 'API keys that rotate in place, members with roles, and a careful danger zone. Built to be trusted.',
+    details: [
+      'A new key is shown once, and it decrypts into place, one character settling after another, so you know it’s real.',
+      'Copying it blooms once; the new key lands at the top of the list with a soft highlight that fades as you take it in.',
+      'Rotating changes the key in place, column by column, and keeps the old one working for a day, with the time left counting down beside it.',
+      'Invites arrive as pending, with a way to resend, and never reorder the people already there.',
+      'Deleting the workspace takes a deliberate hold, and even then there’s a week to undo it.',
+      'The dialog keeps one size between its two stages, so nothing behind it moves.',
+    ],
+    keys: [
+      ['Enter', 'Create the key'],
+      ['Space', 'Hold to delete'],
+    ],
+    props: [
+      { name: 'workspace', type: 'string', default: "'Harbor'", note: 'The workspace’s name, in the danger zone.' },
+      assistant,
+      { name: 'keys', type: 'ApiKey[]', note: 'The keys to list. Only a prefix and the last four characters are ever shown.' },
+      { name: 'members', type: 'Member[]', note: 'The people in the workspace, with their roles.' },
+      { name: 'onCreateKey', type: '(key: ApiKey) => void', note: 'Called with a new key once it’s made. The secret never leaves the dialog.' },
+      { name: 'onRotateKey', type: '(id: string) => void', note: 'Called with a key’s id when a person rotates it.' },
+      { name: 'onInvite', type: '(email: string) => void', note: 'Called with the address a person invites.' },
+      { name: 'onDeleteWorkspace', type: '(deleted: boolean) => void', note: 'Called when a person holds to delete, and with false if they undo it.' },
+    ],
+  },
+  {
+    id: 'code-review',
+    name: 'Code review',
+    short: 'Comments answered with changes',
+    component: 'CodeReview',
+    kind: 'app',
+    window: 'Detent Review',
+    line: 'A pull request where the agent answers your comments with a change you can apply in one press.',
+    details: [
+      'A comment sits on the line it’s about. The agent answers in the thread, a word at a time, with the reasoning first.',
+      'Its suggested change is shown in full before you take it, and its space is held while it writes, so nothing jumps when it appears.',
+      'Apply it and the line lands in the diff as a marked edit with one sweep of green; the lines below glide down to make room.',
+      'The thread resolves to one line you can reopen, and the file counts as viewed.',
+      'A new commit means every check runs again, one segment at a time, and the review turns from changes requested to approved.',
+      'The files already viewed sit folded above the one being discussed, and the activity only ever grows at the bottom, in room held for it, so nothing on the page moves.',
+      'Below 768px the file list folds away; below 1152px the summary moves under the diff.',
+    ],
+    props: [assistant, { name: 'onApply', type: '() => void', note: 'Called when a person applies the suggested change.' }, { name: 'onMerge', type: '() => void', note: 'Called when a person merges, once it’s approved and every check has passed.' }],
+  },
+]
+
+/** What's being built next, shown honestly as coming. */
+export const SOON: { name: string; kind: BlockKind; line: string }[] = []
+
+export const block = (id: string) => BLOCKS.find((b) => b.id === id)
+
+/** The blocks the way the site lists them: app screens, then flows, then marketing sections. */
+export const BLOCK_GROUPS = (['app', 'flow', 'section'] as const).map((k) => ({ k, items: BLOCKS.filter((b) => b.kind === k) }))
+export const BLOCK_ORDER = BLOCK_GROUPS.flatMap((g) => g.items)
