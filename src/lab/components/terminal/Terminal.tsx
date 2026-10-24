@@ -181,16 +181,16 @@ export function Terminal({
 }
 
 /**
- * The block caret. Typing, it sits at the start of the line taking no room and is carried to the
- * end of what's typed by transform (one ch a character, the type is monospace), so it moves on
- * screen without moving in the layout.
+ * The block caret, as tall as the prompt's glyphs and centred on them. Typing, it sits at the start
+ * of the line taking no room and is carried to the end of what's typed by transform (one ch a
+ * character, the type is monospace), so it moves on screen without moving in the layout.
  */
 function Caret({ at }: { at?: number }) {
   return (
     <span
       aria-hidden
-      className={`ml-px inline-block h-[15px] w-[7px] bg-ink/80 motion-safe:animate-[caret_1.05s_infinite] ${at === undefined ? 'translate-y-[3px]' : '-mr-2'}`}
-      style={at === undefined ? undefined : { translate: `${at}ch 3px` }}
+      className={`ml-px inline-block h-[13px] w-[7px] bg-ink/80 motion-safe:animate-[caret_1.05s_infinite] ${at === undefined ? '-translate-y-[0.5px]' : '-mr-2'}`}
+      style={at === undefined ? undefined : { translate: `${at}ch 2px` }}
     />
   )
 }
