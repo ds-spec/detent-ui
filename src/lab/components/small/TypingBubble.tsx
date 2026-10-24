@@ -2,7 +2,7 @@
 
 import { useRef } from 'react'
 import type { ReactNode } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { AnimatePresence, motion, useAnimationFrame, useReducedMotion } from 'motion/react'
 import { useStack } from '../../lib/hooks'
 import { Morph } from '../../ui/Morph'
 import { Orb } from '../../ui/Orb'
@@ -12,22 +12,77 @@ export type Line = { id: string; from: 'me' | 'agent'; text: string; typing?: bo
 const spring = { type: 'spring', stiffness: 420, damping: 34 } as const
 
 /**
- * A conversation where the reply grows out of its own typing bubble. The dots sit in a bubble
- * with the two small trailing circles messages are known by; when the words are ready, the
- * circles tuck away and the same bubble springs open to the reply's measured size, and the
- * words arrive one after another inside it. Your messages are the accent; theirs are paper,
- * beside their orb. Your last message says Read the moment they start to answer.
+ * Typing that keeps a person's rhythm: a burst, a pause to think, another burst. While a burst
+ * runs, a soft wave passes through the dots; in a pause the wave dies down and they rest, then it
+ * picks up again. The rhythm comes from the line's id, so each reply types a little differently
+ * but the same reply always types the same way.
+ */
+function Dots({ seed, still }: { seed: string; still: boolean }) {
+  const dots = useRef<(HTMLSpanElement | null)[]>([])
+  const s = useRef({ t: 0, phase: 0, amp: 0 })
+  // Burst and pause lengths, in ms, picked from the seed.
+  const hash = [...seed].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7)
+  const beats = [900 + (hash & 0x1ff), 340 + ((hash >> 9) & 0xff), 650 + ((hash >> 17) & 0x1ff), 520 + ((hash >> 3) & 0xff)]
+  useAnimationFrame((_, delta) => {
+    if (still) return
+    const st = s.current
+    st.t += delta
+    const cycle = beats.reduce((a, b) => a + b, 0)
+    let at = st.t % cycle
+    let typing = true
+    for (let i = 0; i < beats.length; i++) {
+      if (at < beats[i]) {
+        typing = i % 2 === 0
+        break
+      }
+      at -= beats[i]
+    }
+    // The wave rises quickly into a burst and settles slowly out of it.
+    st.amp += ((typing ? 1 : 0) - st.amp) * Math.min(1, delta / (typing ? 90 : 260))
+    st.phase += (delta / 1000) * Math.PI * 2 * 1.6 * (0.35 + 0.65 * st.amp)
+    dots.current.forEach((el, d) => {
+      if (!el) return
+      const v = st.amp * (0.5 + 0.5 * Math.sin(st.phase - d * 0.95))
+      el.style.opacity = String(0.38 + 0.62 * v)
+      el.style.transform = `translateY(${(-2.5 * v).toFixed(2)}px)`
+    })
+  })
+  return (
+    <>
+      {[0, 1, 2].map((d) => (
+        <span
+          key={d}
+          ref={(el) => {
+            dots.current[d] = el
+          }}
+          className="size-[7px] rounded-full bg-ink-2"
+          style={{ opacity: 0.38 }}
+        />
+      ))}
+    </>
+  )
+}
+
+/**
+ * A conversation where the reply grows out of its own typing bubble. The dots keep a person's
+ * rhythm, bursts and pauses rather than a loop; when the words are ready, the same bubble springs
+ * open to the reply's measured size and the words arrive one after another inside it. Your
+ * messages are ink; theirs are a soft fill beside their avatar. Your last message says when it
+ * was read, the moment they start to answer.
  *
  * The thread hangs from the bottom and older lines rise and fade at the top, so it never jumps.
  */
 export function TypingBubble({
   lines,
   agent = { name: 'Detent', hue: 310 },
+  readAt,
 }: {
   /** The conversation, oldest first. A line marked typing shows the dots until its text arrives. */
   lines: Line[]
   /** Who's answering: their name, for screen readers, and the hue of their orb, or an avatar of your own, 28px round. */
   agent?: { name: string; hue?: number; avatar?: ReactNode }
+  /** When your last message was read, shown beside Read, e.g. "9:41". */
+  readAt?: string
 }) {
   const stack = useRef<HTMLDivElement>(null)
   useStack(stack, 6)
@@ -57,14 +112,15 @@ export function TypingBubble({
               >
                 {mine ? (
                   <div className="flex flex-col items-end">
-                    <p className="max-w-[268px] rounded-[20px] rounded-br-[6px] bg-[var(--accent)] px-3.5 py-2.5 text-body leading-5 text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.18)]">{l.text}</p>
+                    <p className="max-w-[268px] rounded-[20px] rounded-br-[6px] bg-[light-dark(var(--ink),var(--surface-3))] px-3.5 py-2.5 text-body leading-5 text-[light-dark(var(--surface),var(--ink))]">{l.text}</p>
                     {/* One line held under your last message, for when they've read it. */}
                     {i === lastMe && (
                       <span className="relative mt-1 h-4 pr-1 text-caption text-ink-3">
                         <AnimatePresence>
                           {answering && (
                             <motion.span key="read" className="block" initial={{ opacity: 0, y: -3 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-                              Read
+                              <span className="text-ink-2">Read</span>
+                              {readAt && <span className="tnum"> {readAt}</span>}
                             </motion.span>
                           )}
                         </AnimatePresence>
@@ -83,15 +139,8 @@ export function TypingBubble({
                         className="rounded-bl-[6px] bg-surface-2"
                         views={{
                           typing: (
-                            <span className="flex h-10 items-center gap-[5px] px-4" aria-label={`${agent.name} is typing`}>
-                              {[0, 1, 2].map((d) => (
-                                <motion.span
-                                  key={d}
-                                  className="size-2 rounded-full bg-ink-3"
-                                  animate={reduce ? undefined : { y: [0, -3.5, 0], opacity: [0.4, 1, 0.4] }}
-                                  transition={{ duration: 1, repeat: Infinity, delay: d * 0.16, ease: 'easeInOut' }}
-                                />
-                              ))}
+                            <span className="flex h-10 items-center gap-[5px] px-[15px]" aria-label={`${agent.name} is typing`}>
+                              <Dots seed={l.id} still={!!reduce} />
                             </span>
                           ),
                           text: (
@@ -106,15 +155,6 @@ export function TypingBubble({
                           ),
                         }}
                       />
-                      {/* The trailing circles of a typing bubble, tucked away when the words arrive. */}
-                      <AnimatePresence>
-                        {l.typing && (
-                          <motion.span key="tail" aria-hidden className="absolute -bottom-1 -left-1.5 block" exit={{ opacity: 0, scale: 0.3, transition: { duration: 0.16 } }} style={{ transformOrigin: '100% 0%' }}>
-                            <span className="absolute -left-1 top-1 block size-[5px] rounded-full bg-surface-2" />
-                            <span className="block size-[9px] rounded-full bg-surface-2" />
-                          </motion.span>
-                        )}
-                      </AnimatePresence>
                     </div>
                   </>
                 )}

@@ -483,15 +483,15 @@ export function TypingDemo() {
           <p className="text-headline text-ink">Detent</p>
           <p className="relative h-4 text-caption">
             <AnimatePresence initial={false} mode="popLayout">
-              <motion.span key={typing ? 't' : 'o'} className={`absolute left-0 top-0 whitespace-nowrap ${typing ? 'text-[var(--accent)]' : 'text-ink-3'}`} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.18 }}>
-                {typing ? 'typing…' : 'Active now'}
+              <motion.span key={typing ? 't' : 'o'} className="absolute left-0 top-0 whitespace-nowrap text-ink-3" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.18 }}>
+                {typing ? 'typing…' : 'Usually replies in a minute'}
               </motion.span>
             </AnimatePresence>
           </p>
         </div>
       </div>
       <div className="mt-2 h-px bg-line" />
-      <TypingBubble lines={lines} agent={{ name: 'Detent', avatar: <DetentMark size={28} round /> }} />
+      <TypingBubble lines={lines} agent={{ name: 'Detent', avatar: <DetentMark size={28} round /> }} readAt="9:41" />
     </div>
   )
 }
