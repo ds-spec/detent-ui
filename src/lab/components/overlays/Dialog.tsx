@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode, Ref, RefObject } from 'react'
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from 'motion/react'
 import { Close } from '../../icons'
@@ -18,12 +18,14 @@ const WIDTH = { sm: 360, md: 440, lg: 560 }
 
 /**
  * A dialog that appears where it will stay: in the middle, rising out of the page from a hair
- * smaller, quickly, with no travel and no bounce. A dialog opened from inside another pushes that
- * one back and dims it, and brings it forward again when it closes. One that has to be answered
- * gives a small shrug when you click outside instead of closing.
+ * smaller, quickly, with no travel and no bounce. When what's inside changes size, a field
+ * growing or an error appearing, the dialog reshapes around it smoothly instead of jumping. A
+ * dialog opened from inside another pushes that one back and dims it, and brings it forward
+ * again when it closes. One that has to be answered gives a small shrug when you click outside.
  *
- * Focus moves in and stays in until it closes, then goes back where it was. The page behind
- * stops scrolling without the scrollbar's space jumping.
+ * Its actions sit in a quiet band along the bottom, with room on the left for a hint, and
+ * ⌘↵ submits from anywhere inside. Focus moves in and stays in until it closes, then goes back
+ * where it was. The page behind stops scrolling without the scrollbar's space jumping.
  */
 export function Dialog({
   trigger,
@@ -31,8 +33,11 @@ export function Dialog({
   onOpenChange,
   title,
   description,
+  icon,
   children,
   footer,
+  hint,
+  onSubmit,
   size = 'md',
   dismissable = true,
   initialFocus,
@@ -48,10 +53,16 @@ export function Dialog({
   title: ReactNode
   /** A line under the heading. */
   description?: ReactNode
+  /** Above the heading: an icon tile, a few avatars, a logo. */
+  icon?: ReactNode
   /** The body. */
   children?: ReactNode
   /** Actions along the bottom, right-aligned. */
   footer?: ReactNode
+  /** A quiet note at the bottom left, e.g. a keyboard shortcut. */
+  hint?: ReactNode
+  /** Called on ⌘↵ (Ctrl+Enter) anywhere inside. */
+  onSubmit?: () => void
   /** Its width: 360, 440 or 560 pixels, never wider than the screen. */
   size?: keyof typeof WIDTH
   /** Whether a click outside closes it. Escape always does. */
@@ -64,7 +75,9 @@ export function Dialog({
   const shown = controlled ?? own
   const [quiet, setQuiet] = useState(false)
   const [covered, setCovered] = useState(0)
+  const [height, setHeight] = useState<number | null>(null)
   const panel = useRef<HTMLDivElement>(null)
+  const inner = useRef<HTMLDivElement>(null)
   const parent = useContext(Stack)
   const { contained, recede } = useHost()
   const reduce = useReducedMotion()
@@ -104,6 +117,14 @@ export function Dialog({
   useFocusTrap(panel, shown, quiet, initialFocus)
   useScrollLock(shown && !contained)
 
+  // Follow the contents' height, so the dialog reshapes when they change.
+  useLayoutEffect(() => {
+    if (!shown || !inner.current) return
+    const ro = new ResizeObserver(([e]) => setHeight(e.borderBoxSize?.[0]?.blockSize ?? (e.target as HTMLElement).offsetHeight))
+    ro.observe(inner.current)
+    return () => ro.disconnect()
+  }, [shown])
+
   const cover = useCallback((on: boolean) => setCovered((n) => Math.max(0, n + (on ? 1 : -1))), [])
   const stack = useMemo(() => ({ cover }), [cover])
 
@@ -133,36 +154,51 @@ export function Dialog({
                   aria-labelledby={`${id}-title`}
                   aria-describedby={description ? `${id}-text` : undefined}
                   tabIndex={-1}
-                  className="relative rounded-card bg-surface p-6 shadow-modal outline-none"
+                  onKeyDown={(e) => {
+                    if (onSubmit && e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                      e.preventDefault()
+                      onSubmit()
+                    }
+                  }}
+                  className="relative overflow-hidden rounded-card bg-surface shadow-modal outline-none"
                   initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: covered ? 0.94 : 1, y: covered ? -14 : 0 }}
+                  animate={{ opacity: 1, scale: covered ? 0.94 : 1, y: covered ? -14 : 0, height: height ?? 'auto' }}
                   exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.97, transition: { duration: 0.14, ease: ease.exit } }}
-                  transition={{ duration: 0.22, ease: ease.out, y: spring.smooth, scale: covered ? spring.smooth : { duration: 0.22, ease: ease.out } }}
+                  transition={{ duration: 0.22, ease: ease.out, y: spring.smooth, height: spring.smooth, scale: covered ? spring.smooth : { duration: 0.22, ease: ease.out } }}
                 >
-                  <h2 id={`${id}-title`} className="pr-8 text-title text-ink">
-                    {title}
-                  </h2>
-                  {description && (
-                    <p id={`${id}-text`} className="mt-1.5 text-callout text-ink-2">
-                      {description}
-                    </p>
-                  )}
-                  <motion.button
-                    type="button"
-                    aria-label="Close"
-                    whileTap={press}
-                    onClick={() => {
-                      tap()
-                      close()
-                    }}
-                    className="ring-focus absolute right-4 top-4 flex size-8 items-center justify-center rounded-full text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
-                  >
-                    <Close size={16} />
-                  </motion.button>
-                  <Stack.Provider value={stack}>
-                    {children && <div className="mt-5">{children}</div>}
-                    {footer && <div className="mt-6 flex items-center justify-end gap-2">{footer}</div>}
-                  </Stack.Provider>
+                  <div ref={inner} className="p-6">
+                    {icon && <div className="mb-4 flex">{icon}</div>}
+                    <h2 id={`${id}-title`} className="pr-8 text-title text-ink">
+                      {title}
+                    </h2>
+                    {description && (
+                      <p id={`${id}-text`} className="mt-1.5 text-callout text-ink-2">
+                        {description}
+                      </p>
+                    )}
+                    <motion.button
+                      type="button"
+                      aria-label="Close"
+                      whileTap={press}
+                      onClick={() => {
+                        tap()
+                        close()
+                      }}
+                      className="ring-focus absolute right-4 top-4 flex size-8 items-center justify-center rounded-full text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
+                    >
+                      <Close size={16} />
+                    </motion.button>
+                    <Stack.Provider value={stack}>
+                      {children && <div className="mt-5">{children}</div>}
+                      {/* The actions, in a quiet band flush with the bottom, a hint on its left if there is one. */}
+                      {(footer || hint) && (
+                        <div className="-mx-6 -mb-6 mt-6 flex min-h-[60px] items-center gap-2 border-t border-line bg-[color-mix(in_oklch,var(--surface-2)_55%,var(--surface))] px-6 py-3">
+                          {hint && <div className="mr-auto min-w-0 text-footnote text-ink-3">{hint}</div>}
+                          <div className="ml-auto flex items-center gap-2">{footer}</div>
+                        </div>
+                      )}
+                    </Stack.Provider>
+                  </div>
                   {/* Covered by a dialog opened from this one: a shade, so the one in front reads as in front. */}
                   <motion.div aria-hidden className="pointer-events-none absolute inset-0 rounded-[inherit] bg-ink" initial={false} animate={{ opacity: covered ? 0.05 : 0 }} transition={{ duration: 0.2 }} />
                 </motion.div>

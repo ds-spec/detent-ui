@@ -20,10 +20,11 @@ import { Sheet } from '../components/overlays/Sheet'
 import type { SheetHandle } from '../components/overlays/Sheet'
 import { Tooltip, TooltipGroup } from '../components/overlays/Tooltip'
 import type { TooltipGroupHandle } from '../components/overlays/Tooltip'
-import { Bin, Bubble, Check, Code, Copy, FilePage, Folder, Link, More, Pencil, Plus, Prompt } from '../icons'
+import { Bin, Bubble, Check, Close, Code, Copy, FilePage, Folder, Link, More, Pencil, Plus, Prompt } from '../icons'
 import { LayerHost } from '../lib/layer'
 import { spring } from '../lib/motion'
 import { Button } from '../ui/Button'
+import { Kbd } from '../ui/Kbd'
 import { Orb } from '../ui/Orb'
 import { Switch } from '../ui/Switch'
 import { useBench } from './bench'
@@ -107,37 +108,60 @@ const ROLES = [
   { id: 'viewer', name: 'Viewer', line: 'Can look, can’t change.' },
 ]
 
-/** Opens an invite, then a second dialog from inside it, which pushes the first back until it closes. */
+const TEAM: [string, string, number][] = [
+  ['Maya Chen', 'Admin', 150],
+  ['Jonas Weber', 'Member', 250],
+  ['Lena Ortiz', 'Member', 20],
+]
+
+/**
+ * Opens an invite and adds three people, each address settling into a chip as it's typed, the
+ * dialog growing to fit; then opens a second dialog from inside it to pick their role, which
+ * pushes the first back until it closes.
+ */
 export function DialogDemo() {
   const b = useBench()
   const invite = useRef<DialogHandle>(null)
   const roles = useRef<DialogHandle>(null)
-  const [email, setEmail] = useState('')
+  const [emails, setEmails] = useState<string[]>([])
+  const [draft, setDraft] = useState('')
   const [role, setRole] = useState('member')
   const hands = useScript(async (beat) => {
-    setEmail('')
+    setEmails([])
+    setDraft('')
     setRole('member')
     await beat(1200)
     invite.current?.open()
-    await beat(700)
-    const to = 'aiko@acme.dev'
-    for (let i = 1; i <= to.length; i++) {
-      setEmail(to.slice(0, i))
-      await beat(55)
+    await beat(600)
+    for (const to of ['aiko@acme.dev', 'ben@acme.dev', 'li.wei@acme.dev']) {
+      for (let i = 1; i <= to.length; i++) {
+        setDraft(to.slice(0, i))
+        await beat(50)
+      }
+      await beat(260)
+      setEmails((x) => [...x, to])
+      setDraft('')
+      await beat(500)
     }
-    await beat(700)
+    await beat(400)
     roles.current?.open()
     await beat(1100)
     setRole('admin')
     await beat(900)
     roles.current?.close()
-    await beat(1300)
+    await beat(1400)
     invite.current?.close()
     await beat(900)
   })
   const current = ROLES.find((r) => r.id === role)!
+  const add = () => {
+    const t = draft.trim().replace(/,$/, '')
+    if (t) setEmails((x) => [...x, t])
+    setDraft('')
+  }
+  const count = emails.length + (draft.includes('@') ? 1 : 0)
   return (
-    <Window title="Acme · Team" hands={hands} wide>
+    <Window title="Acme · Team" hands={hands} size="h-[440px] w-[600px]">
       <div className="flex h-full flex-col p-5">
         <div className="flex items-center justify-between">
           <div>
@@ -148,42 +172,79 @@ export function DialogDemo() {
             ref={invite}
             dismissable={b.get('dismissable', true)}
             onOpenChange={b.on('onOpenChange')}
+            onSubmit={() => invite.current?.close()}
             trigger={
               <Button variant="primary" size="sm">
                 <Plus size={14} /> Invite people
               </Button>
             }
+            icon={
+              <span className="flex">
+                {TEAM.map(([n, , h], i) => (
+                  <span key={n} className={`rounded-full shadow-[0_0_0_2.5px_var(--surface)] ${i ? '-ml-2' : ''}`}>
+                    <Orb seed={n} hue={h} size={30} />
+                  </span>
+                ))}
+              </span>
+            }
             title="Invite people"
             description="They’ll get an email with a link to join Acme."
+            hint={
+              <span className="flex items-center gap-1.5">
+                <Kbd>⌘</Kbd>
+                <Kbd>↵</Kbd>
+                <span className="ml-0.5">to send</span>
+              </span>
+            }
             footer={
               <>
                 <Button variant="secondary" onClick={() => invite.current?.close()}>
                   Cancel
                 </Button>
                 <Button variant="primary" onClick={() => invite.current?.close()}>
-                  Send invite
+                  {count > 1 ? `Send ${count} invites` : 'Send invite'}
                 </Button>
               </>
             }
           >
-            <label className="block">
-              <span className="text-footnote text-ink-2">Email</span>
+            <span className="text-footnote text-ink-2">Email</span>
+            {/* Addresses settle into chips as they're finished; the field, and the dialog with it, grow to fit. */}
+            <div className="mt-1.5 flex min-h-10 flex-wrap items-center gap-1.5 rounded-control bg-surface p-1.5 shadow-[0_0_0_1px_var(--line-strong)] focus-within:shadow-field">
+              <AnimatePresence initial={false}>
+                {emails.map((m) => (
+                  <motion.span key={m} layout className="flex h-7 items-center gap-1.5 rounded-full bg-surface-2 pl-1 pr-1 text-footnote text-ink" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={spring.snappy}>
+                    <Orb seed={m} hue={(m.charCodeAt(0) * 37) % 360} size={20} />
+                    {m}
+                    <button type="button" aria-label={`Remove ${m}`} onClick={() => setEmails((x) => x.filter((y) => y !== m))} className="ring-focus flex size-5 items-center justify-center rounded-full text-ink-3 hover:bg-surface-3 hover:text-ink">
+                      <Close size={11} />
+                    </button>
+                  </motion.span>
+                ))}
+              </AnimatePresence>
               <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@company.com"
-                className="mt-1.5 h-10 w-full rounded-control bg-surface px-3 text-callout text-ink shadow-[0_0_0_1px_var(--line-strong)] outline-none transition-shadow placeholder:text-ink-3 focus:shadow-field"
+                value={draft}
+                onChange={(e) => (e.target.value.endsWith(',') ? add() : setDraft(e.target.value))}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.metaKey && !e.ctrlKey && draft) {
+                    e.preventDefault()
+                    add()
+                  }
+                }}
+                placeholder={emails.length ? 'Add another' : 'name@company.com'}
+                className="h-7 min-w-[120px] flex-1 bg-transparent px-1.5 text-callout text-ink outline-none placeholder:text-ink-3"
               />
-            </label>
+            </div>
             <div className="mt-4 flex items-center justify-between rounded-row bg-surface-2 py-2.5 pl-3.5 pr-2.5">
               <div className="min-w-0">
-                <p className="text-callout text-ink">{current.name}</p>
+                <p className="text-callout text-ink">
+                  {current.name} <span className="text-ink-3">· role</span>
+                </p>
                 <p className="text-footnote text-ink-3">{current.line}</p>
               </div>
               <Dialog
                 ref={roles}
                 size="sm"
-                description="What Aiko can do in Acme."
+                description="What they can do in Acme."
                 trigger={
                   <Button variant="secondary" size="sm">
                     Change
@@ -214,13 +275,9 @@ export function DialogDemo() {
           </Dialog>
         </div>
         <div className="mt-4 flex flex-col gap-1">
-          {[
-            ['Maya Chen', 'Admin', 150],
-            ['Jonas Weber', 'Member', 250],
-            ['Lena Ortiz', 'Member', 20],
-          ].map(([n, r, h]) => (
+          {TEAM.map(([n, r, h]) => (
             <div key={n} className="flex h-12 items-center gap-3 rounded-row bg-surface px-3 shadow-raised">
-              <Orb seed={n as string} hue={h as number} size={26} />
+              <Orb seed={n} hue={h} size={26} />
               <span className="flex-1 text-callout text-ink">{n}</span>
               <span className="text-footnote text-ink-3">{r}</span>
             </div>
