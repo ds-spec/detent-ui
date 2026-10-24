@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Detent
 
-## Getting Started
+React components for AI products: the prompt box, the plan, the model picker, the file tree and
+the small pieces between them, each with its motion and states already worked out.
 
-First, run the development server:
+[detentui.com](https://detentui.com)
+
+## Use a component
+
+Each free component installs with the shadcn CLI, its source landing in `components/detent`:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npx shadcn add https://detentui.com/r/prompt
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Or the whole agent kit at once:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npx shadcn add https://detentui.com/r/agent-kit
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## What's here
 
-## Learn More
+- `src/lab` holds the 40 free components, their demos, and the motion and UI they share.
+- `src/catalog` says what every component, block and template is, and builds the public registry from the source.
+- `src/site` is the website around them: the gallery, the exhibit and the code browser.
+- `src/app` is its routes.
 
-To learn more about Next.js, take a look at the following resources:
+## Detent Pro
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+29 more components, 18 blocks and 3 templates are [Detent Pro](https://detentui.com/pro). Their
+source lives in a private repository, checked out at `src/pro` when it's there. Without it, `@pro`
+resolves to `src/locked` and each Pro preview builds as a locked stand-in, so the site runs from
+this repository alone.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Run it
 
-## Deploy on Vercel
+```bash
+npm install
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Licence
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT. See [LICENSE](LICENSE).
