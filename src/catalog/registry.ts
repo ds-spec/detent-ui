@@ -133,8 +133,9 @@ function shipped(rel: string, content: string, type: string): RegistryFile {
 function entryOf(name: string): string[] | null {
   const listed = FILES[name]
   if (!listed?.length) return null
-  // The catalog lists files relative to src/lab; only the first is needed, the rest are followed from it.
-  return [path.normalize(path.join('lab', listed[0]))]
+  // The catalog lists files relative to src/lab. Each is a starting point, and what they import is
+  // followed from there: most list one file that imports the rest, a set like Buttons lists them all.
+  return listed.map((f) => path.normalize(path.join('lab', f)))
 }
 
 const describe = (name: string) => {
