@@ -161,7 +161,7 @@ export function ContextDemo() {
                 transition={{ type: 'spring', stiffness: 420, damping: 34, delay: 0.12 }}
                 style={{ transformOrigin: '50% 0%' }}
               >
-                <p className={`max-w-[260px] rounded-[18px] px-3.5 py-2 text-footnote leading-[18px] ${l.me ? 'rounded-br-[6px] bg-[var(--accent)] text-white' : 'rounded-bl-[6px] bg-surface text-ink shadow-raised'}`}>{l.text}</p>
+                <p className={`max-w-[260px] rounded-[18px] px-3.5 py-2 text-footnote leading-[18px] ${l.me ? 'rounded-br-[6px] bg-[light-dark(var(--ink),var(--surface-2))] text-[light-dark(var(--surface),var(--ink))]' : 'rounded-bl-[6px] bg-surface text-ink shadow-raised'}`}>{l.text}</p>
               </motion.div>
             ))}
           </AnimatePresence>
