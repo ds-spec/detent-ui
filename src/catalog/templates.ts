@@ -115,12 +115,37 @@ export const TEMPLATES: Template[] = [
       'Its sessions, turns, sources and models are plain data, ready to be swapped for your own and for what your model streams back.',
     ],
   },
+  {
+    id: 'tandem',
+    form: 'app',
+    name: 'Tandem',
+    kind: 'SaaS dashboard',
+    suits: 'a subscription business that wants to see its numbers',
+    window: 'tandem.app',
+    line: 'The dashboard for a subscription business: one ruler runs every number through the month, an assistant answers with the events behind them, and revenue, customers, invoices and settings share the same hand.',
+    parts: [
+      { anchor: 'overview', name: 'Overview', line: 'Drag the ruler and the whole page shows that day; events catch it with a click. Revenue as a month of dots, one bar lit with its value, people and a calendar.', uses: ['Timeline ruler', 'Dot month', 'Ask Tandem'] },
+      { anchor: 'revenue', name: 'Revenue', line: 'Five numbers with a year in ticks, the month’s movement as a waterfall with its driver lit, revenue by plan, and retention as a field of dots.', uses: ['Waterfall', 'Cohort dots'] },
+      { anchor: 'customers', name: 'Customers', line: 'Found as you type, filtered by plan and state, sorted by what matters; seats as a ruler, health as five dots.', uses: ['Data table', 'Tick bars'] },
+      { anchor: 'customer', name: 'A customer', line: 'Their numbers, twelve weeks of use in dots, what happened and who’s who, and Tandem’s read on what to do next.', uses: ['Activity timeline'] },
+      { anchor: 'invoices', name: 'Invoices', line: 'Failed payments first, with a retry that settles the row as paid and rolls the totals.', uses: ['Retry', 'Rolling numbers'] },
+      { anchor: 'assistant', name: 'Ask Tandem', line: 'A question from any page lands here; the answer reads, streams in, and shows its breakdown and the series behind it.', uses: ['Streaming answer'] },
+      { anchor: 'settings', name: 'Settings', line: 'The workspace, a team you can invite to, API keys to reveal and copy, and what Tandem tells you about.', uses: ['Settings'] },
+      { anchor: 'signin', name: 'Sign in', line: 'Google, GitHub or a link by email, beside the product’s own ink hills.', uses: ['Ink landscape'] },
+    ],
+    details: [
+      'One accent, blue, for where you are and the one thing that matters on each chart. Everything else is ink and grey, in light and in true black.',
+      'Data is drawn, not plotted: months in dots, goals and seats as rulers of ticks, forecasts hatched, one bar lit with its value called out.',
+      'Every number is “as of” a day you choose on the ruler, so you can stand on the day something shipped and see what followed.',
+      'Ask Tandem answers from the page’s own data and events, and a day in an answer moves the ruler there. Its answers are plain data, ready for your model.',
+      'Nothing jumps: rows are placed, answers hold their space before their words land, and every panel morphs rather than pops.',
+    ],
+  },
 ]
 
 /** Templates on the way, named on the gallery. */
 export const SOON: { name: string; kind: string; line: string }[] = [
   { name: 'Voice assistant', kind: 'Voice AI', line: 'For a voice-first product: a living orb, captions that hold their place, and a call you can try.' },
-  { name: 'Insights', kind: 'AI analytics', line: 'For products that read your data and tell you what changed, and why.' },
 ]
 
 export const template = (id: string) => TEMPLATES.find((t) => t.id === id)

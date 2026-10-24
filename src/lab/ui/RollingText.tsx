@@ -9,15 +9,23 @@ const roll = { type: 'spring', stiffness: 380, damping: 34, mass: 0.8 } as const
  * Text whose digits roll like an odometer when they change.
  * `proportional` uses the font's natural figures: each column springs to the width of the
  * digit it lands on, so large prices don't get the mechanical look of tabular figures.
+ * `still` swaps digits without rolling, for numbers that follow a hand frame by frame, where a roll
+ * would never catch up; proportional columns still spring, so the number doesn't jitter.
  */
-export function RollingText({ text, className = '', proportional = false }: { text: string; className?: string; proportional?: boolean }) {
+export function RollingText({ text, className = '', proportional = false, still = false }: { text: string; className?: string; proportional?: boolean; still?: boolean }) {
   const chars = [...text]
   const probe = useRef<HTMLSpanElement>(null)
   const [widths, setWidths] = useState<number[] | null>(null)
 
   useLayoutEffect(() => {
     if (!proportional || !probe.current) return
-    const read = () => setWidths([...probe.current!.children].map((c) => (c as HTMLElement).getBoundingClientRect().width))
+    // Measured in layout pixels: under a CSS `zoom` (the gallery's Fit, a film's stage) the rects come
+    // back zoomed, so divide by the probe's own zoom or every column lands too wide or too narrow.
+    const read = () => {
+      const box = probe.current!
+      const z = box.offsetWidth ? box.getBoundingClientRect().width / box.offsetWidth : 1
+      setWidths([...box.children].map((c) => (c as HTMLElement).getBoundingClientRect().width / z))
+    }
     read()
     document.fonts?.ready.then(read)
   }, [proportional])
@@ -36,7 +44,7 @@ export function RollingText({ text, className = '', proportional = false }: { te
       {chars.map((c, i) => {
         const key = chars.length - i // align from the right so "9:45" -> "10:00" keeps columns stable
         return /\d/.test(c) ? (
-          <Digit key={key} d={+c} width={proportional && widths ? widths[+c] : undefined} />
+          <Digit key={key} d={+c} width={proportional && widths ? widths[+c] : undefined} still={still} />
         ) : (
           <span key={`${key}${c}`} aria-hidden className="whitespace-pre">
             {c}
@@ -47,7 +55,7 @@ export function RollingText({ text, className = '', proportional = false }: { te
   )
 }
 
-function Digit({ d, width }: { d: number; width?: number }) {
+function Digit({ d, width, still }: { d: number; width?: number; still: boolean }) {
   // Fixed 1ch column until the font is measured; then the first width lands instantly
   // and later changes spring, so nothing collapses while waiting for a frame.
   const w = useMotionValue<number | string>(width ?? '1ch')
@@ -65,7 +73,7 @@ function Digit({ d, width }: { d: number; width?: number }) {
 
   return (
     <motion.span aria-hidden className="relative inline-block overflow-hidden" style={{ height: '1.25em', width: w }}>
-      <motion.span className="absolute inset-x-0 top-0 flex flex-col items-center" initial={false} animate={{ y: `${-d * 10}%` }} transition={roll}>
+      <motion.span className="absolute inset-x-0 top-0 flex flex-col items-center" initial={false} animate={{ y: `${-d * 10}%` }} transition={still ? { duration: 0 } : roll}>
         {Array.from({ length: 10 }, (_, n) => (
           <span key={n} className="block" style={{ height: '1.25em' }}>
             {n}
