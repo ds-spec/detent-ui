@@ -66,10 +66,10 @@ function useScript(script: (beat: Beat) => Promise<void>) {
 }
 
 /** A small app window: a title bar and a body, holding its own overlays. */
-function Window({ title, children, hands, wide = false }: { title: string; children: ReactNode; hands: ReturnType<typeof useScript>; wide?: boolean }) {
+function Window({ title, children, hands, wide = false, size }: { title: string; children: ReactNode; hands: ReturnType<typeof useScript>; wide?: boolean; /** Tailwind size classes, when neither default fits. */ size?: string }) {
   return (
     <div {...hands}>
-      <LayerHost className={`${wide ? 'h-[400px] w-[580px]' : 'h-[360px] w-[520px]'} max-w-full rounded-[20px] bg-surface shadow-[0_0_0_1px_var(--line),0_1px_2px_rgb(0_0_0/0.04),0_12px_32px_-16px_rgb(0_0_0/0.14)]`}>
+      <LayerHost className={`${size ?? (wide ? 'h-[400px] w-[580px]' : 'h-[360px] w-[520px]')} max-w-full rounded-[20px] bg-surface shadow-[0_0_0_1px_var(--line),0_1px_2px_rgb(0_0_0/0.04),0_12px_32px_-16px_rgb(0_0_0/0.14)]`}>
         <div className="flex h-10 items-center gap-1.5 border-b border-line px-3.5">
           {[0, 1, 2].map((i) => (
             <span key={i} className="size-[10px] rounded-full bg-[color-mix(in_oklch,var(--ink)_12%,transparent)]" />
@@ -589,21 +589,85 @@ const RUNS = [
   { id: 3119, title: 'Dark mode for the account page', state: 'Failed', ok: false },
 ]
 
-/** Opens a run's details from the side, tugs the sheet partway and lets it spring back, then flicks it away. */
+/** The run's steps and how long each took, in seconds. */
+const STEPS: [string, string, number][] = [
+  ['Read', 'the issue', 9],
+  ['Planned', '3 changes', 21],
+  ['Edited', '3 files', 74],
+  ['Ran', '128 tests', 148],
+]
+const FILES: [string, string, number, number][] = [
+  ['src/cart/', 'total.ts', 18, 6],
+  ['src/cart/', 'discount.ts', 9, 2],
+  ['tests/', 'total.test.ts', 41, 0],
+]
+const clock = (s: number) => (s >= 60 ? `${Math.floor(s / 60)}m ${s % 60}s` : `${s}s`)
+
+/** The run, laid out for the space it has: one column in the compact detent, two in the wide one. */
+function RunDetails() {
+  const total = STEPS.reduce((n, s) => n + s[2], 0)
+  return (
+    <div className="grid gap-6 @[480px]:grid-cols-2 @[480px]:gap-8">
+      <section>
+        <p className="text-footnote text-ink-3">Timeline</p>
+        {/* The run as a ruler: a tick every five seconds, shaded by the step it fell in. */}
+        <div aria-hidden className="mt-2.5 flex h-4 items-end justify-between">
+          {Array.from({ length: Math.round(total / 5) }, (_, t) => {
+            let at = t * 5
+            const i = STEPS.findIndex((s) => (at -= s[2]) < 0)
+            return <span key={t} className="h-full w-[2px] shrink-0 rounded-full bg-ink" style={{ opacity: [0.25, 0.45, 0.7, 1][i] ?? 1 }} />
+          })}
+        </div>
+        <ol className="mt-3.5 space-y-2.5">
+          {STEPS.map(([verb, what, s], i) => (
+            <li key={verb} className="flex items-center gap-2.5 text-callout">
+              <span className="h-3 w-[2px] rounded-full bg-ink" style={{ opacity: [0.25, 0.45, 0.7, 1][i] }} />
+              <span className="flex-1 text-ink">
+                {verb} <span className="text-ink-3">{what}</span>
+              </span>
+              <span className="tnum text-footnote text-ink-3">{clock(s)}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+      <section>
+        <p className="text-footnote text-ink-3">Changed files</p>
+        <ul className="mt-2.5 divide-y divide-line">
+          {FILES.map(([dir, name, add, del]) => (
+            <li key={name} className="flex h-9 items-center gap-2 text-footnote">
+              <span className="min-w-0 flex-1 truncate font-mono">
+                <span className="text-ink-3">{dir}</span>
+                <span className="text-ink">{name}</span>
+              </span>
+              <span className="tnum font-mono text-ok">+{add}</span>
+              <span className="tnum w-6 font-mono text-ink-3">−{del}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  )
+}
+
+/** Opens a run's details from the side, clicks out to the wide detent and back, tugs it and lets it spring back, then flicks it away. */
 export function SheetDemo() {
   const b = useBench()
   const sheet = useRef<SheetHandle>(null)
   const hands = useScript(async (beat) => {
     await beat(1100)
     sheet.current?.open()
-    await beat(1700)
-    sheet.current?.tug(90)
     await beat(1600)
+    sheet.current?.snap(1)
+    await beat(2000)
+    sheet.current?.snap(0)
+    await beat(1300)
+    sheet.current?.tug(90)
+    await beat(1500)
     sheet.current?.close()
     await beat(1200)
   })
   return (
-    <Window title="Runs" hands={hands} wide>
+    <Window title="Runs" hands={hands} size="h-[440px] w-[680px]">
       <div className="p-4">
         {RUNS.map((r, i) => (
           <div key={r.id} className={`flex h-12 items-center gap-3 rounded-row px-3 ${i === 0 ? 'bg-surface shadow-raised' : ''}`}>
@@ -614,9 +678,17 @@ export function SheetDemo() {
               <Sheet
                 ref={sheet}
                 side={b.get('side', 'right')}
+                detents={b.get('side', 'right') === 'right' ? [340, 600] : [0.55, 0.92]}
                 onOpenChange={b.on('onOpenChange')}
-                title="Run 3121"
-                description="Apply discount codes before tax"
+                onDetentChange={b.on('onDetentChange')}
+                title="Apply discount codes before tax"
+                description={
+                  <span className="flex items-center gap-1.5 text-footnote">
+                    <span className="size-1.5 rounded-full bg-ok" />
+                    <span className="text-ink">Passed</span>
+                    <span className="text-ink-3">· Run 3121 · 4m 12s</span>
+                  </span>
+                }
                 trigger={
                   <Button variant="secondary" size="sm">
                     View
@@ -633,35 +705,7 @@ export function SheetDemo() {
                   </>
                 }
               >
-                <dl className="grid grid-cols-[88px_minmax(0,1fr)] gap-y-2.5 text-callout">
-                  {[
-                    [
-                      'Status',
-                      <span key="s" className="flex items-center gap-1.5 text-ok">
-                        <span className="size-1.5 rounded-full bg-ok" /> Passed
-                      </span>,
-                    ],
-                    [
-                      'Branch',
-                      <span key="b" className="font-mono text-footnote text-ink-2">
-                        kiln/482-codes
-                      </span>,
-                    ],
-                    ['Duration', '4m 12s'],
-                    ['Tests', '128 passed'],
-                  ].map(([k, v]) => (
-                    <div key={k as string} className="contents">
-                      <dt className="text-ink-3">{k}</dt>
-                      <dd className="text-ink">{v}</dd>
-                    </div>
-                  ))}
-                </dl>
-                <div className="mt-5 rounded-row bg-surface-2 p-3 font-mono text-[12px] leading-[20px] text-ink-2">
-                  <p>✓ Read the issue</p>
-                  <p>✓ Planned 3 changes</p>
-                  <p>✓ Edited 3 files</p>
-                  <p>✓ 128 tests passed</p>
-                </div>
+                <RunDetails />
               </Sheet>
             ) : (
               <span className="text-footnote text-ink-3">{r.state}</span>
