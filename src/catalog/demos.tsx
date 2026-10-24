@@ -7,14 +7,14 @@ import { PRO_DEMOS, SPOTS } from '@pro'
 /** Each free demo is its own chunk, loaded only when something on screen asks for it. */
 const FREE: Record<string, ComponentType> = {
   toaster: dynamic(() => import('@/lab/demos/toaster').then((m) => m.ToasterDemo), { ssr: false }),
-  slider: dynamic(() => import('@/lab/demos/slider').then((m) => m.SliderDemo), { ssr: false }),
+  signature: dynamic(() => import('@/lab/demos/signature').then((m) => m.SignatureDemo), { ssr: false }),
   dialog: dynamic(() => import('@/lab/demos/overlays').then((m) => m.DialogDemo), { ssr: false }),
   confirm: dynamic(() => import('@/lab/demos/overlays').then((m) => m.ConfirmDemo), { ssr: false }),
   popover: dynamic(() => import('@/lab/demos/overlays').then((m) => m.PopoverDemo), { ssr: false }),
   tooltip: dynamic(() => import('@/lab/demos/overlays').then((m) => m.TooltipDemo), { ssr: false }),
   dropdown: dynamic(() => import('@/lab/demos/overlays').then((m) => m.DropdownDemo), { ssr: false }),
   'context-menu': dynamic(() => import('@/lab/demos/overlays').then((m) => m.ContextDemo), { ssr: false }),
-  sheet: dynamic(() => import('@/lab/demos/overlays').then((m) => m.SheetDemo), { ssr: false }),
+  voicenote: dynamic(() => import('@/lab/demos/voicenote').then((m) => m.VoiceNoteDemo), { ssr: false }),
   hovercard: dynamic(() => import('@/lab/demos/overlays').then((m) => m.HoverCardDemo), { ssr: false }),
   scaffold: dynamic(() => import('@/lab/demos/agent').then((m) => m.ScaffoldDemo), { ssr: false }),
   prompt: dynamic(() => import('@/lab/demos/inputs').then((m) => m.PromptDemo), { ssr: false }),

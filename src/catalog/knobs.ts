@@ -55,7 +55,5 @@ export const KNOBS: Record<string, Record<string, Knob>> = {
   popover: { side: { value: 'bottom', options: SIDES }, arrow: { value: true } },
   tooltip: { side: { value: 'top', options: SIDES } },
   dropdown: { side: { value: 'bottom', options: SIDES } },
-  sheet: { side: { value: 'right', options: ['right', 'bottom'] } },
-  slider: { snap: { value: 9, range: [0, 24] } },
   hovercard: { openDelay: { value: 450, range: [0, 1500], step: 50 }, side: { value: 'bottom', options: SIDES } },
 }
