@@ -23,6 +23,21 @@ export type Release = { date: string; title: string; line: string; items: { labe
 export const RELEASES: Release[] = [
   {
     date: '2026-10-24',
+    title: 'Eight free components, rebuilt to the Pro bar',
+    line: 'Thinking dots that play what each step is doing, a context ring with a redline, a voice meter made of dots, typing that keeps a person’s rhythm, a hover card that glides from one person to the next, a sheet that clicks into detents, and a dialog that reshapes as you fill it. Resizable panels make way for something new: the Detent slider.',
+    items: [
+      { label: 'Detent slider', href: '/components/slider' },
+      { label: 'Thinking indicator', href: '/components/thinking' },
+      { label: 'Context ring', href: '/components/context' },
+      { label: 'Voice input', href: '/components/voice' },
+      { label: 'Typing bubble', href: '/components/typing' },
+      { label: 'Hover card', href: '/components/hovercard' },
+      { label: 'Sheet', href: '/components/sheet' },
+      { label: 'Dialog', href: '/components/dialog' },
+    ],
+  },
+  {
+    date: '2026-10-24',
     title: 'An agent workspace, the first app template',
     line: 'A whole agent workspace to start from: sessions, a thread that shows its work, a composer that queues what you ask while it answers, reasoning set on a ramp of dots, and photos that open full size. And a prompt playground block, to compare models side by side.',
     items: [
