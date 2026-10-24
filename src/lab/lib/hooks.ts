@@ -6,7 +6,9 @@ import type { RefObject } from 'react'
 /** requestAnimationFrame loop; `cb` always sees the latest closure. dt is in ms, capped. */
 export function useFrame(cb: (dt: number, t: number) => void, active = true) {
   const ref = useRef(cb)
-  ref.current = cb
+  useLayoutEffect(() => {
+    ref.current = cb
+  })
   useEffect(() => {
     if (!active) return
     let raf = 0
@@ -47,8 +49,8 @@ const stacks = new WeakMap<Element, () => void>()
  * heights, in the same frame those heights change. Rows can grow, fold, arrive and leave on
  * their own animations while nothing in the layout moves, so the page never registers a shift.
  * Before hydration the children simply flow, in the same places. The box takes the stack's
- * height; children span its content width and should have no margins. `onPlace` runs whenever
- * that height changes, in the same frame, for anything that follows it.
+ * height; children span its content width, and their margins count as they would in flow.
+ * `onPlace` runs whenever that height changes, in the same frame, for anything that follows it.
  */
 export function useStack(ref: RefObject<HTMLElement | null>, gap = 0, onPlace?: () => void) {
   const follow = useRef(onPlace)
@@ -66,8 +68,12 @@ export function useStack(ref: RefObject<HTMLElement | null>, gap = 0, onPlace?: 
     let y = 0
     for (const el of Array.from(box.children) as HTMLElement[]) {
       Object.assign(el.style, { position: 'absolute', top: `${top}px`, left: `${left}px`, right: `${right}px`, translate: `0 ${y}px` })
-      stacked.set(el, top + y)
-      y += parseFloat(getComputedStyle(el).height) + gap
+      // An absolute box still honours its margins, so a top margin moves it down on its own;
+      // both margins take room before the next row, the way they would in flow.
+      const s = getComputedStyle(el)
+      const mt = parseFloat(s.marginTop) || 0
+      stacked.set(el, top + y + mt)
+      y += mt + parseFloat(s.height) + (parseFloat(s.marginBottom) || 0) + gap
     }
     const was = box.style.height
     box.style.height = `${Math.max(0, y - gap) + (cs.boxSizing === 'border-box' ? edges : 0)}px`
