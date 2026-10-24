@@ -7,8 +7,6 @@ import type { MotionValue, PanInfo } from 'motion/react'
 import { ArrowUp, Check, Close, Mic } from '../../icons'
 import { useSize } from '../../lib/hooks'
 import { ease, press, spring } from '../../lib/motion'
-import { Glow, aiInk, useTone } from '../../ui/Intelligence'
-import type { Tone } from '../../ui/Intelligence'
 
 export type VoiceState = 'idle' | 'listening'
 export type VoiceHandle = { send(): void }
@@ -16,17 +14,19 @@ export type VoiceHandle = { send(): void }
 /** The field's width when there's room; a narrower container gets all it has. */
 const W = 440
 const BAR = 36
-const BARS = 46
+const COLS = 30
+const ROWS = 5
 const CANCEL_AT = -72
 
 /**
  * A message field you can talk to.
  *
- * Tap the mic and it stretches into a live waveform the width of the bar; hold it instead
- * and it records only while held. Words arrive grey as they're heard and firm up to full ink
- * once recognition commits them. Stop talking and a ring fills around the check; finish it
- * yourself with Enter, or slide the bar left (or press Escape) to throw the take away. The
- * text keeps its place throughout: the field and the bar never change size.
+ * Tap the mic and it stretches into a live level meter the width of the bar, a field of dots
+ * that scrolls as you speak; hold it instead and it records only while held. While it listens,
+ * the mic beside the clock fills with your voice. Words arrive grey as they're heard and firm up
+ * to full ink once recognition commits them. Stop talking and a ring fills around the check;
+ * finish it yourself with Enter, or slide the bar left (or press Escape) to throw the take away.
+ * The text keeps its place throughout: the field and the bar never change size.
  */
 export function VoiceInput({
   state,
@@ -67,8 +67,6 @@ export function VoiceInput({
   ref?: Ref<VoiceHandle>
 }) {
   const listening = state === 'listening'
-  // The spectrum the first time it listens; after that the same motion in ink.
-  const tone = useTone(listening, 'voice')
   const [sent, setSent] = useState(0)
   const [elapsed, setElapsed] = useState(0)
   const [armed, setArmed] = useState(false)
@@ -87,11 +85,15 @@ export function VoiceInput({
   useEffect(() => {
     if (!listening) return
     const t0 = performance.now()
-    setElapsed(0)
-    const t = setInterval(() => setElapsed(Math.floor((performance.now() - t0) / 1000)), 250)
+    const tick = () => setElapsed(Math.floor((performance.now() - t0) / 1000))
+    const first = setTimeout(tick)
+    const t = setInterval(tick, 250)
     // Follow focus into the bar only if it was already in the field; a demo starting it never steals focus.
     if (root.current?.contains(document.activeElement)) done.current?.focus({ preventScroll: true })
-    return () => clearInterval(t)
+    return () => {
+      clearTimeout(first)
+      clearInterval(t)
+    }
   }, [listening])
 
   // Quiet fills the ring around the check; a sound empties it again.
@@ -166,9 +168,7 @@ export function VoiceInput({
   const heard = words(interim)
 
   return (
-    // While it listens, the field wears Intelligence: a halo behind, light round the edge.
     <div ref={frame} className="relative w-[440px] max-w-full">
-      <Glow on={listening} layer="halo" radius={20} tone={tone} />
       <div ref={root} onKeyDown={onKey} className="relative w-full overflow-hidden rounded-[20px] bg-surface shadow-float">
         <div
           ref={box}
@@ -260,13 +260,13 @@ export function VoiceInput({
                         </motion.span>
                       ) : (
                         <motion.div key="wave" className="absolute inset-0" {...swap}>
-                          <Wave level={level} tone={tone} />
+                          <Meter level={level} />
                         </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
-                  <span className="tnum flex w-11 shrink-0 items-center gap-1.5 font-mono text-caption text-ink-2">
-                    <span className="size-1.5 rounded-full bg-danger motion-safe:animate-pulse" />
+                  <span className="tnum flex w-[52px] shrink-0 items-center gap-1.5 text-footnote text-ink-2">
+                    <LiveMic level={level} />
                     {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, '0')}
                   </span>
                   <button ref={done} type="button" onClick={onStop} aria-label="Finish" className="ring-focus relative flex size-7 shrink-0 items-center justify-center rounded-full bg-ink text-surface">
@@ -288,7 +288,7 @@ export function VoiceInput({
                       onStart()
                     }
                   }}
-                  className="ring-focus absolute top-0 flex size-9 items-center justify-center rounded-full text-ink-2 transition-colors duration-150 hover:bg-surface-2 hover:text-ink"
+                  className="ring-focus absolute top-0 flex size-9 items-center justify-center rounded-full bg-surface-2 text-ink transition-colors duration-150 hover:bg-surface-3"
                   style={{ right: BAR + 6 }}
                   {...swap}
                 >
@@ -318,7 +318,6 @@ export function VoiceInput({
           </AnimatePresence>
         </div>
       </div>
-      <Glow on={listening} layer="ring" radius={20} tone={tone} />
     </div>
   )
 }
@@ -332,39 +331,68 @@ const swap = {
 const words = (s: string) => s.split(/\s+/).filter(Boolean)
 
 /**
- * The waveform scrolls from right to left: the newest sound enters at the right edge and
- * older sound drifts away and fades. Bars are written straight to the DOM each frame.
+ * The level meter: a field of dots, a column for each moment, scrolling right to left. A column
+ * lights outward from its middle row as loud as that moment was, so speech reads as a shape and
+ * the quiet between phrases as a single line. Dots are written straight to the DOM each frame.
  */
-function Wave({ level, tone }: { level: MotionValue<number>; tone: Tone }) {
-  const bars = useRef<(HTMLSpanElement | null)[]>([])
-  const history = useRef<number[]>(Array(BARS).fill(0))
+function Meter({ level }: { level: MotionValue<number> }) {
+  const dots = useRef<(HTMLSpanElement | null)[]>([])
+  const history = useRef<number[]>(Array(COLS).fill(0))
   const smooth = useRef(0)
   const clock = useRef(0)
   useAnimationFrame((_, delta) => {
     smooth.current += (level.get() - smooth.current) * Math.min(1, delta / 60)
     clock.current += delta
-    if (clock.current < 55) return
+    if (clock.current < 70) return
     clock.current = 0
     history.current.push(smooth.current)
     history.current.shift()
-    history.current.forEach((v, i) => {
-      const el = bars.current[i]
-      if (el) el.style.height = `${3 + Math.min(1, v) * 20}px`
+    history.current.forEach((v, c) => {
+      // How far from the middle row this moment reaches: 0 (just the middle) to 2 (all five).
+      const reach = v < 0.06 ? -1 : v < 0.3 ? 0 : v < 0.6 ? 1 : 2
+      for (let r = 0; r < ROWS; r++) {
+        const el = dots.current[r * COLS + c]
+        if (el) el.style.opacity = Math.abs(r - 2) <= reach ? '1' : Math.abs(r - 2) === 0 ? '0.32' : '0.12'
+      }
     })
   })
   return (
-    <span className="absolute inset-0 flex items-center justify-between" style={{ maskImage: 'linear-gradient(to right, transparent, #000 30%)' }}>
-      {Array.from({ length: BARS }, (_, i) => (
+    <span className="absolute inset-0 grid content-center items-center justify-between gap-y-[2.5px]" style={{ gridTemplateColumns: `repeat(${COLS}, 3px)`, maskImage: 'linear-gradient(to right, transparent, #000 28%)' }}>
+      {Array.from({ length: ROWS * COLS }, (_, i) => (
         <span
           key={i}
           ref={(el) => {
-            bars.current[i] = el
+            dots.current[i] = el
           }}
-          className="w-[2.5px] rounded-full"
-          style={{ height: 3, background: tone === 'loud' ? aiInk(i / (BARS - 1)) : 'var(--ink-2)' }}
+          className="size-[3px] rounded-full bg-ink transition-opacity duration-100"
+          style={{ opacity: Math.floor(i / COLS) === 2 ? 0.32 : 0.12 }}
         />
       ))}
     </span>
+  )
+}
+
+/** The mic beside the clock: its capsule fills from the bottom with the voice, in the accent. */
+function LiveMic({ level }: { level: MotionValue<number> }) {
+  const fill = useRef<SVGRectElement>(null)
+  const smooth = useRef(0)
+  useAnimationFrame((_, delta) => {
+    smooth.current += (Math.min(1, level.get() * 1.3) - smooth.current) * Math.min(1, delta / 50)
+    const h = 1.5 + smooth.current * 7.5
+    fill.current?.setAttribute('y', String(11 - h))
+    fill.current?.setAttribute('height', String(h))
+  })
+  return (
+    <svg aria-hidden width="14" height="14" viewBox="0 0 16 16" className="shrink-0">
+      <defs>
+        <clipPath id="live-mic-capsule">
+          <rect x="5" y="1.5" width="6" height="9.5" rx="3" />
+        </clipPath>
+      </defs>
+      <rect ref={fill} x="5" y="9.5" width="6" height="1.5" fill="var(--accent)" clipPath="url(#live-mic-capsule)" />
+      <rect x="5" y="1.5" width="6" height="9.5" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M2.75 7.75a5.25 5.25 0 0 0 10.5 0M8 13v1.75" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
   )
 }
 
