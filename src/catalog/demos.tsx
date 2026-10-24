@@ -7,7 +7,7 @@ import { PRO_DEMOS, SPOTS } from '@pro'
 /** Each free demo is its own chunk, loaded only when something on screen asks for it. */
 const FREE: Record<string, ComponentType> = {
   toaster: dynamic(() => import('@/lab/demos/toaster').then((m) => m.ToasterDemo), { ssr: false }),
-  panels: dynamic(() => import('@/lab/demos/panels').then((m) => m.PanelsDemo), { ssr: false }),
+  slider: dynamic(() => import('@/lab/demos/slider').then((m) => m.SliderDemo), { ssr: false }),
   dialog: dynamic(() => import('@/lab/demos/overlays').then((m) => m.DialogDemo), { ssr: false }),
   confirm: dynamic(() => import('@/lab/demos/overlays').then((m) => m.ConfirmDemo), { ssr: false }),
   popover: dynamic(() => import('@/lab/demos/overlays').then((m) => m.PopoverDemo), { ssr: false }),

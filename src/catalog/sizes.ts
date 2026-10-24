@@ -47,6 +47,7 @@ export const SIZE: Record<string, [number, number]> = {
   confirm: [580, 400],
   dialog: [580, 400],
   sheet: [580, 400],
+  slider: [400, 286],
   'context-menu': [520, 360],
   dropdown: [520, 360],
   hovercard: [520, 360],

@@ -56,7 +56,7 @@ export const RELEASES: Release[] = [
       { label: 'Timeline', href: '/components/timeline', pro: true },
       { label: 'Carousel', href: '/components/carousel', pro: true },
       { label: 'Toasts', href: '/components/toaster' },
-      { label: 'Resizable panels', href: '/components/panels' },
+      { label: 'Detent slider', href: '/components/slider' },
     ],
   },
   {

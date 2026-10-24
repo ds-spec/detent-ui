@@ -49,7 +49,7 @@ export const FILES: Record<string, string[]> = {
   timeline: ['../pro/components/timeline/Timeline.tsx'],
   carousel: ['../pro/components/carousel/Carousel.tsx', 'lib/hooks.ts'],
   toaster: ['components/toast/Toaster.tsx', 'lib/layer.tsx', 'ui/RollingText.tsx'],
-  panels: ['components/panels/Panels.tsx'],
+  slider: ['components/slider/DetentSlider.tsx', 'ui/RollingText.tsx', 'lib/hooks.ts'],
   video: ['../pro/components/video/VideoPlayer.tsx', 'components/overlays/DropdownMenu.tsx', 'components/overlays/Menu.tsx', 'components/overlays/Tooltip.tsx', 'lib/layer.tsx'],
   flow: ['../pro/components/flow/FlowBuilder.tsx', 'components/overlays/DropdownMenu.tsx', 'components/overlays/Menu.tsx', 'components/overlays/Tooltip.tsx', 'lib/layer.tsx'],
   dialog: ['components/overlays/Dialog.tsx', 'lib/layer.tsx'],
