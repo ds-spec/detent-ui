@@ -405,7 +405,13 @@ export function ToastsDemo() {
 
 /* ───────────────────────────── Thinking ───────────────────────────── */
 
-const THOUGHTS = ['Reading the question', 'Searching 3 sources', 'Comparing the two policies', 'Writing the answer']
+/** Each step and how long it runs: thinking doesn't keep an even beat. */
+const THOUGHTS: [string, number][] = [
+  ['Reading the question', 900],
+  ['Searching 3 sources', 2300],
+  ['Comparing the two policies', 1700],
+  ['Writing the answer', 1100],
+]
 
 export function ThinkingDemo() {
   const [run, setRun] = useState(0)
@@ -418,9 +424,9 @@ function ThinkingRun({ onDone }: { onDone: () => void }) {
   const [done, setDone] = useState(false)
   const [open, setOpen] = useState(false)
   const handlers = useLoop(async (beat) => {
-    for (const t of THOUGHTS) {
+    for (const [t, ms] of THOUGHTS) {
       setSteps((s) => [...s, t])
-      await beat(1300)
+      await beat(ms)
     }
     setDone(true)
     await beat(1000)
