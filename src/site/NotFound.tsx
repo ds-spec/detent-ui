@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { ENTRIES } from '@/catalog/meta'
-import { BLOCKS } from '@/pro/blocks/meta'
-import { TEMPLATES } from '@/templates/meta'
+import { BLOCKS } from '@/catalog/blocks'
+import { TEMPLATES } from '@/catalog/templates'
 import { Missing, Nearest, SearchPill } from './NotFoundParts'
 import type { Page } from './NotFoundParts'
 

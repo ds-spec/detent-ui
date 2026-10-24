@@ -1,5 +1,5 @@
-import { BLOCKS } from '@/pro/blocks/meta'
-import { TEMPLATES } from '@/templates/meta'
+import { BLOCKS } from '@/catalog/blocks'
+import { TEMPLATES } from '@/catalog/templates'
 import { PRO_COMPONENTS } from './pro'
 
 /**

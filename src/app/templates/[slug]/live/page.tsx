@@ -1,8 +1,8 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { TEMPLATES, template } from '@/templates/meta'
-import { TemplateView } from '@/templates/registry'
+import { TEMPLATES, template } from '@/catalog/templates'
+import { TemplateView } from '@pro'
 import { page, short } from '@/site/seo'
 
 export function generateStaticParams() {

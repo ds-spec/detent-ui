@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { TEMPLATES, template } from '@/templates/meta'
+import { TEMPLATES, template } from '@/catalog/templates'
 import { Footer } from '@/site/Footer'
 import { Header } from '@/site/Header'
 import { TemplateViewer } from '@/site/templates/TemplateViewer'

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { BLOCKS, KINDS, SOON } from '@/pro/blocks/meta'
+import { BLOCKS, KINDS, SOON } from '@/catalog/blocks'
 import { BlockIndex } from '@/site/blocks/BlockIndex'
 import { ProTag } from '@/site/blocks/ProTag'
 import { Footer } from '@/site/Footer'

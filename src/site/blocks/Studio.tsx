@@ -5,7 +5,7 @@ import { motion, useReducedMotion } from 'motion/react'
 import type { ReactNode } from 'react'
 
 /* What a block is shown on: the colour wallpaper. The UI inside stays quiet; the showcase around it doesn't. */
-export { Wallpaper as Backdrop } from '@/pro/ui/Wallpaper'
+export { Wallpaper as Backdrop } from '@/site/blocks/Wallpaper'
 
 export type Chrome = 'app' | 'titled' | 'browser'
 

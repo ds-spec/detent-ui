@@ -1,6 +1,6 @@
 /**
  * Pro blocks: whole screens built from Detent components, playing live. Plain data, safe for
- * the server; the blocks themselves are looked up by id in ./registry.
+ * the server; the blocks themselves are looked up by id in src/pro/blocks/registry, via `@pro`.
  */
 export type BlockKind = 'app' | 'flow' | 'section'
 

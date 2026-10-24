@@ -2,30 +2,12 @@
 
 import dynamic from 'next/dynamic'
 import type { ComponentType } from 'react'
+import { PRO_DEMOS, SPOTS } from '@pro'
 
-/** Each demo is its own chunk, loaded only when something on screen asks for it. */
-export const DEMOS: Record<string, ComponentType> = {
-  kanban: dynamic(() => import('@/lab/demos/kanban').then((m) => m.KanbanDemo), { ssr: false }),
-  heatmap: dynamic(() => import('@/lab/demos/heatmap').then((m) => m.HeatmapDemo), { ssr: false }),
-  video: dynamic(() => import('@/lab/demos/video').then((m) => m.VideoDemo), { ssr: false }),
-  cropper: dynamic(() => import('@/lab/demos/cropper').then((m) => m.CropperDemo), { ssr: false }),
-  tour: dynamic(() => import('@/lab/demos/tour').then((m) => m.TourDemo), { ssr: false }),
-  composer: dynamic(() => import('@/lab/demos/composer').then((m) => m.ComposerDemo), { ssr: false }),
-  time: dynamic(() => import('@/lab/demos/time').then((m) => m.TimeDemo), { ssr: false }),
-  combobox: dynamic(() => import('@/lab/demos/combobox').then((m) => m.ComboboxDemo), { ssr: false }),
-  trend: dynamic(() => import('@/lab/demos/trend').then((m) => m.TrendDemo), { ssr: false }),
-  bars: dynamic(() => import('@/lab/demos/bars').then((m) => m.BarsDemo), { ssr: false }),
-  rings: dynamic(() => import('@/lab/demos/rings').then((m) => m.RingsDemo), { ssr: false }),
-  waffle: dynamic(() => import('@/lab/demos/waffle').then((m) => m.WaffleDemo), { ssr: false }),
-  gauge: dynamic(() => import('@/lab/demos/gauge').then((m) => m.GaugeDemo), { ssr: false }),
-  stats: dynamic(() => import('@/lab/demos/stats').then((m) => m.StatsDemo), { ssr: false }),
-  codeblock: dynamic(() => import('@/lab/demos/codeblock').then((m) => m.CodeBlockDemo), { ssr: false }),
-  sidebar: dynamic(() => import('@/lab/demos/sidebar').then((m) => m.SidebarDemo), { ssr: false }),
-  timeline: dynamic(() => import('@/lab/demos/timeline').then((m) => m.TimelineDemo), { ssr: false }),
-  carousel: dynamic(() => import('@/lab/demos/carousel').then((m) => m.CarouselDemo), { ssr: false }),
+/** Each free demo is its own chunk, loaded only when something on screen asks for it. */
+const FREE: Record<string, ComponentType> = {
   toaster: dynamic(() => import('@/lab/demos/toaster').then((m) => m.ToasterDemo), { ssr: false }),
   panels: dynamic(() => import('@/lab/demos/panels').then((m) => m.PanelsDemo), { ssr: false }),
-  flow: dynamic(() => import('@/lab/demos/flow').then((m) => m.FlowDemo), { ssr: false }),
   dialog: dynamic(() => import('@/lab/demos/overlays').then((m) => m.DialogDemo), { ssr: false }),
   confirm: dynamic(() => import('@/lab/demos/overlays').then((m) => m.ConfirmDemo), { ssr: false }),
   popover: dynamic(() => import('@/lab/demos/overlays').then((m) => m.PopoverDemo), { ssr: false }),
@@ -35,24 +17,15 @@ export const DEMOS: Record<string, ComponentType> = {
   sheet: dynamic(() => import('@/lab/demos/overlays').then((m) => m.SheetDemo), { ssr: false }),
   hovercard: dynamic(() => import('@/lab/demos/overlays').then((m) => m.HoverCardDemo), { ssr: false }),
   scaffold: dynamic(() => import('@/lab/demos/agent').then((m) => m.ScaffoldDemo), { ssr: false }),
-  answer: dynamic(() => import('@/lab/demos/answer').then((m) => m.AnswerDemo), { ssr: false }),
-  trace: dynamic(() => import('@/lab/demos/trace').then((m) => m.TraceDemo), { ssr: false }),
-  diff: dynamic(() => import('@/lab/demos/diff').then((m) => m.DiffDemo), { ssr: false }),
-  approval: dynamic(() => import('@/lab/demos/approval').then((m) => m.ApprovalDemo), { ssr: false }),
   prompt: dynamic(() => import('@/lab/demos/inputs').then((m) => m.PromptDemo), { ssr: false }),
   tree: dynamic(() => import('@/lab/demos/agent').then((m) => m.TreeDemo), { ssr: false }),
   plan: dynamic(() => import('@/lab/demos/plan').then((m) => m.PlanDemo), { ssr: false }),
   models: dynamic(() => import('@/lab/demos/models').then((m) => m.ModelsDemo), { ssr: false }),
-  table: dynamic(() => import('@/lab/demos/table').then((m) => m.TableDemo), { ssr: false }),
-  chart: dynamic(() => import('@/lab/demos/chart').then((m) => m.ChartDemo), { ssr: false }),
-  usage: dynamic(() => import('@/lab/demos/usage').then((m) => m.UsageDemo), { ssr: false }),
-  dates: dynamic(() => import('@/lab/demos/dates').then((m) => m.DatesDemo), { ssr: false }),
   voice: dynamic(() => import('@/lab/demos/voice').then((m) => m.VoiceDemo), { ssr: false }),
   select: dynamic(() => import('@/lab/demos/menus').then((m) => m.SelectDemo), { ssr: false }),
   rename: dynamic(() => import('@/lab/demos/menus').then((m) => m.RenameDemo), { ssr: false }),
   code: dynamic(() => import('@/lab/demos/inputs').then((m) => m.CodeDemo), { ssr: false }),
   stepper: dynamic(() => import('@/lab/demos/controls').then((m) => m.StepperDemo), { ssr: false }),
-  rewrite: dynamic(() => import('@/lab/demos/rewrite').then((m) => m.RewriteDemo), { ssr: false }),
   tags: dynamic(() => import('@/lab/demos/showcase').then((m) => m.TagsDemo), { ssr: false }),
   upload: dynamic(() => import('@/lab/demos/showcase').then((m) => m.UploadDemo), { ssr: false }),
   inbox: dynamic(() => import('@/lab/demos/controls').then((m) => m.InboxDemo), { ssr: false }),
@@ -63,7 +36,6 @@ export const DEMOS: Record<string, ComponentType> = {
   buttons: dynamic(() => import('@/lab/demos/menus').then((m) => m.ButtonsDemo), { ssr: false }),
   tabs: dynamic(() => import('@/lab/demos/essentials').then((m) => m.TabsDemo), { ssr: false }),
   waitlist: dynamic(() => import('@/lab/demos/site').then((m) => m.WaitlistDemo), { ssr: false }),
-  payments: dynamic(() => import('@/lab/demos/showcase').then((m) => m.WalletDemo), { ssr: false }),
   versions: dynamic(() => import('@/lab/demos/small').then((m) => m.VersionsDemo), { ssr: false }),
   context: dynamic(() => import('@/lab/demos/small').then((m) => m.ContextDemo), { ssr: false }),
   run: dynamic(() => import('@/lab/demos/small').then((m) => m.RunDemo), { ssr: false }),
@@ -76,10 +48,8 @@ export const DEMOS: Record<string, ComponentType> = {
   retry: dynamic(() => import('@/lab/demos/small').then((m) => m.RetryDemo), { ssr: false }),
 }
 
+/** Every demo by component id: the free ones above, and Pro's from Detent Pro (or a locked stand-in without it). */
+export const DEMOS: Record<string, ComponentType> = { ...FREE, ...PRO_DEMOS }
+
 /** Gallery spotlights: for big components, one moment shown large and alone. Everything else shows its full demo. */
-export const SPOTS: Record<string, ComponentType> = {
-  diff: dynamic(() => import('@/lab/demos/spots').then((m) => m.DiffSpot), { ssr: false }),
-  table: dynamic(() => import('@/lab/demos/spots').then((m) => m.TableSpot), { ssr: false }),
-  approval: dynamic(() => import('@/lab/demos/spots').then((m) => m.ApprovalSpot), { ssr: false }),
-  answer: dynamic(() => import('@/lab/demos/spots').then((m) => m.AnswerSpot), { ssr: false }),
-}
+export { SPOTS }

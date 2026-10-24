@@ -1,7 +1,7 @@
 import { ENTRIES } from '@/catalog/meta'
 import { KITS, PRO_COMPONENTS, SITE, installCommand, isProComponent } from '@/catalog/pro'
-import { BLOCKS } from '@/pro/blocks/meta'
-import { TEMPLATES } from '@/templates/meta'
+import { BLOCKS } from '@/catalog/blocks'
+import { TEMPLATES } from '@/catalog/templates'
 
 // For coding agents and AI assistants: what Detent is, what's free, what's Pro, and the exact command for each piece.
 export function GET() {

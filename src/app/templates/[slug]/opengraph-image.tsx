@@ -1,5 +1,5 @@
 import { CONTENT_TYPE, OG, pageImage } from '@/site/og'
-import { TEMPLATES, template } from '@/templates/meta'
+import { TEMPLATES, template } from '@/catalog/templates'
 
 export const alt = 'A Detent template for an AI product'
 export const size = OG

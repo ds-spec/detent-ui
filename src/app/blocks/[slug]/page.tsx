@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { BLOCKS, block } from '@/pro/blocks/meta'
+import { BLOCKS, block } from '@/catalog/blocks'
 import { BlockViewer } from '@/site/blocks/BlockViewer'
 import { Footer } from '@/site/Footer'
 import { Header } from '@/site/Header'

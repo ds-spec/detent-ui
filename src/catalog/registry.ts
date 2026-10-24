@@ -1,7 +1,7 @@
 import { existsSync, statSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
-import { BLOCKS } from '@/pro/blocks/meta'
+import { BLOCKS } from '@/catalog/blocks'
 import { ENTRIES } from './meta'
 import { FILES } from './source'
 import { KITS, SITE, isProComponent } from './pro'
@@ -57,6 +57,7 @@ export const brand = (text: string) =>
 const targetOf = (rel: string) =>
   `${BASE}/${rel
     .replace(/^lab\//, '')
+    .replace(/^pro\/components\//, 'components/')
     .replace(/^pro\/blocks\//, 'blocks/')
     .replace(/^pro\/ui\//, 'blocks/kit/')}`
 

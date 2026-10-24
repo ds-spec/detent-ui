@@ -2,7 +2,7 @@
  * What's in Detent Pro, what it costs, and where to buy it. Plain data, safe for the server.
  * Change a price, a plan's list or a checkout link here and every page follows.
  */
-import { BLOCKS } from '@/pro/blocks/meta'
+import { BLOCKS } from '@/catalog/blocks'
 
 /** The free components that are Pro: the big stateful surfaces that take weeks to get right. */
 export const PRO_COMPONENTS = [

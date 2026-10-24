@@ -1,4 +1,10 @@
 @import "tailwindcss";
+/*
+ * Two folders this repository ignores but the site uses when they're there, so they're named to
+ * be scanned: Detent Pro, checked out from its own private repository, and the unlisted previews.
+ */
+@source "../pro";
+@source "./preview";
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 

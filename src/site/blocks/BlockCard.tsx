@@ -3,7 +3,7 @@
 import { useRef } from 'react'
 import Link from 'next/link'
 import { ArrowRight } from '@/lab/icons'
-import { BLOCK_VIEWS } from '@/pro/blocks/registry'
+import { BLOCK_VIEWS } from '@pro'
 import { useNear } from '../near'
 import { Backdrop, Window } from './Studio'
 

@@ -1,6 +1,7 @@
 /**
  * Templates: whole landing pages for a kind of product, built from the landing kit and the Pro
- * blocks, and whole apps. Plain data, safe for the server; the views are looked up in ./registry.
+ * blocks, and whole apps. Plain data, safe for the server; the views are looked up in
+ * src/pro/templates/registry, via `@pro`.
  */
 
 /** One stretch of a template's page. `anchor` is its id on the page, so a viewer can take you there. */

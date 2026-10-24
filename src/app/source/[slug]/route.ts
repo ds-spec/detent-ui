@@ -1,7 +1,7 @@
 import { ENTRIES } from '@/catalog/meta'
 import { source } from '@/catalog/source'
-import { BLOCKS } from '@/pro/blocks/meta'
-import { TEMPLATES } from '@/templates/meta'
+import { BLOCKS } from '@/catalog/blocks'
+import { TEMPLATES } from '@/catalog/templates'
 
 export function generateStaticParams() {
   return [...ENTRIES, ...BLOCKS, ...TEMPLATES.map((t) => ({ id: `template-${t.id}` }))].map((e) => ({ slug: e.id }))

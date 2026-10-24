@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { SOON, TEMPLATES } from '@/templates/meta'
+import { SOON, TEMPLATES } from '@/catalog/templates'
 import { ProTag } from '@/site/blocks/ProTag'
 import { Footer } from '@/site/Footer'
 import { Header } from '@/site/Header'

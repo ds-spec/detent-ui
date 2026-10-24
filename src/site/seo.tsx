@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { ENTRIES } from '@/catalog/meta'
 import { PLANS, PRO_COMPONENTS, SITE } from '@/catalog/pro'
-import { BLOCKS } from '@/pro/blocks/meta'
-import { TEMPLATES } from '@/templates/meta'
+import { BLOCKS } from '@/catalog/blocks'
+import { TEMPLATES } from '@/catalog/templates'
 
 /**
  * What search engines and link previews read: each page's title, the sentence under it in a

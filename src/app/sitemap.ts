@@ -1,9 +1,9 @@
 import type { MetadataRoute } from 'next'
 import { ENTRIES } from '@/catalog/meta'
 import { RELEASES } from '@/catalog/trust'
-import { BLOCKS } from '@/pro/blocks/meta'
+import { BLOCKS } from '@/catalog/blocks'
 import { url } from '@/site/seo'
-import { TEMPLATES } from '@/templates/meta'
+import { TEMPLATES } from '@/catalog/templates'
 
 /** Every page worth finding: the site's own, then each component, block and template. */
 export default function sitemap(): MetadataRoute.Sitemap {

@@ -1,4 +1,4 @@
-import { BLOCKS } from '@/pro/blocks/meta'
+import { BLOCKS } from '@/catalog/blocks'
 import { CONTENT_TYPE, OG, pageImage } from '@/site/og'
 
 export const alt = 'Detent blocks: whole screens for AI products, already working.'

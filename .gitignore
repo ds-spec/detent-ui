@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Detent Pro: its own private repository, checked out at src/pro
+/src/pro/
+
+# working files: design screenshots, research notes and the unlisted preview pages
+/shots/
+/RESEARCH.md
+/src/app/preview/
