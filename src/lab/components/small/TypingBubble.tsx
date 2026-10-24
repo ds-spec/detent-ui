@@ -99,12 +99,13 @@ export function TypingBubble({
             const mine = l.from === 'me'
             // Their orb sits beside the last of their lines in a run, the way messages group.
             const tail = !mine && lines[i + 1]?.from !== 'agent'
+            // Space between runs is padding, not margin: the stack places rows by their height alone.
             const gap = i > 0 && lines[i - 1].from !== l.from
             return (
               <motion.div
                 key={l.id}
                 layout="position"
-                className={`flex items-end gap-2 ${mine ? 'origin-bottom-right justify-end' : 'origin-bottom-left justify-start'} ${gap ? 'mt-2.5' : ''}`}
+                className={`flex items-end gap-2 ${mine ? 'origin-bottom-right justify-end' : 'origin-bottom-left justify-start'} ${gap ? 'pt-2.5' : ''}`}
                 initial={{ opacity: 0, y: 10, scale: 0.94 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, transition: { duration: 0.15 } }}
