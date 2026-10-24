@@ -26,7 +26,7 @@ export const label = (hue: number) => `oklch(0.53 0.13 ${hue})`
  * count rolls. A typing badge says who is writing, and idle people fade back. Click someone
  * to follow them: their colour rings the avatar, and the view goes where they go.
  */
-export function PresenceStack({
+export function HereNow({
   people,
   max = 4,
   following,

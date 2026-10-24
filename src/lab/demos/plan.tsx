@@ -1,8 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { AgentPlan } from '../components/plan/AgentPlan'
-import type { PlanHandle, PlanMode, PlanStep } from '../components/plan/AgentPlan'
+import { PlanEditor } from '../components/plan/PlanEditor'
+import type { PlanHandle, PlanMode, PlanStep } from '../components/plan/PlanEditor'
 import { useBench } from './bench'
 
 const GOAL = 'Ship the Q3 refund rules'
@@ -130,7 +130,7 @@ export function PlanDemo() {
       onKeyDown={() => (touched.current = true)}
     >
       <div className="absolute inset-x-0 top-0 mx-auto w-[420px] max-w-full">
-        <AgentPlan ref={plan} goal={b.get('goal', GOAL)} mode={p.mode} steps={p.steps} onStepsChange={b.on('onStepsChange', p.setSteps)} onRun={b.on('onRun', p.run)} onStop={b.on('onStop', p.stop)} onRunAgain={b.on('onRunAgain', () => p.reset())} />
+        <PlanEditor ref={plan} goal={b.get('goal', GOAL)} mode={p.mode} steps={p.steps} onStepsChange={b.on('onStepsChange', p.setSteps)} onRun={b.on('onRun', p.run)} onStop={b.on('onStop', p.stop)} onRunAgain={b.on('onRunAgain', () => p.reset())} />
       </div>
     </div>
   )

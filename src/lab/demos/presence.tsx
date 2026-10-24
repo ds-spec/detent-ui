@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { Cursor, PresenceStack, label, tone } from '../components/presence/Presence'
-import type { Person } from '../components/presence/Presence'
+import { Cursor, HereNow, label, tone } from '../components/presence/HereNow'
+import type { Person } from '../components/presence/HereNow'
 import { ease } from '../lib/motion'
 import { Button } from '../ui/Button'
 import { useBench } from './bench'
@@ -130,7 +130,7 @@ export function PresenceDemo() {
           <p className="truncate text-headline text-ink">Q3 refund rules</p>
           <p className="tnum truncate text-caption text-ink-3">Edited just now · {here.length} here</p>
         </div>
-        <PresenceStack people={people} following={following} onFollow={b.on('onFollow', setFollowing)} open={fan} max={b.get('max', 4)} />
+        <HereNow people={people} following={following} onFollow={b.on('onFollow', setFollowing)} open={fan} max={b.get('max', 4)} />
         <Button size="sm" variant="primary" className="rounded-full">
           Share
         </Button>

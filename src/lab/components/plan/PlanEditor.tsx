@@ -30,7 +30,7 @@ const NOTE = 24
  * stays near the top. When everything is done the card folds into a pill you can open
  * again. The card never changes size while it works; only the fold does, and it springs.
  */
-export function AgentPlan({
+export function PlanEditor({
   goal,
   mode,
   steps,
