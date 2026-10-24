@@ -34,7 +34,16 @@ export function SignatureDemo() {
   })
   return (
     <div {...handlers}>
-      <Signature ref={sig} value={name} onChange={setName} onSign={b.on('onSign')} fontFamily={script.style.fontFamily} />
+      <Signature
+        ref={sig}
+        value={name}
+        onChange={setName}
+        onSign={b.on('onSign')}
+        title="Agreement"
+        reference="Nº 0482"
+        detail="Northwind designs and builds the new checkout for Q4, for the fee as quoted, paid half now and half on launch."
+        fontFamily={script.style.fontFamily}
+      />
     </div>
   )
 }

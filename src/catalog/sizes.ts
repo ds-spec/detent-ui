@@ -46,7 +46,7 @@ export const SIZE: Record<string, [number, number]> = {
   waitlist: [420, 197],
   confirm: [580, 400],
   dialog: [600, 440],
-  signature: [460, 234],
+  signature: [520, 365],
   voicenote: [430, 274],
   'context-menu': [520, 360],
   dropdown: [520, 360],
