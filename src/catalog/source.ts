@@ -60,7 +60,7 @@ export const FILES: Record<string, string[]> = {
   'context-menu': ['components/overlays/ContextMenu.tsx', 'components/overlays/Menu.tsx', 'lib/layer.tsx'],
   sheet: ['components/overlays/Sheet.tsx', 'lib/layer.tsx'],
   hovercard: ['components/overlays/HoverCard.tsx', 'lib/layer.tsx'],
-  buttons: ['ui/Button.tsx'],
+  buttons: ['ui/Button.tsx', 'components/buttons/CopyButton.tsx', 'components/buttons/ToggleButton.tsx', 'components/buttons/SplitButton.tsx', 'components/buttons/ProgressButton.tsx', 'components/buttons/HoldButton.tsx'],
   tabs: ['components/DirectionTabs.tsx'],
   waitlist: ['components/site/Waitlist.tsx'],
   versions: ['components/small/Versions.tsx'],

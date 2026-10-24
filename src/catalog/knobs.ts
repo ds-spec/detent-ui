@@ -40,7 +40,7 @@ export const KNOBS: Record<string, Record<string, Knob>> = {
   feedback: { question: { value: 'Was this helpful?' } },
   command: { placeholder: { value: 'Search projects, people and actions…' } },
   presence: { max: { value: 4, range: [2, 6] } },
-  buttons: { variant: { value: 'primary', options: ['primary', 'secondary', 'ghost', 'danger'] }, size: { value: 'md', options: ['sm', 'md', 'lg'] } },
+  buttons: { size: { value: 'md', options: ['sm', 'md', 'lg'] } },
   waitlist: { action: { value: 'Join waitlist' }, placeholder: { value: 'you@company.com' }, joined: { value: 1283, range: [1000, 9999] } },
   run: { label: { value: 'Run agent' } },
   thinking: { expanded: { value: false } },

@@ -33,7 +33,7 @@ const FREE: Record<string, ComponentType> = {
   feedback: dynamic(() => import('@/lab/demos/showcase').then((m) => m.FeedbackDemo), { ssr: false }),
   command: dynamic(() => import('@/lab/demos/command').then((m) => m.CommandDemo), { ssr: false }),
   presence: dynamic(() => import('@/lab/demos/presence').then((m) => m.PresenceDemo), { ssr: false }),
-  buttons: dynamic(() => import('@/lab/demos/menus').then((m) => m.ButtonsDemo), { ssr: false }),
+  buttons: dynamic(() => import('@/lab/demos/buttons').then((m) => m.ButtonsDemo), { ssr: false }),
   tabs: dynamic(() => import('@/lab/demos/essentials').then((m) => m.TabsDemo), { ssr: false }),
   waitlist: dynamic(() => import('@/lab/demos/site').then((m) => m.WaitlistDemo), { ssr: false }),
   versions: dynamic(() => import('@/lab/demos/small').then((m) => m.VersionsDemo), { ssr: false }),

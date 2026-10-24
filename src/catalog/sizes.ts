@@ -30,7 +30,7 @@ export const SIZE: Record<string, [number, number]> = {
   feedback: [420, 420],
   command: [460, 420],
   presence: [440, 420],
-  buttons: [420, 220],
+  buttons: [620, 548],
   tabs: [380, 300],
   payments: [400, 330],
   versions: [360, 230],
