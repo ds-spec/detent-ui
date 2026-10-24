@@ -11,7 +11,7 @@ import { Dialog } from '../components/overlays/Dialog'
 import type { DialogHandle } from '../components/overlays/Dialog'
 import { DropdownMenu } from '../components/overlays/DropdownMenu'
 import type { DropdownHandle } from '../components/overlays/DropdownMenu'
-import { HoverCard } from '../components/overlays/HoverCard'
+import { HoverCard, HoverCardGroup } from '../components/overlays/HoverCard'
 import type { HoverCardHandle } from '../components/overlays/HoverCard'
 import type { MenuItem } from '../components/overlays/Menu'
 import { Popover } from '../components/overlays/Popover'
@@ -675,46 +675,98 @@ export function SheetDemo() {
 
 /* ───────────────────────────── Hover card ───────────────────────────── */
 
-function Profile() {
+type Person = { name: string; handle: string; role: string; hue: number; bio: string; time: [string, string]; city: string; reviews: number; month: number; seed: number }
+
+const PEOPLE: Record<string, Person> = {
+  maya: { name: 'Maya Chen', handle: 'maya', role: 'Staff engineer', hue: 150, bio: 'Checkout and payments at Acme. Reviews most of what Kiln opens.', time: ['9:41', 'PM'], city: 'Lisbon', reviews: 412, month: 38, seed: 3 },
+  jonas: { name: 'Jonas Weber', handle: 'jonas', role: 'Design engineer', hue: 260, bio: 'Owns the empty states and most of the words on screen.', time: ['10:41', 'PM'], city: 'Berlin', reviews: 167, month: 12, seed: 11 },
+}
+
+/** Twelve weeks of reviews as a field of dots, a column a week, darker on busier days. */
+function Activity({ seed }: { seed: number }) {
+  const rand = (i: number) => {
+    const x = Math.sin(seed * 127.1 + i * 311.7) * 43758.5453
+    return x - Math.floor(x)
+  }
+  return (
+    <span aria-hidden className="grid grid-flow-col grid-rows-5 gap-[2.5px]">
+      {Array.from({ length: 60 }, (_, i) => {
+        const v = rand(i) * (0.45 + 0.55 * (i / 60))
+        return <span key={i} className="size-[4px] rounded-full bg-ink" style={{ opacity: v < 0.18 ? 0.09 : v < 0.36 ? 0.3 : v < 0.55 ? 0.6 : 1 }} />
+      })}
+    </span>
+  )
+}
+
+function Profile({ p }: { p: Person }) {
   return (
     <div className="p-4">
-      <div className="flex items-center gap-3">
-        <Orb seed="Maya Chen" hue={150} size={40} />
-        <div className="min-w-0">
-          <p className="text-headline text-ink">Maya Chen</p>
-          <p className="text-footnote text-ink-3">@maya · Staff engineer</p>
+      <div className="flex items-start gap-3">
+        <Orb seed={p.name} hue={p.hue} size={40} />
+        <div className="min-w-0 flex-1">
+          <p className="text-headline text-ink">{p.name}</p>
+          <p className="truncate text-footnote text-ink-3">
+            @{p.handle} · {p.role}
+          </p>
         </div>
+        {/* Their local time, the hour in ink and the rest in grey. */}
+        <p className="tnum text-right text-footnote leading-5">
+          <span className="text-ink">{p.time[0]}</span> <span className="text-ink-3">{p.time[1]}</span>
+          <span className="block text-caption text-ink-3">{p.city}</span>
+        </p>
       </div>
-      <p className="mt-3 text-callout text-ink-2">Checkout and payments at Acme. Reviews most of what Kiln opens.</p>
-      <div className="mt-3 flex gap-4 border-t border-line pt-3 text-footnote">
-        <span>
-          <span className="text-ink">412</span> <span className="text-ink-3">reviews</span>
-        </span>
-        <span>
-          <span className="text-ink">38</span> <span className="text-ink-3">this month</span>
-        </span>
-        <span className="ml-auto flex items-center gap-1.5 text-ok">
-          <span className="size-1.5 rounded-full bg-ok" /> Online
-        </span>
+      <p className="mt-3 text-callout leading-[21px] text-ink-2">{p.bio}</p>
+      <div className="mt-3.5 flex items-end justify-between border-t border-line pt-3.5">
+        <p className="text-footnote leading-5">
+          <span className="tnum text-ink">{p.reviews}</span> <span className="text-ink-3">reviews</span>
+          <span className="block">
+            <span className="tnum text-ink">{p.month}</span> <span className="text-ink-3">this month</span>
+          </span>
+        </p>
+        <Activity seed={p.seed} />
       </div>
     </div>
   )
 }
 
-/** Rests on a mention: the card opens at once in the shape of a profile, then grows to fit it as it loads. */
+/**
+ * Two mentions in one comment, sharing a card. It rests on the first and the card opens in the
+ * shape of a profile, then fills in; it moves to the second and the same card glides over and
+ * becomes the next person, without waiting.
+ */
 export function HoverCardDemo() {
   const b = useBench()
-  const card = useRef<HoverCardHandle>(null)
+  const maya = useRef<HoverCardHandle>(null)
+  const jonas = useRef<HoverCardHandle>(null)
   const [round, setRound] = useState(0)
   const hands = useScript(async (beat) => {
-    // A fresh card each time round, so the profile loads again and the card grows again.
+    // A fresh group each time round, so each profile loads again.
     setRound((n) => n + 1)
     await beat(1200)
-    card.current?.open()
-    await beat(3200)
-    card.current?.close()
+    maya.current?.open()
+    await beat(2600)
+    jonas.current?.open()
+    await beat(2600)
+    jonas.current?.close()
     await beat(1400)
   })
+  const mention = (who: string) => (
+    <a href="#" onClick={(e) => e.preventDefault()} className="ring-focus rounded-[4px] font-medium text-[var(--accent)] hover:underline">
+      @{who}
+    </a>
+  )
+  const card = (who: keyof typeof PEOPLE, ref: typeof maya) => (
+    <HoverCard
+      ref={ref}
+      label={PEOPLE[who].name}
+      width={320}
+      align="center"
+      openDelay={b.get('openDelay', 450)}
+      side={b.get('side', 'bottom')}
+      load={() => new Promise((r) => setTimeout(() => r(<Profile p={PEOPLE[who]} />), 800))}
+      trigger={mention(who)}
+    />
+  )
   return (
     <Window title="Pull request #1290" hands={hands}>
       <div className="p-5">
@@ -724,23 +776,11 @@ export function HoverCardDemo() {
             <p className="text-footnote text-ink-3">
               <span className="text-ink">Lena Ortiz</span> commented
             </p>
-            <p className="mt-1.5 text-callout leading-[22px] text-ink-2">
-              Looks right to me. Can{' '}
-              <HoverCard
-                key={round}
-                ref={card}
-                label="Maya Chen"
-                openDelay={b.get('openDelay', 450)}
-                side={b.get('side', 'bottom')}
-                load={() => new Promise((r) => setTimeout(() => r(<Profile />), 1000))}
-                trigger={
-                  <a href="#" onClick={(e) => e.preventDefault()} className="ring-focus rounded-[4px] font-medium text-[var(--accent)] hover:underline">
-                    @maya
-                  </a>
-                }
-              />{' '}
-              check the rounding in <span className="rounded-[5px] bg-surface-2 px-1 font-mono text-footnote text-ink">total()</span> before we merge?
-            </p>
+            <HoverCardGroup key={round}>
+              <p className="mt-1.5 text-callout leading-[22px] text-ink-2">
+                This looks right to me. Before we merge, can one of you check the rounding in <span className="rounded-[5px] bg-surface-2 px-1 font-mono text-footnote text-ink">total()</span>, {card('maya', maya)} or {card('jonas', jonas)}?
+              </p>
+            </HoverCardGroup>
           </div>
         </div>
       </div>
