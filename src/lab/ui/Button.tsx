@@ -6,8 +6,8 @@ import { ease, press } from '../lib/motion'
 import { Spinner } from './Spinner'
 import { tap } from '../lib/feel'
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
-type Size = 'sm' | 'md' | 'lg'
+export type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
+export type Size = 'sm' | 'md' | 'lg'
 
 const SIZE: Record<Size, string> = {
   sm: 'h-8 gap-1.5 rounded-[9px] px-3 text-footnote',
@@ -22,6 +22,10 @@ const VARIANT: Record<Variant, string> = {
   ghost: 'text-ink-2 hover:bg-surface-2 hover:text-ink active:bg-surface-3',
   danger: 'chip text-danger [--chip-wash:11%] [--chip:var(--danger)] hover:[--chip-wash:17%]',
 }
+
+/** What a button of this variant and size wears, for buttons built on the same tokens. */
+export const buttonClass = (variant: Variant = 'secondary', size: Size = 'md', icon = false) =>
+  `sink ring-focus relative inline-flex shrink-0 select-none items-center justify-center font-medium transition-[background-color,color,box-shadow] duration-150 disabled:pointer-events-none disabled:opacity-45 ${icon ? ICON[size] : SIZE[size]} ${VARIANT[variant]}`
 
 /**
  * The default button. Presses settle to 0.97. Loading swaps the label for a spinner, and
@@ -62,7 +66,7 @@ export function Button({
         if (!rest.disabled && !loading) tap()
         onPointerDown?.(e)
       }}
-      className={`sink ring-focus relative inline-flex shrink-0 select-none items-center justify-center font-medium transition-[background-color,color,box-shadow] duration-150 disabled:pointer-events-none disabled:opacity-45 ${icon ? ICON[size] : SIZE[size]} ${VARIANT[variant]} ${className}`}
+      className={`${buttonClass(variant, size, icon)} ${className}`}
       {...rest}
     >
       <motion.span
