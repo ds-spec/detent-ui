@@ -8,7 +8,7 @@ export const contentType = CONTENT_TYPE
 export default async function Image() {
   return pageImage({
     kicker: `${TEMPLATES.length} templates`,
-    title: 'Whole sites and apps,',
+    title: 'Whole apps,',
     turn: 'ready to ship.',
     tag: 'Pro',
   })

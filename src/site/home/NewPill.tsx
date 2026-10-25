@@ -6,11 +6,11 @@ import { AnimatePresence, motion } from 'motion/react'
 import { ArrowRight } from '@/lab/icons'
 
 const NEW = [
-  { href: '/templates/detent', name: 'Agent workspace' },
-  { href: '/blocks/prompt-playground', name: 'Prompt playground' },
-  { href: '/components/models', name: 'Model picker' },
-  { href: '/components/plan', name: 'Agent plan' },
-  { href: '/components/voice', name: 'Voice input' },
+  { href: '/ai-sdk', name: 'Works with AI SDK' },
+  { href: '/templates/tandem', name: 'Tandem, with AI' },
+  { href: '/blocks/agent-chat', name: 'Agent chat' },
+  { href: '/blocks/integrations', name: 'Integrations' },
+  { href: '/blocks/feature-story', name: 'Feature story' },
 ]
 
 /** The announcement pill: the newest things take turns, rolling through a masked slot that never changes size, always at full ink. */

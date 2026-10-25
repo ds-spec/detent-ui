@@ -3,3 +3,8 @@
 declare module '@pro' {
   export * from '@/locked'
 }
+
+// And `@pro-server`, Pro's route handlers, the same way.
+declare module '@pro-server' {
+  export * from '@/locked/server'
+}

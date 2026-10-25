@@ -155,7 +155,7 @@ export function View({ id }: { id: string }) {
       <Caption e={e} />
       <Notes e={e} />
 
-      <nav aria-label="More components" className="mt-20 grid gap-3 sm:grid-cols-2">
+      <nav aria-label="More components" className="mt-20 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Step to={prev} side="prev" />
         <Step to={next} side="next" />
       </nav>
