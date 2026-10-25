@@ -243,7 +243,7 @@ function keep(stmts: Stmt[], words: Set<string>): string[] {
     if (head.startsWith('@theme')) {
       // Fonts stay the buyer's: the components set no typeface of their own.
       out.push(st.text.replace(/\n[ \t]*--font-(sans|mono):[^;]*;/g, ''))
-    } else if (LIGHT.test(head) || DARK.test(head)) out.push(darkened(st.text))
+    } else if (LIGHT.test(head) || DARK.test(head)) out.push(darkened(bridged(st.text)))
     else if ((head.startsWith('@media') || head.startsWith('@supports')) && st.body !== undefined) {
       const inner = keep(statements(st.body), words)
       if (inner.length) out.push(`\n\n${head} {${inner.map((t) => t.replace(/^\n+/, '\n')).join('')}\n}`)
@@ -251,6 +251,38 @@ function keep(stmts: Stmt[], words: Set<string>): string[] {
   }
   return out
 }
+
+/*
+ * The bridge to the buyer's theme. Anyone installing with `shadcn add` has shadcn's variables, so
+ * each Detent token points at its shadcn counterpart first and keeps Detent's own value as the
+ * fallback: change your --primary and Detent's accent follows; switch to .dark and so does
+ * Detent. The in-between inks are mixed from yours. Tokens shadcn has no word for (the AI
+ * colours, ok and warn, elevations) stay Detent's. Placeholders stand in for shadcn's own
+ * --accent and --card until after the rename, which would otherwise take them for ours.
+ */
+const BRIDGE: Record<string, (own: string) => string> = {
+  '--bg': (v) => `var(--background, ${v})`,
+  '--surface': (v) => `var(--background, ${v})`,
+  '--surface-2': (v) => `var(--muted, ${v})`,
+  '--surface-3': (v) => `var(__SHADCN_ACCENT__, ${v})`,
+  '--line': (v) => `var(--border, ${v})`,
+  '--line-strong': (v) => `var(--input, ${v})`,
+  '--ink': (v) => `var(--foreground, ${v})`,
+  '--ink-2': (v) => `color-mix(in oklch, var(--foreground, ${v}) 42%, var(--muted-foreground, ${v}))`,
+  '--ink-3': (v) => `var(--muted-foreground, ${v})`,
+  '--quiet': (v) => `color-mix(in oklch, var(--muted-foreground, ${v}) 72%, var(--background, transparent))`,
+  '--danger': (v) => `var(--destructive, ${v})`,
+  '--accent': (v) => `var(--primary, ${v})`,
+  '--accent-ink': (v) => `color-mix(in oklch, var(--primary, ${v}) 86%, var(--foreground, ${v}))`,
+  '--card': (v) => `var(__SHADCN_CARD__, ${v})`,
+  '--sheet': (v) => `var(--popover, ${v})`,
+}
+/** Points a token block's declarations at the buyer's shadcn variables, keeping ours as fallbacks. */
+const bridged = (text: string) =>
+  text.replace(/(^|\n)([ \t]*)(--[\w-]+):\s*([^;]+);/g, (all, nl: string, pad: string, name: string, value: string) => {
+    if (!(name in BRIDGE) || value.includes('var(--')) return all
+    return `${nl}${pad}${name}: ${BRIDGE[name](value.trim())};`
+  })
 
 /** The tokens and the CSS every free item needs: one stylesheet, its comments intact, beside the components. */
 export async function registryTheme(): Promise<RegistryItem> {
@@ -273,12 +305,18 @@ export async function registryTheme(): Promise<RegistryItem> {
  * Detent's theme: the tokens every Detent component is drawn with (surfaces, inks, lines, the
  * accent, the type scale, radii, elevation) and the few classes and keyframes they use, in
  * light and dark. Dark follows either a .dark class or data-theme="dark" on an ancestor.
+ *
+ * It follows your shadcn theme: surfaces, inks, lines, the accent, danger and cards read your
+ * --background, --foreground, --muted-foreground, --border, --primary, --destructive and --card,
+ * with Detent's own values as the fallback. Change yours and Detent changes with it.
  * Detent's accent and card are named dt-accent and dt-card, so they never touch your own.
  * Imported once from your global stylesheet, after Tailwind.
  */
 ${kept.join('').trim()}
 `,
   )
+    .replace(/__SHADCN_ACCENT__/g, '--accent')
+    .replace(/__SHADCN_CARD__/g, '--card')
   return {
     $schema: SCHEMA,
     name: 'theme',

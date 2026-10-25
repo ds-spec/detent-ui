@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import type { ReactNode } from 'react'
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from 'motion/react'
 import type { LegacyAnimationControls as AnimationControls } from 'motion/react'
@@ -26,7 +26,22 @@ export type InboxItem = {
 const LIST_H = 312
 const fold = { type: 'spring', bounce: 0, duration: 0.34 } as const
 
+/*
+ * The time the rows are measured against, ticking every 20 seconds. It's read through an external
+ * store, not during render: a server prerender sees no time at all (every row says "Just now"),
+ * and the browser reads the real time once it has the page. Frameworks that prerender (Next.js
+ * among them) flag a clock read while rendering.
+ */
+const TICK = 20_000
+const tick = (onChange: () => void) => {
+  const t = setInterval(onChange, TICK)
+  return () => clearInterval(t)
+}
+const clock = () => Math.floor(Date.now() / TICK) * TICK
+const noClock = () => 0
+
 const ago = (t: number, now: number) => {
+  if (!now) return 'Just now'
   const s = (now - t) / 1000
   if (s < 45) return 'Just now'
   const m = Math.round(s / 60)
@@ -68,7 +83,7 @@ export function Inbox({
   const [open, setOpen] = useState(defaultOpen)
   const [tab, setTab] = useState<'all' | 'unread'>('all')
   const [sweep, setSweep] = useState(false)
-  const [now, setNow] = useState(() => Date.now())
+  const now = useSyncExternalStore(tick, clock, noClock)
   const trigger = useRef<HTMLButtonElement>(null)
   const panel = useRef<HTMLDivElement>(null)
   const bell = useAnimationControls()
@@ -77,11 +92,6 @@ export function Inbox({
 
   const unread = items.filter((i) => i.unread).length
   const shown = tab === 'unread' ? items.filter((i) => i.unread) : items
-
-  useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 20_000)
-    return () => clearInterval(t)
-  }, [])
 
   // Ring when a new unread item lands on top.
   const top = items[0]?.id
