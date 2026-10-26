@@ -4,6 +4,7 @@ import './globals.css'
 import { SITE } from '@/catalog/pro'
 import { Providers } from '@/site/Providers'
 import { DESCRIPTION, NAME, TAGLINE } from '@/site/seo'
+import { MarkdownAlternateLink } from '@/site/MarkdownAlternateLink'
 
 // Geist: a plain Swiss grotesk. Big type is set regular and tight, so size does the work, not weight.
 const sans = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' })
@@ -22,6 +23,15 @@ export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
   formatDetection: { telephone: false, email: false, address: false },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 } },
+  alternates: {
+    canonical: '/',
+    types: {
+      'text/markdown': `${SITE}/index.md`,
+    },
+  },
+  other: {
+    'ai-summary': DESCRIPTION,
+  },
   // The shared image is app/opengraph-image.tsx; sections and detail pages draw their own.
   openGraph: { title: `${NAME} — ${TAGLINE}`, description: DESCRIPTION, siteName: NAME, type: 'website', locale: 'en_US' },
   twitter: { card: 'summary_large_image', title: `${NAME} — ${TAGLINE}`, description: DESCRIPTION },
@@ -40,6 +50,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     <html lang="en" className={`${sans.variable} ${mono.variable}`} data-theme="light" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: theme }} />
+        <MarkdownAlternateLink />
       </head>
       <body>
         <Providers>{children}</Providers>

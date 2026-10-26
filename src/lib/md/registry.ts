@@ -1,0 +1,582 @@
+/**
+ * Renderer registry: maps every public route to a function that returns its markdown content.
+ *
+ * Adding a new page = one entry here. llms.txt, llms-full.txt, and /api/md/_catalog pick it up
+ * automatically.
+ *
+ * Each renderer returns the full markdown string (body + envelope). If the route doesn't exist
+ * (e.g. an unknown slug), return null — the handler will send a 404.
+ */
+
+import { ENTRIES, entry } from '@/catalog/meta'
+import { BLOCKS } from '@/catalog/blocks'
+import { TEMPLATES } from '@/catalog/templates'
+import { RELEASES, CONTACT } from '@/catalog/trust'
+import { PLANS, PRO_COMPONENTS, PRO_BLOCK_COUNT, SITE } from '@/catalog/pro'
+import { NAME, DESCRIPTION, TAGLINE, FREE_COUNT } from '@/site/seo'
+import { abs, envelope, fmtDate, itemList, kvTable, today } from './format'
+
+// ─── Type ────────────────────────────────────────────────────────────────────
+
+export type MarkdownRoute = {
+  /** The HTML path, e.g. "/pricing" or "/components/answer". */
+  path: string
+  /** One-line description for llms.txt. */
+  desc: string
+  /** Whether to include in llms-full.txt. */
+  inFull: boolean
+  /** Whether this is a static, long-lived page (affects cache headers). */
+  isStatic: boolean
+}
+
+export type Renderer = () => string | null
+
+// ─── Static page renderers ────────────────────────────────────────────────────
+
+function renderHome(): string {
+  const body = [
+    `## What is ${NAME}?`,
+    '',
+    DESCRIPTION,
+    '',
+    `## Components (${ENTRIES.length} total, ${FREE_COUNT} free)`,
+    '',
+    `${NAME} ships ${ENTRIES.length} React components for AI products: chat interfaces, agent scaffolds, streaming answers, data tables, charts, and inputs. ${FREE_COUNT} are free under MIT. The rest are Pro.`,
+    '',
+    `Install the free agent kit to get started:`,
+    '',
+    '```bash',
+    `npx shadcn add ${SITE}/r/agent-kit`,
+    '```',
+    '',
+    `## Plans`,
+    '',
+    kvTable(
+      PLANS.map((p) => [`${p.name} — $${p.price}`, p.line]),
+      ['Plan', 'Description'],
+    ),
+    '',
+    `## Key sections`,
+    '',
+    itemList([
+      { label: 'Components', href: abs('/components'), desc: `${ENTRIES.length} React components for AI products` },
+      { label: 'Pro', href: abs('/pro'), desc: `${PRO_COMPONENTS.length} Pro components, ${PRO_BLOCK_COUNT} blocks and ${TEMPLATES.length} templates` },
+      { label: 'Blocks', href: abs('/blocks'), desc: 'Whole screens built from Detent components' },
+      { label: 'Templates', href: abs('/templates'), desc: 'Landing pages and full apps' },
+      { label: 'AI SDK guide', href: abs('/ai-sdk'), desc: 'How Detent integrates with the Vercel AI SDK' },
+      { label: 'Changelog', href: abs('/changelog'), desc: 'Every update, newest first' },
+    ]),
+  ].join('\n')
+
+  return envelope({
+    title: `${NAME} — ${TAGLINE}`,
+    summary: DESCRIPTION,
+    path: '/',
+    updatedAt: RELEASES[0]?.date ?? today(),
+    body,
+    related: [
+      { label: 'Pro', href: abs('/pro') },
+      { label: 'Changelog', href: abs('/changelog') },
+    ],
+  })
+}
+
+function renderPro(): string {
+  const body = [
+    `## What's in Pro`,
+    '',
+    `Pro gives you ${PRO_COMPONENTS.length} advanced React components, ${PRO_BLOCK_COUNT} whole-screen blocks, and ${TEMPLATES.length} templates. One payment, every update for life, unlimited projects.`,
+    '',
+    `## Plans`,
+    '',
+    kvTable(
+      PLANS.map((p) => [`${p.name} — $${p.price}`, `${p.line} ${p.seats}`]),
+      ['Plan', 'Details'],
+    ),
+    '',
+    `## FAQ`,
+    '',
+    `**Is it a subscription?** No. You pay once and keep everything, including every update that ships after you buy.`,
+    '',
+    `**Does it work with the AI SDK?** Yes. \`useDetentChat\` wraps \`useChat\` and returns the props for the streaming answer, run waterfall, and approval card.`,
+    '',
+    `**Will it match my design?** Installed with shadcn, Detent reads your theme: your primary becomes its accent, and \`.dark\` turns it dark.`,
+    '',
+    `**How do I install Pro?** \`npx shadcn add @detent-pro/<component-id>\` — set up your licence key once, then install any piece.`,
+    '',
+    `## Pro components (${PRO_COMPONENTS.length})`,
+    '',
+    itemList(PRO_COMPONENTS.map((id) => {
+      const e = entry(id)
+      return { label: e ? e.name : id, href: abs(`/components/${id}`), desc: e?.line }
+    })),
+  ].join('\n')
+
+  return envelope({
+    title: `${NAME} Pro`,
+    summary: `${PRO_COMPONENTS.length} React components, ${PRO_BLOCK_COUNT} whole screens and ${TEMPLATES.length} templates for AI products. One payment, every update for life.`,
+    path: '/pro',
+    body,
+    related: [
+      { label: 'Components', href: abs('/components') },
+      { label: 'Blocks', href: abs('/blocks') },
+      { label: 'Templates', href: abs('/templates') },
+    ],
+  })
+}
+
+function renderComponents(): string {
+  const byCategory = ENTRIES.reduce<Record<string, typeof ENTRIES>>((acc, e) => {
+    ;(acc[e.category] ??= []).push(e)
+    return acc
+  }, {})
+
+  const body = Object.entries(byCategory)
+    .map(([cat, entries]) => {
+      const header = `## ${cat.charAt(0).toUpperCase() + cat.slice(1)} components`
+      const list = itemList(
+        entries.map((e) => ({ label: e.name, href: abs(`/components/${e.id}`), desc: e.line })),
+      )
+      return [header, '', list].join('\n')
+    })
+    .join('\n\n')
+
+  return envelope({
+    title: `${NAME} component library`,
+    summary: `${ENTRIES.length} React components for AI products: chat, agents, data, inputs and more. ${FREE_COUNT} free under MIT.`,
+    path: '/components',
+    body,
+    related: [{ label: 'Blocks', href: abs('/blocks') }, { label: 'Templates', href: abs('/templates') }],
+  })
+}
+
+function renderBlocks(): string {
+  const body = [
+    `## All blocks (${BLOCKS.length})`,
+    '',
+    itemList(BLOCKS.map((b) => ({ label: b.name, href: abs(`/blocks/${b.id}`), desc: b.line }))),
+    '',
+    'Every block is Pro. Install from the private registry after setting up a licence key.',
+  ].join('\n')
+
+  return envelope({
+    title: `${NAME} Blocks — whole screens`,
+    summary: `${BLOCKS.length} whole-screen React blocks built from Detent components. Pro licence required.`,
+    path: '/blocks',
+    body,
+    related: [{ label: 'Pro', href: abs('/pro') }, { label: 'Templates', href: abs('/templates') }],
+  })
+}
+
+function renderTemplates(): string {
+  const body = [
+    `## All templates (${TEMPLATES.length})`,
+    '',
+    itemList(
+      TEMPLATES.map((t) => ({
+        label: t.name,
+        href: abs(`/templates/${t.id}`),
+        desc: `${t.form === 'app' ? 'App' : 'Landing page'} · ${t.kind} — ${t.line}`,
+      })),
+    ),
+  ].join('\n')
+
+  return envelope({
+    title: `${NAME} Templates`,
+    summary: `${TEMPLATES.length} landing pages and full-app templates for AI products. Pro licence required.`,
+    path: '/templates',
+    body,
+    related: [{ label: 'Pro', href: abs('/pro') }, { label: 'Blocks', href: abs('/blocks') }],
+  })
+}
+
+function renderAiSdk(): string {
+  const body = [
+    `## What is the ${NAME} AI SDK integration?`,
+    '',
+    `${NAME} ships \`useDetentChat\`, a hook that wraps the Vercel AI SDK's \`useChat\`. It returns ready-to-use props for the streaming answer, the agent run waterfall, the approval card, and source citations — timed to arrive as each part of the response comes in.`,
+    '',
+    `## Components in this section`,
+    '',
+    itemList([
+      { label: 'Answer', href: abs('/components/answer'), desc: 'Streaming answer with sources and citations' },
+      { label: 'Trace', href: abs('/components/trace'), desc: 'Agent run waterfall: steps, tools, timing' },
+      { label: 'Approval', href: abs('/components/approval'), desc: 'Human-in-the-loop approval card' },
+      { label: 'Thinking', href: abs('/components/thinking'), desc: 'Streaming reasoning, collapsed by default' },
+    ]),
+    '',
+    `## How it works`,
+    '',
+    '```tsx',
+    "import { useDetentChat } from '@/components/detent/use-detent-chat'",
+    '',
+    "const { answerProps, traceProps, approvalProps } = useDetentChat({ api: '/api/chat' })",
+    '```',
+    '',
+    'The hook reads the AI SDK stream parts and maps each type to the right component props. No manual parsing needed.',
+  ].join('\n')
+
+  return envelope({
+    title: `${NAME} and the AI SDK`,
+    summary: `How ${NAME} integrates with the Vercel AI SDK's useChat: streaming answers, agent run waterfalls, and approval cards, all timed to the parts as they arrive.`,
+    path: '/ai-sdk',
+    body,
+    related: [
+      { label: 'Answer component', href: abs('/components/answer') },
+      { label: 'Pro', href: abs('/pro') },
+    ],
+  })
+}
+
+function renderSystem(): string {
+  const body = [
+    `## Design tokens`,
+    '',
+    `${NAME} ships a set of CSS custom properties (design tokens) that map to your shadcn theme. Your \`--primary\` becomes ${NAME}'s accent, \`--background\` and \`--foreground\` are inherited, and \`.dark\` on the HTML element enables the dark variant automatically.`,
+    '',
+    `## Typography`,
+    '',
+    'Detent uses Geist and Geist Mono from Google Fonts. All font sizes are set with the Tailwind v4 type scale.',
+    '',
+    `## Install`,
+    '',
+    '```bash',
+    `npx shadcn add ${SITE}/r/theme.json`,
+    '```',
+  ].join('\n')
+
+  return envelope({
+    title: `${NAME} design system`,
+    summary: `The tokens, typography and theme that ${NAME} uses. Install with shadcn and it inherits your existing colours and fonts.`,
+    path: '/system',
+    body,
+    related: [{ label: 'Components', href: abs('/components') }],
+  })
+}
+
+function renderChangelog(): string {
+  const body = RELEASES.map((r) => {
+    const items = r.items.map((it) => {
+      const label = it.pro ? `${it.label} *(Pro)*` : it.label
+      return it.href ? `- [${label}](${abs(it.href)})` : `- ${label}`
+    })
+    return [`### ${r.title}`, `*${fmtDate(r.date)}*`, '', r.line, '', ...items].join('\n')
+  }).join('\n\n')
+
+  return envelope({
+    title: `${NAME} Changelog`,
+    summary: 'Every update shipped in Detent, newest first.',
+    path: '/changelog',
+    updatedAt: RELEASES[0]?.date,
+    body,
+  })
+}
+
+function renderLicence(): string {
+  const body = [
+    '## Summary',
+    '',
+    'The Detent licence lets you use the components in any number of personal or commercial projects. You may not resell or redistribute the components themselves.',
+    '',
+    '## Key terms',
+    '',
+    kvTable([
+      ['Licensor', 'Detent'],
+      ['Licence type', 'Commercial, per-seat'],
+      ['Projects', 'Unlimited'],
+      ['Redistribution', 'Not permitted'],
+      ['Updates', 'All future updates included'],
+    ]),
+    '',
+    `Contact: ${CONTACT}`,
+  ].join('\n')
+
+  return envelope({
+    title: `${NAME} licence`,
+    summary: 'The terms under which you may use Detent components in your projects.',
+    path: '/licence',
+    body,
+    related: [{ label: 'Terms', href: abs('/terms') }, { label: 'Refunds', href: abs('/refunds') }],
+  })
+}
+
+function renderTerms(): string {
+  const body = [
+    '## Summary',
+    '',
+    'These are the general terms of service for using Detent. By purchasing a licence you agree to these terms.',
+    '',
+    `Contact: ${CONTACT}`,
+  ].join('\n')
+
+  return envelope({
+    title: `${NAME} — Terms of Service`,
+    summary: 'The terms of service for purchasing and using a Detent licence.',
+    path: '/terms',
+    body,
+    related: [{ label: 'Licence', href: abs('/licence') }, { label: 'Refunds', href: abs('/refunds') }],
+  })
+}
+
+function renderRefunds(): string {
+  const body = [
+    '## Refund policy',
+    '',
+    'You may request a full refund within 14 days of purchase, no questions asked. After 14 days, refunds are at our discretion.',
+    '',
+    `Contact: ${CONTACT}`,
+  ].join('\n')
+
+  return envelope({
+    title: `${NAME} — Refund Policy`,
+    summary: 'The refund policy for Detent Pro purchases.',
+    path: '/refunds',
+    body,
+    related: [{ label: 'Terms', href: abs('/terms') }, { label: 'Licence', href: abs('/licence') }],
+  })
+}
+
+// ─── Dynamic page renderers ───────────────────────────────────────────────────
+
+function renderComponent(slug: string): string | null {
+  const e = entry(slug)
+  if (!e) return null
+
+  const body = [
+    `## About`,
+    '',
+    e.line,
+    '',
+    e.details.length > 0
+      ? ['## Details', '', ...e.details.map((d) => `- ${d}`)].join('\n')
+      : '',
+    '',
+    e.keys && e.keys.length > 0
+      ? ['## Keyboard shortcuts', '', kvTable(e.keys, ['Keys', 'Action'])].join('\n')
+      : '',
+    '',
+    `## Install`,
+    '',
+    '```bash',
+    `npx shadcn add ${SITE}/r/${e.id}`,
+    '```',
+  ]
+    .filter(Boolean)
+    .join('\n')
+
+  return envelope({
+    title: `${e.name} — ${NAME}`,
+    summary: e.line,
+    path: `/components/${e.id}`,
+    body,
+    related: [
+      { label: 'All components', href: abs('/components') },
+      { label: 'Pro', href: abs('/pro') },
+    ],
+  })
+}
+
+function renderBlock(slug: string): string | null {
+  const b = BLOCKS.find((b) => b.id === slug)
+  if (!b) return null
+
+  const body = [
+    `## About`,
+    '',
+    b.line,
+    '',
+    `## Details`,
+    '',
+    ...b.details.map((d) => `- ${d}`),
+    '',
+    b.keys && b.keys.length > 0
+      ? ['## Keyboard shortcuts', '', kvTable(b.keys, ['Keys', 'Action'])].join('\n')
+      : '',
+    '',
+    `## Install (Pro required)`,
+    '',
+    '```bash',
+    `npx shadcn add @detent-pro/${b.id}`,
+    '```',
+  ]
+    .filter(Boolean)
+    .join('\n')
+
+  return envelope({
+    title: `${b.name} — ${NAME}`,
+    summary: b.line,
+    path: `/blocks/${b.id}`,
+    body,
+    related: [
+      { label: 'All blocks', href: abs('/blocks') },
+      { label: 'Pro', href: abs('/pro') },
+    ],
+  })
+}
+
+function renderTemplate(slug: string): string | null {
+  const t = TEMPLATES.find((t) => t.id === slug)
+  if (!t) return null
+
+  const body = [
+    `## About`,
+    '',
+    t.line,
+    '',
+    `**Type:** ${t.form === 'app' ? 'Full app' : 'Landing page'}`,
+    `**Suits:** ${t.suits}`,
+    '',
+    `## Sections`,
+    '',
+    itemList(t.parts.map((p) => ({ label: p.name, desc: p.line }))),
+    '',
+    `## Install (Pro required)`,
+    '',
+    '```bash',
+    `npx shadcn add @detent-pro/template-${t.id}`,
+    '```',
+  ].join('\n')
+
+  return envelope({
+    title: `${t.name} — ${NAME} Template`,
+    summary: t.line,
+    path: `/templates/${t.id}`,
+    body,
+    related: [
+      { label: 'All templates', href: abs('/templates') },
+      { label: 'Pro', href: abs('/pro') },
+    ],
+  })
+}
+
+// ─── Registry ─────────────────────────────────────────────────────────────────
+
+/**
+ * Exact-match map: route path → renderer function.
+ * All static pages are registered here.
+ */
+const STATIC_ROUTES: Record<string, { render: () => string | null; desc: string; isStatic: boolean }> = {
+  '/':            { render: renderHome,       desc: `${NAME} — the UI kit for AI products`,              isStatic: true },
+  '/pro':         { render: renderPro,        desc: `Pro components, blocks and templates`,              isStatic: true },
+  '/components':  { render: renderComponents, desc: `All ${ENTRIES.length} components, by category`,    isStatic: true },
+  '/blocks':      { render: renderBlocks,     desc: `All ${BLOCKS.length} whole-screen blocks`,         isStatic: true },
+  '/templates':   { render: renderTemplates,  desc: `All ${TEMPLATES.length} templates`,                isStatic: true },
+  '/ai-sdk':      { render: renderAiSdk,      desc: 'How Detent integrates with the Vercel AI SDK',    isStatic: true },
+  '/system':      { render: renderSystem,     desc: 'Design tokens, typography and theme',             isStatic: true },
+  '/changelog':   { render: renderChangelog,  desc: 'Every update, newest first',                      isStatic: false },
+  '/licence':     { render: renderLicence,    desc: 'Licence terms and key conditions',                isStatic: true },
+  '/terms':       { render: renderTerms,      desc: 'Terms of service',                                isStatic: true },
+  '/refunds':     { render: renderRefunds,    desc: 'Refund policy: 14 days, no questions asked',      isStatic: true },
+}
+
+/**
+ * Look up and render the markdown for a given canonical path.
+ * Returns null if no renderer is found or the entity doesn't exist.
+ */
+export function renderMarkdown(canonicalPath: string): { content: string | null; isStatic: boolean } {
+  // Exact match (static pages)
+  if (canonicalPath in STATIC_ROUTES) {
+    const { render, isStatic } = STATIC_ROUTES[canonicalPath]
+    return { content: render(), isStatic }
+  }
+
+  // Dynamic: /components/<id>
+  const componentMatch = canonicalPath.match(/^\/components\/([^/]+)$/)
+  if (componentMatch) {
+    return { content: renderComponent(componentMatch[1]), isStatic: true }
+  }
+
+  // Dynamic: /blocks/<slug>
+  const blockMatch = canonicalPath.match(/^\/blocks\/([^/]+)$/)
+  if (blockMatch) {
+    return { content: renderBlock(blockMatch[1]), isStatic: true }
+  }
+
+  // Dynamic: /templates/<slug>
+  const templateMatch = canonicalPath.match(/^\/templates\/([^/]+)$/)
+  if (templateMatch) {
+    return { content: renderTemplate(templateMatch[1]), isStatic: true }
+  }
+
+  return { content: null, isStatic: false }
+}
+
+// ─── Route catalog (feeds llms.txt, llms-full.txt, /api/md/_catalog) ──────────
+
+/**
+ * Every addressable markdown route. This is the single source of truth.
+ * Add a new renderer to STATIC_ROUTES and it appears here automatically.
+ * Dynamic routes are expanded from the catalog data.
+ */
+export function listMarkdownRoutes(): MarkdownRoute[] {
+  const routes: MarkdownRoute[] = []
+
+  // Static pages — in content priority order
+  const staticOrder = ['/', '/pro', '/components', '/blocks', '/templates', '/ai-sdk', '/system', '/changelog', '/licence', '/terms', '/refunds']
+  for (const path of staticOrder) {
+    const r = STATIC_ROUTES[path]
+    if (r) routes.push({ path, desc: r.desc, inFull: true, isStatic: r.isStatic })
+  }
+
+  // Dynamic: top 30 free components in llms-full, rest linked only
+  const FREE_LIMIT = 30
+  const freeEntries = ENTRIES.filter((e) => !e.id.startsWith('_'))
+  freeEntries.forEach((e, i) => {
+    routes.push({
+      path: `/components/${e.id}`,
+      desc: e.line,
+      inFull: i < FREE_LIMIT,
+      isStatic: true,
+    })
+  })
+
+  // Dynamic: top 20 blocks in llms-full
+  const BLOCK_LIMIT = 20
+  BLOCKS.forEach((b, i) => {
+    routes.push({
+      path: `/blocks/${b.id}`,
+      desc: b.line,
+      inFull: i < BLOCK_LIMIT,
+      isStatic: true,
+    })
+  })
+
+  // Dynamic: all templates
+  TEMPLATES.forEach((t) => {
+    routes.push({
+      path: `/templates/${t.id}`,
+      desc: t.line,
+      inFull: true,
+      isStatic: true,
+    })
+  })
+
+  return routes
+}
+
+/**
+ * Dev check: every public route in the app must have a renderer or be explicitly skipped.
+ * Import and call this in a test or CI script.
+ */
+export const SKIPPED_ROUTES: Record<string, string> = {
+  '/preview': 'Unlisted preview pages — noindex, not for crawlers',
+  '/preview-fit': 'Unlisted preview pages — noindex, not for crawlers',
+  '/api': 'API routes — machine endpoints, not content pages',
+  '/r': 'shadcn registry — JSON endpoints, not content pages',
+}
+
+export function assertAllRoutesCovered(publicRoutes: string[]): string[] {
+  const covered = new Set([...Object.keys(STATIC_ROUTES)])
+  const skipped = new Set(Object.keys(SKIPPED_ROUTES))
+  const missing: string[] = []
+  for (const route of publicRoutes) {
+    const isExact = covered.has(route)
+    const isDynamic =
+      route.startsWith('/components/') ||
+      route.startsWith('/blocks/') ||
+      route.startsWith('/templates/')
+    const isSkipped = [...skipped].some((s) => route.startsWith(s))
+    if (!isExact && !isDynamic && !isSkipped) missing.push(route)
+  }
+  return missing
+}

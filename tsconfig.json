@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@pro": ["./src/locked/index.tsx"],
+      "@pro-server": ["./src/locked/server.ts"]
     }
   },
   "include": [
