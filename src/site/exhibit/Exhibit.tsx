@@ -369,10 +369,13 @@ function Neighbour({ e, dir, onGo }: { e: (typeof ENTRIES)[number]; dir: 'prev' 
   const family = CATEGORIES.find((c) => c.id === e.category)!
   const Demo = DEMOS[e.id]
   return (
-    <button
-      type="button"
+    // A link-role div, not a button: the live demo inside has buttons of its own, and a button can't hold one.
+    <div
+      role="link"
+      tabIndex={0}
       onClick={onGo}
-      className={`ring-focus group/n flex items-center gap-4 rounded-[26px] bg-surface p-2 text-left shadow-[var(--card-edge)] transition-shadow duration-300 hover:shadow-[var(--card-lift)] max-sm:p-4 ${back ? 'pr-5' : 'flex-row-reverse pl-5 text-right'}`}
+      onKeyDown={(k) => k.key === 'Enter' && onGo()}
+      className={`ring-focus group/n flex cursor-pointer items-center gap-4 rounded-[26px] bg-surface p-2 text-left shadow-[var(--card-edge)] transition-shadow duration-300 hover:shadow-[var(--card-lift)] max-sm:p-4 ${back ? 'pr-5' : 'flex-row-reverse pl-5 text-right'}`}
     >
       <span aria-hidden inert className="pointer-events-none relative hidden h-28 w-40 shrink-0 overflow-hidden rounded-[20px] shadow-[inset_0_0_0_1px_var(--line)] sm:block lg:w-48" style={{ background: wellOf(FAMILY_TONE[family.id] ?? 'blue') }}>
         {Demo ? (
@@ -391,7 +394,7 @@ function Neighbour({ e, dir, onGo }: { e: (typeof ENTRIES)[number]; dir: 'prev' 
       <span className={`flex size-9 shrink-0 items-center justify-center rounded-full text-ink-2 shadow-[inset_0_0_0_1px_var(--line-strong)] transition-[transform,color,background-color,box-shadow] duration-300 ease-[cubic-bezier(0.2,0.9,0.25,1)] group-hover/n:bg-ink group-hover/n:text-surface group-hover/n:shadow-none ${back ? 'group-hover/n:-translate-x-1' : 'group-hover/n:translate-x-1'}`}>
         {back ? <ArrowLeft size={16} /> : <ArrowRight size={16} />}
       </span>
-    </button>
+    </div>
   )
 }
 
