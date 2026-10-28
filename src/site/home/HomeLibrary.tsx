@@ -25,7 +25,7 @@ const FREE = ENTRIES.length - PRO_COMPONENTS.length
 /** The eight, row by row: each pair is wide then narrow, or narrow then wide. Four free, four Pro. */
 const ROWS: [string, string][] = [
   ['answer', 'approval'],
-  ['signature', 'table'],
+  ['signature', 'filter'],
   ['toasts', 'presence'],
   ['trace', 'scaffold'],
 ]

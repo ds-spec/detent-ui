@@ -21,7 +21,6 @@ export const KNOBS: Record<string, Record<string, Knob>> = {
   prompt: { placeholder: { value: 'Ask anything' } },
   tree: { label: { value: 'Agent files' } },
   plan: { goal: { value: 'Ship the Q3 refund rules' } },
-  table: { hints: { value: true } },
   chart: { title: { value: 'Revenue' } },
   voice: { placeholder: { value: 'Message Copilot, or tap the mic' } },
   select: { label: { value: 'Status' }, placeholder: { value: 'Unassigned' } },

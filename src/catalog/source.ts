@@ -14,7 +14,7 @@ export const FILES: Record<string, string[]> = {
   tree: ['components/tree/FileTree.tsx'],
   activity: ['components/activity/AgentActivity.tsx', 'components/small/Thinking.tsx'],
   models: ['components/models/ModelPicker.tsx'],
-  table: ['../pro/components/table/DataTable.tsx'],
+  filter: ['../pro/components/filter/AskFilter.tsx'],
   chart: ['../pro/components/chart/ScrubChart.tsx'],
   usage: ['../pro/components/usage/SpendCap.tsx'],
   dates: ['../pro/components/dates/DateRangePicker.tsx', '../pro/components/dates/parse.ts'],

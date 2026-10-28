@@ -12,7 +12,7 @@ const PRO_CODE = [
   'trace',
   'approval',
   'rewrite',
-  'table',
+  'filter',
   'chart',
   'usage',
   'dates',

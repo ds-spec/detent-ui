@@ -180,7 +180,7 @@ export const RELEASES: Release[] = [
     line: 'Where it started: a command menu, a data table, a file tree and the inputs around them.',
     items: [
       { label: 'Command menu' },
-      { label: 'Data table', href: '/components/table', pro: true },
+      { label: 'Data table', pro: true },
       { label: 'File tree', href: '/components/tree' },
       { label: 'Upload', href: '/components/upload' },
       { label: 'Select' },

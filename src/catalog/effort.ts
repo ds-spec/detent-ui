@@ -14,7 +14,7 @@ export const DAYS: Record<string, number> = {
   trace: 12,
   approval: 8,
   rewrite: 8,
-  table: 15,
+  filter: 8,
   chart: 8,
   usage: 6,
   dates: 8,

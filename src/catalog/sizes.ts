@@ -14,7 +14,7 @@ export const SIZE: Record<string, [number, number]> = {
   tree: [300, 420],
   plan: [420, 520],
   models: [340, 420],
-  table: [760, 520],
+  filter: [722, 550],
   chart: [560, 440],
   usage: [520, 476],
   dates: [700, 452],
@@ -60,6 +60,5 @@ export const SIZE: Record<string, [number, number]> = {
 export const SPOT_SIZE: Record<string, [number, number]> = {
   answer: [420, 400],
   diff: [420, 312],
-  table: [420, 380],
   approval: [364, 306],
 }
