@@ -6,7 +6,7 @@
 export const SIZE: Record<string, [number, number]> = {
   scaffold: [720, 328],
   answer: [720, 480],
-  trace: [540, 424],
+  trace: [602, 560],
   diff: [720, 600],
   rewrite: [560, 314],
   approval: [380, 548],

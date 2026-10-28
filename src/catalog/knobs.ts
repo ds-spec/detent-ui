@@ -14,7 +14,7 @@ const SIDES = ['top', 'right', 'bottom', 'left']
 export const KNOBS: Record<string, Record<string, Knob>> = {
   scaffold: { name: { value: 'support-bot' } },
   answer: { compact: { value: false } },
-  trace: { rows: { value: 10, range: [4, 12] } },
+  trace: { rows: { value: 9, range: [4, 10] } },
   diff: { title: { value: 'Apply the Q3 refund rules' }, file: { value: 'src/billing/refunds.ts' } },
   rewrite: { assistant: { value: 'Detent' } },
   approval: { agent: { value: 'support-bot' }, autoFocus: { value: false } },
