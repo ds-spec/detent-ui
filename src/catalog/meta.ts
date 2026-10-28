@@ -246,7 +246,7 @@ const ALL: Entry[] = [
   },
   {
     id: 'models',
-    name: 'Model picker',
+    name: 'Model & effort',
     short: 'Model, effort and cost in one menu',
     category: 'agents',
     feel: ['press', 'drag'],
@@ -343,7 +343,7 @@ const ALL: Entry[] = [
   },
   {
     id: 'dates',
-    name: 'Date range picker',
+    name: 'Typed date range',
     short: 'Ranges you can say',
     category: 'inputs',
     feel: ['type', 'drag'],
@@ -462,7 +462,7 @@ const ALL: Entry[] = [
   },
   {
     id: 'tags',
-    name: 'Tag input',
+    name: 'Colour tags',
     short: 'Tags with their own colours',
     category: 'inputs',
     feel: ['type'],
@@ -519,7 +519,7 @@ const ALL: Entry[] = [
 
   {
     id: 'timeline',
-    name: 'Timeline',
+    name: 'Issue timeline',
     short: 'A history that holds still',
     category: 'feedback',
     feel: ['stream'],
@@ -953,7 +953,7 @@ const ALL: Entry[] = [
   },
   {
     id: 'bars',
-    name: 'Bar chart',
+    name: 'Goal bars',
     short: 'Capsule bars with a goal',
     category: 'data',
     feel: ['press'],
@@ -991,7 +991,7 @@ const ALL: Entry[] = [
   },
   {
     id: 'waffle',
-    name: 'Waffle chart',
+    name: 'Share grid',
     short: 'Shares in a hundred cells',
     category: 'data',
     feel: ['press'],
@@ -1006,7 +1006,7 @@ const ALL: Entry[] = [
   },
   {
     id: 'gauge',
-    name: 'Gauge',
+    name: 'Tick gauge',
     short: 'A reading against its limit',
     category: 'data',
     feel: ['stream'],
@@ -1138,7 +1138,7 @@ const ALL: Entry[] = [
 
   {
     id: 'codeblock',
-    name: 'Code block',
+    name: 'Live code block',
     short: 'Code the way people read',
     category: 'agents',
     feel: ['stream'],
@@ -1157,7 +1157,7 @@ const ALL: Entry[] = [
 
   {
     id: 'time',
-    name: 'Time picker',
+    name: 'Typed time range',
     short: 'Times you can type',
     category: 'inputs',
     feel: ['type'],
