@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import { PRO_BLOCKS, TOTAL_DAYS } from '@/catalog/effort'
-import { PRO_COMPONENTS, SITE, TERMS } from '@/catalog/pro'
+import { PRO_COMPONENTS, TERMS } from '@/catalog/pro'
 import { TEMPLATES } from '@/catalog/templates'
 import { REFUND_DAYS } from '@/catalog/trust'
-import { BigBuy, BuyHead, BuyProvider, Choose, Stage } from '@/site/pro/Buy'
-import { Compare, Inside } from '@/site/pro/Inside'
-import { CopyCommand } from '@/site/parts'
+import { BigBuy, BuyBar, BuyProvider, HeroHead, WideStage } from '@/site/pro/Buy'
+import { Compare } from '@/site/pro/Inside'
+import { Days, DaysHead } from '@/site/pro/Days'
+import { Gap } from '@/site/pro/Gap'
 import { JsonLd, page, proGraph } from '@/site/seo'
 import { SitePage } from '@/site/sheets'
 
@@ -29,44 +30,44 @@ const FAQ: [string, string][] = [
   ['What if it’s not right for me?', `Email within ${REFUND_DAYS} days of buying and you get every cent back. No form, no questions.`],
 ]
 
-/** Setting up the Pro registry in a project: the key, where it goes, and the first install. */
-const STEPS: [string, string, string?][] = [
-  ['Keep your licence key at hand', 'It’s in the email from your purchase. Put it in your project’s .env.local, which stays out of git.', 'DETENT_LICENSE_KEY=your-licence-key\n'],
-  [
-    'Add Detent Pro to components.json',
-    'The registry sends your key with every install, so Pro installs like anything else.',
-    `"registries": {\n  "@detent-pro": {\n    "url": "${SITE}/r/pro/{name}.json",\n    "headers": { "Authorization": "Bearer \${DETENT_LICENSE_KEY}" }\n  }\n}`,
-  ],
-  ['Install what you need', 'Each piece arrives as source in components/detent, with its theme and the packages it needs.', 'npx shadcn add @detent-pro/diff'],
-]
-
 const H2 = 'text-[clamp(32px,3.4vw,48px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink'
 
 /**
- * Pro, sold the way a good shop sells one thing: the price first, with the thing itself running
- * beside two plain questions. Then everything in it by name, the plans side by side, the
- * questions people ask, and one button that is the price.
+ * Pro, sold by showing what it saves: what it would take to build and what it costs, one bar that
+ * is the whole checkout, and the product running under it. Then the gap between most AI apps and
+ * one built with Pro, where the days went, the plans side by side, the questions people ask, and
+ * one button that is the price.
  */
 export default function ProPage() {
   return (
     <SitePage>
       <JsonLd data={proGraph(FAQ)} />
       <BuyProvider>
-        <section className="mx-auto max-w-[1360px] px-5 pt-8 sm:px-6 sm:pt-10">
-          <BuyHead />
-          <div className="rise mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-12 xl:grid-cols-[minmax(0,1fr)_460px] xl:gap-16" style={{ animationDelay: '220ms' }}>
-            <Stage />
-            <Choose />
+        <section className="mx-auto max-w-[1360px] px-5 pt-12 sm:px-6 sm:pt-16">
+          <HeroHead />
+          <div className="rise mt-9" style={{ animationDelay: '200ms' }}>
+            <BuyBar />
+          </div>
+          <div className="rise mt-12 sm:mt-14" style={{ animationDelay: '320ms' }}>
+            <WideStage />
+          </div>
+        </section>
+
+        <section id="gap" aria-labelledby="gap-title" className="mx-auto mt-28 max-w-[1360px] scroll-mt-24 px-5 sm:mt-36 sm:px-6">
+          <h2 id="gap-title" className={H2}>
+            The model already works.
+            <span className="block text-quiet">The app still feels like a demo.</span>
+          </h2>
+          <p className="mt-5 max-w-[560px] text-[16px] leading-[1.6] text-ink-3">Four places almost every AI app looks unfinished. Flip each one to see the difference Pro makes.</p>
+          <div className="mt-10 sm:mt-14">
+            <Gap />
           </div>
         </section>
 
         <section id="inside" aria-labelledby="inside-title" className="mx-auto mt-28 max-w-[1360px] scroll-mt-24 px-5 sm:mt-36 sm:px-6">
-          <h2 id="inside-title" className={H2}>
-            Everything in Pro.
-            <span className="block text-quiet">Every piece, by name.</span>
-          </h2>
+          <DaysHead className={H2} />
           <div className="mt-10 sm:mt-14">
-            <Inside />
+            <Days />
           </div>
         </section>
 
@@ -78,32 +79,6 @@ export default function ProPage() {
           <div className="mt-10 sm:mt-14">
             <Compare />
           </div>
-        </section>
-
-        <section id="install" aria-labelledby="install-title" className="mx-auto mt-28 grid max-w-[1360px] scroll-mt-24 gap-x-16 gap-y-10 px-5 sm:mt-36 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
-          <h2 id="install-title" className={H2}>
-            Install Pro.
-            <span className="block text-quiet">Once per project.</span>
-          </h2>
-          <ol>
-            {STEPS.map(([title, line, code], i) => (
-              <li key={title} className="grid grid-cols-[28px_minmax(0,1fr)] gap-x-3 py-6 shadow-[inset_0_1px_0_var(--line)] last:shadow-[inset_0_1px_0_var(--line),inset_0_-1px_0_var(--line)]">
-                <span className="tnum pt-0.5 font-mono text-[13px] text-ink-3">{i + 1}</span>
-                <div className="min-w-0">
-                  <p className="text-[17px] tracking-[-0.01em] text-ink">{title}</p>
-                  <p className="mt-1 max-w-[620px] text-[15px] leading-[1.6] text-ink-3">{line}</p>
-                  {code &&
-                    (code.includes('\n') ? (
-                      <pre className="mt-4 overflow-x-auto rounded-[12px] bg-surface-2 px-4 py-3.5 font-mono text-[13px] leading-[1.65] text-ink-2 [scrollbar-width:thin]">{code}</pre>
-                    ) : (
-                      <div className="mt-4 max-w-[520px]">
-                        <CopyCommand command={code} fill />
-                      </div>
-                    ))}
-                </div>
-              </li>
-            ))}
-          </ol>
         </section>
 
         <section id="questions" aria-labelledby="questions-title" className="mx-auto mt-28 grid max-w-[1360px] scroll-mt-24 gap-x-16 gap-y-10 px-5 sm:mt-36 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">

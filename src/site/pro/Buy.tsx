@@ -39,7 +39,7 @@ export function BuyProvider({ children }: { children: ReactNode }) {
 
 const plan = (id: Plan['id']) => PLANS.find((p) => p.id === id)!
 
-function useChoice() {
+export function useChoice() {
   const c = useContext(Ctx)
   if (!c) throw new Error('The parts of the buy panel sit inside BuyProvider')
   // A team licence always comes with the templates; the solo choice is kept for if they switch back.
@@ -116,7 +116,14 @@ export function Stage() {
   )
 }
 
-function Shots({ shots, tone }: { shots: Shot[]; tone: 'amber' | 'violet' }) {
+/** The stage drawn wide under the hero: the screen runs bigger and the box's foot crops it, like a window seen through it. */
+export function WideStage() {
+  const { edition } = useChoice()
+  const all = edition === 'all'
+  return <Shots key={edition} shots={all ? TEMPLATE_SHOTS : BLOCK_SHOTS} tone={all ? 'amber' : 'violet'} wide />
+}
+
+function Shots({ shots, tone, wide = false }: { shots: Shot[]; tone: 'amber' | 'violet'; wide?: boolean }) {
   const reduce = useReducedMotion()
   const [n, setN] = useState(0)
   const [held, setHeld] = useState(false)
@@ -132,18 +139,18 @@ function Shots({ shots, tone }: { shots: Shot[]; tone: 'amber' | 'violet' }) {
   return (
     <motion.div initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1, transition: { duration: 0.35, ease: UI } }} onPointerEnter={() => setHeld(true)} onPointerLeave={() => setHeld(false)}>
       {/* Shaped like the screen it holds on a phone, so the screen fills it; as tall as the panel beside it on a laptop. */}
-      <div className="relative isolate aspect-[4/3] overflow-hidden rounded-[22px] sm:aspect-[16/10] sm:rounded-[28px] lg:aspect-auto lg:h-[clamp(300px,58vh,620px)]">
+      <div className={`relative isolate overflow-hidden ${wide ? 'aspect-[4/3] rounded-[24px] sm:aspect-auto sm:h-[clamp(380px,62vh,660px)] sm:rounded-[36px]' : 'aspect-[4/3] rounded-[22px] sm:aspect-[16/10] sm:rounded-[28px] lg:aspect-auto lg:h-[clamp(300px,58vh,620px)]'}`}>
         <Backdrop tone={tone} />
         <AnimatePresence initial={false} mode="popLayout">
           <motion.div
             key={s.id}
             inert
-            className="absolute inset-0"
+            className={wide ? 'absolute inset-x-0 top-0 h-full sm:h-[calc(100%+120px)]' : 'absolute inset-0'}
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0, transition: { duration: 0.45, ease: UI } }}
             exit={{ opacity: 0, transition: { duration: 0.15, ease: UI } }}
           >
-            <Fit pad={20} max={1} min={0.2}>
+            <Fit pad={wide ? 44 : 20} max={wide ? 1.12 : 1} min={0.2}>
               <div style={{ width: 1000, height: 660 }}>
                 <Window title={s.title} chrome={s.chrome}>
                   <div className="h-full overflow-hidden">
@@ -292,5 +299,108 @@ export function BigBuy() {
         <ArrowRight size={24} />
       </span>
     </a>
+  )
+}
+
+/*
+ * The hero, centred: what Pro saves you and what it costs, both rolling with the choice; under it
+ * one bar that is the whole checkout (edition, licence, price, button), so the page asks two small
+ * questions in one line instead of a column of form.
+ */
+export function HeroHead() {
+  const { plan, days } = useChoice()
+  return (
+    <div className="flex flex-col items-center text-center">
+      <h1 className="focus-in text-[clamp(40px,5vw,72px)] font-normal leading-[1.02] tracking-[-0.055em] text-ink">
+        <span className="sr-only">
+          Skip {days} days of work. Pay ${plan.price}, once.
+        </span>
+        <span aria-hidden className="flex flex-wrap items-center justify-center">
+          Skip&nbsp;
+          <RollingText text={String(days)} proportional />
+          &nbsp;days of work.
+        </span>
+        <span aria-hidden className="block text-quiet">
+          Pay <RollingText text={`$${plan.price}`} proportional />, once.
+        </span>
+      </h1>
+      <p className="rise mt-6 max-w-[520px] text-balance text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
+        The hard parts of an AI app, finished: every state, both themes, every width. Installed as source you own.
+      </p>
+    </div>
+  )
+}
+
+export function BuyBar() {
+  const { edition, seats, setEdition, setSeats, plan } = useChoice()
+  const team = seats === 'team'
+  const what = edition === 'all' ? `${PRO_COMPONENTS.length} Pro components, ${PRO_BLOCK_COUNT} screens and ${TEMPLATES.length} apps` : `${PRO_COMPONENTS.length} Pro components and ${PRO_BLOCK_COUNT} whole screens`
+  return (
+    <div className="flex w-full flex-col items-center">
+      <div className="flex w-full max-w-[820px] flex-col gap-3 rounded-[26px] bg-surface p-2 shadow-[var(--card-edge)] sm:flex-row sm:items-center sm:rounded-full sm:gap-2">
+        <Seg
+          label="Edition"
+          value={edition}
+          onPick={(v) => setEdition(v as Edition)}
+          options={[
+            ['pro', 'Pro', team],
+            ['all', 'Pro + Templates', false],
+          ]}
+        />
+        <Seg
+          label="Licence"
+          value={seats}
+          onPick={(v) => setSeats(v as Seats)}
+          options={[
+            ['one', 'Just me', false],
+            ['team', 'Team', false],
+          ]}
+        />
+        <div className="flex items-center gap-3 px-2 pb-1 sm:ml-auto sm:p-0">
+          <p className="flex flex-1 items-baseline gap-1 sm:flex-none">
+            <span className="tnum text-[24px] leading-none tracking-[-0.04em] text-ink">
+              <RollingText text={`$${plan.price}`} proportional />
+            </span>
+            <span className="text-[13px] text-ink-3">once</span>
+          </p>
+          <a href={plan.href} className="ring-focus group/buy flex h-11 shrink-0 items-center gap-2 rounded-full bg-ink pl-5 pr-4 text-[15px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.97]">
+            {plan.cta}
+            <ArrowRight size={15} className="transition-transform duration-150 group-hover/buy:translate-x-0.5" />
+          </a>
+        </div>
+      </div>
+      {/* What the choice gets you, then the promises, in one quiet line. */}
+      <p className="mt-4 max-w-[920px] text-balance px-4 text-center text-[13px] leading-[1.7] text-ink-3">
+        <span className="text-ink-2">
+          {what}, for {plan.seats}.
+        </span>{' '}
+        One payment · Every update for life · {REFUND_DAYS}-day refund · The source is yours
+      </p>
+    </div>
+  )
+}
+
+/** Two answers in a track; the chosen one sits on a plate that slides between them. */
+function Seg({ label, value, onPick, options }: { label: string; value: string; onPick: (v: string) => void; options: [string, string, boolean][] }) {
+  return (
+    <div role="radiogroup" aria-label={label} className="grid grid-cols-2 rounded-full bg-surface-2 p-1 sm:flex">
+      {options.map(([v, name, disabled]) => {
+        const on = v === value
+        return (
+          <button
+            key={v}
+            type="button"
+            role="radio"
+            aria-checked={on}
+            disabled={disabled}
+            onClick={() => onPick(v)}
+            className={`ring-focus relative h-9 whitespace-nowrap rounded-full px-4 text-[14px] transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${on ? 'text-ink' : 'text-ink-3 enabled:hover:text-ink'}`}
+          >
+            {on && <motion.span layoutId={`seg-${label}`} className="absolute inset-0 rounded-full bg-surface shadow-[var(--card-edge)]" transition={{ type: 'spring', stiffness: 520, damping: 42 }} />}
+            <span className="relative">{name}</span>
+          </button>
+        )
+      })}
+    </div>
   )
 }
