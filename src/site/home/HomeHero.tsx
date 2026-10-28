@@ -29,7 +29,7 @@ const OPEN = { type: 'spring', stiffness: 280, damping: 34 } as const
 const DWELL = 6500
 /** The radius of the curves that join the bridge to the sheets. */
 const JOIN = 22
-const ICON: Record<string, ReactNode> = { prompt: <Prompt size={15} />, plan: <Note size={15} />, models: <Layers size={15} />, voice: <Mic size={15} /> }
+const ICON: Record<string, ReactNode> = { prompt: <Prompt size={15} />, activity: <Note size={15} />, models: <Layers size={15} />, voice: <Mic size={15} /> }
 
 const nameOf = (id: string) => ENTRIES.find((e) => e.id === id)?.name ?? id
 const familyOf = (id: string) => CATEGORIES.find((c) => c.id === ENTRIES.find((e) => e.id === id)?.category)?.name ?? ''

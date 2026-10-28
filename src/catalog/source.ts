@@ -12,7 +12,7 @@ export const FILES: Record<string, string[]> = {
   approval: ['../pro/components/approval/ApprovalTray.tsx'],
   prompt: ['components/prompt/PromptBox.tsx'],
   tree: ['components/tree/FileTree.tsx'],
-  plan: ['components/plan/PlanEditor.tsx'],
+  activity: ['components/activity/AgentActivity.tsx', 'components/small/Thinking.tsx'],
   models: ['components/models/ModelPicker.tsx'],
   table: ['../pro/components/table/DataTable.tsx'],
   chart: ['../pro/components/chart/ScrubChart.tsx'],

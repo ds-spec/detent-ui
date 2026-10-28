@@ -166,7 +166,7 @@ export const RELEASES: Release[] = [
       { label: 'Diff review', href: '/components/diff', pro: true },
       { label: 'Approval tray', href: '/components/approval', pro: true },
       { label: 'Prompt box', href: '/components/prompt' },
-      { label: 'Plan editor', href: '/components/plan' },
+      { label: 'Plan editor' },
       { label: 'Model picker', href: '/components/models' },
       { label: 'Scrub chart', href: '/components/chart', pro: true },
       { label: 'Date range picker', href: '/components/dates', pro: true },

@@ -19,7 +19,7 @@ const FREE: Record<string, ComponentType> = {
   scaffold: dynamic(() => import('@/lab/demos/agent').then((m) => m.ScaffoldDemo), { ssr: false }),
   prompt: dynamic(() => import('@/lab/demos/inputs').then((m) => m.PromptDemo), { ssr: false }),
   tree: dynamic(() => import('@/lab/demos/agent').then((m) => m.TreeDemo), { ssr: false }),
-  plan: dynamic(() => import('@/lab/demos/plan').then((m) => m.PlanDemo), { ssr: false }),
+  activity: dynamic(() => import('@/lab/demos/activity').then((m) => m.ActivityDemo), { ssr: false }),
   models: dynamic(() => import('@/lab/demos/models').then((m) => m.ModelsDemo), { ssr: false }),
   voice: dynamic(() => import('@/lab/demos/voice').then((m) => m.VoiceDemo), { ssr: false }),
   select: dynamic(() => import('@/lab/demos/menus').then((m) => m.SelectDemo), { ssr: false }),

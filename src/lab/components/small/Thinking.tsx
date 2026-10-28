@@ -32,7 +32,7 @@ const CHECK = [15, 21, 17, 13, 9] // (row 3, col 0) → (4, 1) → (3, 2) → (2
 const RING = [0, 1, 2, 3, 4, 9, 14, 19, 24, 23, 22, 21, 20, 15, 10, 5] // the edge, clockwise
 const clamp = (v: number) => Math.min(1, Math.max(0, v))
 
-type Pattern = ThoughtKind | 'done'
+export type Pattern = ThoughtKind | 'done'
 
 /** Each kind caught as one still, for the list of steps: the dots that are lit. */
 const STILL: Record<ThoughtKind, number[]> = {
@@ -86,7 +86,7 @@ function level(p: Pattern, t: number, i: number): number {
 }
 
 /** The dot field. `kind` changes blend over a quarter second; `still` draws one frame and stops. */
-function Dots({ kind, size = 17, still = false, tint }: { kind: Pattern; size?: number; still?: boolean; tint?: string }) {
+export function Dots({ kind, size = 17, still = false, tint }: { kind: Pattern; size?: number; still?: boolean; tint?: string }) {
   const refs = useRef<(SVGCircleElement | null)[]>([])
   const reduce = useReducedMotion()
   const swap = useRef({ from: kind, to: kind, at: 0, t0: 0 })

@@ -53,8 +53,8 @@ export const isLockedSource = (slug: string, blocks: string[]) => isProComponent
 export const KITS: Record<string, { name: string; line: string; items: string[] }> = {
   'agent-kit': {
     name: 'Agent kit',
-    line: 'The free components for an agent product: the prompt box, the plan, the model picker, the file tree, the scaffold and the small pieces around them.',
-    items: ['scaffold', 'prompt', 'tree', 'plan', 'models', 'versions', 'context', 'run', 'thinking', 'typing', 'toasts'],
+    line: 'The free components for an agent product: the prompt box, the agents’ activity, the model picker, the file tree, the scaffold and the small pieces around them.',
+    items: ['scaffold', 'prompt', 'tree', 'activity', 'models', 'versions', 'context', 'run', 'thinking', 'typing', 'toasts'],
   },
 }
 
