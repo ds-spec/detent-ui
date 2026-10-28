@@ -8,8 +8,8 @@ import { AnimatePresence, motion } from 'motion/react'
 import { DEMOS } from '@/catalog/demos'
 import { CATEGORIES, ENTRIES } from '@/catalog/meta'
 import { SIZE } from '@/catalog/sizes'
-import { isProComponent } from '@/catalog/pro'
-import { ArrowLeft, ArrowRight, Close, Expand, Inspect, Moon, Refresh, Sun } from '@/lab/icons'
+import { SITE, installCommand, isProComponent } from '@/catalog/pro'
+import { ArrowLeft, ArrowRight, Check, Copy, Moon, Refresh, Sun } from '@/lab/icons'
 import { useTheme } from '@/lab/lib/hooks'
 import { Kbd } from '@/lab/ui/Kbd'
 import { ModelAnnotated } from '../annotated/ModelAnnotated'
@@ -23,6 +23,15 @@ import { useSite } from '../Providers'
 import { BenchProvider } from '../bench/state'
 import { ProTag } from '../blocks/ProTag'
 import { Index } from './Index'
+import { Rail } from './Rail'
+import { Shell, Trail, scroller } from '../shell/Shell'
+import type { RailGroup } from './Rail'
+import { CategoryIcon } from '../icons'
+import { wellOf } from '../wells'
+import type { Tone } from '../home/lights'
+
+/** Each family's light, for the stage a component runs on. */
+const FAMILY_TONE: Record<string, Tone> = { agents: 'blue', data: 'amber', inputs: 'rose', feedback: 'violet', essentials: 'violet', overlays: 'rose', marketing: 'amber' }
 
 const ease = [0.2, 0.9, 0.25, 1] as const
 const lift = { type: 'spring', stiffness: 380, damping: 40 } as const
@@ -36,6 +45,29 @@ const ANNOTATED: Record<string, (p: { className?: string }) => ReactNode> = { mo
 
 const first = (s: string) => s.split(/(?<=\.)\s/)[0]
 
+/** Every component for the list down the side, family by family. */
+const RAIL: RailGroup[] = CATEGORIES.map((c) => ({
+  id: c.id,
+  name: c.name,
+  icon: <CategoryIcon name={c.icon} size={12} />,
+  color: `var(--${c.id})`,
+  items: ENTRIES.filter((x) => x.category === c.id).map((x) => ({ id: x.id, name: x.name, line: x.short ?? first(x.line), pro: isProComponent(x.id) })),
+})).filter((g) => g.items.length)
+
+/** A component, small, in its family's well: what the list shows beside a name you point at. */
+function peek(id: string) {
+  const x = ENTRIES.find((e) => e.id === id)
+  const Demo = DEMOS[id]
+  if (!x || !Demo) return null
+  return (
+    <div className="absolute inset-0" style={{ background: wellOf(FAMILY_TONE[x.category] ?? 'blue') }}>
+      <Fit pad={14} max={0.55} min={0.2}>
+        <Demo />
+      </Fit>
+    </div>
+  )
+}
+
 /**
  * The components page, as an exhibit. One component has the page: a big two-tone title, the
  * live component standing on the page itself, and one floating dock with every tool. The
@@ -45,10 +77,11 @@ const first = (s: string) => s.split(/(?<=\.)\s/)[0]
  */
 export function Exhibit({ children }: { children: ReactNode }) {
   const at = usePathname().split('/')[2] ?? ''
+  if (ENTRIES.some((e) => e.id === at)) return <Shown at={at}>{children}</Shown>
   return (
     <>
       <Header />
-      {ENTRIES.some((e) => e.id === at) ? <Shown at={at}>{children}</Shown> : children}
+      {children}
       <Footer />
     </>
   )
@@ -95,7 +128,10 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
     if (last.current === i) return
     last.current = i
     tick()
-    if (window.scrollY > 80) window.scrollTo({ top: 0, behavior: 'smooth' })
+    // The page scrolls in its panel on a laptop, and as a whole on anything smaller.
+    const panel = scroller()
+    if (panel && panel.scrollTop > 80) panel.scrollTo({ top: 0, behavior: 'smooth' })
+    else if (window.scrollY > 80) window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [i, tick])
 
   const e = ENTRIES[i]
@@ -153,22 +189,24 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
   }, [index])
 
   return (
-    <main className="mx-auto max-w-[1360px] px-5 sm:px-8">
+    <Shell list={<Rail label="Components" groups={RAIL} current={id} onPick={go} preview={peek} />} bar={<Trail steps={['Components', family.name, e.name]} />}>
+    <main className="mx-auto max-w-[1280px] px-4 sm:px-8">
+      <div className="pb-6 sm:pb-8">
       {/* The title: which family, where you are in the forty, and what this one is. */}
-      <header className="flex flex-col gap-6 pt-10 sm:pt-12 xl:flex-row xl:items-end xl:justify-between">
+      <header className="flex flex-col gap-6 pt-8 sm:pt-10 2xl:flex-row 2xl:items-end 2xl:justify-between">
         <div className="min-w-0">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             <span className="chip inline-flex h-7 items-center gap-1.5 rounded-full px-2.5 text-footnote font-medium transition-[color,background-color,box-shadow] duration-300" style={{ color: `var(--${family.id})`, ['--chip' as string]: `var(--${family.id})` }}>
               <span className="size-1.5 rounded-full" style={{ background: `var(--${family.id})` }} />
               {family.name}
             </span>
             {isProComponent(e.id) && <ProTag />}
-            <button type="button" onClick={() => setIndex(true)} className="ring-focus tnum flex h-7 items-center gap-2 rounded-full pl-2.5 pr-1.5 text-footnote text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink">
+            <button type="button" onClick={() => setIndex(true)} className="ring-focus tnum flex h-7 items-center gap-2 rounded-full pl-2.5 pr-1.5 text-footnote text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink lg:hidden">
               All components
               <Kbd>/</Kbd>
             </button>
           </div>
-          <h1 className="mt-4 text-[clamp(32px,3.8vw,48px)] font-normal leading-[1.08] tracking-[-0.045em] text-ink">
+          <h1 className="mt-5 text-[clamp(36px,4vw,56px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink">
             <span className="relative block h-[1.08em] overflow-hidden">
               <Glide k={e.id} dir={dir}>
                 {e.name}
@@ -181,7 +219,11 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
             </span>
           </h1>
         </div>
-        <div className="w-full max-w-[460px] shrink-0 xl:w-[460px]">
+        <div className="flex w-full max-w-[460px] shrink-0 flex-col gap-3 2xl:w-[460px]">
+          {/* Hand it to your agent. */}
+          <div className="flex items-center 2xl:justify-end">
+            <CopyPrompt name={e.name} line={e.line} command={installCommand(e.id, !isProComponent(e.id))} page={`${SITE}/components/${e.id}.md`} />
+          </div>
           <Install id={e.id} free={!isProComponent(e.id)} />
         </div>
       </header>
@@ -189,22 +231,24 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
       {/* The bench: the component on its stage, its props beside it, and the usage under both. One bench per component, so it starts clean. */}
       {present && <motion.div className="fixed inset-0 z-[45] bg-bg" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setPresent(false)} />}
       <BenchProvider key={id}>
-      <div className="mt-2 grid gap-4 xl:grid-cols-[minmax(0,1fr)_400px]">
-      <div className="relative h-[var(--stage-phone)] lg:h-[var(--stage)] xl:col-start-1 xl:row-start-1" style={{ ['--stage' as string]: `max(clamp(540px, calc(100dvh - 290px), 760px), ${need}px)`, ['--stage-phone' as string]: phone }}>
+      <div className="mt-4 grid gap-3 2xl:grid-cols-[minmax(0,1fr)_380px]">
+      <div className="relative flex h-[var(--stage-phone)] flex-col lg:h-[var(--stage)] 2xl:col-start-1 2xl:row-start-1" style={{ ['--stage' as string]: `max(clamp(540px, calc(100dvh - 290px), 760px), ${need}px)`, ['--stage-phone' as string]: phone }}>
         <motion.section
           ref={stage}
           layout
           transition={{ layout: lift }}
           data-theme={stageTheme ?? undefined}
           aria-label={`${e.name}, live`}
-          className={`overflow-hidden text-ink ${present ? 'fixed inset-3 z-50 rounded-[32px] bg-bg sm:inset-4' : 'absolute inset-0 rounded-[32px] bg-card shadow-[inset_0_0_0_1px_light-dark(transparent,var(--line))]'}`}
+          className={`overflow-hidden text-ink ${present ? 'fixed inset-3 z-50 rounded-[32px] bg-bg sm:inset-4' : 'absolute inset-x-0 bottom-0 top-12 rounded-[28px] shadow-[inset_0_0_0_1px_var(--line)]'}`}
+          // The stage is a well tinted with the family's light, the same as the plates on the walls.
+          style={{ background: present ? undefined : wellOf(FAMILY_TONE[family.id] ?? 'blue') }}
         >
           <AnimatePresence mode="popLayout" initial={false} custom={dir}>
             <motion.div
               key={`${e.id}-${run}`}
               data-inspect-root
               custom={dir}
-              className="absolute inset-x-0 bottom-0 top-16"
+              className="absolute inset-0"
               variants={{
                 enter: (d: number) => ({ opacity: 0, x: d * 48 }),
                 still: { opacity: 1, x: 0 },
@@ -230,7 +274,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
 
           <AnimatePresence>
             {mode === 'code' && (
-              <motion.div key="code" className="absolute inset-x-0 bottom-0 top-16 z-[5]" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6, transition: { duration: 0.15 } }} transition={{ duration: 0.3, ease }}>
+              <motion.div key="code" className="absolute inset-0 z-[5]" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6, transition: { duration: 0.15 } }} transition={{ duration: 0.3, ease }}>
                 <Code id={e.id} />
               </motion.div>
             )}
@@ -239,37 +283,21 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
           <InspectLayer on={inspect && mode === 'preview'} stage={stage} />
 
         </motion.section>
-        {/* Every tool in one floating dock across the top of the stage, in its own reserved strip, so it's
-            in view the moment the page opens and never covers the component. Scrolling, it stays just
-            under the site header until the stage has passed. */}
-        <div className={present ? 'pointer-events-none fixed inset-x-0 bottom-8 z-[55] flex justify-center' : 'pointer-events-none absolute inset-0 z-10 flex flex-col justify-start'}>
-          <div className={`pointer-events-auto flex justify-center ${present ? '' : 'sticky top-20 pt-3'}`}>
-            <div className="glass flex items-center gap-0.5 rounded-full bg-surface p-1 shadow-modal">
-              <Modes mode={mode} setMode={setMode} pro={isProComponent(e.id)} />
-              <Rule />
-              <Tool className="hidden sm:block" label={inspect ? 'Stop inspecting' : 'Inspect'} keys="I" on={inspect} onClick={() => setInspect((v) => !v)}>
-                <Inspect size={16} />
-              </Tool>
-              <Tool label={shown === 'dark' ? 'View in light' : 'View in dark'} onClick={() => setStageTheme(stageTheme ? null : page === 'dark' ? 'light' : 'dark')}>
-                {shown === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-              </Tool>
-              <Tool label="Replay" onClick={() => setRun((r) => r + 1)}>
-                <motion.span key={run} className="flex" initial={{ rotate: -180 }} animate={{ rotate: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 22 }}>
-                  <Refresh size={16} />
-                </motion.span>
-              </Tool>
-              <Tool className="hidden sm:block" label={present ? 'Stop presenting' : 'Present'} keys="P" on={present} onClick={() => setPresent((v) => !v)}>
-                {present ? <Close size={16} /> : <Expand size={16} />}
-              </Tool>
-              <Rule />
-              <Tool label={`Previous: ${prev.name}`} keys="←" onClick={() => go(prev.id)}>
-                <ArrowLeft size={16} />
-              </Tool>
-              <Tool label={`Next: ${next.name}`} keys="→" onClick={() => go(next.id)}>
-                <ArrowRight size={16} />
-              </Tool>
-            </div>
-          </div>
+        {/* Above the stage, quietly: what you're looking at on the left, and two small tools on the right. The rest are keys. */}
+        <div className="absolute inset-x-0 top-0 flex h-12 items-start justify-between">
+          <span className="flex rounded-full bg-surface-2 p-1">
+            <Modes mode={mode} setMode={setMode} pro={isProComponent(e.id)} />
+          </span>
+          <span className="flex items-center gap-0.5">
+            <Tool label="Replay" onClick={() => setRun((r) => r + 1)}>
+              <motion.span key={run} className="flex" initial={{ rotate: -180 }} animate={{ rotate: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 22 }}>
+                <Refresh size={16} />
+              </motion.span>
+            </Tool>
+            <Tool label={shown === 'dark' ? 'View in light' : 'View in dark'} onClick={() => setStageTheme(stageTheme ? null : page === 'dark' ? 'light' : 'dark')}>
+              {shown === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            </Tool>
+          </span>
         </div>
       </div>
 
@@ -280,40 +308,42 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
       </div>
       </BenchProvider>
 
-      {/* How it's made, quietly, for anyone who scrolls. */}
-      <section aria-labelledby="details" className="mt-24 grid gap-x-16 gap-y-8 lg:grid-cols-[320px_minmax(0,1fr)]">
-        <h2 id="details" className="text-title text-ink">
-          The details
+      {/* How it's made: each detail on a card of its own, and the keys it answers to beside them. */}
+      <section aria-labelledby="details" className="mt-16 sm:mt-20">
+        <h2 id="details" className="px-1 text-[clamp(26px,2.4vw,34px)] font-normal tracking-[-0.04em] text-ink">
+          The details <span className="text-quiet">that make it.</span>
         </h2>
-        <div className="grid gap-x-16 gap-y-10 xl:grid-cols-[minmax(0,1fr)_280px]">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.ul key={e.id} className="grid gap-x-12 sm:grid-cols-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.1 } }} transition={{ duration: 0.3 }}>
-            {e.details.map((d, n) => (
-              <li key={n} className="py-4 text-body text-ink-2 shadow-[inset_0_1px_0_var(--line)]">
-                {d}
-              </li>
-            ))}
-          </motion.ul>
-        </AnimatePresence>
-        {e.keys && (
-          <dl className="h-fit">
-            {e.keys.map(([k, what], n) => (
-              <div key={k + what} className="flex items-center justify-between gap-4 py-2.5" style={{ boxShadow: n ? 'inset 0 1px 0 var(--line)' : undefined }}>
-                <dd className="text-callout text-ink-2">{what}</dd>
-                <dt className="flex shrink-0 gap-1">
-                  {k.split(' ').map((part, j) => (
-                    <Kbd key={j}>{part}</Kbd>
-                  ))}
-                </dt>
-              </div>
-            ))}
-          </dl>
-        )}
+        <div className="mt-6 grid gap-3 xl:grid-cols-[minmax(0,1fr)_300px]">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.ul key={e.id} className="grid gap-3 sm:grid-cols-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.1 } }} transition={{ duration: 0.3 }}>
+              {e.details.map((d, n) => (
+                <li key={n} className="flex gap-4 rounded-[22px] bg-surface p-5 shadow-[var(--card-edge)]">
+                  <span className="tnum mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-surface-2 text-[11px] text-ink-3">{n + 1}</span>
+                  <span className="text-[15px] leading-[1.6] text-ink-2">{d}</span>
+                </li>
+              ))}
+            </motion.ul>
+          </AnimatePresence>
+          {e.keys && (
+            <dl className="h-fit rounded-[22px] bg-surface px-5 py-3 shadow-[var(--card-edge)]">
+              <p className="pb-2 pt-1 text-[13px] text-ink-3">Keys</p>
+              {e.keys.map(([k, what], n) => (
+                <div key={k + what} className="flex items-center justify-between gap-4 py-2.5" style={{ boxShadow: n ? 'inset 0 1px 0 var(--line)' : undefined }}>
+                  <dd className="text-callout text-ink-2">{what}</dd>
+                  <dt className="flex shrink-0 gap-1">
+                    {k.split(' ').map((part, j) => (
+                      <Kbd key={j}>{part}</Kbd>
+                    ))}
+                  </dt>
+                </div>
+              ))}
+            </dl>
+          )}
         </div>
       </section>
 
       {/* The way on: the components either side, small enough to pass, plain enough to press. */}
-      <nav aria-label="More components" className="mt-28 grid gap-3 sm:grid-cols-2">
+      <nav aria-label="More components" className="mt-16 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Neighbour e={prev} dir="prev" onGo={() => go(prev.id)} />
         <Neighbour e={next} dir="next" onGo={() => go(next.id)} />
       </nav>
@@ -327,22 +357,29 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
           go(to)
         }}
       />
+      </div>
     </main>
+    </Shell>
   )
 }
 
-/** The component either side, at the foot of the page: its name and its family, and an arrow that leans the way you'd go. */
+/** The component either side, at the foot of the page: running small in its own well, with its name and family, and an arrow that leans the way you'd go. */
 function Neighbour({ e, dir, onGo }: { e: (typeof ENTRIES)[number]; dir: 'prev' | 'next'; onGo: () => void }) {
   const back = dir === 'prev'
   const family = CATEGORIES.find((c) => c.id === e.category)!
+  const Demo = DEMOS[e.id]
   return (
     <button
       type="button"
       onClick={onGo}
-      className={`ring-focus group/n flex items-center gap-4 rounded-[18px] p-5 text-left shadow-[inset_0_0_0_1px_var(--line)] transition-[background-color,box-shadow] duration-200 hover:bg-[color-mix(in_oklch,var(--accent)_5%,transparent)] hover:shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--accent)_30%,transparent)] ${back ? '' : 'flex-row-reverse text-right'}`}
+      className={`ring-focus group/n flex items-center gap-4 rounded-[26px] bg-surface p-2 text-left shadow-[var(--card-edge)] transition-shadow duration-300 hover:shadow-[var(--card-lift)] max-sm:p-4 ${back ? 'pr-5' : 'flex-row-reverse pl-5 text-right'}`}
     >
-      <span className={`flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-2 text-ink-2 transition-[transform,color,background-color] duration-300 ease-[cubic-bezier(0.2,0.9,0.25,1)] group-hover/n:bg-accent group-hover/n:text-white ${back ? 'group-hover/n:-translate-x-1' : 'group-hover/n:translate-x-1'}`}>
-        {back ? <ArrowLeft size={16} /> : <ArrowRight size={16} />}
+      <span aria-hidden inert className="pointer-events-none relative hidden h-28 w-40 shrink-0 overflow-hidden rounded-[20px] shadow-[inset_0_0_0_1px_var(--line)] sm:block lg:w-48" style={{ background: wellOf(FAMILY_TONE[family.id] ?? 'blue') }}>
+        {Demo ? (
+          <Fit pad={10} max={0.42} min={0.18}>
+            <Demo />
+          </Fit>
+        ) : null}
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-caption text-ink-3">
@@ -351,6 +388,37 @@ function Neighbour({ e, dir, onGo }: { e: (typeof ENTRIES)[number]; dir: 'prev' 
         <span className="mt-0.5 block truncate text-title text-ink">{e.name}</span>
         <span className="block truncate text-footnote text-ink-3">{e.short ?? first(e.line)}</span>
       </span>
+      <span className={`flex size-9 shrink-0 items-center justify-center rounded-full text-ink-2 shadow-[inset_0_0_0_1px_var(--line-strong)] transition-[transform,color,background-color,box-shadow] duration-300 ease-[cubic-bezier(0.2,0.9,0.25,1)] group-hover/n:bg-ink group-hover/n:text-surface group-hover/n:shadow-none ${back ? 'group-hover/n:-translate-x-1' : 'group-hover/n:translate-x-1'}`}>
+        {back ? <ArrowLeft size={16} /> : <ArrowRight size={16} />}
+      </span>
+    </button>
+  )
+}
+
+/** Hands the component to a coding agent: a prompt with what it is, the command that installs it, and the page that documents it. */
+function CopyPrompt({ name, line, command, page }: { name: string; line: string; command: string; page: string }) {
+  const [done, setDone] = useState(false)
+  const timer = useRef(0)
+  useEffect(() => () => clearTimeout(timer.current), [])
+  const copy = async () => {
+    const text = `Add the ${name} component from Detent to this project. ${line}\n\nInstall it with:\n${command}\n\nIts props, usage and details are at ${page}. Fit it to the project's theme and use it where it belongs.`
+    try {
+      await navigator.clipboard.writeText(text)
+    } catch {
+      /* Clipboard blocked: nothing to show. */
+    }
+    setDone(true)
+    clearTimeout(timer.current)
+    timer.current = window.setTimeout(() => setDone(false), 1600)
+  }
+  return (
+    <button type="button" onClick={copy} className="ring-focus flex h-9 items-center gap-2 rounded-full bg-ink pl-3.5 pr-4 text-[13px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]">
+      <AnimatePresence initial={false} mode="popLayout">
+        <motion.span key={done ? 'ok' : 'copy'} className="flex" initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.6 }} transition={{ duration: 0.15 }}>
+          {done ? <Check size={14} strokeWidth={2.6} /> : <Copy size={14} style={{ ['--icon-cutout' as string]: 'var(--ink)' }} />}
+        </motion.span>
+      </AnimatePresence>
+      {done ? 'Copied for your agent' : 'Copy prompt'}
     </button>
   )
 }

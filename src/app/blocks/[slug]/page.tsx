@@ -3,8 +3,6 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { BLOCKS, block } from '@/catalog/blocks'
 import { BlockViewer } from '@/site/blocks/BlockViewer'
-import { Footer } from '@/site/Footer'
-import { Header } from '@/site/Header'
 import { JsonLd, crumbs, page, short } from '@/site/seo'
 
 export function generateStaticParams() {
@@ -19,14 +17,10 @@ export async function generateMetadata({ params }: PageProps<'/blocks/[slug]'>):
 
 export default function BlockPage({ params }: PageProps<'/blocks/[slug]'>) {
   return (
-    <>
-      <Header />
-      {/* The placeholder holds the page's height, so the footer never shows above the block and then drops. */}
-      <Suspense fallback={<div className="min-h-[100dvh]" />}>
-        <Shown params={params} />
-      </Suspense>
-      <Footer />
-    </>
+    // The block's page is an app of its own: the frame with every block down its side, and the block in its panel.
+    <Suspense fallback={<div className="min-h-[100dvh]" style={{ background: 'var(--shell)' }} />}>
+      <Shown params={params} />
+    </Suspense>
   )
 }
 

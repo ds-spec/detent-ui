@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, animate, motion } from 'motion/react'
 import type { AnimationPlaybackControls } from 'motion/react'
-import { ArrowLeft, ArrowRight, Check, Close, Copy, Expand, Moon, Refresh, Sun } from '@/lab/icons'
+import { ArrowLeft, ArrowRight, Check, Close, Copy, Expand, Layers, Moon, Node, Note, Refresh, Sun } from '@/lab/icons'
 import { useTheme } from '@/lab/lib/hooks'
 import { tap } from '@/lab/lib/feel'
 import { RollingText } from '@/lab/ui/RollingText'
@@ -16,10 +16,13 @@ import type { Block } from '@/catalog/blocks'
 import { Kbd } from '@/lab/ui/Kbd'
 import { Hover } from '@/lab/ui/Hover'
 import { Code } from '../browser/Code'
-import { Modes, Rule, Tool } from '../exhibit/Exhibit'
+import { Modes, Tool } from '../exhibit/Exhibit'
 import { Install } from '../parts'
 import { PropRows, PropsSection } from '../PropsTable'
 import { ProTag } from './ProTag'
+import { Rail } from '../exhibit/Rail'
+import { Shell, Trail } from '../shell/Shell'
+import type { RailGroup } from '../exhibit/Rail'
 import { Backdrop, Window } from './Studio'
 
 /** Widths the frame clicks into as you drag it: the sizes a screen most often meets. */
@@ -33,6 +36,10 @@ const SNAP = 14
 const settle = { type: 'spring', stiffness: 460, damping: 44 } as const
 
 const first = (s: string) => s.split(/(?<=\.)\s/)[0]
+
+/** Every block for the list down the side, kind by kind. */
+const KIND_LOOK = { app: { icon: <Layers size={12} />, color: 'var(--data)' }, flow: { icon: <Node size={12} />, color: 'var(--agents)' }, section: { icon: <Note size={12} />, color: 'var(--marketing)' } } as const
+const RAIL: RailGroup[] = BLOCK_GROUPS.filter((g) => g.items.length).map((g) => ({ id: g.k, name: `${KINDS[g.k]}s`, ...KIND_LOOK[g.k], items: g.items.map((b) => ({ id: b.id, name: b.name, line: b.short })) }))
 
 /**
  * A block on its desk. The frame is the block's container, and the block sizes itself by it,
@@ -75,21 +82,18 @@ export function BlockViewer({ id }: { id: string }) {
   }, [router, prev, next, present])
 
   return (
-    <main className="mx-auto max-w-[1360px] px-5 pb-24 sm:px-6">
+    <Shell list={<Rail label="Blocks" groups={RAIL} current={b.id} onPick={(to) => router.push(`/blocks/${to}`)} />} bar={<Trail steps={['Blocks', `${KINDS[b.kind]}s`, b.name]} />}>
+    <main className="mx-auto max-w-[1280px] px-4 pb-16 sm:px-8">
       <header className="pt-8 sm:pt-10">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-footnote text-ink-3">
-            <ProTag />
-            <span>{KINDS[b.kind]}</span>
-            <span aria-hidden className="size-[3px] rounded-full bg-ink-3/60" />
-            <span>Light and dark</span>
-            <span aria-hidden className="size-[3px] rounded-full bg-ink-3/60" />
-            <span>Fits any width</span>
-          </p>
-          <Switcher current={b.id} prev={prev} next={next} />
+        <div className="flex flex-wrap items-center gap-2.5">
+          <span className="text-[13px] text-ink-2">{KINDS[b.kind]}</span>
+          <ProTag />
+          <span className="lg:hidden">
+            <Switcher current={b.id} prev={prev} next={next} />
+          </span>
         </div>
-        <div className="mt-4 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <h1 className="min-w-0 text-[clamp(32px,3.8vw,48px)] font-normal leading-[1.08] tracking-[-0.045em] text-ink">
+        <div className="mt-5 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <h1 className="min-w-0 text-[clamp(36px,4vw,56px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink">
             {b.name}
             <span className="block text-quiet">{b.short}</span>
           </h1>
@@ -99,25 +103,25 @@ export function BlockViewer({ id }: { id: string }) {
         </div>
       </header>
 
-      {/* The tools above the desk, staying just under the site header while the desk scrolls past, so
-          Preview, Code and the rest are in view from the start and never sit on the block. */}
-      <div className="relative">
-        <div className="pointer-events-none sticky top-20 z-20 mb-4 flex justify-center">
-          <div className="glass pointer-events-auto flex items-center gap-0.5 rounded-full bg-surface p-1 shadow-float">
+      {/* Above the desk, quietly: what you're looking at on the left, three small tools on the right. */}
+      <div className="relative mt-8">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="flex rounded-full bg-surface-2 p-1">
             <Modes mode={mode} setMode={setMode} pro />
-            <Rule />
-            <Tool label={shown === 'dark' ? 'View in light' : 'View in dark'} onClick={() => setStageTheme(stageTheme ? null : page === 'dark' ? 'light' : 'dark')}>
-              {shown === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-            </Tool>
+          </span>
+          <span className="flex items-center gap-0.5">
             <Tool label="Replay" onClick={() => setRun((r) => r + 1)}>
               <motion.span key={run} className="flex" initial={{ rotate: -180 }} animate={{ rotate: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 22 }}>
                 <Refresh size={16} />
               </motion.span>
             </Tool>
+            <Tool label={shown === 'dark' ? 'View in light' : 'View in dark'} onClick={() => setStageTheme(stageTheme ? null : page === 'dark' ? 'light' : 'dark')}>
+              {shown === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            </Tool>
             <Tool className="hidden sm:block" label="Full screen" keys="Esc" onClick={() => setPresent(true)}>
               <Expand size={16} />
             </Tool>
-          </div>
+          </span>
         </div>
         <Desk title={b.window} chrome={b.chrome} run={run} mode={mode} theme={stageTheme} present={present} onExit={() => setPresent(false)} view={<Live id={b.id} />} code={<Code id={b.id} />} />
       </div>
@@ -157,11 +161,12 @@ export function BlockViewer({ id }: { id: string }) {
       </section>
 
       {/* The way on: the blocks either side, small enough to pass, plain enough to press. */}
-      <nav aria-label="More blocks" className="mt-28 grid gap-3 sm:grid-cols-2">
+      <nav aria-label="More blocks" className="mt-28 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Neighbour b={prev} dir="prev" />
         <Neighbour b={next} dir="next" />
       </nav>
     </main>
+    </Shell>
   )
 }
 
