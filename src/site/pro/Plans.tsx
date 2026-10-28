@@ -1,92 +1,70 @@
-import { Check } from '@/lab/icons'
-import { PLANS, TERMS } from '@/catalog/pro'
+import { Check, Code, Refresh, Undo } from '@/lab/icons'
+import { PLANS } from '@/catalog/pro'
 import type { Plan } from '@/catalog/pro'
+import { REFUND_DAYS } from '@/catalog/trust'
 
 /**
- * The plans. The two for one person sit side by side: Pro is a plain card; Pro + Templates is
- * the same card inverted, with a slow glint of light crossing it now and then, because it's the
- * one with everything. Team runs the full width beneath them, so the first choice stays a simple
- * one and a team still finds theirs right there. Prices are one payment, said the same way everywhere.
+ * The plans, side by side: Pro and Team are plain cards; Pro + Templates, the one with everything,
+ * is the same card inverted. Each says who it's for, its one price, the way in, and what's in it.
+ * Underneath, the promises every plan shares, said once.
  */
 export function Plans({ compact = false }: { compact?: boolean }) {
-  const team = PLANS.find((p) => p.id === 'team')
   return (
     <div>
-      <div className="mx-auto grid max-w-[900px] gap-4 md:grid-cols-2">
-        {PLANS.filter((p) => p.id !== 'team').map((p) => (
+      <div className="mx-auto grid max-w-[1180px] gap-3 md:grid-cols-3">
+        {PLANS.map((p) => (
           <PlanCard key={p.id} plan={p} compact={compact} />
         ))}
       </div>
-      {team && <TeamRow plan={team} />}
-      <p className="mt-6 text-center text-footnote text-ink-3">{TERMS}</p>
+      <ul className="mx-auto mt-3 grid max-w-[1180px] gap-x-6 gap-y-3 rounded-[22px] px-6 py-5 text-[13.5px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)] sm:grid-cols-2 lg:grid-cols-4">
+        {(
+          [
+            [<Check key="c" size={14} />, 'One payment, never a subscription'],
+            [<Refresh key="r" size={14} />, 'Every update, for life'],
+            [<Undo key="u" size={14} />, `${REFUND_DAYS}-day refund, no questions`],
+            [<Code key="o" size={14} />, 'Source in your project, yours to change'],
+          ] as const
+        ).map(([icon, text]) => (
+          <li key={text} className="flex items-center gap-2.5">
+            <span className="text-ink-3">{icon}</span>
+            {text}
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
 
-/** Team: the same promise for up to ten people, read across in one row. The last two lines of every plan are said once, below, so the row shows what's different. */
-function TeamRow({ plan }: { plan: Plan }) {
+function PlanCard({ plan, compact }: { plan: Plan; compact: boolean }) {
+  const ink = plan.best
+  // The last two lines of every plan are the promises below the cards; each card says what's its own.
+  const features = plan.features.filter((f) => f !== 'Every update, for life' && f !== 'Unlimited projects')
   return (
-    <div className="mx-auto mt-4 grid max-w-[900px] gap-7 rounded-[28px] bg-surface p-7 text-ink shadow-border sm:p-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:gap-10">
-      <div className="min-w-0">
-        <div className="flex h-6 items-center gap-2.5">
-          <p className="text-headline">{plan.name}</p>
-          <span className="rounded-full bg-surface-2 px-2.5 text-caption font-medium leading-6 text-ink-2">{plan.seats[0].toUpperCase() + plan.seats.slice(1)}</span>
-        </div>
-        <p className="mt-1 text-callout text-ink-3">{plan.line}</p>
-        <ul className="mt-6 grid gap-x-8 gap-y-3 text-callout text-ink-2 sm:grid-cols-2">
-          {plan.features.slice(0, 4).map((f) => (
+    <div className={`relative flex flex-col rounded-[28px] p-7 sm:p-8 ${ink ? 'bg-ink text-surface shadow-modal' : 'bg-surface text-ink shadow-[var(--card-edge)]'}`}>
+      <div className="flex h-6 items-center justify-between gap-4">
+        <p className="text-[17px] tracking-[-0.01em]">{plan.name}</p>
+        {ink && <span className="rounded-full bg-surface/15 px-2.5 text-[12px] font-medium leading-6">Everything</span>}
+      </div>
+      <p className={`mt-1 text-[14.5px] ${ink ? 'text-surface/60' : 'text-ink-3'}`}>{plan.line}</p>
+      <p className="mt-8 flex items-baseline gap-2">
+        <span className="tnum text-[56px] font-normal leading-none tracking-[-0.055em]">${plan.price}</span>
+        <span className={`text-[13.5px] ${ink ? 'text-surface/60' : 'text-ink-3'}`}>once, for {plan.seats}</span>
+      </p>
+      <a href={plan.href} className={`ring-focus mt-8 flex h-11 items-center justify-center rounded-full text-[14px] font-medium transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.98] ${ink ? 'bg-surface text-ink' : 'bg-ink text-surface'}`}>
+        {plan.cta}
+      </a>
+      {!compact && (
+        <ul className={`mt-8 flex flex-col gap-3 pt-7 text-[14px] ${ink ? 'text-surface/85 shadow-[inset_0_1px_0_rgb(255_255_255/0.14)]' : 'text-ink-2 shadow-[inset_0_1px_0_var(--line)]'}`}>
+          {features.map((f) => (
             <li key={f} className="flex gap-3">
-              <span className="mt-[3px] grid size-4 shrink-0 place-items-center rounded-full bg-surface-2">
+              <span className={`mt-[3px] grid size-4 shrink-0 place-items-center rounded-full ${ink ? 'bg-surface/15' : 'bg-surface-2'}`}>
                 <Check size={10} strokeWidth={3} />
               </span>
               {f}
             </li>
           ))}
         </ul>
-      </div>
-      <div className="flex items-center justify-between gap-6 md:flex-col md:items-end">
-        <p className="flex items-baseline gap-2">
-          <span className="tnum text-[44px] font-normal leading-none tracking-[-0.05em]">${plan.price}</span>
-          <span className="text-footnote text-ink-3">once</span>
-        </p>
-        <a href={plan.href} className="ring-focus flex h-11 items-center justify-center rounded-full bg-ink px-6 text-callout font-medium text-surface transition-opacity duration-150 hover:opacity-90">
-          {plan.cta}
-        </a>
-      </div>
-    </div>
-  )
-}
-
-function PlanCard({ plan, compact }: { plan: Plan; compact: boolean }) {
-  const inverted = plan.best
-  return (
-    <div className={`relative flex flex-col overflow-hidden rounded-[28px] p-7 sm:p-8 ${inverted ? 'pro-sheen bg-ink text-surface shadow-modal' : 'bg-surface text-ink shadow-border'}`}>
-      <div className="flex h-6 items-center justify-between gap-4">
-        <p className="text-headline">{plan.name}</p>
-        {inverted && <span className="rounded-full bg-surface/15 px-2.5 text-caption font-medium leading-6">Everything</span>}
-      </div>
-      <p className={`mt-1 text-callout ${inverted ? 'text-surface/60' : 'text-ink-3'}`}>{plan.line}</p>
-      <p className="mt-7 flex items-baseline gap-2">
-        <span className="tnum text-[52px] font-normal leading-none tracking-[-0.05em]">${plan.price}</span>
-        <span className={`text-footnote ${inverted ? 'text-surface/60' : 'text-ink-3'}`}>once, for {plan.seats}</span>
-      </p>
-      <a
-        href={plan.href}
-        className={`ring-focus relative mt-7 flex h-11 items-center justify-center rounded-full text-callout font-medium transition-opacity duration-150 hover:opacity-90 ${inverted ? 'bg-surface text-ink' : 'bg-ink text-surface'}`}
-      >
-        {plan.cta}
-      </a>
-      {!compact && <span className={`mt-7 h-px ${inverted ? 'bg-surface/15' : 'bg-[var(--line)]'}`} />}
-      <ul className={`flex flex-col gap-3 text-callout ${compact ? 'mt-6' : 'mt-6'} ${inverted ? 'text-surface/85' : 'text-ink-2'}`}>
-        {plan.features.map((f) => (
-          <li key={f} className="flex gap-3">
-            <span className={`mt-[3px] grid size-4 shrink-0 place-items-center rounded-full ${inverted ? 'bg-surface/15' : 'bg-surface-2'}`}>
-              <Check size={10} strokeWidth={3} />
-            </span>
-            {f}
-          </li>
-        ))}
-      </ul>
+      )}
     </div>
   )
 }
