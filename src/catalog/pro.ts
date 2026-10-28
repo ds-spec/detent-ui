@@ -16,7 +16,7 @@ const PRO_CODE = [
   'chart',
   'usage',
   'dates',
-  'payments',
+  'extract',
   'flow',
   'kanban',
   'forecast',

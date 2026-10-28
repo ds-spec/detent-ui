@@ -73,7 +73,7 @@ export const FILES: Record<string, string[]> = {
   files: ['components/small/FileChip.tsx'],
   toasts: ['components/small/AgentToasts.tsx'],
   retry: ['components/small/RetryButton.tsx'],
-  payments: ['../pro/components/wallet/PaymentMethods.tsx'],
+  extract: ['../pro/components/extract/ExtractionReview.tsx'],
   // Pro blocks live beside the lab, in src/pro.
   'prompt-playground': ['../pro/blocks/playground/Playground.tsx', '../pro/blocks/playground/content.ts', '../pro/chat/Reasoning.tsx', '../pro/chat/ModelPicker.tsx', '../pro/chat/LevelSlider.tsx', '../pro/ui/props.tsx', 'ui/DetentMark.tsx'],
   'agent-chat': ['../pro/blocks/chat/AgentChat.tsx', '../pro/blocks/chat/content.tsx', '../pro/ai/ai-sdk.ts', '../pro/ui/props.tsx'],

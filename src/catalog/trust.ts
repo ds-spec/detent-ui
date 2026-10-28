@@ -186,7 +186,7 @@ export const RELEASES: Release[] = [
       { label: 'Select' },
       { label: 'Voice input', href: '/components/voice' },
       { label: 'Spend cap', href: '/components/usage', pro: true },
-      { label: 'Payment methods', href: '/components/payments', pro: true },
+      { label: 'Payment methods', pro: true },
     ],
   },
 ]
