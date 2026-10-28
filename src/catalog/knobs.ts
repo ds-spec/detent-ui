@@ -49,7 +49,6 @@ export const KNOBS: Record<string, Record<string, Knob>> = {
   toasts: { max: { value: 3, range: [1, 5] }, expanded: { value: false } },
   retry: { title: { value: 'Rate limited' }, base: { value: 5, range: [1, 30] } },
   flow: { follow: { value: true } },
-  heatmap: { label: { value: 'commits' } },
   dialog: { dismissable: { value: true } },
   confirm: { confirmLabel: { value: 'Delete project' }, doneLabel: { value: 'Deleted' } },
   popover: { side: { value: 'bottom', options: SIDES }, arrow: { value: true } },

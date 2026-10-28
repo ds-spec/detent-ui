@@ -133,7 +133,7 @@ export const RELEASES: Release[] = [
     items: [
       { label: 'Flow builder', href: '/components/flow', pro: true },
       { label: 'Kanban board', href: '/components/kanban', pro: true },
-      { label: 'Year grid', href: '/components/heatmap', pro: true },
+      { label: 'Year grid', pro: true },
       { label: 'Video player', href: '/components/video', pro: true },
       { label: 'Image cropper', href: '/components/cropper', pro: true },
       { label: 'Product tour', href: '/components/tour', pro: true },

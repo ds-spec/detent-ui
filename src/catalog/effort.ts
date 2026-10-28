@@ -21,7 +21,7 @@ export const DAYS: Record<string, number> = {
   payments: 6,
   flow: 15,
   kanban: 10,
-  heatmap: 6,
+  forecast: 7,
   video: 8,
   cropper: 8,
   tour: 8,

@@ -32,7 +32,7 @@ export const FILES: Record<string, string[]> = {
   command: ['components/command/CommandMenu.tsx'],
   presence: ['components/presence/HereNow.tsx'],
   kanban: ['../pro/components/kanban/Kanban.tsx', 'ui/Orb.tsx'],
-  heatmap: ['../pro/components/heatmap/YearGrid.tsx', 'ui/Count.tsx'],
+  forecast: ['../pro/components/forecast/CashForecast.tsx'],
   cropper: ['../pro/components/cropper/ImageCropper.tsx'],
   tour: ['../pro/components/tour/ProductTour.tsx', 'lib/layer.tsx'],
   composer: ['../pro/components/composer/RichComposer.tsx'],

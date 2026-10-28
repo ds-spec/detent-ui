@@ -19,7 +19,7 @@ const PRO_CODE = [
   'payments',
   'flow',
   'kanban',
-  'heatmap',
+  'forecast',
   'video',
   'cropper',
   'tour',
