@@ -398,10 +398,11 @@ export function Signature({
         </div>
       </div>
 
-      <div className="relative mt-4 flex h-12 items-center justify-end gap-1 border-t border-line pt-3">
-        <AnimatePresence initial={false} mode="popLayout">
+      {/* The actions and the sealed line take turns: one rolls out before the other rolls in, so they never sit on top of each other. */}
+      <div className="relative mt-4 flex h-12 items-center justify-end gap-1 overflow-hidden border-t border-line pt-3">
+        <AnimatePresence initial={false} mode="wait">
           {sealed ? (
-            <motion.div key="sealed" className="flex items-center gap-2 text-footnote" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>
+            <motion.div key="sealed" className="flex items-center gap-2 text-footnote" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: ease.out } }} exit={{ opacity: 0, y: -10, transition: { duration: 0.12, ease: ease.exit } }}>
               <span className="text-ink">Signed and sealed</span>
               <span className="tnum text-ink-3">{sealed.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
               <motion.button type="button" whileTap={press} onPointerDown={tap} onClick={clear} className="ring-focus ml-2 h-8 rounded-full px-3 font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink">
@@ -409,7 +410,7 @@ export function Signature({
               </motion.button>
             </motion.div>
           ) : (
-            <motion.div key="actions" className="flex items-center gap-1" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>
+            <motion.div key="actions" className="flex items-center gap-1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: ease.out } }} exit={{ opacity: 0, y: -10, transition: { duration: 0.12, ease: ease.exit } }}>
               <motion.button type="button" whileTap={press} onPointerDown={tap} onClick={clear} disabled={!value} className="ring-focus h-8 rounded-full px-3 text-footnote font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink disabled:opacity-40">
                 Clear
               </motion.button>
