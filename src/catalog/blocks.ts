@@ -573,21 +573,21 @@ export const BLOCKS: Block[] = [
   {
     id: 'billing',
     name: 'Billing',
-    short: 'Plans, usage and a spend cap',
+    short: 'Plans, usage and a limit',
     component: 'Billing',
     kind: 'flow',
     window: 'Detent · Settings',
-    line: 'Plans, live usage, a spend cap and the card on file, in one settings page. Every change shows its price before it charges.',
+    line: 'Plans, usage against a monthly limit and the card on file, in one settings page. Every change shows its price before it charges.',
     details: [
       'Switch between monthly and yearly and every price rolls to its new figure instead of blinking.',
-      'Usage is live: spend so far, where it’s heading, and a cap you drag that names the day you’d reach it.',
+      'Usage sits against a monthly limit: spend so far, where the month is heading, and a limit you can change that shows what it would mean before you save it.',
       'Changing plan shows what you’ll pay today, with credit for the rest of the old plan, before anything is charged.',
       'The plan you’re on sits on a soft plate. When you switch, it glides to the new one and the card blooms once.',
       'The new invoice slides in at the top of the list, and a quiet note says where the receipt went.',
-      'Below 768px the settings menu folds away; the plans and usage stack, and the meter scales rather than crops.',
+      'Below 768px the settings menu folds away; the plans and usage stack, and the usage card scales rather than crops.',
     ],
     keys: [
-      ['↑ ↓', 'Move the spend cap'],
+      ['Esc', 'Stop editing the limit'],
       ['Esc', 'Close the summary'],
     ],
     props: [

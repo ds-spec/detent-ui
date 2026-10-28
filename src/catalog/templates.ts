@@ -132,7 +132,7 @@ const ALL: Template[] = [
       { anchor: 'invoices', name: 'Invoices', line: 'Failed payments first, with a retry that settles the row as paid and rolls the totals.', uses: ['Retry', 'Rolling numbers'] },
       { anchor: 'assistant', name: 'Ask Tandem', line: 'On the AI SDK: it reads the dashboard’s data through tools, streams its answer, draws what it found under it, and charges a card only with your yes.', uses: ['Approval tray', 'AI SDK adapter'] },
       { anchor: 'agents', name: 'Agents', line: 'Dunning, churn watch and a Monday report, working in the background: each run as a live waterfall, every request for a yes in one tray, counted in the sidebar from any page.', uses: ['Run waterfall', 'Approval tray', 'Streaming answer'] },
-      { anchor: 'settings', name: 'Settings', line: 'One page you scroll: the workspace, the team, the AI’s spend with a cap you drag, its model, and what agents may do without asking, which the route obeys.', uses: ['Spend cap', 'Model & effort'] },
+      { anchor: 'settings', name: 'Settings', line: 'One page you scroll: the workspace, the team, the AI’s spend against a monthly limit, its model, and what agents may do without asking, which the route obeys.', uses: ['Usage limit', 'Model & effort'] },
       { anchor: 'signin', name: 'Sign in', line: 'Google, GitHub or a link by email, beside the product’s own ink hills.', uses: ['Ink landscape'] },
     ],
     details: [

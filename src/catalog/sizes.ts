@@ -16,7 +16,7 @@ export const SIZE: Record<string, [number, number]> = {
   models: [340, 420],
   filter: [722, 550],
   chart: [560, 440],
-  usage: [520, 476],
+  usage: [600, 500],
   dates: [700, 452],
   forecast: [712, 688],
   voice: [440, 164],

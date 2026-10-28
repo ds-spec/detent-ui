@@ -16,7 +16,7 @@ export const FILES: Record<string, string[]> = {
   models: ['components/models/ModelPicker.tsx'],
   filter: ['../pro/components/filter/AskFilter.tsx'],
   chart: ['../pro/components/chart/ScrubChart.tsx'],
-  usage: ['../pro/components/usage/SpendCap.tsx'],
+  usage: ['../pro/components/usage/UsageLimit.tsx'],
   dates: ['../pro/components/dates/DateRangePicker.tsx', '../pro/components/dates/parse.ts'],
   voice: ['components/voice/VoiceInput.tsx'],
   select: ['components/select/Select.tsx'],
