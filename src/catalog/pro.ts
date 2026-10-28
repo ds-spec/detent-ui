@@ -27,14 +27,8 @@ const PRO_CODE = [
   'time',
   'combobox',
   'trend',
-  'bars',
-  'rings',
-  'waffle',
-  'gauge',
-  'stats',
   'codeblock',
   'sidebar',
-  'timeline',
   'carousel',
 ]
 

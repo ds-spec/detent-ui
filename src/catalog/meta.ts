@@ -508,12 +508,12 @@ const ALL: Entry[] = [
   },
 
   {
-    id: 'timeline',
-    name: 'Issue timeline',
-    short: 'A history that holds still',
+    id: 'history',
+    name: 'Ticket history',
+    short: 'Everything that happened, in order',
     category: 'feedback',
     feel: ['stream'],
-    line: 'A ticket’s history on one line: comments, commits and moves. A run of commits folds into a single row, and new events wait at the top instead of shoving what you’re reading.',
+    line: 'Every comment, commit and move on a ticket, by day. Repeats fold into one row, and anything new waits above what you’re reading until you want it.',
     tags: ['New'],
     details: [
       'Events are grouped by day under headers that stay put while you scroll: comments, status changes, commits, reviews and deploys, each with its own mark on the line.',
@@ -991,8 +991,8 @@ const ALL: Entry[] = [
     ],
   },
   {
-    id: 'gauge',
-    name: 'Tick gauge',
+    id: 'meter',
+    name: 'Tick meter',
     short: 'A reading against its limit',
     category: 'data',
     feel: ['stream'],

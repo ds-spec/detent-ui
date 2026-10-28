@@ -6,6 +6,12 @@ import { PRO_DEMOS, SPOTS } from '@pro'
 
 /** Each free demo is its own chunk, loaded only when something on screen asks for it. */
 const FREE: Record<string, ComponentType> = {
+  bars: dynamic(() => import('@/lab/demos/bars').then((m) => m.BarsDemo), { ssr: false }),
+  rings: dynamic(() => import('@/lab/demos/rings').then((m) => m.RingsDemo), { ssr: false }),
+  waffle: dynamic(() => import('@/lab/demos/waffle').then((m) => m.WaffleDemo), { ssr: false }),
+  meter: dynamic(() => import('@/lab/demos/gauge').then((m) => m.GaugeDemo), { ssr: false }),
+  stats: dynamic(() => import('@/lab/demos/stats').then((m) => m.StatsDemo), { ssr: false }),
+  history: dynamic(() => import('@/lab/demos/timeline').then((m) => m.TimelineDemo), { ssr: false }),
   toaster: dynamic(() => import('@/lab/demos/toaster').then((m) => m.ToasterDemo), { ssr: false }),
   signature: dynamic(() => import('@/lab/demos/signature').then((m) => m.SignatureDemo), { ssr: false }),
   dialog: dynamic(() => import('@/lab/demos/overlays').then((m) => m.DialogDemo), { ssr: false }),
