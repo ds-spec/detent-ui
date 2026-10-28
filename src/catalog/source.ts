@@ -40,7 +40,7 @@ export const FILES: Record<string, string[]> = {
   combobox: ['../pro/components/combobox/Combobox.tsx', 'lib/layer.tsx'],
   trend: ['../pro/components/charts/TrendChart.tsx', '../pro/components/charts/parts.tsx', '../pro/components/charts/ChartCard.tsx', 'lib/hooks.ts'],
   bars: ['../pro/components/charts/BarChart.tsx', '../pro/components/charts/parts.tsx', '../pro/components/charts/ChartCard.tsx'],
-  rings: ['../pro/components/charts/ActivityRings.tsx', '../pro/components/charts/parts.tsx', '../pro/components/charts/ChartCard.tsx'],
+  rings: ['../pro/components/charts/GoalNumerals.tsx', 'ui/DotType.tsx', '../pro/components/charts/parts.tsx', '../pro/components/charts/ChartCard.tsx'],
   waffle: ['../pro/components/charts/Waffle.tsx', '../pro/components/charts/parts.tsx', '../pro/components/charts/ChartCard.tsx'],
   gauge: ['../pro/components/charts/Gauge.tsx', '../pro/components/charts/ChartCard.tsx', 'ui/RollingText.tsx'],
   stats: ['../pro/components/charts/StatTile.tsx', '../pro/components/charts/parts.tsx', 'ui/RollingText.tsx', 'lib/hooks.ts'],
