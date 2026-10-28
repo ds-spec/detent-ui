@@ -27,7 +27,7 @@ export const DAYS: Record<string, number> = {
   tour: 8,
   composer: 12,
   // Blocks
-  'feature-bento': 8,
+  'live-features': 8,
   pricing: 6,
   testimonials: 4,
   faq: 4,
@@ -37,7 +37,7 @@ export const DAYS: Record<string, number> = {
   analytics: 10,
   'prompt-playground': 14,
   'agent-chat': 12,
-  'agent-run': 15,
+  'task-to-merge': 15,
   'voice-mode': 15,
   evals: 12,
   'support-inbox': 15,

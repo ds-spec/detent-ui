@@ -90,7 +90,7 @@ const PILL = 'ring-focus inline-flex h-8 items-center gap-1.5 rounded-full px-3 
 
 type Shot = { id: string; name: string; line: string; count: string; href: string; title: string; chrome: 'browser' | 'titled'; view: ComponentType }
 
-const BLOCK_SHOTS: Shot[] = ['support-inbox', 'agent-run', 'evals'].flatMap((id) => {
+const BLOCK_SHOTS: Shot[] = ['support-inbox', 'task-to-merge', 'evals'].flatMap((id) => {
   const b = BLOCKS.find((x) => x.id === id)
   const View = BLOCK_VIEWS[id]
   if (!b || !View) return []

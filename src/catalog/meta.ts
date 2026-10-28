@@ -424,10 +424,10 @@ const ALL: Entry[] = [
   {
     id: 'rename',
     name: 'Inline rename',
-    short: 'Rename without moving a pixel',
+    short: 'F2, type, done',
     category: 'inputs',
     feel: ['type'],
-    line: 'The text becomes a field without moving a pixel. Extensions stay put; Escape brings the old name back.',
+    line: 'F2 and the name is already selected, the extension left out of it. A name that can’t be used shakes once and says why; Escape brings the old one back.',
     tags: ['Keyboard'],
     zoom: 1.4,
     details: [
@@ -527,10 +527,10 @@ const ALL: Entry[] = [
   {
     id: 'timeline',
     name: 'Timeline',
-    short: 'What happened, newest first',
+    short: 'A history that holds still',
     category: 'feedback',
     feel: ['stream'],
-    line: 'What happened, newest first, grouped by day. Runs fold into one line, and new events never move the page under someone reading.',
+    line: 'A ticket’s history on one line: comments, commits and moves. A run of commits folds into a single row, and new events wait at the top instead of shoving what you’re reading.',
     tags: ['New'],
     details: [
       'Events are grouped by day under headers that stay put while you scroll: comments, status changes, commits, reviews and deploys, each with its own mark on the line.',

@@ -46,8 +46,8 @@ const product: Prop = { name: 'product', type: 'string', default: "'Detent'", no
 
 export const BLOCKS: Block[] = [
   {
-    id: 'feature-bento',
-    name: 'Feature bento',
+    id: 'live-features',
+    name: 'Live features',
     short: 'Five features, each one working',
     component: 'FeatureBento',
     kind: 'section',
@@ -73,7 +73,7 @@ export const BLOCKS: Block[] = [
   },
   {
     id: 'pricing',
-    name: 'Usage pricing',
+    name: 'Metered pricing',
     short: 'Plans priced by your usage',
     component: 'Pricing',
     kind: 'section',
@@ -325,7 +325,7 @@ export const BLOCKS: Block[] = [
       'The chart stacks what the assistant resolved under what went to your team. Point at a bar, or use the arrow keys, and a reading follows it from bar to bar.',
       'Every number counts to its new value in a slot that holds its place, and the line under each one swaps whole, so changing the range never moves the page.',
       'The queue and the feed stack their rows by transform. Rows arrive and leave by their own height and everything else glides, without the layout moving.',
-      'The sidebar’s usage card is billed the way the Usage pricing block prices it, so the two read as one product.',
+      'The sidebar’s usage card is billed the way the Metered pricing block prices it, so the two read as one product.',
       'Sized by its container: the sidebar folds away below 768px, the side column drops under the main one below 896px, and the feed drops its topic and handler columns when it’s narrow.',
     ],
     keys: [
@@ -401,8 +401,8 @@ export const BLOCKS: Block[] = [
     ],
   },
   {
-    id: 'agent-run',
-    name: 'Agent run',
+    id: 'task-to-merge',
+    name: 'Task to merge',
     short: 'From plan to merged pull request',
     component: 'AgentRun',
     kind: 'app',
@@ -435,7 +435,7 @@ export const BLOCKS: Block[] = [
     kind: 'app',
     window: 'Detent Voice',
     chrome: 'titled',
-    line: 'A call with the assistant as a ball of light. It listens, thinks and speaks in its own colours, stops when you talk over it, and shows what it changed with a way to undo it.',
+    line: 'A call where the assistant is a ball of light that pools cool while you talk and warm while it answers. Talk over it and it stops mid-sentence; anything it changes comes back as a card with Undo.',
     details: [
       'The orb’s colours pool and turn inside it: cooler while it listens, swirling while it thinks, warmer while it speaks, and it swells with whoever is talking.',
       'Captions hold every word’s place before it’s said, so the lines never re-wrap as they’re spoken.',

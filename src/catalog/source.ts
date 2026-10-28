@@ -77,7 +77,7 @@ export const FILES: Record<string, string[]> = {
   // Pro blocks live beside the lab, in src/pro.
   'prompt-playground': ['../pro/blocks/playground/Playground.tsx', '../pro/blocks/playground/content.ts', '../pro/chat/Reasoning.tsx', '../pro/chat/ModelPicker.tsx', '../pro/chat/LevelSlider.tsx', '../pro/ui/props.tsx', 'ui/DetentMark.tsx'],
   'agent-chat': ['../pro/blocks/chat/AgentChat.tsx', '../pro/blocks/chat/content.tsx', '../pro/ai/ai-sdk.ts', '../pro/ui/props.tsx'],
-  'agent-run': ['../pro/blocks/agent/AgentRun.tsx', '../pro/blocks/agent/content.ts', '../pro/ui/props.tsx'],
+  'task-to-merge': ['../pro/blocks/agent/AgentRun.tsx', '../pro/blocks/agent/content.ts', '../pro/ui/props.tsx'],
   'support-inbox': ['../pro/blocks/inbox/Inbox.tsx', '../pro/blocks/inbox/content.ts', '../pro/ui/props.tsx', 'ui/DetentMark.tsx'],
   'sign-in': ['../pro/blocks/signin/SignIn.tsx', '../pro/ui/props.tsx', 'ui/DetentMark.tsx'],
   billing: ['../pro/blocks/billing/Billing.tsx', '../pro/ui/SettingsNav.tsx', '../pro/ui/props.tsx'],
@@ -90,7 +90,7 @@ export const FILES: Record<string, string[]> = {
   'data-table': ['../pro/blocks/table/ConversationTable.tsx', '../pro/blocks/table/content.ts', '../pro/blocks/analytics/Sidebar.tsx', '../pro/ui/Segmented.tsx', '../pro/ui/Stream.tsx', '../pro/ui/props.tsx', 'ui/DetentMark.tsx'],
   analytics: ['../pro/blocks/analytics/Analytics.tsx', '../pro/blocks/analytics/Sidebar.tsx', '../pro/blocks/analytics/content.ts', '../pro/ui/Segmented.tsx', '../lab/lib/hooks.ts', '../lab/ui/Count.tsx', '../pro/ui/props.tsx', 'ui/DetentMark.tsx'],
   pricing: ['../pro/blocks/pricing/Pricing.tsx', '../pro/ui/Segmented.tsx', '../lab/ui/Count.tsx', '../pro/ui/props.tsx'],
-  'feature-bento': ['../pro/blocks/bento/FeatureBento.tsx', '../pro/blocks/bento/tiles.tsx', '../pro/ui/Segmented.tsx', '../pro/ui/Stream.tsx', '../lab/ui/Count.tsx', '../pro/ui/props.tsx', 'ui/DetentMark.tsx'],
+  'live-features': ['../pro/blocks/bento/FeatureBento.tsx', '../pro/blocks/bento/tiles.tsx', '../pro/ui/Segmented.tsx', '../pro/ui/Stream.tsx', '../lab/ui/Count.tsx', '../pro/ui/props.tsx', 'ui/DetentMark.tsx'],
   onboarding: ['../pro/blocks/onboarding/Onboarding.tsx', '../pro/ui/props.tsx', 'ui/DetentMark.tsx'],
   evals: ['../pro/blocks/evals/Evals.tsx', '../pro/blocks/evals/content.ts', '../lab/ui/Count.tsx', '../pro/ui/props.tsx'],
   'template-rapport': [
