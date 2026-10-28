@@ -1,14 +1,12 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
-import { PRO_BLOCKS, TOTAL_DAYS, TOTAL_MONTHS } from '@/catalog/effort'
-import { PLANS, PRO_COMPONENTS, TERMS } from '@/catalog/pro'
+import { PRO_BLOCKS, TOTAL_DAYS } from '@/catalog/effort'
+import { PRO_COMPONENTS, TERMS } from '@/catalog/pro'
 import { TEMPLATES } from '@/catalog/templates'
-import { ProTag } from '@/site/blocks/ProTag'
-import { Footer } from '@/site/Footer'
-import { Header } from '@/site/Header'
-import { Ledger } from '@/site/pro/Ledger'
-import { Plans } from '@/site/pro/Plans'
+import { REFUND_DAYS } from '@/catalog/trust'
+import { BigBuy, BuyHead, BuyProvider, Choose, Stage } from '@/site/pro/Buy'
+import { Compare, Inside } from '@/site/pro/Inside'
 import { JsonLd, page, proGraph } from '@/site/seo'
+import { SitePage } from '@/site/sheets'
 
 export const metadata: Metadata = page({
   title: 'Detent Pro — components, screens and templates for AI apps',
@@ -17,106 +15,91 @@ export const metadata: Metadata = page({
   path: '/pro',
 })
 
-const [pro, all] = PLANS
-
 const FAQ: [string, string][] = [
-  ['Is it a subscription?', 'No. You pay once and keep everything, including every update that ships after you buy.'],
-  ['What’s the difference between the plans?', 'Pro is what you build the product with: the Pro components and every block. Pro + Templates adds the templates: landing pages that sell the product and apps to start it from, including every template still to come.'],
+  ['Who is it for?', 'Developers and small teams building an AI product in React: a chat, an agent, a copilot, or a SaaS with AI inside. If you already use shadcn and the AI SDK, it drops straight in.'],
+  ['Is it a subscription?', 'No. You pay once and keep it, along with every update that ships after you buy.'],
+  ['What’s the difference between the plans?', 'Pro is what you build the product with: the Pro components and every block. Pro + Templates adds the templates: whole apps to start from, including every template still to come. Team is everything, for up to ten people.'],
+  ['Does it work with the AI SDK?', 'Yes. useDetentChat takes what useChat gives you and returns the props for the streaming answer, the run waterfall and the approval card, so reasoning, tools, approvals and sources each land where they belong. The Agent chat block and Tandem run on it.'],
+  ['Will it match my design?', 'Installed with shadcn, Detent takes on your theme: your primary becomes its accent, it uses your background, borders and muted text, and .dark turns it dark. Your fonts stay yours.'],
   ['How do I install Pro?', 'With the shadcn CLI, from Detent’s private registry. Add your licence key once, then install like anything else: npx shadcn add @detent-pro/diff. The source lands in your project.'],
-  ['Can my team share one licence?', 'A licence is for one person. Team covers up to ten people for $799, with a key for each of them and one more for CI and shared repos.'],
+  ['Can my team share one licence?', 'A licence is for one person. Team covers up to ten people, with a key for each of them and one more for CI and shared repos.'],
   ['Can I use it for client work?', 'Yes, in as many projects as you like, commercial ones included. What you can’t do is resell or redistribute the components themselves.'],
   ['Do the free components stay free?', 'Yes. Everything free stays free, and keeps getting better alongside Pro.'],
+  ['What if it’s not right for me?', `Email within ${REFUND_DAYS} days of buying and you get every cent back. No form, no questions.`],
 ]
 
-const h2 = 'text-[clamp(32px,4.2vw,52px)] font-normal leading-[1.06] tracking-[-0.045em] text-ink'
+const H2 = 'text-[clamp(32px,3.4vw,48px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink'
 
 /**
- * Pro, told as time. The hero says what it's worth in days of work; the ledger lists everything
- * in it with roughly how long each takes to build, running each one as you pass and adding the
- * days up until it reaches the whole. Then the price, the questions, and the way in.
+ * Pro, sold the way a good shop sells one thing: the price first, with the thing itself running
+ * beside two plain questions. Then everything in it by name, the plans side by side, the
+ * questions people ask, and one button that is the price.
  */
 export default function ProPage() {
   return (
-    <>
-      <Header />
-      <main className="mx-auto max-w-[1360px] px-5 sm:px-6">
-        <JsonLd data={proGraph(FAQ)} />
-        <section className="flex flex-col items-center pt-20 text-center sm:pt-32">
-          <ProTag className="rise" />
-          <h1 className="mt-7 text-[clamp(40px,5.6vw,68px)] font-normal leading-[1.03] tracking-[-0.05em] text-ink">
-            <span className="focus-in inline-block">{TOTAL_DAYS} days of work.</span>
-            <span className="focus-in block text-quiet" style={{ animationDelay: '120ms' }}>
-              Yours for ${pro.price}.
-            </span>
-          </h1>
-          <p className="rise mt-7 max-w-[640px] text-lead text-ink-3" style={{ animationDelay: '240ms' }}>
-            {PRO_COMPONENTS.length} components, {PRO_BLOCKS.length} whole screens and {TEMPLATES.length} templates, each built to the same bar: every state, every key, both themes, every width, and nothing ever jumps. By our estimate, that’s about {TOTAL_MONTHS} months of one good engineer’s time,
-            already done.
-          </p>
-          <div className="rise mt-10 flex flex-wrap items-center justify-center gap-3" style={{ animationDelay: '320ms' }}>
-            <Link href="#pricing" className="ring-focus flex h-11 items-center rounded-full bg-ink px-6 text-callout font-medium text-surface transition-opacity duration-150 hover:opacity-90">
-              {pro.cta} · ${pro.price}
-            </Link>
-            <Link href="#inside" className="ring-focus flex h-11 items-center rounded-full bg-surface-2 px-6 text-callout font-medium text-ink transition-colors duration-150 hover:bg-card">
-              See what’s inside
-            </Link>
+    <SitePage>
+      <JsonLd data={proGraph(FAQ)} />
+      <BuyProvider>
+        <section className="mx-auto max-w-[1360px] px-5 pt-8 sm:px-6 sm:pt-10">
+          <BuyHead />
+          <div className="rise mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-12 xl:grid-cols-[minmax(0,1fr)_460px] xl:gap-16" style={{ animationDelay: '220ms' }}>
+            <Stage />
+            <Choose />
           </div>
-          <p className="rise mt-5 text-footnote text-ink-3" style={{ animationDelay: '380ms' }}>
-            {TERMS}
-          </p>
         </section>
 
-        {/* Everything in it, running, with what each would take to build. */}
-        <section id="inside" className="mt-28 scroll-mt-20 sm:mt-36">
-          <h2 className={h2}>
+        <section id="inside" aria-labelledby="inside-title" className="mx-auto mt-28 max-w-[1360px] scroll-mt-24 px-5 sm:mt-36 sm:px-6">
+          <h2 id="inside-title" className={H2}>
             Everything in Pro.
-            <span className="block text-quiet">And what it would take to build it yourself.</span>
+            <span className="block text-quiet">Every piece, by name.</span>
           </h2>
-          <div className="mt-12 sm:mt-16">
-            <Ledger />
+          <div className="mt-10 sm:mt-14">
+            <Inside />
           </div>
         </section>
 
-        <section id="pricing" className="mt-32 scroll-mt-20 sm:mt-44">
-          <h2 className={`${h2} text-center`}>
-            One payment.
-            <span className="block text-quiet">The {TOTAL_DAYS} days are on us.</span>
+        <section aria-labelledby="compare-title" className="mx-auto mt-28 max-w-[1360px] px-5 sm:mt-36 sm:px-6">
+          <h2 id="compare-title" className={H2}>
+            Free, or Pro.
+            <span className="block text-quiet">What each one gets you.</span>
           </h2>
-          <div className="mt-12 sm:mt-16">
-            <Plans />
+          <div className="mt-10 sm:mt-14">
+            <Compare />
           </div>
-          <p className="mt-8 text-center text-footnote text-ink-3">Pro + Templates is ${all.price}: everything above, and every template still to come.</p>
         </section>
 
-        <section className="mx-auto mt-32 max-w-[900px] sm:mt-44">
-          <h2 className={h2}>Questions.</h2>
-          <div className="mt-10">
+        <section id="questions" aria-labelledby="questions-title" className="mx-auto mt-28 grid max-w-[1360px] scroll-mt-24 gap-x-16 gap-y-10 px-5 sm:mt-36 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
+          <h2 id="questions-title" className={H2}>
+            Questions.
+            <span className="block text-quiet">Before you buy.</span>
+          </h2>
+          <div>
             {FAQ.map(([q, a]) => (
-              <details key={q} className="group/q shadow-[inset_0_1px_0_var(--line)]">
-                <summary className="ring-focus flex cursor-pointer list-none items-center justify-between gap-6 rounded-[8px] py-5 text-headline text-ink [&::-webkit-details-marker]:hidden">
+              <details key={q} className="group/q shadow-[inset_0_1px_0_var(--line)] last:shadow-[inset_0_1px_0_var(--line),inset_0_-1px_0_var(--line)]">
+                <summary className="ring-focus flex cursor-pointer list-none items-center justify-between gap-6 rounded-[6px] py-5 text-[17px] tracking-[-0.01em] text-ink [&::-webkit-details-marker]:hidden">
                   {q}
                   <span aria-hidden className="relative size-3.5 shrink-0 text-ink-3">
                     <span className="absolute inset-x-0 top-1/2 h-[1.5px] -translate-y-1/2 rounded-full bg-current" />
                     <span className="absolute inset-y-0 left-1/2 w-[1.5px] -translate-x-1/2 rounded-full bg-current transition-transform duration-300 group-open/q:scale-y-0" />
                   </span>
                 </summary>
-                <p className="max-w-[680px] pb-6 text-callout text-ink-3">{a}</p>
+                <p className="max-w-[620px] pb-6 text-[15px] leading-[1.6] text-ink-3">{a}</p>
               </details>
             ))}
           </div>
         </section>
 
-        <section className="mt-32 flex flex-col items-center text-center sm:mt-44">
-          <h2 className={h2}>
+        <section className="mx-auto mt-28 flex max-w-[1360px] flex-col items-center px-5 pb-8 text-center sm:mt-40 sm:px-6">
+          <h2 className={H2}>
             Ship the hard parts this week.
             <span className="block text-quiet">Not this quarter.</span>
           </h2>
-          <Link href="#pricing" className="ring-focus mt-10 flex h-11 items-center rounded-full bg-ink px-6 text-callout font-medium text-surface transition-opacity duration-150 hover:opacity-90">
-            {pro.cta} · ${pro.price}
-          </Link>
+          <div className="mt-10 flex w-full justify-center sm:mt-12">
+            <BigBuy />
+          </div>
+          <p className="mt-5 text-[13px] text-ink-3">{TERMS}</p>
         </section>
-      </main>
-      <Footer />
-    </>
+      </BuyProvider>
+    </SitePage>
   )
 }

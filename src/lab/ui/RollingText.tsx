@@ -21,10 +21,13 @@ export function RollingText({ text, className = '', proportional = false, still 
     if (!proportional || !probe.current) return
     // Measured in layout pixels: under a CSS `zoom` (the gallery's Fit, a film's stage) the rects come
     // back zoomed, so divide by the probe's own zoom or every column lands too wide or too narrow.
+    // Kept in em, so the columns follow the type if its size changes later: a headline set with
+    // clamp() and a window resized, or a breakpoint crossed.
     const read = () => {
       const box = probe.current!
       const z = box.offsetWidth ? box.getBoundingClientRect().width / box.offsetWidth : 1
-      setWidths([...box.children].map((c) => (c as HTMLElement).getBoundingClientRect().width / z))
+      const em = parseFloat(getComputedStyle(box).fontSize) || 16
+      setWidths([...box.children].map((c) => (c as HTMLElement).getBoundingClientRect().width / z / em))
     }
     read()
     document.fonts?.ready.then(read)
@@ -35,10 +38,13 @@ export function RollingText({ text, className = '', proportional = false, still 
       {/* Screen readers get the value as plain text; the rolling columns are hidden from them. */}
       <span className="sr-only">{text}</span>
       {proportional && (
-        <span ref={probe} aria-hidden className="pointer-events-none invisible absolute left-0 top-0 flex whitespace-pre">
-          {Array.from({ length: 10 }, (_, n) => (
-            <span key={n}>{n}</span>
-          ))}
+        // The measuring strip keeps its own width inside a clip of no size, so it never widens the page beside a price at its edge.
+        <span aria-hidden className="pointer-events-none absolute left-0 top-0 size-0 overflow-hidden">
+          <span ref={probe} className="invisible flex w-max whitespace-pre">
+            {Array.from({ length: 10 }, (_, n) => (
+              <span key={n}>{n}</span>
+            ))}
+          </span>
         </span>
       )}
       {chars.map((c, i) => {
@@ -58,16 +64,16 @@ export function RollingText({ text, className = '', proportional = false, still 
 function Digit({ d, width, still }: { d: number; width?: number; still: boolean }) {
   // Fixed 1ch column until the font is measured; then the first width lands instantly
   // and later changes spring, so nothing collapses while waiting for a frame.
-  const w = useMotionValue<number | string>(width ?? '1ch')
+  const w = useMotionValue<string>(width === undefined ? '1ch' : `${width}em`)
   const had = useRef(width !== undefined)
   useLayoutEffect(() => {
     if (width === undefined) return
     if (!had.current) {
       had.current = true
-      w.set(width)
+      w.set(`${width}em`)
       return
     }
-    const ctl = animate(w, width, roll)
+    const ctl = animate(w, `${width}em`, roll)
     return () => ctl.stop()
   }, [width, w])
 
