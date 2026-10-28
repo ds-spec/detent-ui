@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { CodeInput } from '../components/code/CodeInput'
 import type { CodeHandle } from '../components/code/CodeInput'
-import { PromptBox } from '../components/prompt/PromptBox'
-import type { Message, PromptHandle } from '../components/prompt/PromptBox'
+import { PromptBox, PromptStarters } from '../components/prompt/PromptBox'
+import type { Attachment, Message, PromptHandle, Starter } from '../components/prompt/PromptBox'
 import { Mail, Orbit } from '../icons'
 import { ease, press } from '../lib/motion'
 import { useBench } from './bench'
@@ -106,6 +106,11 @@ const REPLY: Record<string, string> = {
 }
 
 const SUGGEST = ['Summarize the board update', 'What changed since Q2?', 'Draft the hiring ask']
+const STARTERS: Starter[] = [
+  { label: 'Draft', lead: 'A note to Acme', rest: 'on the late invoices.' },
+  { label: 'Find', lead: 'Refunds over $500', rest: 'since the 1st.' },
+  { label: 'Explain', lead: 'Why burn rose', rest: 'in October.' },
+]
 const BOARD = { id: 'sample', name: 'Q3 board update.pdf', size: 1_153_434, type: 'application/pdf' }
 
 /** The demo writes its own prompts: a mode, a few words typed with a human rhythm, then Send. */
@@ -115,12 +120,14 @@ const SCRIPT = [
   { mode: 'quick', text: 'Shorter, please' },
 ]
 
-type Turn = { id: number; q: string; files: number; a: string | null; stopped?: boolean }
+type Turn = { id: number; q: string; files: Attachment[]; a: string | null; stopped?: boolean }
 
 /** Types, sends, waits for the answer, and goes again. Hovering pauses it; touching it hands it over. */
 export function PromptDemo() {
   const b = useBench()
   const [turn, setTurn] = useState<Turn | null>(null)
+  // How far the box has grown above its rest, so the thread can make room for it.
+  const [grown, setGrown] = useState(0)
   const pending = useRef<{ t: number; done: () => void } | null>(null)
   const box = useRef<PromptHandle>(null)
   const held = useRef(false)
@@ -129,7 +136,7 @@ export function PromptDemo() {
   const onSend = (m: Message) =>
     new Promise<void>((done) => {
       const id = Date.now()
-      setTurn({ id, q: m.text, files: m.files.length, a: null })
+      setTurn({ id, q: m.text, files: m.files, a: null })
       const t = window.setTimeout(() => {
         setTurn((x) => (x?.id === id ? { ...x, a: REPLY[m.mode] ?? REPLY.think } : x))
         pending.current = null
@@ -199,25 +206,35 @@ export function PromptDemo() {
           Detent Pro
         </span>
       </div>
-      {/* Bottom space leaves room for a row of attachments; anything taller floats over the thread. */}
-      <div className="relative flex flex-1 flex-col justify-end px-6 pb-[70px]">
+      {/* Attachments sit in the box, so the thread only needs a little room; anything taller floats over it. */}
+      <div className="relative flex flex-1 flex-col justify-end px-6" style={{ paddingBottom: 20 + grown }}>
         <AnimatePresence mode="popLayout" initial={false}>
           {turn ? (
             <motion.div key={turn.id} exit={{ opacity: 0, transition: { duration: 0.15 } }}>
-              <motion.div
-                className="ml-auto w-fit max-w-[82%] rounded-[18px] rounded-br-[6px] bg-surface px-3.5 py-2 text-callout leading-[21px] text-ink"
-                style={{ boxShadow: 'var(--elev-raised)' }}
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, ease: ease.out, delay: 0.12 }}
-              >
-                {turn.q || `${turn.files} file${turn.files === 1 ? '' : 's'}`}
-                {turn.q && turn.files > 0 && (
-                  <span className="ml-1.5 text-ink-3">
-                    + {turn.files} file{turn.files === 1 ? '' : 's'}
-                  </span>
-                )}
-              </motion.div>
+              {/* What was sent with it: the files as small cards above the words, as they sat in the box. */}
+              {turn.files.length > 0 && (
+                <motion.div className="mb-1.5 ml-auto flex w-fit max-w-[82%] flex-wrap justify-end gap-1.5" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: ease.out, delay: 0.08 }}>
+                  {turn.files.map((f) => (
+                    <span key={f.id} className="flex h-9 max-w-[200px] items-center gap-2 rounded-[11px] bg-surface pl-1 pr-2.5" style={{ boxShadow: 'var(--elev-raised)' }}>
+                      <span className="flex size-7 shrink-0 items-center justify-center rounded-[7px] bg-surface-2 bg-cover bg-center font-mono text-[8.5px] text-ink-2" style={f.url ? { backgroundImage: `url("${f.url}")` } : undefined}>
+                        {!f.url && (f.name.split('.').pop() ?? '').slice(0, 4).toUpperCase()}
+                      </span>
+                      <span className="truncate text-footnote text-ink">{f.name}</span>
+                    </span>
+                  ))}
+                </motion.div>
+              )}
+              {turn.q && (
+                <motion.div
+                  className="ml-auto w-fit max-w-[82%] rounded-[18px] rounded-br-[6px] bg-surface px-3.5 py-2 text-callout leading-[21px] text-ink"
+                  style={{ boxShadow: 'var(--elev-raised)' }}
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, ease: ease.out, delay: 0.12 }}
+                >
+                  {turn.q}
+                </motion.div>
+              )}
               {/* The reply: who's answering, thinking while it works, then the answer a word at a time. */}
               <div className="mt-4 flex min-h-[88px] gap-3">
                 <span className="grid size-7 shrink-0 place-items-center rounded-full bg-surface text-[var(--accent)]" style={{ boxShadow: 'var(--elev-raised)' }}>
@@ -238,18 +255,14 @@ export function PromptDemo() {
               </div>
             </motion.div>
           ) : (
-            <motion.div key="empty" className="flex flex-col items-center pb-8 text-center" exit={{ opacity: 0, transition: { duration: 0.15 } }}>
-              <span className="grid size-10 place-items-center rounded-full bg-surface text-[var(--accent)]" style={{ boxShadow: 'var(--elev-raised)' }}>
-                <Orbit size={18} />
-              </span>
-              <p className="mt-4 text-title text-ink">What can I help with?</p>
-              <p className="mt-1 text-footnote text-ink-3">Ask about the file, or anything else.</p>
+            <motion.div key="empty" className="-mx-3 pb-1" exit={{ opacity: 0, transition: { duration: 0.15 } }}>
+              <PromptStarters width={516} items={STARTERS} onPick={(t) => (b.log('onPick', t), box.current?.type(t))} />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
       <div className="shrink-0 px-3 pb-3">
-        <PromptBox ref={box} width={516} onSend={(m) => (b.log('onSend', m), onSend(m))} onStop={() => (b.log('onStop'), onStop())} suggestions={SUGGEST} initialFiles={[BOARD]} placeholder={b.get('placeholder', 'Ask anything')} />
+        <PromptBox ref={box} width={516} onGrow={setGrown} label={turn ? undefined : 'New chat'} hint="or drop a file to start from it." model="Sonnet 4.5" status="Reading the board update" onVoice={() => b.log('onVoice')} onSend={(m) => (b.log('onSend', m), onSend(m))} onStop={() => (b.log('onStop'), onStop())} suggestions={SUGGEST} initialFiles={[BOARD]} placeholder={b.get('placeholder', 'Ask anything')} />
       </div>
     </div>
   )
