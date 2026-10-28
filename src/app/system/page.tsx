@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
-import { Footer } from '@/site/Footer'
-import { Header } from '@/site/Header'
+import { ENTRIES } from '@/catalog/meta'
 import { Materials, Motion, Shape, Type } from '@/site/system/Specimens'
 import { page } from '@/site/seo'
+import { LinkShell } from '@/site/shell/Shell'
 
 export const metadata: Metadata = page({
   title: 'Design system',
@@ -18,15 +18,18 @@ const SECTIONS = [
   { id: 'shape', title: 'Shape', line: 'Radii are concentric, spacing sits on a 4pt grid, and anything you can press is at least 32 points.', body: <Shape /> },
 ]
 
+/** The list down the side: the four things, and the list marks the one you're reading. */
+const RAIL = [{ id: 'page', name: 'On this page', items: SECTIONS.map((s) => ({ id: s.id, name: s.title })) }]
+const LINKS = Object.fromEntries(SECTIONS.map((s) => [s.id, `#${s.id}`]))
+
 export default function System() {
   return (
-    <>
-      <Header />
-      <main className="mx-auto max-w-[1360px] px-5 sm:px-6">
-        <section className="pt-20 sm:pt-28">
+    <LinkShell label="System" groups={RAIL} links={LINKS} trail={['System']}>
+      <main className="mx-auto max-w-[1280px] px-4 pb-16 sm:px-8">
+        <section className="pt-16 sm:pt-24">
           <p className="text-footnote text-ink-3">System</p>
           <h1 className="mt-3 max-w-[760px] text-[clamp(36px,4.6vw,52px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink">Everything is built on the same four things.</h1>
-          <p className="mt-5 max-w-[560px] text-body text-ink-3">Type, materials, motion and shape. Every component follows them, so forty pieces read as one set.</p>
+          <p className="mt-5 max-w-[560px] text-body text-ink-3">Type, materials, motion and shape. Every component follows them, so {ENTRIES.length} pieces read as one set.</p>
         </section>
         {SECTIONS.map((s) => (
           <section key={s.id} id={s.id} className="mt-24 scroll-mt-24">
@@ -40,7 +43,6 @@ export default function System() {
           </section>
         ))}
       </main>
-      <Footer />
-    </>
+    </LinkShell>
   )
 }

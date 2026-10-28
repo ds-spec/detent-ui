@@ -2,8 +2,6 @@ import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { TEMPLATES, template } from '@/catalog/templates'
-import { Footer } from '@/site/Footer'
-import { Header } from '@/site/Header'
 import { TemplateViewer } from '@/site/templates/TemplateViewer'
 import { JsonLd, crumbs, page, short } from '@/site/seo'
 
@@ -19,14 +17,9 @@ export async function generateMetadata({ params }: PageProps<'/templates/[slug]'
 
 export default function TemplatePage({ params }: PageProps<'/templates/[slug]'>) {
   return (
-    <>
-      <Header />
-      {/* The placeholder holds the page's height, so the footer never shows above the template and then drops. */}
-      <Suspense fallback={<div className="min-h-[100dvh]" />}>
-        <Shown params={params} />
-      </Suspense>
-      <Footer />
-    </>
+    <Suspense fallback={<div className="min-h-[100dvh]" />}>
+      <Shown params={params} />
+    </Suspense>
   )
 }
 

@@ -206,7 +206,7 @@
   --ink: #ededed;
   --ink-2: #a1a1a1;
   --ink-3: #8f8f8f;
-  --quiet: #6b6b6b;
+  --quiet: #77777c;
   --ai-1: #3ec6ff;
   --ai-2: #6a7bff;
   --ai-3: #c46bff;
@@ -245,6 +245,52 @@
   --folder-ink: #a1a1a1;
   --sheet: #ececec;
   --sheet-line: #d6d6d6;
+}
+
+/* ── Sheets on a ground ─────────────────────────────────────────
+   The site's pages are white sheets laid on a soft ground. The leaf is a page's main sheet, the
+   paper a quieter one, the mount what a part sits in on a sheet, the bezel the rim round a window
+   of colour, and a well the tinted stage a part runs on. In dark the ground is black and the
+   sheets a step above it, edged with light. */
+
+:root,
+[data-theme="light"] {
+  --ground: #eeede9;
+  --leaf: #fdfdfc;
+  --paper: #f6f5f2;
+  --mount: #f1f0ed;
+  --bezel: #ffffff;
+  --well: #f3f2ef;
+  --well-tint: 30%;
+  --well-glow: linear-gradient(transparent, transparent);
+  /* The library's pages as an app: the frame the sidebar is part of, and the panel set into it. The
+     frame is the home page’s ground, so stepping in from home keeps one grey. */
+  --shell: #eeede9;
+  --shell-hover: rgb(0 0 0 / 0.04);
+  --shell-on: rgb(0 0 0 / 0.065);
+  --panel: #ffffff;
+  --panel-edge: 0 0 0 1px rgb(0 0 0 / 0.06), 0 1px 3px rgb(0 0 0 / 0.04);
+  --leaf-edge: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 0 0 1px rgb(0 0 0 / 0.03);
+  --card-edge: 0 0 0 1px rgb(21 22 26 / 0.05), 0 1px 2px rgb(21 22 26 / 0.04);
+  --card-lift: 0 0 0 1px rgb(21 22 26 / 0.07), 0 30px 60px -30px rgb(30 30 60 / 0.28);
+}
+[data-theme="dark"] {
+  --ground: #000000;
+  --leaf: #0b0b0c;
+  --paper: #0b0b0c;
+  --mount: #141416;
+  --bezel: #1c1c1f;
+  --well: #0d0d0f;
+  --well-tint: 0%;
+  --well-glow: radial-gradient(90% 60% at 50% -8%, rgb(255 255 255 / 0.075), transparent 70%);
+  --shell: #000000;
+  --shell-hover: rgb(255 255 255 / 0.05);
+  --shell-on: rgb(255 255 255 / 0.08);
+  --panel: #0b0b0c;
+  --panel-edge: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 0 0 1px rgb(255 255 255 / 0.09);
+  --leaf-edge: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 0 0 1px rgb(255 255 255 / 0.08);
+  --card-edge: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 0 0 1px rgb(255 255 255 / 0.1);
+  --card-lift: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 0 0 1px rgb(255 255 255 / 0.16), 0 30px 60px -30px rgb(0 0 0 / 0.9);
 }
 
 /* ── Pro app material ───────────────────────────────────────────

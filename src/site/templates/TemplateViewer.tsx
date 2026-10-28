@@ -3,6 +3,7 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { motion, useReducedMotion } from 'motion/react'
 import { ArrowRight, Expand, Moon, Refresh, Sun } from '@/lab/icons'
 import { useTheme } from '@/lab/lib/hooks'
@@ -14,6 +15,9 @@ import { Modes, Rule, Tool } from '../exhibit/Exhibit'
 import { Install } from '../parts'
 import { Desk } from '../blocks/BlockViewer'
 import { ProTag } from '../blocks/ProTag'
+import { Rail } from '../exhibit/Rail'
+import { Shell, Trail } from '../shell/Shell'
+import { TEMPLATE_RAIL } from './rail'
 
 /** The template, scrolling in its own window, kept out of the viewer's renders so resizing stays smooth. */
 const Page = memo(function Page({ id, scroller, onScroll, theme }: { id: string; scroller: RefObject<HTMLDivElement | null>; onScroll: () => void; theme?: 'light' | 'dark' }) {
@@ -33,6 +37,7 @@ const Page = memo(function Page({ id, scroller, onScroll, theme }: { id: string;
 export function TemplateViewer({ id }: { id: string }) {
   const t = template(id)!
   const app = t.form === 'app'
+  const router = useRouter()
   const reduce = useReducedMotion()
   const [mode, setMode] = useState<'preview' | 'code'>('preview')
   const [run, setRun] = useState(0)
@@ -77,7 +82,8 @@ export function TemplateViewer({ id }: { id: string }) {
   }
 
   return (
-    <main className="mx-auto max-w-[1360px] px-5 pb-24 sm:px-6">
+    <Shell list={<Rail label="Templates" groups={TEMPLATE_RAIL} current={t.id} onPick={(to) => router.push(`/templates/${to}`)} />} bar={<Trail steps={['Templates', t.name]} />}>
+    <main className="mx-auto max-w-[1280px] px-4 pb-16 sm:px-8">
       <header className="pt-8 sm:pt-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-footnote text-ink-3">
@@ -92,7 +98,8 @@ export function TemplateViewer({ id }: { id: string }) {
             <span aria-hidden className="size-[3px] rounded-full bg-ink-3/60" />
             <span>Fits any width</span>
           </p>
-          <Link href="/templates" className="ring-focus rounded-[6px] text-footnote text-ink-3 transition-colors hover:text-ink">
+          {/* The list down the side does this on a laptop; below one, this is the way back. */}
+          <Link href="/templates" className="ring-focus rounded-[6px] text-footnote text-ink-3 transition-colors hover:text-ink lg:hidden">
             All templates
           </Link>
         </div>
@@ -199,5 +206,6 @@ export function TemplateViewer({ id }: { id: string }) {
         </ul>
       </section>
     </main>
+    </Shell>
   )
 }

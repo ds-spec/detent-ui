@@ -1,71 +1,58 @@
 import type { Metadata } from 'next'
 import { SOON, TEMPLATES } from '@/catalog/templates'
 import { ProTag } from '@/site/blocks/ProTag'
-import { Footer } from '@/site/Footer'
-import { Header } from '@/site/Header'
 import { TemplateCard } from '@/site/templates/TemplateCard'
 import { JsonLd, list, page } from '@/site/seo'
+import { Band, BandHead, card } from '@/site/sheets'
+import { LinkShell } from '@/site/shell/Shell'
+import { TEMPLATE_LINKS, TEMPLATE_RAIL } from '@/site/templates/rail'
 
 export const metadata: Metadata = page({
-  title: 'Templates — landing pages and apps for AI products',
-  description: `${TEMPLATES.length} templates for AI products, from landing pages to an agent workspace app, built in React from Detent blocks: light and dark, any width, no layout shift.`,
+  title: 'Templates — apps for AI products, AI built in',
+  description: `${TEMPLATES.length} app templates with the AI built in: an agent workspace, a SaaS dashboard and a CRM, built in React from Detent components and the AI SDK: light and dark, any width, no layout shift.`,
   path: '/templates',
 })
 
 export default function TemplatesPage() {
   return (
-    <>
-      <Header />
-      <main className="mx-auto max-w-[1360px] px-5 sm:px-6">
-        <section className="flex flex-col items-center pt-20 text-center sm:pt-32">
-          <ProTag className="rise" />
-          <h1 className="mt-7 text-[clamp(40px,5.2vw,60px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink">
-            <span className="focus-in inline-block">Whole sites and apps,</span>{' '}
-            <span className="focus-in inline-block" style={{ animationDelay: '80ms' }}>
-              ready to ship.
-            </span>
-            <span className="focus-in block text-quiet" style={{ animationDelay: '160ms' }}>
-              Start from one that already works.
-            </span>
-          </h1>
-          <p className="rise mt-7 max-w-[620px] text-lead text-ink-3" style={{ animationDelay: '260ms' }}>
-            Each template is a complete landing page or app for a kind of AI product: the product working the moment it loads, every claim shown live, light and dark, and not one layout shift. Change the words and ship it.
-          </p>
-        </section>
-
+    <LinkShell label="Templates" groups={TEMPLATE_RAIL} links={TEMPLATE_LINKS} trail={['Templates']}>
+      <Band>
+        <BandHead
+          as="h1"
+          tag={<ProTag />}
+          title="Skip the blank repo."
+          quiet="Start from an app that works."
+          line="Complete apps with the AI wired in: chat, agents, approvals, reports. Every screen live, in light and dark, at any width. Rename it, point it at your model, ship it."
+        />
         <JsonLd
           data={list(
             'Detent templates',
             TEMPLATES.map((t) => ({ name: t.name, path: `/templates/${t.id}` })),
           )}
         />
-        <section aria-label="Templates" className="mt-16 flex flex-col gap-10 sm:mt-24">
+        <div aria-label="Templates" className="mt-12 flex flex-col gap-3 sm:mt-16">
           {TEMPLATES.map((t) => (
             <TemplateCard key={t.id} t={t} />
           ))}
-        </section>
+        </div>
+      </Band>
 
-        {SOON.length > 0 && (
-          <section aria-label="In the works" className="mt-32 sm:mt-40">
-            <h2 className="text-[clamp(32px,4.2vw,52px)] font-normal leading-[1.06] tracking-[-0.045em] text-ink">
-              In the works.
-              <span className="block text-quiet">One for every kind of AI product.</span>
-            </h2>
-            <ul className="mt-12 grid gap-x-12 sm:grid-cols-2 lg:grid-cols-3">
-              {SOON.map((s) => (
-                <li key={s.name} className="flex flex-col gap-1 py-6 shadow-[inset_0_1px_0_var(--line)]">
-                  <span className="flex items-center justify-between gap-4">
-                    <span className="text-headline text-ink">{s.name}</span>
-                    <span className="text-footnote text-ink-3">{s.kind}</span>
-                  </span>
-                  <span className="text-callout text-ink-3">{s.line}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-      </main>
-      <Footer />
-    </>
+      {SOON.length > 0 && (
+        <Band tone="quiet" label="In the works">
+          <BandHead title="In the works." quiet="One for every kind of AI product." />
+          <ul className="mt-12 grid gap-3 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
+            {SOON.map((s) => (
+              <li key={s.name} className={card}>
+                <span className="flex items-center justify-between gap-4">
+                  <span className="text-[17px] tracking-[-0.01em] text-ink">{s.name}</span>
+                  <span className="text-[13px] text-ink-3">{s.kind}</span>
+                </span>
+                <span className="mt-2 block text-[14px] leading-[1.55] text-ink-3">{s.line}</span>
+              </li>
+            ))}
+          </ul>
+        </Band>
+      )}
+    </LinkShell>
   )
 }
