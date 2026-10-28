@@ -3,9 +3,10 @@
  * Change a price, a plan's list or a checkout link here and every page follows.
  */
 import { BLOCKS } from '@/catalog/blocks'
+import { UNLISTED } from '@/catalog/meta'
 
 /** The free components that are Pro: the big stateful surfaces that take weeks to get right. */
-export const PRO_COMPONENTS = [
+const PRO_CODE = [
   'answer',
   'diff',
   'trace',
@@ -37,7 +38,10 @@ export const PRO_COMPONENTS = [
   'carousel',
 ]
 
-export const isProComponent = (id: string) => PRO_COMPONENTS.includes(id)
+/** The Pro components in the catalog. Unlisted ones stay Pro, so their source stays locked. */
+export const PRO_COMPONENTS = PRO_CODE.filter((id) => !UNLISTED.has(id))
+
+export const isProComponent = (id: string) => PRO_CODE.includes(id)
 
 /** Every block is Pro: whole screens are what the licence buys. The free tier is components. */
 export const PRO_BLOCK_COUNT = BLOCKS.length
@@ -94,10 +98,10 @@ export const PLANS: Plan[] = [
     name: 'Pro',
     price: 199,
     seats: 'one person',
-    line: 'For building the product.',
+    line: 'Everything you build the product with.',
     cta: 'Get Pro',
     href: CHECKOUT.pro,
-    features: [`${PRO_COMPONENTS.length} Pro components`, `${PRO_BLOCK_COUNT} blocks: whole screens, already working`, 'Install from the private registry', 'Source in your project, yours to change', 'Every update, for life', 'Unlimited projects'],
+    features: [`${PRO_COMPONENTS.length} Pro components`, `${PRO_BLOCK_COUNT} blocks: whole screens, already working`, 'Installs with the shadcn CLI', 'Source in your project, yours to change', 'Every update, for life', 'Unlimited projects'],
   },
   {
     id: 'all',

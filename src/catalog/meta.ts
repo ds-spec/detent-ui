@@ -40,7 +40,7 @@ export const FEELS: { id: Feel; name: string; blurb: string }[] = [
   { id: 'approve', name: 'Approve', blurb: 'The moments where a person decides.' },
 ]
 
-export const CATEGORIES: Category[] = [
+const ALL_CATEGORIES: Category[] = [
   { id: 'agents', name: 'Agents', blurb: 'The interface layer for AI products: runs you can watch, decisions you can make, prompts that feel good to write.', icon: 'Node' },
   { id: 'data', name: 'Data', blurb: 'Numbers you can hold: lines you scrub, tables you sort and edit, and none of it jumps when it changes.', icon: 'Chart' },
   { id: 'inputs', name: 'Inputs', blurb: 'Fields and controls that respond like physical things, and never move the page while you use them.', icon: 'Pencil' },
@@ -50,12 +50,12 @@ export const CATEGORIES: Category[] = [
   { id: 'marketing', name: 'Marketing', blurb: 'For the page that comes before the product.', icon: 'Orbit' },
 ]
 
-export const ENTRIES: Entry[] = [
+const ALL: Entry[] = [
   /* ── Agents ── */
   {
     id: 'scaffold',
     name: 'Agent scaffold',
-    short: 'An agent, scaffolded live',
+    short: 'One command, a whole project',
     category: 'agents',
     feel: ['stream'],
     line: 'Creating an agent project in one window: the command types itself, and every file it prints lands in the tree beside it.',
@@ -72,7 +72,7 @@ export const ENTRIES: Entry[] = [
   {
     id: 'answer',
     name: 'Streaming answer',
-    short: 'Answers that show their sources',
+    short: 'Thinks out loud, then cites its sources',
     category: 'agents',
     feel: ['stream'],
     line: 'Thinking, tool calls and a streamed reply with live citations, in a copilot that keeps the conversation going.',
@@ -94,7 +94,7 @@ export const ENTRIES: Entry[] = [
   {
     id: 'trace',
     name: 'Run waterfall',
-    short: 'Every step of a run',
+    short: 'Where every second of a run went',
     category: 'agents',
     feel: ['stream', 'approve'],
     line: 'A live agent run: bars grow as steps work, retries stay on one row, and a refund waits for your Approve.',
@@ -138,7 +138,7 @@ export const ENTRIES: Entry[] = [
   },
   {
     id: 'rewrite',
-    name: 'Inline edit',
+    name: 'Rewrite',
     short: 'Rewrite a phrase in place',
     category: 'agents',
     feel: ['type', 'approve'],
@@ -162,7 +162,7 @@ export const ENTRIES: Entry[] = [
   {
     id: 'approval',
     name: 'Approval tray',
-    short: 'Where agents ask permission',
+    short: 'Agents ask before they act',
     category: 'agents',
     feel: ['approve', 'press'],
     line: 'Where an agent waits for permission. Queued asks peek behind, money needs a second press, approved cards lift away.',
@@ -183,7 +183,7 @@ export const ENTRIES: Entry[] = [
   {
     id: 'prompt',
     name: 'Prompt box',
-    short: 'A box that grows upward',
+    short: 'Grows as you type, stops mid-answer',
     category: 'agents',
     feel: ['type', 'stream'],
     line: 'Grows upward, never pushing the page. Suggestions roll through the empty box and Tab takes one. Send lifts your words off.',
@@ -229,8 +229,8 @@ export const ENTRIES: Entry[] = [
   /* ── Inputs ── */
   {
     id: 'plan',
-    name: 'Agent plan',
-    short: 'Plans you can reorder',
+    name: 'Plan editor',
+    short: 'Steer the plan before it runs',
     category: 'agents',
     feel: ['drag', 'approve'],
     line: 'The plan an agent proposes: reorder and rename steps, run it, watch each one land, and let it fold away when done.',
@@ -254,7 +254,7 @@ export const ENTRIES: Entry[] = [
   {
     id: 'models',
     name: 'Model picker',
-    short: 'Pick a model and effort',
+    short: 'Model, effort and cost in one menu',
     category: 'agents',
     feel: ['press', 'drag'],
     line: 'Pick a model and how hard it thinks. Effort is four bars that rise as they fill, and the same bars sit small in the trigger.',
@@ -328,7 +328,7 @@ export const ENTRIES: Entry[] = [
   },
   {
     id: 'usage',
-    name: 'Usage meter',
+    name: 'Spend cap',
     short: 'Spend, forecast and cap',
     category: 'data',
     feel: ['drag'],
@@ -377,7 +377,7 @@ export const ENTRIES: Entry[] = [
   {
     id: 'voice',
     name: 'Voice input',
-    short: 'Speech that firms up',
+    short: 'Speak, and watch the words firm up',
     category: 'inputs',
     feel: ['press', 'stream'],
     line: 'The mic stretches into a live level meter of dots, and the mic beside the clock fills with your voice. Words arrive grey, firm up as they are recognised, and quiet finishes the take.',
@@ -649,8 +649,8 @@ export const ENTRIES: Entry[] = [
   },
   {
     id: 'presence',
-    name: 'Presence stack',
-    short: 'See who’s here',
+    name: 'Here now',
+    short: 'Who’s here, and where they’re looking',
     category: 'essentials',
     feel: ['stream'],
     line: 'Who’s here, what they’re doing, and a way to follow them. The stack fans out into space it already has.',
@@ -859,7 +859,7 @@ export const ENTRIES: Entry[] = [
   {
     id: 'toasts',
     name: 'Agent toasts',
-    short: 'What your agent is doing',
+    short: 'Your agent’s progress, at a glance',
     category: 'agents',
     feel: ['stream'],
     line: 'What an agent is doing, as toasts that update in place: a ring travels round its avatar while a step runs, then closes and settles a badge when it lands.',
@@ -1038,7 +1038,7 @@ export const ENTRIES: Entry[] = [
 
   {
     id: 'heatmap',
-    name: 'Activity heatmap',
+    name: 'Year grid',
     short: 'Your year at a glance',
     category: 'data',
     feel: ['drag'],
@@ -1408,6 +1408,17 @@ export const ENTRIES: Entry[] = [
     details: ['The button folds into a spinner while it works.', 'The field becomes your place in line, and the number counts up to your spot.'],
   },
 ]
+
+/**
+ * Basics that left the catalog on 2026-10-24. shadcn and Radix cover them, so Detent doesn't sell
+ * them; the code stays, because blocks and templates are built from it.
+ */
+export const UNLISTED = new Set(['buttons', 'tabs', 'select', 'stepper', 'code', 'toaster', 'dialog', 'confirm', 'popover', 'tooltip', 'dropdown', 'context-menu', 'hovercard', 'combobox', 'command', 'carousel', 'sidebar'])
+
+export const ENTRIES: Entry[] = ALL.filter((e) => !UNLISTED.has(e.id))
+
+/** Only the families that still have something in them. */
+export const CATEGORIES: Category[] = ALL_CATEGORIES.filter((c) => ENTRIES.some((e) => e.category === c.id))
 
 export const entry = (id: string | null) => ENTRIES.find((e) => e.id === id) ?? null
 export const categoryOf = (e: Entry) => CATEGORIES.find((c) => c.id === e.category)!

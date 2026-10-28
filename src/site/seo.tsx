@@ -15,7 +15,7 @@ export const TAGLINE = 'Interfaces that click into place'
 export const FREE_COUNT = ENTRIES.length - PRO_COMPONENTS.length
 
 /** What Detent is, in one sentence: the default description, and the one structured data uses. */
-export const DESCRIPTION = `${ENTRIES.length} React components for AI products: chat, agents, streaming answers, model pickers, data and inputs. ${FREE_COUNT} are free and install with the shadcn CLI.`
+export const DESCRIPTION = `The UI kit for AI products: ${ENTRIES.length} React components, full screens and whole apps for streaming answers, tool calls, approvals and agents. Wired to the AI SDK, styled by your shadcn theme. ${FREE_COUNT} are free.`
 
 export const url = (path = '/') => `${SITE}${path === '/' ? '' : path}`
 
@@ -31,10 +31,19 @@ export const short = (s: string, n = 158) => (s.length <= n ? s : `${s.slice(0, 
 export function page({ title, description, path, absolute = false, noindex = false, image }: { title: string; description: string; path: string; absolute?: boolean; noindex?: boolean; image?: string }): Metadata {
   const full = absolute ? title : `${title} · ${NAME}`
   const images = image ? { images: [{ url: image, width: 1200, height: 630, alt: full }] } : {}
+  const mdUrl = path === '/' ? `${SITE}/index.md` : `${SITE}${path}.md`
   return {
     title: absolute ? { absolute: title } : title,
     description,
-    alternates: { canonical: path },
+    alternates: {
+      canonical: path,
+      types: {
+        'text/markdown': mdUrl,
+      },
+    },
+    other: {
+      'ai-summary': description,
+    },
     openGraph: { title: full, description, url: path, siteName: NAME, type: 'website', locale: 'en_US', ...images },
     twitter: { card: 'summary_large_image', title: full, description, ...images },
     ...(noindex ? { robots: { index: false, follow: true } } : {}),
