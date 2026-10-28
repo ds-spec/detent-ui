@@ -25,7 +25,7 @@ export function PropsPanel({ id, api }: { id: string; api: Api }) {
   const events = props.filter(isEvent)
   return (
     <>
-      <aside aria-label="Props" className="flex min-h-0 flex-col overflow-hidden rounded-[32px] bg-surface shadow-[inset_0_0_0_1px_var(--line)] xl:col-start-2 xl:row-start-1">
+      <aside aria-label="Props" className="flex min-h-0 flex-col overflow-hidden rounded-[30px] bg-surface shadow-[var(--card-edge)] 2xl:col-start-2 2xl:row-start-1">
         <div className="flex h-14 shrink-0 items-center justify-between px-6">
           <p className="text-headline text-ink">
             Props <span className="tnum font-normal text-ink-3">{props.length}</span>
@@ -195,7 +195,7 @@ function Usage({ api, props, knobs, value }: { api: Api; props: PropDoc[]; knobs
     setTimeout(() => setCopied(false), 1400)
   }
   return (
-    <section aria-label="Usage" className="overflow-hidden rounded-[24px] bg-surface shadow-[inset_0_0_0_1px_var(--line)] xl:col-span-2">
+    <section aria-label="Usage" className="overflow-hidden rounded-[26px] bg-surface shadow-[var(--card-edge)] 2xl:col-span-2">
       <div className="flex h-12 items-center justify-between px-6 shadow-[inset_0_-1px_0_var(--line)]">
         <p className="text-footnote font-medium text-ink">
           Usage <span className="font-normal text-ink-3">· follows the props you set</span>

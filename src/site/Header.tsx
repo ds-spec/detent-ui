@@ -4,68 +4,110 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { ArrowRight } from '@/lab/icons'
-import { Mark, SearchButton, ThemeButton } from './parts'
+import { ArrowRight, Search } from '@/lab/icons'
+import { Mark, ThemeButton } from './parts'
+import { useSite } from './Providers'
 
 const NAV = [
   { href: '/components', label: 'Components' },
-  { href: '/blocks', label: 'Blocks', pro: true },
-  { href: '/templates', label: 'Templates', pro: true },
+  { href: '/blocks', label: 'Blocks' },
+  { href: '/templates', label: 'Templates' },
+  { href: '/ai-sdk', label: 'AI SDK' },
   { href: '/pro', label: 'Pricing' },
-  { href: '/#library', label: 'Library' },
-  { href: '/#install', label: 'Install' },
 ]
 
-/** Clear at the top; once something scrolls under it, frosted with a single hairline. */
+const UI = 'cubic-bezier(0.2, 0, 0, 1)'
+const here = (href: string, path: string) => path.startsWith(href)
+
+/*
+ * The header, made of the page's own material. Three parts on one line: the mark on the left, the
+ * links in the middle in a small pill of their own, and search, the theme and the way in on the
+ * right. A plate rests under the page you're on and slides to whichever link you point at, so the
+ * pill reads as one control rather than five words.
+ *
+ * At the top of a page the bar lies open on the ground. As soon as the page moves it gathers
+ * itself into a sheet of its own, a pill floating over the page, narrower, and the links' pill
+ * dissolves into it. The two states are one bar changing shape, so nothing jumps.
+ */
 export function Header() {
-  const [under, setUnder] = useState(false)
+  const [stuck, setStuck] = useState(false)
+  const [menu, setMenu] = useState(false)
   const path = usePathname()
+  const { openSearch } = useSite()
   useEffect(() => {
-    const on = () => setUnder(window.scrollY > 8)
+    const on = () => setStuck(window.scrollY > 24)
     on()
     window.addEventListener('scroll', on, { passive: true })
     return () => window.removeEventListener('scroll', on)
   }, [])
+  // Moving to another page closes the menu.
+  const [seen, setSeen] = useState(path)
+  if (seen !== path) {
+    setSeen(path)
+    setMenu(false)
+  }
+  useEffect(() => {
+    if (!menu) return
+    const key = (e: KeyboardEvent) => e.key === 'Escape' && setMenu(false)
+    window.addEventListener('keydown', key)
+    return () => window.removeEventListener('keydown', key)
+  }, [menu])
+
   return (
-    <header
-      className="sticky top-0 z-40 transition-[background-color,box-shadow] duration-200"
-      style={{
-        // Nearly opaque instead of blurred: a blur behind the header repaints every frame something moves under it.
-        background: under ? 'color-mix(in oklch, var(--bg) 94%, transparent)' : 'transparent',
-        boxShadow: under ? 'inset 0 -1px 0 var(--line)' : 'none',
-      }}
-    >
-      <div className="mx-auto flex h-16 max-w-[1360px] items-center gap-6 px-5 sm:px-6 xl:gap-8">
-        <Link href="/" className="ring-focus group/brand -mx-1.5 flex items-center gap-2.5 rounded-[8px] px-1.5 py-1">
+    <header className="pointer-events-none sticky top-0 z-50 h-[72px] px-2.5 sm:px-5">
+      <div
+        className="pointer-events-auto relative mx-auto grid grid-cols-[1fr_auto] items-center transition-[max-width,height,margin,padding,background-color,box-shadow,border-radius] duration-500 lg:grid-cols-[1fr_auto_1fr]"
+        style={{
+          transitionTimingFunction: UI,
+          maxWidth: stuck ? 980 : 1440,
+          height: stuck ? 54 : 72,
+          marginTop: stuck ? 9 : 0,
+          padding: stuck ? '0 8px 0 18px' : '0 10px 0 24px',
+          borderRadius: stuck ? 999 : 0,
+          background: stuck ? 'color-mix(in oklch, var(--leaf) 90%, transparent)' : 'transparent',
+          boxShadow: stuck ? 'var(--leaf-edge), 0 14px 34px -16px rgb(0 0 0 / 0.24)' : '0 0 0 0 transparent',
+          backdropFilter: stuck ? 'blur(14px) saturate(1.2)' : 'none',
+          WebkitBackdropFilter: stuck ? 'blur(14px) saturate(1.2)' : 'none',
+        }}
+      >
+        <Link href="/" className="ring-focus -mx-1.5 flex w-fit items-center gap-2.5 rounded-[8px] px-1.5 py-1">
           <Mark />
-          <span className="text-headline tracking-[-0.02em] text-ink">Detent</span>
+          <span className="text-[15px] font-medium tracking-[-0.02em] text-ink">Detent</span>
         </Link>
-        <Nav path={path} />
-        <span className="flex-1" />
-        <div className="flex items-center gap-2">
-          <SearchButton />
-          <ThemeButton />
-          <Link
-            href="/components"
-            className="ring-focus hidden h-8 items-center whitespace-nowrap rounded-full bg-ink px-3.5 text-footnote font-medium text-surface transition-opacity duration-150 hover:opacity-90 sm:flex"
+
+        <Links stuck={stuck} path={path} />
+
+        <div className="flex items-center justify-end gap-1.5">
+          <button
+            type="button"
+            onClick={openSearch}
+            aria-label="Search components (⌘K)"
+            title="Search  ⌘K"
+            className="ring-focus grid size-9 place-items-center rounded-full text-ink-2 transition-[background-color,box-shadow,color] duration-300 hover:text-ink"
+            style={{ transitionTimingFunction: UI, background: stuck ? 'transparent' : 'color-mix(in oklch, var(--leaf) 75%, transparent)', boxShadow: stuck ? 'none' : 'inset 0 0 0 1px var(--line)' }}
           >
+            <Search size={15} />
+          </button>
+          <ThemeButton />
+          <Link href="/components" className="ring-focus group/go hidden h-9 items-center gap-1.5 rounded-full bg-ink pl-4 pr-3.5 text-[13px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97] sm:flex">
             Get started
+            <ArrowRight size={13} className="transition-transform duration-150 group-hover/go:translate-x-0.5" />
           </Link>
-          <MenuButton path={path} />
+          <button type="button" aria-label={menu ? 'Close menu' : 'Menu'} aria-expanded={menu} onClick={() => setMenu((m) => !m)} className="ring-focus grid size-9 place-items-center rounded-full text-ink-2 hover:bg-[var(--line)] lg:hidden">
+            <span aria-hidden className="relative block h-3 w-4">
+              <motion.span className="absolute left-0 top-0 h-[1.5px] w-4 rounded-full bg-current" initial={false} animate={menu ? { y: 5.25, rotate: 45 } : { y: 0, rotate: 0 }} transition={{ type: 'spring', stiffness: 520, damping: 34 }} />
+              <motion.span className="absolute bottom-0 left-0 h-[1.5px] w-4 rounded-full bg-current" initial={false} animate={menu ? { y: -5.25, rotate: -45 } : { y: 0, rotate: 0 }} transition={{ type: 'spring', stiffness: 520, damping: 34 }} />
+            </span>
+          </button>
         </div>
+        <AnimatePresence>{menu && <Menu path={path} onClose={() => setMenu(false)} />}</AnimatePresence>
       </div>
     </header>
   )
 }
 
-const here = (href: string, path: string) => !href.includes('#') && path.startsWith(href)
-
-/**
- * The main links. Pointing at one turns it the accent, and a short tick of the accent slides
- * along under the row to sit beneath it, the way a pointer settles on a mark. It rests under the
- * page you're on and goes back there when you leave.
- */
-function Nav({ path }: { path: string }) {
+/** The links in a small pill of their own, with a plate that rests under the current page and slides to the one you point at. */
+function Links({ stuck, path }: { stuck: boolean; path: string }) {
   const box = useRef<HTMLElement>(null)
   const links = useRef<(HTMLAnchorElement | null)[]>([])
   const [hot, setHot] = useState<number | null>(null)
@@ -73,7 +115,6 @@ function Nav({ path }: { path: string }) {
   const reduce = useReducedMotion()
   const active = NAV.findIndex((n) => here(n.href, path))
   const at = hot ?? (active >= 0 ? active : null)
-
   useLayoutEffect(() => {
     const read = () => setSpots(links.current.map((a) => (a ? { x: a.offsetLeft, w: a.offsetWidth } : { x: 0, w: 0 })))
     read()
@@ -81,115 +122,65 @@ function Nav({ path }: { path: string }) {
     if (box.current) ro.observe(box.current)
     return () => ro.disconnect()
   }, [])
-
   const spot = at !== null ? spots[at] : undefined
   return (
-    <nav ref={box} aria-label="Main" className="relative hidden h-16 items-center gap-5 lg:flex xl:gap-6" onPointerLeave={() => setHot(null)}>
+    <nav
+      ref={box}
+      aria-label="Main"
+      className="relative hidden h-10 items-center rounded-full p-1 transition-[background-color,box-shadow] duration-500 lg:flex"
+      style={{ transitionTimingFunction: UI, background: stuck ? 'transparent' : 'color-mix(in oklch, var(--leaf) 55%, transparent)', boxShadow: stuck ? 'none' : 'inset 0 0 0 1px var(--line)' }}
+      onPointerLeave={() => setHot(null)}
+    >
       <motion.span
         aria-hidden
-        className="pointer-events-none absolute bottom-[17px] left-0 h-[2px] w-3 rounded-full bg-accent"
+        className="pointer-events-none absolute left-0 top-1 h-8 rounded-full"
+        style={{ background: stuck ? 'var(--line)' : 'var(--surface)', boxShadow: stuck ? 'none' : 'var(--elev-raised)' }}
         initial={false}
-        animate={spot ? { x: spot.x + spot.w / 2 - 6, opacity: 1 } : { opacity: 0 }}
-        transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 560, damping: 38, opacity: { duration: 0.15 } }}
+        animate={spot ? { x: spot.x, width: spot.w, opacity: 1 } : { opacity: 0 }}
+        transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 520, damping: 40, opacity: { duration: 0.15 } }}
       />
-      {NAV.map((n, i) => {
-        const lit = hot === i
-        return (
-          <Link
-            key={n.href}
-            ref={(el) => {
-              links.current[i] = el
-            }}
-            href={n.href}
-            aria-current={i === active ? 'page' : undefined}
-            onPointerEnter={() => setHot(i)}
-            onFocus={() => setHot(i)}
-            onBlur={() => setHot(null)}
-            className={`ring-focus relative flex h-8 items-center gap-1.5 rounded-[6px] text-footnote transition-colors duration-200 ${lit ? 'text-[var(--accent-ink)]' : i === active ? 'text-ink' : 'text-ink-2'}`}
-          >
-            {n.label}
-            {n.pro && <span className="rounded-full bg-surface-2 px-1.5 text-caption font-medium leading-[18px] text-ink-2">Pro</span>}
-          </Link>
-        )
-      })}
+      {NAV.map((n, i) => (
+        <Link
+          key={n.href}
+          ref={(el) => {
+            links.current[i] = el
+          }}
+          href={n.href}
+          aria-current={i === active ? 'page' : undefined}
+          onPointerEnter={() => setHot(i)}
+          onFocus={() => setHot(i)}
+          onBlur={() => setHot(null)}
+          className={`ring-focus relative flex h-8 items-center whitespace-nowrap rounded-full px-3.5 text-[13.5px] transition-colors duration-200 ${at === i ? 'text-ink' : 'text-ink-2'}`}
+        >
+          {n.label}
+        </Link>
+      ))}
     </nav>
   )
 }
 
-/**
- * Below 1024px the links don't fit beside search, so they fold into a menu: a sheet that drops
- * from under the header with every link set large, the page you're on marked, and a way in at
- * the bottom. Escape, a link or the button closes it.
- */
-function MenuButton({ path }: { path: string }) {
-  const [open, setOpen] = useState(false)
+/** Below a laptop: the links drop as a sheet from under the bar. */
+function Menu({ path, onClose }: { path: string; onClose: () => void }) {
   const reduce = useReducedMotion()
-  // Moving to another page closes it.
-  const [seen, setSeen] = useState(path)
-  if (seen !== path) {
-    setSeen(path)
-    setOpen(false)
-  }
-  useEffect(() => {
-    if (!open) return
-    const key = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
-    window.addEventListener('keydown', key)
-    return () => window.removeEventListener('keydown', key)
-  }, [open])
   return (
-    <>
-      <button
-        type="button"
-        aria-label={open ? 'Close menu' : 'Menu'}
-        aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
-        className="ring-focus relative grid size-8 place-items-center rounded-full text-ink-2 transition-colors duration-150 hover:bg-surface-2 hover:text-ink lg:hidden"
-      >
-        <span aria-hidden className="relative block h-3 w-4">
-          <motion.span className="absolute left-0 top-0 h-[1.5px] w-4 rounded-full bg-current" initial={false} animate={open ? { y: 5.25, rotate: 45 } : { y: 0, rotate: 0 }} transition={{ type: 'spring', stiffness: 520, damping: 34 }} />
-          <motion.span className="absolute bottom-0 left-0 h-[1.5px] w-4 rounded-full bg-current" initial={false} animate={open ? { y: -5.25, rotate: -45 } : { y: 0, rotate: 0 }} transition={{ type: 'spring', stiffness: 520, damping: 34 }} />
-        </span>
-      </button>
-      <AnimatePresence>
-        {open && (
-          <>
-            <motion.button key="scrim" type="button" aria-label="Close menu" tabIndex={-1} onClick={() => setOpen(false)} className="fixed inset-x-0 bottom-0 top-16 z-30 bg-black/20 lg:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} />
-            <motion.nav
-              key="menu"
-              aria-label="Main"
-              className="fixed inset-x-0 top-16 z-40 bg-bg px-5 pb-6 pt-2 shadow-[0_1px_0_var(--line),0_24px_48px_-24px_rgb(0_0_0/0.25)] sm:px-6 lg:hidden"
-              initial={reduce ? { opacity: 0 } : { opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, y: -6, transition: { duration: 0.14 } }}
-              transition={{ duration: 0.22, ease: [0.2, 0.9, 0.25, 1] }}
-            >
-              <ul className="mx-auto max-w-[1360px]">
-                {NAV.map((n, i) => {
-                  const on = here(n.href, path)
-                  return (
-                    <motion.li key={n.href} initial={reduce ? false : { opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, delay: 0.03 * i }}>
-                      <Link
-                        href={n.href}
-                        onClick={() => setOpen(false)}
-                        aria-current={on ? 'page' : undefined}
-                        className={`ring-focus flex h-14 items-center gap-2.5 rounded-[10px] text-[24px] tracking-[-0.03em] shadow-[inset_0_-1px_0_var(--line)] ${on ? 'text-ink' : 'text-ink-2'}`}
-                      >
-                        {on && <span aria-hidden className="h-[2px] w-3 rounded-full bg-accent" />}
-                        {n.label}
-                        {n.pro && <span className="rounded-full bg-surface-2 px-1.5 text-caption font-medium leading-[18px] text-ink-2">Pro</span>}
-                      </Link>
-                    </motion.li>
-                  )
-                })}
-              </ul>
-              <Link href="/components" onClick={() => setOpen(false)} className="ring-focus mx-auto mt-5 flex h-11 max-w-[1360px] items-center justify-center gap-2 rounded-full bg-ink text-callout font-medium text-surface sm:hidden">
-                Get started
-                <ArrowRight size={15} />
-              </Link>
-            </motion.nav>
-          </>
-        )}
-      </AnimatePresence>
-    </>
+    <motion.nav
+      aria-label="Main"
+      className="absolute inset-x-0 top-[calc(100%+8px)] origin-top rounded-[22px] p-2 lg:hidden"
+      style={{ background: 'var(--leaf)', boxShadow: 'var(--leaf-edge), 0 24px 48px -20px rgb(0 0 0 / 0.3)' }}
+      initial={reduce ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4, scale: 0.99, transition: { duration: 0.12 } }}
+      transition={{ type: 'spring', stiffness: 520, damping: 38 }}
+    >
+      {NAV.map((n) => (
+        <Link key={n.href} href={n.href} onClick={onClose} aria-current={here(n.href, path) ? 'page' : undefined} className={`ring-focus flex h-12 items-center rounded-[14px] px-3.5 text-[17px] tracking-[-0.01em] hover:bg-[var(--line)] ${here(n.href, path) ? 'text-ink' : 'text-ink-2'}`}>
+          {n.label}
+        </Link>
+      ))}
+      <Link href="/components" onClick={onClose} className="ring-focus mt-1 flex h-11 items-center justify-center gap-1.5 rounded-full bg-ink text-[14px] font-medium text-surface sm:hidden">
+        Get started
+        <ArrowRight size={13} />
+      </Link>
+    </motion.nav>
   )
 }

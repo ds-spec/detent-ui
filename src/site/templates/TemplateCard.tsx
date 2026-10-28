@@ -4,12 +4,16 @@ import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { animate, useReducedMotion } from 'motion/react'
 import type { AnimationPlaybackControls } from 'motion/react'
-import { ArrowRight } from '@/lab/icons'
+import { ArrowUpRight } from '@/lab/icons'
 import { useTheme } from '@/lab/lib/hooks'
 import { TemplateBody } from '@pro'
 import type { Template } from '@/catalog/templates'
 import { Backdrop, Window } from '../blocks/Studio'
 import { useNear } from '../near'
+import type { Tone } from '../home/lights'
+
+/** Each template stands on its own light. */
+const TONE: Record<string, Tone> = { detent: 'blue', tandem: 'violet', rapport: 'amber' }
 
 /**
  * A template on the gallery, running live in a browser window. A whole site doesn't fit in a
@@ -49,9 +53,9 @@ export function TemplateCard({ t }: { t: Template }) {
 
   return (
     // The page inside has links of its own, so the card isn't one: a single link lies over all of it.
-    <article className="group/card relative rounded-[32px]" onPointerEnter={(e) => e.pointerType === 'mouse' && go(true)} onPointerLeave={() => go(false)}>
-      <div className="relative overflow-hidden rounded-[28px] p-3 sm:p-10">
-        <Backdrop />
+    <article className="group/card relative rounded-[30px] bg-surface p-2 shadow-[var(--card-edge)] transition-shadow duration-300 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--card-lift)]" onPointerEnter={(e) => e.pointerType === 'mouse' && go(true)} onPointerLeave={() => go(false)}>
+      <div className="relative overflow-hidden rounded-[24px] p-3 sm:p-10">
+        <Backdrop tone={TONE[t.id] ?? 'rose'} />
         <div ref={box} className="relative h-[clamp(520px,58vw,780px)]" inert>
           <Window title={t.window} chrome="browser">
             <div ref={page} className="h-full overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -60,12 +64,12 @@ export function TemplateCard({ t }: { t: Template }) {
           </Window>
         </div>
       </div>
-      <div className="relative flex items-end justify-between gap-6 px-2 pb-1 pt-5">
+      <div className="relative flex items-end justify-between gap-6 px-3 pb-2 pt-5">
         <div className="min-w-0">
           <p className="text-footnote text-ink-3">
             {app ? 'App' : 'Landing page'} · {t.kind}
           </p>
-          <h2 className="mt-1 text-title text-ink">{t.name}</h2>
+          <h2 className="mt-1.5 text-[24px] leading-7 tracking-[-0.025em] text-ink">{t.name}</h2>
           <p className="mt-1 line-clamp-2 max-w-[680px] text-callout text-ink-3">{t.line}</p>
           <p className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-footnote text-ink-3">
             <span>
@@ -84,11 +88,11 @@ export function TemplateCard({ t }: { t: Template }) {
             </span>
           </p>
         </div>
-        <span aria-hidden className="mb-1 flex size-11 shrink-0 items-center justify-center rounded-full bg-ink text-surface transition-transform duration-300 ease-[cubic-bezier(0.2,0.9,0.25,1)] group-hover/card:translate-x-1">
-          <ArrowRight size={18} />
+        <span aria-hidden className="mb-1 flex size-11 shrink-0 items-center justify-center rounded-full text-ink shadow-[inset_0_0_0_1px_var(--line-strong)] transition-[background-color,color,box-shadow] duration-200 group-hover/card:bg-ink group-hover/card:text-surface group-hover/card:shadow-none">
+          <ArrowUpRight size={16} className="transition-transform duration-200 group-hover/card:-translate-y-px group-hover/card:translate-x-px" />
         </span>
       </div>
-      <Link href={`/templates/${t.id}`} aria-label={`${t.name}, ${app ? 'an app' : 'a landing page'} for ${t.suits}`} className="ring-focus absolute inset-0 z-10 rounded-[32px]" />
+      <Link href={`/templates/${t.id}`} aria-label={`${t.name}, ${app ? 'an app' : 'a landing page'} for ${t.suits}`} className="ring-focus absolute inset-0 z-10 rounded-[30px]" />
     </article>
   )
 }
