@@ -67,7 +67,7 @@ const ROWS: [string, ReactNode, ReactNode, ReactNode, ReactNode][] = [
   ['AI SDK adapter', NO, YES, YES, YES],
   ['Takes your shadcn theme', YES, YES, YES, YES],
   ['Installs from', 'Public registry', 'Private registry', 'Private registry', 'Private registry'],
-  ['People', 'Anyone', 'One', 'One', 'Up to ten, plus CI'],
+  ['People', 'Anyone', 'One', 'One', 'Up to five, plus CI'],
   ['Licence', 'MIT', 'Unlimited projects', 'Unlimited projects', 'Unlimited projects'],
 ]
 

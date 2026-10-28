@@ -18,11 +18,11 @@ export const metadata: Metadata = page({
 const FAQ: [string, string][] = [
   ['Who is it for?', 'Developers and small teams building an AI product in React: a chat, an agent, a copilot, or a SaaS with AI inside. If you already use shadcn and the AI SDK, it drops straight in.'],
   ['Is it a subscription?', 'No. You pay once and keep it, along with every update that ships after you buy.'],
-  ['What’s the difference between the plans?', 'Pro is what you build the product with: the Pro components and every block. Pro + Templates adds the templates: whole apps to start from, including every template still to come. Team is everything, for up to ten people.'],
+  ['What’s the difference between the plans?', 'Pro is what you build the product with: the Pro components and every block. Pro + Templates adds the templates: whole apps to start from, including every template still to come. Team is everything, for up to five people.'],
   ['Does it work with the AI SDK?', 'Yes. useDetentChat takes what useChat gives you and returns the props for the streaming answer, the run waterfall and the approval card, so reasoning, tools, approvals and sources each land where they belong. The Agent chat block and Tandem run on it.'],
   ['Will it match my design?', 'Installed with shadcn, Detent takes on your theme: your primary becomes its accent, it uses your background, borders and muted text, and .dark turns it dark. Your fonts stay yours.'],
   ['How do I install Pro?', 'With the shadcn CLI, from Detent’s private registry. Add your licence key once, then install like anything else: npx shadcn add @detent-pro/diff. The source lands in your project.'],
-  ['Can my team share one licence?', 'A licence is for one person. Team covers up to ten people, with a key for each of them and one more for CI and shared repos.'],
+  ['Can my team share one licence?', 'A licence is for one person. Team covers up to five people, with a key for each of them and one more for CI and shared repos.'],
   ['Can I use it for client work?', 'Yes, in as many projects as you like, commercial ones included. What you can’t do is resell or redistribute the components themselves.'],
   ['Do the free components stay free?', 'Yes. Everything free stays free, and keeps getting better alongside Pro.'],
   ['What if it’s not right for me?', `Email within ${REFUND_DAYS} days of buying and you get every cent back. No form, no questions.`],

@@ -62,7 +62,7 @@ export default function Licence() {
             <>
               <P>A Pro licence covers the {PRO_COMPONENTS.length} Pro components, every block that isn’t free and, with Pro + Templates or Team, every template, landing page or app: everything sold now and every update that follows.</P>
               <P>
-                <Strong>Pro</Strong> and <Strong>Pro + Templates</Strong> are for one person. <Strong>Team</Strong> is for up to ten people in one company, each with a key of their own, plus one key for CI and shared repositories.
+                <Strong>Pro</Strong> and <Strong>Pro + Templates</Strong> are for one person. <Strong>Team</Strong> is for up to five people in one company, each with a key of their own, plus one key for CI and shared repositories.
               </P>
             </>
           ),

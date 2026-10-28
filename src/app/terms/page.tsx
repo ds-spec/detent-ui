@@ -48,7 +48,7 @@ export default function Terms() {
           title: 'Licence keys',
           body: (
             <>
-              <P>Your licence key installs Pro from the private registry. Keep it to the people your licence covers: one person for Pro and Pro + Templates, up to ten for Team.</P>
+              <P>Your licence key installs Pro from the private registry. Keep it to the people your licence covers: one person for Pro and Pro + Templates, up to five for Team.</P>
               <P>A key that’s shared beyond its licence, or used against the licence’s terms, can be turned off. We’ll write first and give you a chance to put it right.</P>
             </>
           ),

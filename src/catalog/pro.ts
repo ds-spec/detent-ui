@@ -81,7 +81,7 @@ export type Plan = {
   id: 'pro' | 'all' | 'team'
   name: string
   price: number
-  /** Who it covers, said after the price: one person, or a team of up to ten. */
+  /** Who it covers, said after the price: one person, or a team of up to five. */
   seats: string
   /** Who it's for, in a line. */
   line: string
@@ -96,7 +96,7 @@ export const PLANS: Plan[] = [
   {
     id: 'pro',
     name: 'Pro',
-    price: 199,
+    price: 149,
     seats: 'one person',
     line: 'Everything you build the product with.',
     cta: 'Get Pro',
@@ -106,7 +106,7 @@ export const PLANS: Plan[] = [
   {
     id: 'all',
     name: 'Pro + Templates',
-    price: 299,
+    price: 249,
     seats: 'one person',
     line: 'For the product and the page that sells it.',
     cta: 'Get everything',
@@ -117,12 +117,12 @@ export const PLANS: Plan[] = [
   {
     id: 'team',
     name: 'Team',
-    price: 799,
-    seats: 'up to ten people',
+    price: 599,
+    seats: 'up to five people',
     line: 'Everything, for everyone building it with you.',
     cta: 'Get Team',
     href: CHECKOUT.team,
-    features: ['Everything in Pro + Templates', 'A licence key for each person, up to ten', 'One more key for CI and shared repos', 'Company invoices, with VAT handled', 'Every update, for life', 'Unlimited projects'],
+    features: ['Everything in Pro + Templates', 'A licence key for each person, up to five', 'One more key for CI and shared repos', 'Company invoices, with VAT handled', 'Every update, for life', 'Unlimited projects'],
   },
 ]
 

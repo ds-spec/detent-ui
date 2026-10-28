@@ -190,7 +190,7 @@ export function Choose() {
         <Tile name="edition" on={edition === 'all'} onPick={() => setEdition('all')} title="Pro + Templates" price={`$${plan('all').price}`} line={`Everything in Pro, plus ${TEMPLATES.length} apps with the AI built in.`} />
       </Question>
       {/* Two short answers side by side; the line under them says what the chosen one means. */}
-      <Question title="Licence." quiet="Who’s building it." row note={team ? 'Up to ten people, a key each, and one more for CI.' : 'One person, in as many projects as you like.'}>
+      <Question title="Licence." quiet="Who’s building it." row note={team ? 'Up to five people, a key each, and one more for CI.' : 'One person, in as many projects as you like.'}>
         <Tile name="seats" short on={!team} onPick={() => setSeats('one')} title="Just me" price="Included" />
         <Tile name="seats" short on={team} onPick={() => setSeats('team')} title="My team" price={`$${plan('team').price}`} />
       </Question>
