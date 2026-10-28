@@ -42,6 +42,8 @@ next-env.d.ts
 
 # Detent Pro: its own private repository, checked out at src/pro
 /src/pro/
+# the Pro registry, built from it with the site; never a public file
+/.detent/
 
 # working files: design screenshots, research notes and the unlisted preview pages
 /shots/

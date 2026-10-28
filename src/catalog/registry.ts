@@ -5,6 +5,7 @@ import { BLOCKS } from '@/catalog/blocks'
 import { ENTRIES } from './meta'
 import { FILES } from './source'
 import { KITS, SITE, isProComponent } from './pro'
+import { TEMPLATES } from './templates'
 
 /*
  * The public shadcn registry, built from the source as it is. Each free item carries every file
@@ -46,6 +47,11 @@ export function freeNames() {
 
 /** The name of a Pro thing, so the registry can say so instead of a plain not-found. */
 export const isProName = (name: string) => isProComponent(name) || BLOCKS.some((b) => b.id === name) || name.startsWith('template-')
+
+/** Everything a licence installs, by name: Pro components, every block, and the templates. */
+export function proNames() {
+  return [...ENTRIES.filter((e) => isProComponent(e.id)).map((e) => e.id), ...BLOCKS.map((b) => b.id), ...TEMPLATES.map((t) => `template-${t.id}`)].filter((n) => !!FILES[n]?.length)
+}
 
 /** Renames the two tokens that clash with shadcn's, in source and in CSS alike. */
 export const brand = (text: string) =>
@@ -139,6 +145,10 @@ function entryOf(name: string): string[] | null {
 }
 
 const describe = (name: string) => {
+  if (name.startsWith('template-')) {
+    const t = TEMPLATES.find((x) => `template-${x.id}` === name)
+    return { title: t?.name ?? name.slice(9), description: t?.line ?? 'A Detent template.', type: 'registry:block' }
+  }
   const e = ENTRIES.find((x) => x.id === name)
   if (e) return { title: e.name, description: e.line, type: 'registry:component' }
   const b = BLOCKS.find((x) => x.id === name)
@@ -150,15 +160,10 @@ const describe = (name: string) => {
 
 export const itemUrl = (name: string) => `${SITE}/r/${name}.json`
 
-/** One free item, ready to serve, or null if it isn't free. */
-export async function registryItem(name: string): Promise<RegistryItem | null> {
-  'use cache'
-  if (!freeNames().includes(name)) return null
-  if (name === 'theme') return null
+/** One item built from its source, its theme named by `theme`. */
+async function build(name: string, theme: string): Promise<RegistryItem | null> {
   const about = describe(name)
   if (!about) return null
-  if (KITS[name])
-    return { $schema: SCHEMA, name, ...about, author: 'Detent', registryDependencies: KITS[name].items.map(itemUrl), files: [] }
   const entry = entryOf(name)
   if (!entry) return null
   const { files, deps } = await gather(entry)
@@ -168,9 +173,30 @@ export async function registryItem(name: string): Promise<RegistryItem | null> {
     ...about,
     author: 'Detent',
     dependencies: [...deps].sort(),
-    registryDependencies: [itemUrl('theme')],
+    registryDependencies: [theme],
     files: [...files].map(([rel, code]) => shipped(rel, brand(rewrite(rel, code)), about.type)),
   }
+}
+
+/** One free item, ready to serve, or null if it isn't free. */
+export async function registryItem(name: string): Promise<RegistryItem | null> {
+  'use cache'
+  if (!freeNames().includes(name)) return null
+  if (name === 'theme') return null
+  const about = describe(name)
+  if (!about) return null
+  if (KITS[name])
+    return { $schema: SCHEMA, name, ...about, author: 'Detent', registryDependencies: KITS[name].items.map(itemUrl), files: [] }
+  return build(name, itemUrl('theme'))
+}
+
+/**
+ * One Pro item. It's built when the site is, by scripts/build-pro-registry.mjs, and served only to a
+ * licence; its theme is the Pro registry's own, which also carries the CSS the Pro pieces use.
+ */
+export async function proItem(name: string): Promise<RegistryItem | null> {
+  if (!proNames().includes(name)) return null
+  return build(name, '@detent-pro/theme')
 }
 
 /* ── The theme ─────────────────────────────────────────────────── */
@@ -287,10 +313,15 @@ const bridged = (text: string) =>
 /** The tokens and the CSS every free item needs: one stylesheet, its comments intact, beside the components. */
 export async function registryTheme(): Promise<RegistryItem> {
   'use cache'
+  return themeFor(freeNames())
+}
+
+/** The theme for a set of items: the tokens, and the CSS their code uses. The Pro registry's covers everything. */
+export async function themeFor(names: string[]): Promise<RegistryItem> {
   const all = statements(await readFile(path.join(SRC, 'app/globals.css'), 'utf8'))
-  // Everything the free items' code mentions, then whatever the kept CSS mentions in turn: a class's animation names its keyframes.
+  // Everything the items' code mentions, then whatever the kept CSS mentions in turn: a class's animation names its keyframes.
   let words = new Set<string>()
-  for (const name of freeNames()) {
+  for (const name of names) {
     const entry = !KITS[name] && entryOf(name)
     if (!entry) continue
     for (const code of (await gather(entry)).files.values()) stringWords(code).forEach((w) => words.add(w))

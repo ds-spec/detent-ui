@@ -6,6 +6,8 @@ import type { NextConfig } from "next";
 const pro = existsSync("src/pro/index.ts") ? "./src/pro/index.ts" : "./src/locked/index.tsx";
 // Pro's routes, for the server: the live demos' AI SDK handlers. Locked, each answers 404.
 const proServer = existsSync("src/pro/server.ts") ? "./src/pro/server.ts" : "./src/locked/server.ts";
+// The Pro registry, built before the site by scripts/build-pro-registry.mjs. Without it, an empty one.
+const proRegistry = existsSync(".detent/pro-registry.json") ? "./.detent/pro-registry.json" : "./src/locked/pro-registry.json";
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -15,6 +17,7 @@ const nextConfig: NextConfig = {
     resolveAlias: {
       "@pro": pro,
       "@pro-server": proServer,
+      "@pro-registry": proRegistry,
     },
     rules: {
       "*.css": {
