@@ -1,12 +1,12 @@
 'use client'
 
 import { tap } from '../../lib/feel'
-import { useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { ReactNode, Ref } from 'react'
 import type { MotionValue } from 'motion/react'
 import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react'
-import { ArrowUp, Bolt, Check, ChevronDown, Close, FilePage, Plus, Search, Orbit, Stop, Upload } from '../../icons'
+import { ArrowUp, Bolt, Check, ChevronDown, Close, FilePage, Plus, Search, Orbit, Upload } from '../../icons'
 import { useStack } from '../../lib/hooks'
 import { ease, press, spring } from '../../lib/motion'
 import { Kbd } from '../../ui/Kbd'
@@ -69,7 +69,7 @@ const fromFile = (f: File): Attachment => ({
 /**
  * A prompt box for AI products. It sits in a fixed footprint and grows upward over the
  * page as you write or attach, so nothing beneath it ever moves. Send lifts your words off
- * the box; while the answer is coming the send button becomes Stop, circled by a slow orbit.
+ * the box; while the answer is coming the send button becomes Stop, a square of dots a wave runs through.
  * Drop files anywhere on it. Enter sends, Shift+Enter adds a line, Escape stops. Given
  * suggestions, the empty box rolls through them, and Tab takes the one showing.
  */
@@ -347,7 +347,7 @@ export function PromptBox({
             <ModePicker modes={modes} current={current} open={menu} setOpen={setMenu} onPick={setMode} bottom={menuBottom} layer={layer} />
 
             <span className="flex-1" />
-            <SendButton canSend={canSend} busy={busy} tone={tone} onSend={send} onStop={stop} reduce={!!reduce} />
+            <SendButton canSend={canSend} busy={busy} onSend={send} onStop={stop} reduce={!!reduce} />
           </div>
         </div>
 
@@ -603,9 +603,8 @@ function ModePicker({
   )
 }
 
-function SendButton({ canSend, busy, tone, onSend, onStop, reduce }: { canSend: boolean; busy: boolean; tone: Tone; onSend: () => void; onStop: () => void; reduce: boolean }) {
+function SendButton({ canSend, busy, onSend, onStop, reduce }: { canSend: boolean; busy: boolean; onSend: () => void; onStop: () => void; reduce: boolean }) {
   const lit = canSend || busy
-  const orbit = useId()
   return (
     <motion.button
       type="button"
@@ -622,37 +621,25 @@ function SendButton({ canSend, busy, tone, onSend, onStop, reduce }: { canSend: 
     >
       <AnimatePresence initial={false} mode="popLayout">
         <motion.span key={busy ? 'stop' : 'send'} className="flex" initial={{ opacity: 0, y: busy ? 0 : 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: busy ? -6 : 0 }} transition={{ duration: 0.2, ease: ease.out }}>
-          {busy ? <Stop size={14} /> : <ArrowUp size={16} />}
+          {busy ? <DotStop reduce={reduce} /> : <ArrowUp size={16} />}
         </motion.span>
       </AnimatePresence>
-
-      {/* While working, a short arc orbits the button. */}
-      <AnimatePresence>
-        {busy && (
-          <motion.svg
-            aria-hidden
-            className="pointer-events-none absolute -inset-[4px] size-[40px]"
-            viewBox="0 0 40 40"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, rotate: reduce ? 0 : 360 }}
-            exit={{ opacity: 0, transition: { duration: 0.15 } }}
-            transition={{
-              opacity: { duration: 0.2 },
-              rotate: { duration: 1.4, ease: 'linear', repeat: Infinity },
-            }}
-          >
-            <defs>
-              <linearGradient id={orbit} x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" style={{ stopColor: tone === 'loud' ? 'var(--ai-1)' : 'var(--ink-3)' }} />
-                <stop offset="0.5" style={{ stopColor: tone === 'loud' ? 'var(--ai-3)' : 'var(--ink-2)' }} />
-                <stop offset="1" style={{ stopColor: tone === 'loud' ? 'var(--ai-4)' : 'var(--ink)' }} />
-              </linearGradient>
-            </defs>
-            <circle cx="20" cy="20" r="18.5" fill="none" stroke="var(--line)" strokeWidth="1.5" />
-            <circle cx="20" cy="20" r="18.5" fill="none" stroke={`url(#${orbit})`} strokeWidth="2" strokeLinecap="round" strokeDasharray="26 200" />
-          </motion.svg>
-        )}
-      </AnimatePresence>
     </motion.button>
+  )
+}
+
+/** Stop, drawn as a dot-matrix square. While the answer comes in, a wave runs through it corner to corner. */
+function DotStop({ reduce }: { reduce: boolean }) {
+  return (
+    <span aria-hidden className="grid grid-cols-4 gap-px">
+      {Array.from({ length: 16 }, (_, i) => (
+        <motion.span
+          key={i}
+          className="size-[2px] rounded-full bg-current"
+          animate={reduce ? undefined : { opacity: [1, 0.25, 1] }}
+          transition={{ duration: 1.2, ease: 'easeInOut', repeat: Infinity, delay: ((i % 4) + Math.floor(i / 4)) * 0.08 }}
+        />
+      ))}
+    </span>
   )
 }

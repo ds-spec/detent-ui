@@ -192,7 +192,7 @@ const ALL: Entry[] = [
     details: [
       'It reserves one line of space and grows upward over the thread as you write or attach.',
       'While it’s empty, suggestions roll through the placeholder like an odometer, and Tab takes the one showing.',
-      'Sending lifts your words off the box; the send button becomes Stop, circled by a slow orbit.',
+      'Sending lifts your words off the box; the send button becomes Stop, a dot-matrix square that a slow wave runs through while the answer comes in.',
       'The tools stay quiet until you point at them, and the mode chip resizes to each label without squashing.',
       'Drop or paste files anywhere on it; they arrive as small chips you can remove.',
     ],
