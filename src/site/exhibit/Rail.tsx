@@ -12,7 +12,8 @@ import { Search } from '@/lab/icons'
  * and, where the page has one, a small live preview of it opens beside the list.
  */
 
-export type RailItem = { id: string; name: string; line?: string; pro?: boolean }
+/** `pro` marks it Pro; `free`, where a list mixes both, says so too. Components only mark Pro. */
+export type RailItem = { id: string; name: string; line?: string; pro?: boolean; free?: boolean }
 export type RailGroup = { id: string; name: string; icon?: ReactNode; color?: string; items: RailItem[] }
 
 export function Rail({ groups, current, onPick, label, preview }: { groups: RailGroup[]; current: string; onPick: (id: string) => void; label: string; preview?: (id: string, onReady: () => void) => ReactNode }) {
@@ -82,7 +83,7 @@ export function Rail({ groups, current, onPick, label, preview }: { groups: Rail
               </button>
               <AnimatePresence initial={false}>
                 {open && (
-                  <motion.div key="items" className="overflow-hidden" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 40, opacity: { duration: 0.15 } }}>
+                  <motion.div key="items" className="flex flex-col gap-0.5 overflow-hidden" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 40, opacity: { duration: 0.15 } }}>
                     {g.items.map((x) => {
                       const on = x.id === current
                       return (
@@ -98,7 +99,7 @@ export function Rail({ groups, current, onPick, label, preview }: { groups: Rail
                           className={`ring-focus flex h-8 w-full items-center gap-2 rounded-[8px] px-2 text-left text-[13.5px] transition-colors duration-150 ${on ? 'bg-[var(--shell-on)] text-ink' : 'text-ink-2 hover:bg-[var(--shell-hover)] hover:text-ink'}`}
                         >
                           <span className="min-w-0 flex-1 truncate">{x.name}</span>
-                          {x.pro && <span className="text-[11px] text-ink-3">Pro</span>}
+                          {x.pro ? <span className="text-[11px] text-ink-3">Pro</span> : x.free && <span className="text-[11px] text-ink-3">Free</span>}
                         </button>
                       )
                     })}
