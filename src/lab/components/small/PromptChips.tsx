@@ -52,7 +52,8 @@ export function PromptChips({ suggestions, onSend, width = 380, ref }: {
   return (
     <LayoutGroup>
       <div style={{ width, maxWidth: '100%' }}>
-        <div className="mb-3.5 flex h-[92px] flex-wrap content-end justify-center gap-2">
+        {/* At least two rows tall, so short sets keep their place; longer suggestions grow the area rather than spill over what sits above it. */}
+        <div className="mb-3.5 flex min-h-[92px] flex-wrap content-end justify-center gap-2">
           <AnimatePresence initial={false} mode="popLayout">
             {suggestions.map((s, i) =>
               picked === i ? null : (
