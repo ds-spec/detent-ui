@@ -59,8 +59,12 @@ export const brand = (text: string) =>
     .replace(/--(color-)?(accent|card)\b/g, '--$1dt-$2')
     .replace(/\b(bg|text|border|ring|ring-offset|outline|fill|stroke|from|via|to|decoration|caret|divide|shadow|accent)-(accent|card)\b(?![-\w])/g, '$1-dt-$2')
 
+/** A template's routes: what lands in the buyer's own app/ folder rather than under components. */
+const ROUTE = /^pro\/templates\/[^/]+\/(app\/.+)$/
+
 /** Where a source file lands in the buyer's project, relative to their root (or src/). */
 const targetOf = (rel: string) =>
+  rel.match(ROUTE)?.[1] ??
   `${BASE}/${rel
     .replace(/^lab\//, '')
     .replace(/^pro\/components\//, 'components/')
@@ -129,11 +133,13 @@ const OPENING = /^\s*(?:\/\*[\s\S]*?\*\/\s*|\/\/[^\n]*\n\s*)+/
  * rewrite (no client directive, no `@/` import) goes as a plain file, word for word; any other
  * that opens with notes has them moved to just under its imports, where they survive.
  */
-function shipped(rel: string, content: string, type: string): RegistryFile {
+function shipped(rel: string, content: string, kind: string): RegistryFile {
   const file = { path: targetOf(rel), target: targetOf(rel) }
+  // Routes go in as pages, so the CLI puts them in the app folder (src/app when there's a src).
+  const type = ROUTE.test(rel) ? 'registry:page' : kind
   const opening = content.match(OPENING)?.[0]
   if (!opening || /^\s*['"]use client['"]/.test(content)) return { ...file, type, content }
-  if (!/from\s+['"]@\//.test(content)) return { ...file, type: 'registry:file', content }
+  if (!/from\s+['"]@\//.test(content)) return { ...file, type: ROUTE.test(rel) ? type : 'registry:file', content }
   const rest = content.slice(opening.length)
   const imports = rest.match(/^(?:import[^\n]*\n(?:[ \t]+[^\n]*\n)*\}?[^\n]*\n?)*/)?.[0] ?? ''
   return { ...file, type, content: `${imports.trimEnd()}\n\n${opening.trim()}\n${rest.slice(imports.length)}` }
