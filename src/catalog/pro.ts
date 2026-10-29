@@ -7,6 +7,8 @@ import { UNLISTED } from './unlisted'
 
 /** The free components that are Pro: the big stateful surfaces that take weeks to get right. */
 const PRO_CODE = [
+  'thread',
+  'toolcall',
   'answer',
   'ask',
   'docchat',
