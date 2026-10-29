@@ -128,38 +128,6 @@ export function BlockViewer({ id }: { id: string }) {
 
       <Props b={b} />
 
-      <section aria-labelledby="details" className="mt-24 grid gap-x-16 gap-y-8 lg:grid-cols-[320px_minmax(0,1fr)]">
-        <h2 id="details" className="text-title text-ink">
-          The details
-        </h2>
-        <div className="grid gap-x-16 gap-y-12 xl:grid-cols-[minmax(0,1fr)_280px]">
-          <ul className="grid gap-x-12 sm:grid-cols-2">
-            {b.details.map((d, n) => (
-              <li key={n} className="py-4 text-body text-ink-2 shadow-[inset_0_1px_0_var(--line)]">
-                {d}
-              </li>
-            ))}
-          </ul>
-          {b.keys && (
-            <div>
-              <p className="text-footnote text-ink-3">Keys</p>
-              <dl className="mt-2">
-                {b.keys.map(([k, what], n) => (
-                  <div key={k} className="flex items-center justify-between gap-4 py-2.5" style={{ boxShadow: n ? 'inset 0 1px 0 var(--line)' : undefined }}>
-                    <dd className="text-callout text-ink-2">{what}</dd>
-                    <dt className="flex shrink-0 gap-1">
-                      {k.split(' ').map((part, j) => (
-                        <Kbd key={j}>{part}</Kbd>
-                      ))}
-                    </dt>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          )}
-        </div>
-      </section>
-
       {/* The way on: the blocks either side, small enough to pass, plain enough to press. */}
       <nav aria-label="More blocks" className="mt-28 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Neighbour b={prev} dir="prev" />

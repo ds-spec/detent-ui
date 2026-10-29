@@ -210,19 +210,6 @@ export function TemplateViewer({ id }: { id: string }) {
           </ol>
         </section>
       )}
-
-      <section aria-labelledby="details" className="mt-24 grid gap-x-16 gap-y-8 lg:grid-cols-[320px_minmax(0,1fr)]">
-        <h2 id="details" className="text-title text-ink">
-          The details
-        </h2>
-        <ul className="grid gap-x-12 sm:grid-cols-2">
-          {t.details.map((d, n) => (
-            <li key={n} className="py-4 text-body text-ink-2 shadow-[inset_0_1px_0_var(--line)]">
-              {d}
-            </li>
-          ))}
-        </ul>
-      </section>
     </main>
     </Shell>
   )
