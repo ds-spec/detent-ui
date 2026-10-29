@@ -18,6 +18,7 @@ import { CopyCommand, Install } from '../parts'
 import { Desk } from '../blocks/BlockViewer'
 import { ProTag } from '../blocks/ProTag'
 import { Rail } from '../exhibit/Rail'
+import { DownloadStarter } from './Download'
 import { Shell, Trail } from '../shell/Shell'
 import { TEMPLATE_RAIL } from './rail'
 
@@ -202,6 +203,7 @@ export function TemplateViewer({ id }: { id: string }) {
               Make it yours
             </h2>
             <p className="mt-2 max-w-[300px] text-callout text-ink-3">From install to your product, in the order you’d do it. Every file it names lands in your project as source.</p>
+            {t.form === 'app' && <DownloadStarter id={t.id} name={t.name} />}
           </div>
           <ol>
             {START[t.id].map((step, i) => (

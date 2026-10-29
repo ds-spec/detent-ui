@@ -1,0 +1,27 @@
+// Writes each template's starter project to .detent/starters/<id>/ and its zip beside it, from the
+// Pro registry (run build-pro-registry.mjs first). The site makes the same zips on request; this
+// is for checking them: install and build one before a release.
+//   node scripts/build-starters.mjs            every template
+//   node scripts/build-starters.mjs tandem     one
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import path from 'node:path'
+import { createJiti } from 'jiti'
+
+const root = process.cwd()
+const jiti = createJiti(import.meta.url, { alias: { '@/': path.join(root, 'src/') } })
+const { starterFiles, zip } = await jiti.import('../src/catalog/starter.ts')
+const items = JSON.parse(readFileSync(path.join(root, '.detent/pro-registry.json'), 'utf8')).items
+const ids = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(items).filter((n) => n.startsWith('template-')).map((n) => n.slice(9))
+
+for (const id of ids) {
+  const out = path.join(root, '.detent/starters', id)
+  rmSync(out, { recursive: true, force: true })
+  const files = starterFiles(id, items[`template-${id}`], items.theme)
+  for (const [p, c] of Object.entries(files)) {
+    mkdirSync(path.dirname(path.join(out, p)), { recursive: true })
+    writeFileSync(path.join(out, p), c)
+  }
+  const z = zip(files, `${id}-app`)
+  writeFileSync(`${out}.zip`, z)
+  console.log(`${id}: ${Object.keys(files).length} files, ${(z.length / 1024).toFixed(0)} KB zipped`)
+}
