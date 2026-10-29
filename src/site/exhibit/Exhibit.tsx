@@ -123,6 +123,12 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
     setSeen(i)
     setDir(Math.abs(d) > ENTRIES.length / 2 ? -Math.sign(d) : Math.sign(d) || 1)
   }
+  // Arriving from another page, Next scrolls the panel to this route's own part, the props, which sit
+  // below the stage. The component comes first, so arrival starts at the top.
+  useEffect(() => {
+    const panel = scroller()
+    if (panel) panel.scrollTop = 0
+  }, [])
   // Each move clicks, if sound is on, and brings the new component back into view. Arriving doesn't.
   const last = useRef(i)
   useEffect(() => {

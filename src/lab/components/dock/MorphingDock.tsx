@@ -46,7 +46,7 @@ export function MorphingDock({
 }: {
   /** The tools, left to right, each with the panel it opens. */
   tools: DockTool[]
-  /** The page the dock floats over. It recedes while a panel is open. */
+  /** The page the dock floats over. It recedes while a panel is open. The dock fills its parent and lays the page in absolutely, so give the parent a height. */
   children?: ReactNode
   /** Every panel's width in px. */
   width?: number
