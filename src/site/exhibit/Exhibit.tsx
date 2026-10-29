@@ -9,7 +9,7 @@ import { DEMOS } from '@/catalog/demos'
 import { CATEGORIES, ENTRIES } from '@/catalog/meta'
 import { SIZE } from '@/catalog/sizes'
 import { SITE, installCommand, isProComponent } from '@/catalog/pro'
-import { Check, Copy, Moon, Refresh, Sun } from '@/lab/icons'
+import { Check, Copy, Expand, Moon, Refresh, Sun } from '@/lab/icons'
 import { useTheme } from '@/lab/lib/hooks'
 import { Kbd } from '@/lab/ui/Kbd'
 import { ModelAnnotated } from '../annotated/ModelAnnotated'
@@ -28,6 +28,7 @@ import { Rail } from './Rail'
 import { Shell, Trail, scroller } from '../shell/Shell'
 import type { RailGroup } from './Rail'
 import { CategoryIcon } from '../icons'
+import { ExitFull } from '../blocks/BlockViewer'
 import { wellOf } from '../wells'
 import type { Tone } from '../home/lights'
 
@@ -246,7 +247,8 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
           transition={{ layout: lift }}
           data-theme={stageTheme ?? undefined}
           aria-label={`${e.name}, live`}
-          className={`overflow-hidden text-ink ${present ? 'fixed inset-3 z-50 rounded-[32px] bg-bg sm:inset-4' : 'absolute inset-x-0 bottom-0 top-12 rounded-[28px] shadow-[inset_0_0_0_1px_var(--line)]'}`}
+          // Full screen is the component alone, edge to edge on the page's own ground: no well, no frame.
+          className={`overflow-hidden text-ink ${present ? 'fixed inset-0 z-50 bg-bg' : 'absolute inset-x-0 bottom-0 top-12 rounded-[28px] shadow-[inset_0_0_0_1px_var(--line)]'}`}
           // The stage is a well tinted with the family's light, the same as the plates on the walls.
           style={{ background: present ? undefined : wellOf(FAMILY_TONE[family.id] ?? 'blue') }}
         >
@@ -288,6 +290,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
           </AnimatePresence>
 
           <InspectLayer on={inspect && mode === 'preview'} stage={stage} />
+          {present && <ExitFull onExit={() => setPresent(false)} />}
 
         </motion.section>
         {/* Above the stage, quietly: what you're looking at on the left, and two small tools on the right. The rest are keys. */}
@@ -303,6 +306,9 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
             </Tool>
             <Tool label={shown === 'dark' ? 'View in light' : 'View in dark'} onClick={() => setStageTheme(stageTheme ? null : page === 'dark' ? 'light' : 'dark')}>
               {shown === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            </Tool>
+            <Tool className="hidden sm:block" label="Full screen" keys="P" onClick={() => setPresent(true)}>
+              <Expand size={16} />
             </Tool>
           </span>
         </div>

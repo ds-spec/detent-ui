@@ -374,7 +374,8 @@ export function Desk({ title, chrome, run, mode, theme, present, onExit, view, c
     const ro = new ResizeObserver(read)
     ro.observe(el)
     return () => ro.disconnect()
-  }, [])
+    // Leaving full screen brings a new track to measure.
+  }, [present])
 
   const width = w === null ? max : Math.min(w, max)
   const stops = DETENTS.filter((d) => d.w < max - 40)
@@ -429,22 +430,33 @@ export function Desk({ title, chrome, run, mode, theme, present, onExit, view, c
     e.preventDefault()
   }
 
+  // Full screen is the block alone: no backdrop, no window, no ruler, edge to edge on the page's own ground.
+  if (present)
+    return (
+      <motion.div data-theme={theme ?? undefined} className="fixed inset-0 z-50 bg-bg text-ink" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+        <div key={run} className={`h-full transition-opacity duration-300 ${mode === 'code' ? 'pointer-events-none opacity-0' : ''}`}>
+          {view}
+        </div>
+        <AnimatePresence>
+          {mode === 'code' && (
+            <motion.div key="code" className="absolute inset-0 z-[5] bg-surface" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6, transition: { duration: 0.15 } }} transition={{ duration: 0.3 }}>
+              {code}
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <ExitFull onExit={onExit} />
+      </motion.div>
+    )
+
   return (
     <>
-      {present && <motion.div className="fixed inset-0 z-[45] bg-bg" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={onExit} />}
       {/* The desk: the block's own backdrop, a ruler, and the block in a window you can resize. */}
-      <div data-desk data-theme={theme ?? undefined} className={`text-ink ${present ? 'fixed inset-3 z-50 flex flex-col rounded-[28px] px-4 pb-4 pt-12 sm:inset-4 sm:px-8 sm:pb-8' : 'relative mt-6 rounded-[32px] px-3 pb-3 pt-3 sm:px-8 sm:pb-8 sm:pt-0'}`}>
+      <div data-desk data-theme={theme ?? undefined} className="relative mt-6 rounded-[32px] px-3 pb-3 pt-3 text-ink sm:px-8 sm:pb-8 sm:pt-0">
         <Backdrop />
-        {present ? (
-          <button type="button" onClick={onExit} aria-label="Leave full screen" className="ring-focus absolute right-4 top-3 z-10 flex size-9 items-center justify-center rounded-full text-ink-2 hover:bg-surface/60">
-            <Close size={16} />
-          </button>
-        ) : (
-          <Ruler max={max} width={width} stops={stops} here={here} onPick={to} />
-        )}
-        <div ref={track} className={`relative ${present ? 'min-h-0 flex-1' : 'h-[clamp(560px,calc(100dvh-320px),840px)]'}`}>
+        <Ruler max={max} width={width} stops={stops} here={here} onPick={to} />
+        <div ref={track} className="relative h-[clamp(560px,calc(100dvh-320px),840px)]">
           {max > 0 && (
-            <Window title={title} chrome={chrome} width={present ? '100%' : width} compact={!present && width < 520}>
+            <Window title={title} chrome={chrome} width={width} compact={width < 520}>
               <div key={run} className={`h-full transition-opacity duration-300 ${mode === 'code' ? 'pointer-events-none opacity-0' : ''}`}>
                 {view}
               </div>
@@ -458,7 +470,7 @@ export function Desk({ title, chrome, run, mode, theme, present, onExit, view, c
             </Window>
           )}
 
-          {!present && max > 0 && (
+          {max > 0 && (
             <button
               type="button"
               role="slider"
@@ -530,5 +542,22 @@ function Ruler({ max, width, stops, here, onPick }: { max: number; width: number
         <RollingText text={String(Math.round(width))} />
       </span>
     </div>
+  )
+}
+
+/** The way out of full screen: a small pill at the foot, faint until it's pointed at. Escape works too. */
+export function ExitFull({ onExit }: { onExit: () => void }) {
+  return (
+    <motion.button
+      type="button"
+      onClick={onExit}
+      className="ring-focus fixed bottom-5 left-1/2 z-[60] flex h-9 -translate-x-1/2 items-center gap-2 rounded-full bg-[var(--sheet)] pl-3 pr-2 text-footnote text-ink-2 shadow-float transition-opacity duration-200 hover:!opacity-100 focus-visible:!opacity-100"
+      initial={{ y: 12, opacity: 0 }}
+      animate={{ y: 0, opacity: 0.6 }}
+      transition={{ delay: 0.2, duration: 0.25 }}
+    >
+      <Close size={13} /> Exit full screen
+      <Kbd>Esc</Kbd>
+    </motion.button>
   )
 }
