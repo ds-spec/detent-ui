@@ -9,7 +9,7 @@ export const SIZE: Record<string, [number, number]> = {
   trace: [602, 560],
   diff: [720, 600],
   rewrite: [560, 314],
-  approval: [380, 548],
+  approval: [380, 600],
   prompt: [540, 500],
   tree: [300, 420],
   plan: [420, 520],
@@ -60,5 +60,5 @@ export const SIZE: Record<string, [number, number]> = {
 export const SPOT_SIZE: Record<string, [number, number]> = {
   answer: [420, 400],
   diff: [420, 312],
-  approval: [364, 306],
+  approval: [364, 360],
 }
