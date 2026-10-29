@@ -8,6 +8,6 @@
  *
  * Later that day eight more left: doubles of better pieces (prompt chips, retry, typing bubble),
  * two of the four small charts (goal bars, share grid), and three agent controls that didn't hold
- * up (run button, context ring, model & effort).
+ * up (run button, context ring, model & effort). Diff review followed it out.
  */
-export const UNLISTED = new Set(['buttons', 'tabs', 'select', 'stepper', 'code', 'toaster', 'dialog', 'confirm', 'popover', 'tooltip', 'dropdown', 'context-menu', 'hovercard', 'combobox', 'command', 'carousel', 'sidebar', 'kanban', 'cropper', 'video', 'tour', 'chips', 'retry', 'typing', 'bars', 'waffle', 'run', 'context', 'models'])
+export const UNLISTED = new Set(['buttons', 'tabs', 'select', 'stepper', 'code', 'toaster', 'dialog', 'confirm', 'popover', 'tooltip', 'dropdown', 'context-menu', 'hovercard', 'combobox', 'command', 'carousel', 'sidebar', 'kanban', 'cropper', 'video', 'tour', 'chips', 'retry', 'typing', 'bars', 'waffle', 'run', 'context', 'models', 'diff', 'chart', 'trend', 'funnel', 'bridge', 'donut'])

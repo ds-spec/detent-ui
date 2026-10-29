@@ -92,7 +92,7 @@ export const RELEASES: Release[] = [
     title: 'Charts, one at a time',
     line: 'The chart kit is now six components you can take on their own, each with its own page, and all of them redrawn as instruments.',
     items: [
-      { label: 'Trend chart', href: '/components/trend', pro: true },
+      { label: 'Trend chart', pro: true },
       { label: 'Goal bars' },
       { label: 'Goal numerals', href: '/components/rings' },
       { label: 'Share grid' },
@@ -163,12 +163,12 @@ export const RELEASES: Release[] = [
     items: [
       { label: 'Streaming answer', href: '/components/answer', pro: true },
       { label: 'Run trace', href: '/components/trace', pro: true },
-      { label: 'Diff review', href: '/components/diff' },
+      { label: 'Diff review' },
       { label: 'Approval tray', href: '/components/approval', pro: true },
       { label: 'Prompt box', href: '/components/prompt' },
       { label: 'Plan editor' },
       { label: 'Model & effort' },
-      { label: 'Scrub chart', href: '/components/chart', pro: true },
+      { label: 'Scrub chart', pro: true },
       { label: 'Typed date range', href: '/components/dates', pro: true },
       { label: 'Blocks', href: '/blocks' },
       { label: 'Lumen template', pro: true },

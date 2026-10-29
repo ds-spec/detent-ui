@@ -9,6 +9,14 @@ import { UNLISTED } from './unlisted'
 const PRO_CODE = [
   'answer',
   'ask',
+  'images',
+  'askchart',
+  'bridge',
+  'funnel',
+  'radar',
+  'donut',
+  'scatter',
+  'histogram',
   'activity',
   'trace',
   'approval',
@@ -47,8 +55,8 @@ export const isLockedSource = (slug: string, blocks: string[]) => isProComponent
 export const KITS: Record<string, { name: string; line: string; items: string[] }> = {
   'agent-kit': {
     name: 'Agent kit',
-    line: 'The free components for an agent product: the prompt box, diff review, the composer, the file tree, the scaffold and the small pieces around them.',
-    items: ['scaffold', 'prompt', 'tree', 'diff', 'versions', 'thinking', 'toasts', 'composer'],
+    line: 'The free components for an agent product: the prompt box, the composer, the file tree, the scaffold and the small pieces around them.',
+    items: ['scaffold', 'prompt', 'tree', 'versions', 'thinking', 'toasts', 'composer'],
   },
 }
 
