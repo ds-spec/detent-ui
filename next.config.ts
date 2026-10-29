@@ -12,7 +12,10 @@ const proRegistry = existsSync(".detent/pro-registry.json") ? "./.detent/pro-reg
 const nextConfig: NextConfig = {
   // Pieces that were replaced keep their old address working.
   async redirects() {
-    return [{ source: '/components/stats', destination: '/components/metric', permanent: true }]
+    return [
+      { source: '/components/stats', destination: '/components/metric', permanent: true },
+      ...['kanban', 'cropper', 'video', 'tour'].map((id) => ({ source: `/components/${id}`, destination: '/components', permanent: true })),
+    ]
   },
   cacheComponents: true,
   partialPrefetching: true,
