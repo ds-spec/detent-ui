@@ -97,7 +97,7 @@ const ALL: Template[] = [
     line: 'The app for an AI agent that works across your tools: sessions down the side, a thread that shows its work as it goes, and a composer that takes photos, files, tools and skills, queues what you ask while it answers, and sets how hard it thinks on a ramp of dots.',
     parts: [
       { anchor: 'sessions', name: 'Sessions', line: 'Pinned, renamed, archived with an undo, filtered by project; a clock on any with a question waiting.', uses: ['Gliding highlight', 'Inline rename'] },
-      { anchor: 'thread', name: 'Thread', line: 'Each step as it runs, a plan to approve, a pause before any command it isn’t trusted with, and charts, terminals and sources in the answer.', uses: ['Streaming answer', 'Approvals'] },
+      { anchor: 'thread', name: 'Thread', line: 'The plan ticking off as it works, the diff written line by line and the tests printing as they run, a pause before any command it isn’t trusted with, then charts, terminals, the PR and sources in the answer.', uses: ['Streaming answer', 'Approvals', 'Live steps'] },
       { anchor: 'composer', name: 'Composer', line: '@ for tools, / for skills, photos pasted or dropped, dictation, and Plan first.', uses: ['Rich composer'] },
       { anchor: 'queue', name: 'Up next', line: 'What you ask while it answers waits in order: send one now, take it back to edit, or drop it. Stopping holds the rest until you resume.', uses: ['Queue'] },
       { anchor: 'models', name: 'Model and reasoning', line: 'Each model with its mark and what it’s for, and reasoning on a ramp of dots that lights up to the playhead.', uses: ['Dot ramp'] },
@@ -110,7 +110,7 @@ const ALL: Template[] = [
     details: [
       'One accent, used as a mark: blue for where you are, what has focus, and how hard it thinks. Everything else is ink and grey, in light, and in a near-black dark with Graphite and Dusk beside it.',
       'Nothing moves on its own. Buttons that rest while it answers keep their room, photos are sized before they paint, and panels glide open rather than jump: not one layout shift.',
-      'It works the way an agent should be watched: each step as it runs, a plan first when you ask for one, and a pause before any command you haven’t trusted.',
+      'It works the way an agent should be watched: its plan ticking off, the code it writes and the commands it runs printing live, a plan to approve first when you ask for one, and a pause before any command you haven’t trusted.',
       'It works on a phone: sessions become a drawer with the whole app at its foot, review covers the chat, and photos open full width.',
       'The demo plays itself until you touch it, then hands the app to you; a question it was halfway through typing is finished and left for you to send.',
       'Its sessions, turns, sources and models are plain data, ready to be swapped for your own and for what your model streams back.',
