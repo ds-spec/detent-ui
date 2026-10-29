@@ -7,6 +7,7 @@ import { BigBuy, BuyBar, BuyProvider, HeroHead, WideStage } from '@/site/pro/Buy
 import { Compare } from '@/site/pro/Inside'
 import { Days, DaysHead } from '@/site/pro/Days'
 import { Gap } from '@/site/pro/Gap'
+import { Install } from '@/site/pro/Install'
 import { JsonLd, page, proGraph } from '@/site/seo'
 import { SitePage } from '@/site/sheets'
 
@@ -23,7 +24,7 @@ const FAQ: [string, string][] = [
   ['What’s the difference between the plans?', 'Pro is what you build the product with: the Pro components and the Pro blocks. Pro + Templates adds the templates: whole apps to start from, including every template still to come. Team is everything, for up to five people.'],
   ['Does it work with the AI SDK?', 'Yes. useDetentChat takes what useChat gives you and returns the props for the streaming answer, the run waterfall and the approval card, so reasoning, tools, approvals and sources each land where they belong. The Agent chat block and Tandem run on it.'],
   ['Will it match my design?', 'Installed with shadcn, Detent takes on your theme: your primary becomes its accent, it uses your background, borders and muted text, and .dark turns it dark. Your fonts stay yours.'],
-  ['How do I install Pro?', 'With the shadcn CLI, from Detent’s private registry. Add the registry and your licence key to the project once, as below, then install like anything else: npx shadcn add @detent-pro/diff. The source lands in your project.'],
+  ['How do I install Pro?', 'With the shadcn CLI, from Detent’s private registry. Add the registry and your licence key to the project once, as in Set up once above, then install like anything else: npx shadcn add @detent-pro/diff. The source lands in your project.'],
   ['Can my team share one licence?', 'A licence is for one person. Team covers up to five people, with a key for each of them and one more for CI and shared repos.'],
   ['Can I use it for client work?', 'Yes, in as many projects as you like, commercial ones included. What you can’t do is resell or redistribute the components themselves.'],
   ['Do the free components stay free?', 'Yes. Everything free stays free, and keeps getting better alongside Pro.'],
@@ -78,6 +79,17 @@ export default function ProPage() {
           </h2>
           <div className="mt-10 sm:mt-14">
             <Compare />
+          </div>
+        </section>
+
+        <section id="install" aria-labelledby="install-title" className="mx-auto mt-28 max-w-[1360px] scroll-mt-24 px-5 sm:mt-36 sm:px-6">
+          <h2 id="install-title" className={H2}>
+            Set up once.
+            <span className="block text-quiet">Then it’s just shadcn.</span>
+          </h2>
+          <p className="mt-5 max-w-[560px] text-[16px] leading-[1.6] text-ink-3">Pro installs from a private registry with the shadcn CLI. Two files in your project, then add anything by name.</p>
+          <div className="mt-10 sm:mt-14">
+            <Install />
           </div>
         </section>
 

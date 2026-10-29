@@ -216,7 +216,7 @@ export function TemplateViewer({ id }: { id: string }) {
 }
 
 /** One step of making a template yours: its number, what to do and why, and the code, with the file it goes in. */
-function StartStep({ n, step }: { n: number; step: Step }) {
+export function StartStep({ n, step }: { n: number; step: Step }) {
   const [copied, setCopied] = useState(false)
   const block = step.code?.includes('\n')
   const copy = () => {
