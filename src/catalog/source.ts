@@ -212,7 +212,7 @@ export const FILES: Record<string, string[]> = {
     '../pro/ui/icons.tsx',
     '../pro/ui/AppIcon.tsx',
   ],
-  'voice-mode': ['../pro/blocks/voice/VoiceMode.tsx', '../pro/blocks/voice/content.ts', '../pro/ui/LivingOrb.tsx', '../pro/ui/props.tsx', 'ui/DetentMark.tsx'],
+  'voice-mode': ['../pro/blocks/voice/VoiceMode.tsx', '../pro/blocks/voice/content.ts', 'components/small/Thinking.tsx', '../pro/ui/props.tsx', 'ui/DetentMark.tsx'],
 }
 
 /** A file as the Code tab shows it. A teaser is Pro source: only its opening lines, nothing to copy. */
