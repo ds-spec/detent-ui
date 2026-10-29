@@ -23,37 +23,51 @@ export function PropsPanel({ id, api }: { id: string; api: Api }) {
   const props = api.props.filter((p) => p.name !== 'ref')
   const value = (p: PropDoc) => (bench && p.name in bench.values ? bench.values[p.name] : knobs[p.name]?.value)
   const events = props.filter(isEvent)
+  const live = Object.keys(knobs).length > 0
+  // The columns, shared by the head and every row so they line up: prop, what it does, default, and a control when the demo has one.
+  const cols = live ? 'md:grid-cols-[minmax(150px,200px)_minmax(0,1fr)_minmax(110px,160px)_190px]' : 'md:grid-cols-[minmax(150px,200px)_minmax(0,1fr)_minmax(110px,180px)]'
   return (
     <>
-      <aside aria-label="Props" className="flex min-h-0 flex-col overflow-hidden rounded-[30px] bg-surface shadow-[var(--card-edge)] 2xl:col-start-2 2xl:row-start-1">
-        <div className="flex h-14 shrink-0 items-center justify-between px-6">
+      <section aria-label="Props" className="overflow-hidden rounded-[26px] bg-surface shadow-[var(--card-edge)]">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-6 pb-4 pt-5">
           <p className="text-headline text-ink">
             Props <span className="tnum font-normal text-ink-3">{props.length}</span>
           </p>
-          {Object.keys(knobs).length > 0 && <p className="text-caption text-ink-3">Change any marked ●</p>}
+          <p className="text-footnote text-ink-3">{live ? 'Read from the source. Change one under Try it and the preview follows.' : 'Read from the source.'}</p>
         </div>
-        <ul className="min-h-0 flex-1 overflow-y-auto px-3 pb-2 [scrollbar-width:thin]">
+        <div role="table" aria-label="Props">
+          <div role="row" className={`hidden gap-6 px-6 pb-2 text-caption text-ink-3 shadow-[inset_0_-1px_0_var(--line)] md:grid ${cols}`}>
+            <span role="columnheader">Prop</span>
+            <span role="columnheader">Description</span>
+            <span role="columnheader">Default</span>
+            {live && <span role="columnheader" className="text-right">Try it</span>}
+          </div>
           {props.map((p) => (
-            <Row key={p.name} p={p} knob={knobs[p.name]} value={value(p)} set={(v) => bench?.set(p.name, v)} changed={!!knobs[p.name] && value(p) !== knobs[p.name].value} pulse={bench?.hot[p.name]} />
+            <Row key={p.name} p={p} cols={cols} live={live} knob={knobs[p.name]} value={value(p)} set={(v) => bench?.set(p.name, v)} changed={!!knobs[p.name] && value(p) !== knobs[p.name].value} pulse={bench?.hot[p.name]} />
           ))}
-          {api.methods && (
-            <li className="px-3 pt-4 text-caption text-ink-3">
-              Through a ref: {api.methods.map((m, i) => (
-                <code key={m} className="font-mono text-ink-2">
-                  {i ? ', ' : ''}
-                  {m.split('(')[0]}()
-                </code>
-              ))}
-            </li>
-          )}
-          {api.extends && (
-            <li className="px-3 pt-3 text-caption text-ink-3">
-              Also takes every prop of <code className="font-mono text-ink-2">&lt;{api.extends}&gt;</code>.
-            </li>
-          )}
-        </ul>
-        <Events calls={bench?.calls ?? []} listening={events.length > 0} />
-      </aside>
+        </div>
+        {(api.methods || api.extends) && (
+          <div className="flex flex-col gap-1.5 px-6 py-4 text-footnote text-ink-3 shadow-[inset_0_1px_0_var(--line)]">
+            {api.methods && (
+              <p>
+                Through a ref:{' '}
+                {api.methods.map((m, i) => (
+                  <code key={m} className="font-mono text-ink-2">
+                    {i ? ', ' : ''}
+                    {m.split('(')[0]}()
+                  </code>
+                ))}
+              </p>
+            )}
+            {api.extends && (
+              <p>
+                Also takes every prop of <code className="font-mono text-ink-2">&lt;{api.extends}&gt;</code>.
+              </p>
+            )}
+          </div>
+        )}
+        {events.length > 0 && <Events calls={bench?.calls ?? []} />}
+      </section>
       <Usage api={api} props={props} knobs={knobs} value={value} />
     </>
   )
@@ -61,22 +75,33 @@ export function PropsPanel({ id, api }: { id: string; api: Api }) {
 
 const isEvent = (p: PropDoc) => /^on[A-Z]/.test(p.name) && p.type.includes('=>')
 
-function Row({ p, knob, value, set, changed, pulse }: { p: PropDoc; knob?: Knob; value: unknown; set: (v: unknown) => void; changed: boolean; pulse?: number }) {
+/** One prop: its name and whether it's needed; what it does with its type under it; its default; and, if the demo has one, the control. */
+function Row({ p, cols, live, knob, value, set, changed, pulse }: { p: PropDoc; cols: string; live: boolean; knob?: Knob; value: unknown; set: (v: unknown) => void; changed: boolean; pulse?: number }) {
   return (
-    <li className="flex min-h-[60px] items-center gap-4 px-3 py-2.5 shadow-[inset_0_-1px_0_var(--line)] last:shadow-none">
-      <div className="min-w-0 flex-1">
-        <p className="flex min-w-0 items-center gap-2">
-          {knob && <span aria-hidden className={`size-1.5 shrink-0 rounded-full transition-colors ${changed ? 'bg-[var(--accent)]' : 'bg-[color-mix(in_oklch,var(--ink)_22%,transparent)]'}`} />}
-          <code className={`shrink-0 font-mono text-[13px] ${changed ? 'text-[var(--accent-ink)]' : 'text-ink'}`}>{p.name}</code>
-          <code className="min-w-0 truncate font-mono text-[11.5px] text-ink-3" title={p.type}>
-            {p.type}
-          </code>
-          {p.required && <span className="shrink-0 text-[11px] text-ink-3">Required</span>}
-        </p>
-        {p.note && <p className="mt-0.5 line-clamp-2 text-caption text-ink-3">{p.note}</p>}
+    <div role="row" className={`grid grid-cols-1 gap-x-6 gap-y-2 px-6 py-4 shadow-[inset_0_-1px_0_var(--line)] last:shadow-none md:items-start ${cols}`}>
+      <div role="cell" className="flex flex-wrap items-center gap-2 md:pt-px">
+        <code className={`font-mono text-[13.5px] transition-colors ${changed ? 'text-[var(--accent-ink)]' : 'text-ink'}`}>{p.name}</code>
+        {p.required && <span className="rounded-full bg-surface-2 px-2 py-0.5 text-[11px] font-medium text-ink-2">Required</span>}
       </div>
-      <div className="flex shrink-0 justify-end">{knob ? <Control k={knob} value={value} set={set} name={p.name} /> : isEvent(p) ? <Fired pulse={pulse} /> : p.default ? <code className="max-w-[120px] truncate font-mono text-[11.5px] text-ink-3">{p.default}</code> : null}</div>
-    </li>
+      <div role="cell" className="min-w-0">
+        {p.note && <p className="text-callout leading-[1.55] text-ink-2">{p.note}</p>}
+        <code className={`inline-block max-w-full break-words rounded-[6px] bg-surface-2 px-1.5 py-0.5 font-mono text-[12px] leading-[1.5] text-ink-3 ${p.note ? 'mt-1.5' : ''}`}>{p.type}</code>
+      </div>
+      <div role="cell" className="flex items-center gap-2 md:block md:pt-0.5">
+        <span className="text-caption text-ink-3 md:hidden">Default</span>
+        {p.default ? <code className="break-words font-mono text-[12.5px] text-ink-2">{p.default}</code> : <span className="text-callout text-ink-3">—</span>}
+      </div>
+      {live && (
+        <div role="cell" className={`min-h-8 items-center md:flex md:justify-end ${knob || isEvent(p) ? 'flex' : 'hidden'}`}>
+          {knob ? <Control k={knob} value={value} set={set} name={p.name} /> : isEvent(p) ? <Fired pulse={pulse} /> : null}
+        </div>
+      )}
+      {!live && isEvent(p) && (
+        <div className="md:col-start-2">
+          <Fired pulse={pulse} />
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -124,7 +149,7 @@ function Fired({ pulse }: { pulse?: number }) {
 }
 
 /** Every call a callback gets, newest on top, each in a slot of its own so nothing below it jumps. */
-function Events({ calls, listening }: { calls: Call[]; listening: boolean }) {
+function Events({ calls }: { calls: Call[] }) {
   // The clock starts after the first paint, so the server and the first render agree.
   const [now, setNow] = useState(0)
   useEffect(() => {
@@ -139,11 +164,11 @@ function Events({ calls, listening }: { calls: Call[]; listening: boolean }) {
     <div className="h-[176px] shrink-0 bg-[color-mix(in_oklch,var(--ink)_2.5%,transparent)] px-6 pt-4 shadow-[inset_0_1px_0_var(--line)]">
       <p className="flex items-center gap-2 text-footnote font-medium text-ink">
         Events
-        {listening && <span className="size-1.5 rounded-full bg-[var(--ok)] motion-safe:animate-pulse" />}
-        <span className="truncate font-normal text-ink-3">{listening ? 'What it calls, as it calls it' : 'It doesn’t call back'}</span>
+        <span className="size-1.5 rounded-full bg-[var(--ok)] motion-safe:animate-pulse" />
+        <span className="truncate font-normal text-ink-3">What it calls, as it calls it</span>
       </p>
       <div className="relative mt-2.5 h-[120px] overflow-hidden">
-        {listening && calls.length === 0 && <p className="absolute inset-x-0 top-0 text-caption text-ink-3">Nothing yet. Press something on the left.</p>}
+        {calls.length === 0 && <p className="absolute inset-x-0 top-0 text-caption text-ink-3">Nothing yet. Press something on the left.</p>}
         <AnimatePresence initial={false}>
           {calls.slice(0, 4).map((c, i) => (
             <motion.p
@@ -195,7 +220,7 @@ function Usage({ api, props, knobs, value }: { api: Api; props: PropDoc[]; knobs
     setTimeout(() => setCopied(false), 1400)
   }
   return (
-    <section aria-label="Usage" className="overflow-hidden rounded-[26px] bg-surface shadow-[var(--card-edge)] 2xl:col-span-2">
+    <section aria-label="Usage" className="overflow-hidden rounded-[26px] bg-surface shadow-[var(--card-edge)]">
       <div className="flex h-12 items-center justify-between px-6 shadow-[inset_0_-1px_0_var(--line)]">
         <p className="text-footnote font-medium text-ink">
           Usage <span className="font-normal text-ink-3">· follows the props you set</span>

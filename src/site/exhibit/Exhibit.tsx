@@ -9,14 +9,13 @@ import { DEMOS } from '@/catalog/demos'
 import { CATEGORIES, ENTRIES } from '@/catalog/meta'
 import { SIZE } from '@/catalog/sizes'
 import { SITE, installCommand, isProComponent } from '@/catalog/pro'
-import { ArrowLeft, ArrowRight, Check, Copy, Moon, Refresh, Sun } from '@/lab/icons'
+import { Check, Copy, Moon, Refresh, Sun } from '@/lab/icons'
 import { useTheme } from '@/lab/lib/hooks'
 import { Kbd } from '@/lab/ui/Kbd'
 import { ModelAnnotated } from '../annotated/ModelAnnotated'
 import { Code } from '../browser/Code'
 import { InspectLayer } from '../browser/Inspect'
 import { Fit } from '../Fit'
-import { useNear } from '../near'
 import { Footer } from '../Footer'
 import { Header } from '../Header'
 import { Install } from '../parts'
@@ -229,11 +228,11 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
         </div>
       </header>
 
-      {/* The bench: the component on its stage, its props beside it, and the usage under both. One bench per component, so it starts clean. */}
+      {/* The bench: the component on its stage, its props under it, then the usage. One bench per component, so it starts clean. */}
       {present && <motion.div className="fixed inset-0 z-[45] bg-bg" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setPresent(false)} />}
       <BenchProvider key={id}>
-      <div className="mt-4 grid gap-3 2xl:grid-cols-[minmax(0,1fr)_380px]">
-      <div className="relative flex h-[var(--stage-phone)] flex-col lg:h-[var(--stage)] 2xl:col-start-1 2xl:row-start-1" style={{ ['--stage' as string]: `max(clamp(540px, calc(100dvh - 290px), 760px), ${need}px)`, ['--stage-phone' as string]: phone }}>
+      <div className="mt-4 grid gap-3">
+      <div className="relative flex h-[var(--stage-phone)] flex-col lg:h-[var(--stage)] " style={{ ['--stage' as string]: `max(clamp(540px, calc(100dvh - 290px), 760px), ${need}px)`, ['--stage-phone' as string]: phone }}>
         <motion.section
           ref={stage}
           layout
@@ -309,45 +308,26 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
       </div>
       </BenchProvider>
 
-      {/* How it's made: each detail on a card of its own, and the keys it answers to beside them. */}
-      <section aria-labelledby="details" className="mt-16 sm:mt-20">
-        <h2 id="details" className="px-1 text-[clamp(26px,2.4vw,34px)] font-normal tracking-[-0.04em] text-ink">
-          The details <span className="text-quiet">that make it.</span>
-        </h2>
-        <div className="mt-6 grid gap-3 xl:grid-cols-[minmax(0,1fr)_300px]">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.ul key={e.id} className="grid gap-3 sm:grid-cols-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.1 } }} transition={{ duration: 0.3 }}>
-              {e.details.map((d, n) => (
-                <li key={n} className="flex gap-4 rounded-[22px] bg-surface p-5 shadow-[var(--card-edge)]">
-                  <span className="tnum mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-surface-2 text-[11px] text-ink-3">{n + 1}</span>
-                  <span className="text-[15px] leading-[1.6] text-ink-2">{d}</span>
-                </li>
-              ))}
-            </motion.ul>
-          </AnimatePresence>
-          {e.keys && (
-            <dl className="h-fit rounded-[22px] bg-surface px-5 py-3 shadow-[var(--card-edge)]">
-              <p className="pb-2 pt-1 text-[13px] text-ink-3">Keys</p>
-              {e.keys.map(([k, what], n) => (
-                <div key={k + what} className="flex items-center justify-between gap-4 py-2.5" style={{ boxShadow: n ? 'inset 0 1px 0 var(--line)' : undefined }}>
-                  <dd className="text-callout text-ink-2">{what}</dd>
-                  <dt className="flex shrink-0 gap-1">
-                    {k.split(' ').map((part, j) => (
-                      <Kbd key={j}>{part}</Kbd>
-                    ))}
-                  </dt>
-                </div>
-              ))}
-            </dl>
-          )}
-        </div>
-      </section>
-
-      {/* The way on: the components either side, small enough to pass, plain enough to press. */}
-      <nav aria-label="More components" className="mt-16 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Neighbour e={prev} dir="prev" onGo={() => go(prev.id)} />
-        <Neighbour e={next} dir="next" onGo={() => go(next.id)} />
-      </nav>
+      {/* The keys it answers to, when it has any. */}
+      {e.keys && (
+        <section aria-labelledby="keys" className="mt-12 sm:mt-16">
+          <h2 id="keys" className="px-1 text-[clamp(22px,2vw,28px)] font-normal tracking-[-0.035em] text-ink">
+            Keyboard <span className="text-quiet">it answers to.</span>
+          </h2>
+          <dl className="mt-5 grid gap-x-8 rounded-[22px] bg-surface px-6 py-2 shadow-[var(--card-edge)] sm:grid-cols-2">
+            {e.keys.map(([k, what]) => (
+              <div key={k + what} className="flex items-center justify-between gap-4 py-3 shadow-[inset_0_1px_0_var(--line)] first:shadow-none sm:[&:nth-child(2)]:shadow-none">
+                <dd className="text-callout text-ink-2">{what}</dd>
+                <dt className="flex shrink-0 gap-1">
+                  {k.split(' ').map((part, j) => (
+                    <Kbd key={j}>{part}</Kbd>
+                  ))}
+                </dt>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
 
       <Index
         open={index}
@@ -364,43 +344,6 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
   )
 }
 
-/** The component either side, at the foot of the page: running small in its own well, with its name and family, and an arrow that leans the way you'd go. */
-function Neighbour({ e, dir, onGo }: { e: (typeof ENTRIES)[number]; dir: 'prev' | 'next'; onGo: () => void }) {
-  const back = dir === 'prev'
-  const family = CATEGORIES.find((c) => c.id === e.category)!
-  const Demo = DEMOS[e.id]
-  // It sits at the foot of the page, so it only runs once it's scrolled near.
-  const well = useRef<HTMLSpanElement | null>(null)
-  const near = useNear(well)
-  return (
-    // A link-role div, not a button: the live demo inside has buttons of its own, and a button can't hold one.
-    <div
-      role="link"
-      tabIndex={0}
-      onClick={onGo}
-      onKeyDown={(k) => k.key === 'Enter' && onGo()}
-      className={`ring-focus group/n flex cursor-pointer items-center gap-4 rounded-[26px] bg-surface p-2 text-left shadow-[var(--card-edge)] transition-shadow duration-300 hover:shadow-[var(--card-lift)] max-sm:p-4 ${back ? 'pr-5' : 'flex-row-reverse pl-5 text-right'}`}
-    >
-      <span ref={well} aria-hidden inert className="pointer-events-none relative hidden h-28 w-40 shrink-0 overflow-hidden rounded-[20px] shadow-[inset_0_0_0_1px_var(--line)] sm:block lg:w-48" style={{ background: wellOf(FAMILY_TONE[family.id] ?? 'blue') }}>
-        {Demo && near ? (
-          <Fit pad={10} max={0.42} min={0.18}>
-            <Demo />
-          </Fit>
-        ) : null}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-caption text-ink-3">
-          {back ? 'Previous' : 'Next'} · {family.name}
-        </span>
-        <span className="mt-0.5 block truncate text-title text-ink">{e.name}</span>
-        <span className="block truncate text-footnote text-ink-3">{e.short ?? first(e.line)}</span>
-      </span>
-      <span className={`flex size-9 shrink-0 items-center justify-center rounded-full text-ink-2 shadow-[inset_0_0_0_1px_var(--line-strong)] transition-[transform,color,background-color,box-shadow] duration-300 ease-[cubic-bezier(0.2,0.9,0.25,1)] group-hover/n:bg-ink group-hover/n:text-surface group-hover/n:shadow-none ${back ? 'group-hover/n:-translate-x-1' : 'group-hover/n:translate-x-1'}`}>
-        {back ? <ArrowLeft size={16} /> : <ArrowRight size={16} />}
-      </span>
-    </div>
-  )
-}
 
 /** Hands the component to a coding agent: a prompt with what it is, the command that installs it, and the page that documents it. */
 function CopyPrompt({ name, line, command, page }: { name: string; line: string; command: string; page: string }) {
