@@ -309,7 +309,7 @@ function Usage({ b }: { b: Block }) {
   const text = `<${b.component} accent="#3a5bf6"${call ? ` ${call.name}={(${args}) => {}}` : ''} />`
   const [copied, setCopied] = useState(false)
   return (
-    <div className="group/u relative mt-6 flex items-center rounded-[14px] bg-surface-2 pl-4 pr-1.5">
+    <div className="group/u relative flex items-center rounded-[14px] bg-surface-2 pl-4 pr-1.5">
       <pre className="min-w-0 flex-1 overflow-x-auto py-3.5 font-mono text-footnote [scrollbar-width:none]" translate="no">
         <span className="text-ink-3">&lt;</span>
         <span className="text-ink">{b.component}</span> <span className="text-ink-2">accent</span>
@@ -352,11 +352,14 @@ function Usage({ b }: { b: Block }) {
 /** Every prop the block takes: its own first, then the three every block shares. */
 function Props({ b }: { b: Block }) {
   return (
-    <PropsSection className="mt-20" blurb="All optional. With none, it plays exactly as it does here, and hands over to whoever touches it.">
-      <Usage b={b} />
-      <PropRows list={b.props} />
-      <p className="mt-10 text-footnote text-ink-3">Every block takes</p>
-      <PropRows list={COMMON} />
+    <PropsSection className="mt-6" count={b.props.length + COMMON.length} blurb="All optional. With none, it plays exactly as it does here, and hands over to whoever touches it.">
+      <div className="px-6 pb-5">
+        <Usage b={b} />
+      </div>
+      <PropRows list={b.props} title={`${b.name}’s own`} />
+      <div className="shadow-[inset_0_1px_0_var(--line)]">
+        <PropRows list={COMMON} title="Every block takes" />
+      </div>
     </PropsSection>
   )
 }

@@ -15,11 +15,17 @@ import { Search } from '@/lab/icons'
 export type RailItem = { id: string; name: string; line?: string; pro?: boolean }
 export type RailGroup = { id: string; name: string; icon?: ReactNode; color?: string; items: RailItem[] }
 
-export function Rail({ groups, current, onPick, label, preview }: { groups: RailGroup[]; current: string; onPick: (id: string) => void; label: string; preview?: (id: string) => ReactNode }) {
+export function Rail({ groups, current, onPick, label, preview }: { groups: RailGroup[]; current: string; onPick: (id: string) => void; label: string; preview?: (id: string, onReady: () => void) => ReactNode }) {
   const reduce = useReducedMotion()
   const [q, setQ] = useState('')
   const [shut, setShut] = useState<string[]>([])
   const [peek, setPeek] = useState<{ id: string; y: number; x: number } | null>(null)
+  // What the card shows: the last preview that was ready. The next one loads out of sight behind it
+  // and takes over only once it's ready, so moving down the list never flashes a blank card.
+  const [shownAt, setShownAt] = useState<{ id: string; y: number; x: number } | null>(null)
+  const [readyId, setReadyId] = useState<string | null>(null)
+  // The one under the pointer is ready: it takes the card (state derived while rendering, so there's no extra frame).
+  if (peek && readyId === peek.id && (shownAt?.id !== peek.id || shownAt.y !== peek.y)) setShownAt(peek)
   const list = useRef<HTMLDivElement>(null)
   const timer = useRef(0)
   const all = groups.flatMap((g) => g.items)
@@ -42,10 +48,15 @@ export function Rail({ groups, current, onPick, label, preview }: { groups: Rail
   }
   const leave = () => {
     clearTimeout(timer.current)
-    timer.current = window.setTimeout(() => setPeek(null), 120)
+    timer.current = window.setTimeout(() => {
+      setPeek(null)
+      setShownAt(null)
+      setReadyId(null)
+    }, 120)
   }
-  const peeked = peek ? all.find((x) => x.id === peek.id) : null
-  const top = peek ? Math.max(72, Math.min(peek.y - 112, (typeof window === 'undefined' ? 900 : innerHeight) - 252)) : 0
+  const peeked = shownAt ? all.find((x) => x.id === shownAt.id) : null
+  const top = shownAt ? Math.max(72, Math.min(shownAt.y - 112, (typeof window === 'undefined' ? 900 : innerHeight) - 252)) : 0
+  const layers = [shownAt?.id, peek?.id].filter((x, i, a): x is string => !!x && a.indexOf(x) === i)
 
   return (
     <div aria-label={label} role="navigation" className="relative z-30 flex min-h-0 flex-1 flex-col">
@@ -102,20 +113,26 @@ export function Rail({ groups, current, onPick, label, preview }: { groups: Rail
 
       {/* The preview of the name under the pointer, beside the list. */}
       <AnimatePresence>
-        {peek && peeked && preview && (
+        {peek && preview && (
           <motion.div
             key="peek"
             aria-hidden
             className="pointer-events-none fixed left-0 top-0 z-50 w-[288px] overflow-hidden rounded-[16px] bg-surface shadow-modal"
             initial={{ opacity: 0, scale: 0.97, x: peek.x, y: top }}
-            animate={{ opacity: 1, scale: 1, x: peek.x, y: top }}
+            animate={shownAt ? { opacity: 1, scale: 1, x: shownAt.x, y: top } : { opacity: 0, scale: 0.97, x: peek.x, y: top }}
             exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.1 } }}
             transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 520, damping: 42 }}
           >
-            <div className="relative h-[172px] overflow-hidden">{preview(peek.id)}</div>
+            <div className="relative h-[172px] overflow-hidden">
+              {layers.map((id) => (
+                <div key={id} className="absolute inset-0 transition-opacity duration-150" style={{ opacity: id === shownAt?.id ? 1 : 0 }}>
+                  {preview(id, () => setReadyId(id))}
+                </div>
+              ))}
+            </div>
             <div className="px-3.5 pb-3 pt-2.5 shadow-[inset_0_1px_0_var(--line)]">
-              <p className="truncate text-[13px] text-ink">{peeked.name}</p>
-              {peeked.line && <p className="truncate text-[12px] text-ink-3">{peeked.line}</p>}
+              <p className="truncate text-[13px] text-ink">{peeked?.name}</p>
+              {peeked?.line && <p className="truncate text-[12px] text-ink-3">{peeked.line}</p>}
             </div>
           </motion.div>
         )}

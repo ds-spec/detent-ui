@@ -16,6 +16,7 @@ import { ModelAnnotated } from '../annotated/ModelAnnotated'
 import { Code } from '../browser/Code'
 import { InspectLayer } from '../browser/Inspect'
 import { Fit } from '../Fit'
+import { Mini } from '../Mini'
 import { Footer } from '../Footer'
 import { Header } from '../Header'
 import { Install } from '../parts'
@@ -55,15 +56,15 @@ const RAIL: RailGroup[] = CATEGORIES.map((c) => ({
 })).filter((g) => g.items.length)
 
 /** A component, small, in its family's well: what the list shows beside a name you point at. */
-function peek(id: string) {
+function peek(id: string, onReady: () => void) {
   const x = ENTRIES.find((e) => e.id === id)
   const Demo = DEMOS[id]
   if (!x || !Demo) return null
   return (
     <div className="absolute inset-0" style={{ background: wellOf(FAMILY_TONE[x.category] ?? 'blue') }}>
-      <Fit pad={14} max={0.55} min={0.2}>
+      <Mini pad={14} max={0.55} onReady={onReady}>
         <Demo />
-      </Fit>
+      </Mini>
     </div>
   )
 }
