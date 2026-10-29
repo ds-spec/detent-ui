@@ -4,7 +4,6 @@ import './globals.css'
 import { SITE } from '@/catalog/pro'
 import { Providers } from '@/site/Providers'
 import { DESCRIPTION, NAME, TAGLINE } from '@/site/seo'
-import { MarkdownAlternateLink } from '@/site/MarkdownAlternateLink'
 
 // Geist: a plain Swiss grotesk. Big type is set regular and tight, so size does the work, not weight.
 const sans = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' })
@@ -50,7 +49,6 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     <html lang="en" className={`${sans.variable} ${mono.variable}`} data-theme="light" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: theme }} />
-        <MarkdownAlternateLink />
       </head>
       <body>
         <Providers>{children}</Providers>
