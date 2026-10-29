@@ -313,6 +313,8 @@ export const BLOCKS: Block[] = [
       { name: 'pageSize', type: 'number', default: '8', note: 'Rows on a page. The body is always this many rows tall.' },
       { name: 'onOpen', type: '(id: string) => void', note: 'Called with a conversation a person opens.' },
       { name: 'onAction', type: "(action: 'approve' | 'resolve' | 'assign', ids: string[]) => void", note: 'Called when a person runs an action on rows. The script doesn’t call it.' },
+      { name: 'sidebar', type: 'boolean', default: 'true', note: 'Draw the product’s sidebar. Turn it off to drop the screen into your own layout.' },
+      { name: 'onNavigate', type: '(page: SidebarPage) => void', note: 'Called with a sidebar page a person presses. Without it the sidebar is a picture.' },
     ],
   },
   {
@@ -341,6 +343,8 @@ export const BLOCKS: Block[] = [
       { name: 'onRangeChange', type: '(range: string) => void', note: 'Called when a person changes the range. The script doesn’t call it.' },
       { name: 'onApprove', type: '(id: string) => void', note: 'Called with the request a person approves.' },
       { name: 'onDeny', type: '(id: string) => void', note: 'Called with the request a person denies.' },
+      { name: 'sidebar', type: 'boolean', default: 'true', note: 'Draw the product’s sidebar. Turn it off to drop the screen into your own layout.' },
+      { name: 'onNavigate', type: '(page: SidebarPage) => void', note: 'Called with a sidebar page a person presses. Without it the sidebar is a picture.' },
     ],
   },
   {

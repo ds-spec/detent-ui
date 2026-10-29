@@ -1,7 +1,7 @@
 'use client'
 
 import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { ReactNode } from 'react'
+import type { ComponentType, ReactNode } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, animate, motion } from 'motion/react'
@@ -341,11 +341,17 @@ function Props({ b }: { b: Block }) {
   )
 }
 
+/**
+ * Screens of one product that are sold as separate blocks: pressing a page in one's sidebar opens
+ * the block that is that page, so on the site they read as one app.
+ */
+const LINKED: Record<string, Record<string, string>> = {
+  analytics: { Conversations: 'data-table' },
+  'data-table': { Overview: 'analytics' },
+}
+
 /** The block itself, kept out of the viewer's renders: dragging the frame only resizes its box. */
-const Live = memo(function Live({ id }: { id: string }) {
-  const View = BLOCK_VIEWS[id]
-  return <View />
-})
+const Live = memo(function Live({ id }: { id: string })
 
 /**
  * The desk: a backdrop, a ruler, and whatever it shows in a window you can resize, from a phone's
