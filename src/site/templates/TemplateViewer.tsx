@@ -5,14 +5,16 @@ import type { RefObject } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion, useReducedMotion } from 'motion/react'
-import { ArrowRight, Expand, Moon, Refresh, Sun } from '@/lab/icons'
+import { ArrowRight, Check, Copy, Expand, Moon, Refresh, Sun } from '@/lab/icons'
 import { useTheme } from '@/lab/lib/hooks'
 import { tap } from '@/lab/lib/feel'
 import { TemplateBody } from '@pro'
 import { template } from '@/catalog/templates'
+import { START } from '@/catalog/template-start'
+import type { Step } from '@/catalog/template-start'
 import { Code } from '../browser/Code'
 import { Modes, Rule, Tool } from '../exhibit/Exhibit'
-import { Install } from '../parts'
+import { CopyCommand, Install } from '../parts'
 import { Desk } from '../blocks/BlockViewer'
 import { ProTag } from '../blocks/ProTag'
 import { Rail } from '../exhibit/Rail'
@@ -193,6 +195,22 @@ export function TemplateViewer({ id }: { id: string }) {
         </ul>
       </section>
 
+      {START[t.id] && (
+        <section aria-labelledby="start" className="mt-24 grid gap-x-16 gap-y-8 lg:grid-cols-[320px_minmax(0,1fr)]">
+          <div>
+            <h2 id="start" className="text-title text-ink">
+              Make it yours
+            </h2>
+            <p className="mt-2 max-w-[300px] text-callout text-ink-3">From install to your product, in the order you’d do it. Every file it names lands in your project as source.</p>
+          </div>
+          <ol>
+            {START[t.id].map((step, i) => (
+              <StartStep key={step.title} n={i + 1} step={step} />
+            ))}
+          </ol>
+        </section>
+      )}
+
       <section aria-labelledby="details" className="mt-24 grid gap-x-16 gap-y-8 lg:grid-cols-[320px_minmax(0,1fr)]">
         <h2 id="details" className="text-title text-ink">
           The details
@@ -207,5 +225,48 @@ export function TemplateViewer({ id }: { id: string }) {
       </section>
     </main>
     </Shell>
+  )
+}
+
+/** One step of making a template yours: its number, what to do and why, and the code, with the file it goes in. */
+function StartStep({ n, step }: { n: number; step: Step }) {
+  const [copied, setCopied] = useState(false)
+  const block = step.code?.includes('\n')
+  const copy = () => {
+    void navigator.clipboard?.writeText(step.code ?? '').catch(() => {})
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1400)
+  }
+  return (
+    <li className="grid grid-cols-[28px_minmax(0,1fr)] gap-x-3 py-6 shadow-[inset_0_1px_0_var(--line)]">
+      <span className="tnum pt-0.5 font-mono text-[13px] text-ink-3">{n}</span>
+      <div className="min-w-0">
+        <p className="text-headline text-ink">{step.title}</p>
+        <p className="mt-1 max-w-[640px] text-callout leading-[1.6] text-ink-3">{step.line}</p>
+        {step.code && !block && (
+          <div className="mt-4 max-w-[520px]">
+            <CopyCommand command={step.code} fill />
+          </div>
+        )}
+        {step.code && block && (
+          <div className="mt-4 overflow-hidden rounded-[14px] bg-surface-2">
+            <div className="flex h-10 items-center justify-between pl-4 pr-1.5 shadow-[inset_0_-1px_0_var(--line)]">
+              <span className="truncate font-mono text-caption text-ink-3">{step.file}</span>
+              <button type="button" onClick={copy} aria-label={copied ? 'Copied' : 'Copy'} className="ring-focus grid size-8 shrink-0 place-items-center rounded-full text-ink-3 transition-colors hover:bg-surface hover:text-ink">
+                <span className="col-start-1 row-start-1 transition-opacity" style={{ opacity: copied ? 0 : 1 }}>
+                  <Copy size={14} />
+                </span>
+                <span className="col-start-1 row-start-1 text-ok transition-opacity" style={{ opacity: copied ? 1 : 0 }}>
+                  <Check size={14} />
+                </span>
+              </button>
+            </div>
+            <pre className="overflow-x-auto px-4 py-3.5 font-mono text-[12.5px] leading-[1.7] text-ink-2 [scrollbar-width:thin]" translate="no">
+              {step.code.trimEnd()}
+            </pre>
+          </div>
+        )}
+      </div>
+    </li>
   )
 }

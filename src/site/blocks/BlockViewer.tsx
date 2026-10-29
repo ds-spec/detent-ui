@@ -11,7 +11,7 @@ import { useTheme } from '@/lab/lib/hooks'
 import { tap } from '@/lab/lib/feel'
 import { RollingText } from '@/lab/ui/RollingText'
 import { BLOCK_VIEWS } from '@pro'
-import { BLOCKS, BLOCK_GROUPS, BLOCK_ORDER, COMMON, KINDS } from '@/catalog/blocks'
+import { BLOCKS, BLOCK_GROUPS, BLOCK_ORDER, KINDS } from '@/catalog/blocks'
 import type { Block } from '@/catalog/blocks'
 import { Kbd } from '@/lab/ui/Kbd'
 import { Hover } from '@/lab/ui/Hover'
@@ -302,64 +302,73 @@ function Neighbour({ b, dir }: { b: Block; dir: 'prev' | 'next' }) {
 
 /* ───────────────────────────── Props ───────────────────────────── */
 
-/** A usage line made from the block's own props: the accent, and the first thing it tells you about. */
+const isEvent = (p: { type: string }) => p.type.includes('=>')
+/** The names a callback is called with, read from its type: `(conversation: Conversation, text: string) => void` gives "conversation, text". */
+const argsOf = (type: string) => [...type.split('=>')[0].matchAll(/(\w+)\s*:/g)].map((m) => m[1]).join(', ')
+/** What's worth showing first in the usage: your records (arrays and maps) before plain copy. */
+const weight = (p: { type: string }) => (/\[\]|Record<|\{/.test(p.type) ? 0 : 1)
+
+/**
+ * The wiring, as you'd write it: the block with your data passed in and your handlers, the way a
+ * real app uses it. The data are the records it shows; the handlers are what it tells you.
+ */
 function Usage({ b }: { b: Block }) {
-  const call = b.props.find((p) => p.type.includes('=>'))
-  const args = call ? [...call.type.split('=>')[0].matchAll(/(\w+)\s*:/g)].map((m) => m[1]).join(', ') : ''
-  const text = `<${b.component} accent="#3a5bf6"${call ? ` ${call.name}={(${args}) => {}}` : ''} />`
+  const data = b.props.filter((p) => !isEvent(p)).sort((x, y) => weight(x) - weight(y)).slice(0, 3)
+  const events = b.props.filter(isEvent).slice(0, 3)
+  const lines = [...data.map((p) => `  ${p.name}={${p.name}}`), ...events.map((p) => `  ${p.name}={(${argsOf(p.type)}) => {}}`)]
+  const text = lines.length ? `<${b.component}\n${lines.join('\n')}\n/>` : `<${b.component} />`
   const [copied, setCopied] = useState(false)
   return (
-    <div className="group/u relative flex items-center rounded-[14px] bg-surface-2 pl-4 pr-1.5">
-      <pre className="min-w-0 flex-1 overflow-x-auto py-3.5 font-mono text-footnote [scrollbar-width:none]" translate="no">
-        <span className="text-ink-3">&lt;</span>
-        <span className="text-ink">{b.component}</span> <span className="text-ink-2">accent</span>
-        <span className="text-ink-3">=</span>
-        <span className="text-[var(--accent)]">&quot;#3a5bf6&quot;</span>
-        {call && (
-          <>
-            {' '}
-            <span className="text-ink-2">{call.name}</span>
-            <span className="text-ink-3">={'{'}</span>
-            <span className="text-ink-2">
-              ({args}) =&gt; {'{}'}
-            </span>
-            <span className="text-ink-3">{'}'}</span>
-          </>
-        )}
-        <span className="text-ink-3"> /&gt;</span>
+    <div className="overflow-hidden rounded-[14px] bg-surface-2">
+      <div className="flex h-10 items-center justify-between pl-4 pr-1.5 shadow-[inset_0_-1px_0_var(--line)]">
+        <span className="text-caption text-ink-3">Usage</span>
+        <button
+          type="button"
+          aria-label={copied ? 'Copied' : 'Copy usage'}
+          onClick={() => {
+            navigator.clipboard?.writeText(text).catch(() => {})
+            setCopied(true)
+            setTimeout(() => setCopied(false), 1400)
+          }}
+          className="ring-focus grid size-8 shrink-0 place-items-center rounded-full text-ink-3 transition-colors hover:bg-surface hover:text-ink"
+        >
+          <span className={`col-start-1 row-start-1 transition-opacity ${copied ? 'opacity-0' : ''}`}>
+            <Copy size={14} />
+          </span>
+          <span className={`col-start-1 row-start-1 text-accent transition-opacity ${copied ? '' : 'opacity-0'}`}>
+            <Check size={14} />
+          </span>
+        </button>
+      </div>
+      <pre className="overflow-x-auto px-4 py-3.5 font-mono text-[12.5px] leading-[1.7] text-ink-2 [scrollbar-width:thin]" translate="no">
+        {text}
       </pre>
-      <button
-        type="button"
-        aria-label={copied ? 'Copied' : 'Copy usage'}
-        onClick={() => {
-          navigator.clipboard?.writeText(text).catch(() => {})
-          setCopied(true)
-          setTimeout(() => setCopied(false), 1400)
-        }}
-        className="ring-focus grid size-8 shrink-0 place-items-center rounded-full text-ink-3 transition-colors hover:bg-surface hover:text-ink"
-      >
-        <span className={`col-start-1 row-start-1 transition-opacity ${copied ? 'opacity-0' : ''}`}>
-          <Copy size={14} />
-        </span>
-        <span className={`col-start-1 row-start-1 text-accent transition-opacity ${copied ? '' : 'opacity-0'}`}>
-          <Check size={14} />
-        </span>
-      </button>
     </div>
   )
 }
 
-/** Every prop the block takes: its own first, then the three every block shares. */
+/**
+ * Wiring the block into an app, grouped by job rather than listed as an API: what you pass in, what
+ * it tells you back, and the three every block shares in one line. The source is yours, so this is
+ * only what connects it; everything else you change in the file.
+ */
 function Props({ b }: { b: Block }) {
+  const data = b.props.filter((p) => !isEvent(p)).sort((x, y) => weight(x) - weight(y))
+  const events = b.props.filter(isEvent)
   return (
-    <PropsSection className="mt-6" count={b.props.length + COMMON.length} blurb="All optional. With none, it plays exactly as it does here, and hands over to whoever touches it.">
+    <PropsSection className="mt-6" title="Wire it up" blurb="All optional. With none, it plays exactly as it does here and hands over to whoever touches it.">
       <div className="px-6 pb-5">
         <Usage b={b} />
       </div>
-      <PropRows list={b.props} title={`${b.name}’s own`} />
-      <div className="shadow-[inset_0_1px_0_var(--line)]">
-        <PropRows list={COMMON} title="Every block takes" />
-      </div>
+      {data.length > 0 && <PropRows list={data} title="Your data" />}
+      {events.length > 0 && (
+        <div className={data.length ? 'shadow-[inset_0_1px_0_var(--line)]' : ''}>
+          <PropRows list={events} title="What it tells you" />
+        </div>
+      )}
+      <p className="px-6 py-4 text-footnote leading-[1.6] text-ink-3 shadow-[inset_0_1px_0_var(--line)]">
+        Every block also takes <code className="font-mono text-ink-2">accent</code>, the one colour everything in it derives from; <code className="font-mono text-ink-2">autoplay</code>, which plays the demo until someone touches it; and <code className="font-mono text-ink-2">className</code>.
+      </p>
     </PropsSection>
   )
 }

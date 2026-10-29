@@ -65,7 +65,11 @@ const targetOf = (rel: string) =>
     .replace(/^lab\//, '')
     .replace(/^pro\/components\//, 'components/')
     .replace(/^pro\/blocks\//, 'blocks/')
-    .replace(/^pro\/ui\//, 'blocks/kit/')}`
+    .replace(/^pro\/ui\//, 'blocks/kit/')
+    // Templates land under their own names, never under the "pro" folder this repo keeps them in.
+    .replace(/^pro\/templates\//, 'templates/')
+    .replace(/^pro\/chat\//, 'templates/detent/')
+    .replace(/^pro\/ai\//, 'ai/')}`
 
 const EXT = ['', '.tsx', '.ts', '/index.tsx', '/index.ts']
 /** Resolves an import to a file under src, or null when it isn't one of ours. */

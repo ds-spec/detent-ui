@@ -39,12 +39,12 @@ export function PropRows({ list, title }: { list: Row[]; title?: string }) {
 }
 
 /** The card around the tables: the title, how many there are, and a line on what they're for. */
-export function PropsSection({ blurb, count, children, className = '' }: { blurb: string; count?: number; children: ReactNode; className?: string }) {
+export function PropsSection({ blurb, count, title = 'Props', children, className = '' }: { blurb: string; count?: number; title?: string; children: ReactNode; className?: string }) {
   return (
     <section aria-labelledby="props" className={`overflow-hidden rounded-[26px] bg-surface shadow-[var(--card-edge)] ${className}`}>
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-6 pb-4 pt-5">
         <h2 id="props" className="text-headline text-ink">
-          Props {count !== undefined && <span className="tnum font-normal text-ink-3">{count}</span>}
+          {title} {count !== undefined && <span className="tnum font-normal text-ink-3">{count}</span>}
         </h2>
         <p className="text-footnote text-ink-3">{blurb}</p>
       </div>
