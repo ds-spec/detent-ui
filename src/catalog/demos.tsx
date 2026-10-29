@@ -26,6 +26,7 @@ const FREE: Record<string, ComponentType> = {
   prompt: dynamic(() => import('@/lab/demos/inputs').then((m) => m.PromptDemo), { ssr: false }),
   tree: dynamic(() => import('@/lab/demos/agent').then((m) => m.TreeDemo), { ssr: false }),
   diff: dynamic(() => import('@/lab/demos/diff').then((m) => m.DiffDemo), { ssr: false }),
+  images: dynamic(() => import('@/lab/demos/images').then((m) => m.ImagesDemo), { ssr: false }),
   dock: dynamic(() => import('@/lab/demos/dock').then((m) => m.DockDemo), { ssr: false }),
   time: dynamic(() => import('@/lab/demos/time').then((m) => m.TimeDemo), { ssr: false }),
   composer: dynamic(() => import('@/lab/demos/composer').then((m) => m.ComposerDemo), { ssr: false }),
