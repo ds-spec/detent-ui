@@ -3,3 +3,4 @@ const missing = () => Response.json({ error: 'This demo runs with the Detent Pro
 
 export const tandemChat: (req: Request) => Promise<Response> = async () => missing()
 export const rapportChat: (req: Request) => Promise<Response> = async () => missing()
+export const detentChat: (req: Request) => Promise<Response> = async () => missing()

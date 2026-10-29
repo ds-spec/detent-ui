@@ -44,9 +44,10 @@ export const START: Record<string, Step[]> = {
     { title: 'Add your sign-in', line: 'The sign-in page is at /dashboard/sign-in. Call your auth in its handler (Auth.js, Clerk, Better Auth), and keep /dashboard behind it in your proxy.ts.', file: 'app/dashboard/sign-in/page.tsx' },
   ],
   detent: [
-    { title: 'Install it', line: 'The workspace lands in components/detent/templates/detent, with every piece it’s built from.', code: 'npx shadcn add @detent-pro/template-detent' },
-    { title: 'Give it a page', line: 'It fills whatever holds it. Name your product with product, and pass autoplay={false} to stop the demo from playing.', file: 'app/page.tsx', code: page('Workspace', 'detent/Workspace') },
-    { title: 'Put in your sessions', line: 'The sidebar’s sessions, the sources answers cite and the turns of a session are plain data in detent/data.ts. Answers are markdown-lite: paragraphs, **bold**, `code`, and [n] for a citation.' },
-    { title: 'Connect your agent', line: 'The workspace is the front end. Where it plays a turn from data.ts, append what your agent streams instead: the thread draws the same text, citations and tool steps.' },
+    { title: 'Install it', line: 'The workspace lands as pages in app/chat (a new chat, each session at its own address, and Automations) with its agent’s AI route at app/api/detent. The workspace itself goes in components/detent/templates/detent.', code: 'npx shadcn add @detent-pro/template-detent' },
+    { title: 'Open it', line: 'Run your app and go to /chat. Every session has its own URL, so links, refresh and the back button work. Ask it anything: the agent searches, reads and answers with sources, and asks before it runs a command. It answers from a script until you give it a model, so it runs with no key.' },
+    { title: 'Give it a real model', line: 'Swap the script for any AI SDK model and add its key to .env.local. Point its three tools at your own search, files and sandbox; a tool with needsApproval waits for a yes in the thread.', file: 'components/detent/templates/detent/ai/route.ts', code: model('scripted') },
+    { title: 'Put in your sessions', line: 'The layout reads the sessions down the side on the server. Swap the body for your database, and store each session’s turns with it to bring old ones back.', file: 'components/detent/templates/detent/db.ts', code: 'export async function getSessions(): Promise<Session[]> {\n  return db.select().from(sessions) // was the demo’s\n}' },
+    { title: 'Make it your product', line: 'Your name for its models and your team’s workspace come from one file; the mark in the rail is Mark.tsx. Colours and type come from your shadcn theme.', file: 'components/detent/templates/detent/config.ts', code: "export const BRAND = {\n  name: 'Acme',\n  workspace: 'Acme',\n  workspaces: ['Acme', 'Personal'],\n}" },
   ],
 }

@@ -60,7 +60,7 @@ export const brand = (text: string) =>
     .replace(/\b(bg|text|border|ring|ring-offset|outline|fill|stroke|from|via|to|decoration|caret|divide|shadow|accent)-(accent|card)\b(?![-\w])/g, '$1-dt-$2')
 
 /** A template's routes: what lands in the buyer's own app/ folder rather than under components. */
-const ROUTE = /^pro\/templates\/[^/]+\/(app\/.+)$/
+const ROUTE = /^pro\/(?:templates\/[^/]+|chat)\/(app\/.+)$/
 
 /** Where a source file lands in the buyer's project, relative to their root (or src/). */
 const targetOf = (rel: string) =>
