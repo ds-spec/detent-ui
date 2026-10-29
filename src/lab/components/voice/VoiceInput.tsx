@@ -164,6 +164,8 @@ export function VoiceInput({
     if (info.offset.x < CANCEL_AT) onCancel()
   }
 
+  // The mic sits at the end; when there's something to send it steps left to make room for Send.
+  const slot = text.trim() ? BAR + 6 : 0
   const committed = words(text)
   const heard = words(interim)
 
@@ -229,7 +231,7 @@ export function VoiceInput({
             className="absolute top-1/2 z-10 -translate-y-1/2 overflow-hidden"
             initial={false}
             animate={{
-              clipPath: listening ? `inset(0px 0px 0px 0px round ${BAR / 2}px)` : `inset(0px ${BAR + 6}px 0px ${w - 20 - 2 * BAR - 6}px round ${BAR / 2}px)`,
+              clipPath: listening ? `inset(0px 0px 0px 0px round ${BAR / 2}px)` : `inset(0px ${slot}px 0px ${w - 20 - BAR - slot}px round ${BAR / 2}px)`,
               backgroundColor: listening ? (armed ? 'color-mix(in oklch, var(--danger) 14%, var(--surface))' : 'var(--surface-2)') : 'rgba(0,0,0,0)',
             }}
             transition={{ clipPath: spring.smooth, backgroundColor: { duration: 0.2 } }}
@@ -289,8 +291,9 @@ export function VoiceInput({
                     }
                   }}
                   className="ring-focus absolute top-0 flex size-9 items-center justify-center rounded-full bg-surface-2 text-ink transition-colors duration-150 hover:bg-surface-3"
-                  style={{ right: BAR + 6 }}
                   {...swap}
+                  animate={{ ...(swap.animate as object), right: slot }}
+                  style={{ right: slot }}
                 >
                   <Mic size={17} />
                 </motion.button>

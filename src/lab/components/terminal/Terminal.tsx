@@ -214,7 +214,8 @@ export function CopyCommand({ command, prompt = '$' }: { command: string; prompt
     timer.current = window.setTimeout(() => setCopied(0), 1600)
   }
   return (
-    <div className="inline-flex h-10 items-center gap-2.5 rounded-full bg-surface pl-4 pr-1 font-mono text-footnote shadow-float">
+    // Copy keeps to the end however wide the pill is laid out, its icon as far from the edge as the prompt.
+    <div className="inline-flex h-10 items-center gap-2.5 rounded-full bg-surface pl-4 pr-2 font-mono text-footnote shadow-float">
       <span className="text-ink-3">{prompt}</span>
       <span className="relative text-ink">
         <AnimatePresence>
@@ -236,7 +237,7 @@ export function CopyCommand({ command, prompt = '$' }: { command: string; prompt
         type="button"
         onClick={copy}
         aria-label={copied ? 'Copied' : 'Copy command'}
-        className="ring-focus relative flex size-8 items-center justify-center rounded-full text-ink-3 transition-colors duration-150 hover:bg-surface-2 hover:text-ink"
+        className="ring-focus relative ml-auto flex size-8 shrink-0 items-center justify-center rounded-full text-ink-3 transition-colors duration-150 hover:bg-surface-2 hover:text-ink"
       >
         <AnimatePresence initial={false} mode="popLayout">
           <motion.span
