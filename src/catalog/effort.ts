@@ -10,7 +10,8 @@ import { PRO_COMPONENTS } from './pro'
 export const DAYS: Record<string, number> = {
   // Components
   answer: 10,
-  diff: 15,
+  ask: 8,
+  activity: 7,
   trace: 12,
   approval: 8,
   rewrite: 8,
@@ -19,13 +20,13 @@ export const DAYS: Record<string, number> = {
   usage: 6,
   dates: 8,
   extract: 9,
+  lens: 5,
   flow: 15,
   kanban: 10,
   forecast: 7,
   video: 8,
   cropper: 8,
   tour: 8,
-  composer: 12,
   // Blocks
   'live-features': 8,
   pricing: 6,

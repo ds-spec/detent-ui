@@ -8,7 +8,8 @@ import { UNLISTED } from './unlisted'
 /** The free components that are Pro: the big stateful surfaces that take weeks to get right. */
 const PRO_CODE = [
   'answer',
-  'diff',
+  'ask',
+  'activity',
   'trace',
   'approval',
   'rewrite',
@@ -23,10 +24,9 @@ const PRO_CODE = [
   'video',
   'cropper',
   'tour',
-  'composer',
-  'time',
   'combobox',
   'trend',
+  'lens',
   'codeblock',
   'sidebar',
   'carousel',
@@ -47,8 +47,8 @@ export const isLockedSource = (slug: string, blocks: string[]) => isProComponent
 export const KITS: Record<string, { name: string; line: string; items: string[] }> = {
   'agent-kit': {
     name: 'Agent kit',
-    line: 'The free components for an agent product: the prompt box, the agents’ activity, the model picker, the file tree, the scaffold and the small pieces around them.',
-    items: ['scaffold', 'prompt', 'tree', 'activity', 'models', 'versions', 'context', 'run', 'thinking', 'typing', 'toasts'],
+    line: 'The free components for an agent product: the prompt box, diff review, the composer, the file tree, the scaffold and the small pieces around them.',
+    items: ['scaffold', 'prompt', 'tree', 'diff', 'versions', 'thinking', 'toasts', 'composer'],
   },
 }
 

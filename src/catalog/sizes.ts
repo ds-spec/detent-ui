@@ -6,6 +6,7 @@
 export const SIZE: Record<string, [number, number]> = {
   scaffold: [720, 328],
   answer: [720, 480],
+  ask: [640, 504],
   metric: [640, 552],
   trace: [602, 560],
   diff: [720, 600],
@@ -17,6 +18,7 @@ export const SIZE: Record<string, [number, number]> = {
   models: [340, 420],
   filter: [722, 550],
   chart: [560, 440],
+  lens: [640, 312],
   usage: [600, 500],
   extract: [902, 700],
   dates: [700, 452],

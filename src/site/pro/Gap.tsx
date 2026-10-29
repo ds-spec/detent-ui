@@ -48,12 +48,12 @@ const CASES: Case[] = [
     today: Confirm,
   },
   {
-    id: 'diff',
-    tab: 'Code changes',
-    pain: 'An agent’s edit arrives as a wall of unified diff. Accept all, or read three hundred lines of plus and minus.',
+    id: 'ask',
+    tab: 'Docs search',
+    pain: 'Search misses the question, and an Ask AI button opens a chatbot that answers with no sources. Readers never learn which page it came from.',
     tone: 'amber',
-    handled: ['Hunk-by-hunk verdicts', 'Lines stream in as they’re written', 'Unified slides into split'],
-    today: Patch,
+    handled: ['Keywords search, questions answer', 'Every claim names its page', 'Streams in without moving the list'],
+    today: Lookup,
   },
 ]
 
@@ -255,33 +255,20 @@ function Confirm() {
   )
 }
 
-function Patch() {
-  const lines = [
-    'diff --git a/src/billing/refund.ts b/src/billing/refund.ts',
-    '@@ -12,9 +12,14 @@ export async function refund(invoice: Invoice) {',
-    '   const paid = await getPayments(invoice.id)',
-    '-  if (paid.length === 0) return',
-    '-  const amount = paid[0].amount',
-    '+  if (paid.length === 0) {',
-    '+    throw new RefundError("nothing to refund")',
-    '+  }',
-    '+  const amount = paid.reduce((n, p) => n + p.amount, 0)',
-    '+  const prorated = prorate(amount, invoice.period)',
-    '   await stripe.refunds.create({',
-    '-    amount,',
-    '+    amount: prorated,',
-    '     payment_intent: paid[0].intent,',
-    '   })',
-    '@@ -40,6 +45,8 @@ export function prorate(amount: number, p: Period) {',
-    '+  if (p.kind === "annual") return amount * left(p)',
-  ]
+function Lookup() {
   return (
-    <div className={`w-[620px] ${MONO} whitespace-pre text-ink-2`}>
-      {lines.map((l, i) => (
-        <div key={i} className={l.startsWith('@@') || l.startsWith('diff') ? 'text-ink-3' : ''}>
-          {l}
-        </div>
-      ))}
+    <div className={`w-[520px] ${SYS}`}>
+      <div className="flex h-10 items-center gap-2 rounded-[8px] bg-surface px-3 text-[14px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line-strong)]">
+        how do I rotate an API key?
+        <span className="ml-auto rounded-[6px] bg-[#0a66ff] px-2.5 py-1 text-[12px] text-white">Ask AI</span>
+      </div>
+      <p className="mt-3 px-1 text-[13px] text-ink-3">No results for “how do I rotate an API key?”</p>
+      <div className="mt-6 rounded-[12px] bg-surface p-4 shadow-[0_12px_40px_rgb(0_0_0/0.14),0_0_0_1px_var(--line)]">
+        <p className="text-[12px] font-semibold text-ink">AI Assistant</p>
+        <p className="mt-2 text-[14px] leading-[1.55] text-ink-2">
+          To rotate an API key, go to your settings and generate a new key. Make sure to update your applications with the new key. Let me know if you have any other questions!
+        </p>
+      </div>
     </div>
   )
 }
