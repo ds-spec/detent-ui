@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { DEMOS } from '@/catalog/demos'
 import { PLANS, installCommand, isProComponent } from '@/catalog/pro'
-import { ArrowRight, ArrowUpRight, Code, Mic, Note, Prompt } from '@/lab/icons'
+import { ArrowRight, ArrowUpRight, Chart, Note, Play, Prompt } from '@/lab/icons'
 import { Fit } from '@/site/Fit'
 import { CopyCommand } from '@/site/parts'
 import { BRIDGE, CARDS, GRAIN, LAYER, useWide } from './lights'
@@ -29,7 +29,7 @@ const OPEN = { type: 'spring', stiffness: 280, damping: 34 } as const
 const DWELL = 6500
 /** The radius of the curves that join the bridge to the sheets. */
 const JOIN = 22
-const ICON: Record<string, ReactNode> = { prompt: <Prompt size={15} />, activity: <Note size={15} />, diff: <Code size={15} />, voice: <Mic size={15} /> }
+const ICON: Record<string, ReactNode> = { prompt: <Prompt size={15} />, activity: <Note size={15} />, voicenote: <Play size={15} />, metric: <Chart size={15} /> }
 
 export function HomeHero({ lib }: { lib: LibItem[] }) {
   const [open, setOpen] = useState(CARDS[0].id)
