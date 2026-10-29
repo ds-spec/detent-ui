@@ -529,6 +529,9 @@ export const BLOCKS: Block[] = [
       'Teammates already in your GitHub organization are suggested, each with their orb; one press adds them, one more sends the invites.',
       'Templates show which of their tools you’ve connected and fade the ones you haven’t, so the right first agent is obvious.',
       'The new agent does its first job in front of you, step by step, before you hand it anything real.',
+      'One question at a time, set in the middle of the page in two tones, with its answer and the way on right under it; four segments at the top fill as steps finish.',
+      'Beside the steps, the workspace is a real window that comes alive: tools land in its sidebar, people join, the agent appears, and its activity says what you did, ending with the first run, live.',
+      'Below 1024px the window folds away and the first run plays beside the question instead.',
 
     ],
     props: [
