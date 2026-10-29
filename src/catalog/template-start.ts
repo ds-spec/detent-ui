@@ -29,12 +29,11 @@ model: anthropic('claude-sonnet-5-5'), // was ${was}`
 
 export const START: Record<string, Step[]> = {
   rapport: [
-    { title: 'Install it', line: 'Rapport lands in components/detent/templates/rapport, with every piece it’s built from and the packages it needs.', code: 'npx shadcn add @detent-pro/template-rapport' },
-    { title: 'Give it a page', line: 'It fills whatever holds it, so give it the whole screen.', file: 'app/page.tsx', code: page('RapportApp', 'rapport/App') },
-    { title: 'Turn on Ask Rapport', line: 'One line puts its AI SDK route where the app calls it. It answers from a script until you give it a model, so it runs with no key.', file: 'app/api/rapport/route.ts', code: "export { POST } from '@/components/detent/templates/rapport/ai/route'\n" },
+    { title: 'Install it', line: 'Rapport lands as real pages in app/crm: today’s brief, the inbox, tasks, the pipeline, companies, people, reports, Ask Rapport and settings, a page for every deal, company and person, with a loading and an error state, and its AI route at app/api/rapport. The app they share goes in components/detent/templates/rapport.', code: 'npx shadcn add @detent-pro/template-rapport' },
+    { title: 'Open it', line: 'Run your app and go to /crm. Every page and record has its own URL, so links, refresh and the back button work. It answers from a script until you give it a model, so it runs with no key.' },
+    { title: 'Make it your product', line: 'The name and domain are written into every screen from one file: the sidebar, the brief, Ask, deal pages, the inbox and settings. Colours and type come from your shadcn theme.', file: 'components/detent/templates/rapport/config.ts', code: "export const BRAND = {\n  name: 'Acme',\n  domain: 'acme.com',\n}" },
+    { title: 'Put in your data', line: 'The layout reads your deals and tasks on the server and hands them to every page; what people change in a session is applied on top. Swap each function’s body for your database. Ask Rapport’s tools read the same data in ai/tools.ts.', file: 'components/detent/templates/rapport/db.ts', code: 'export async function getDeals(): Promise<Deal[]> {\n  return db.select().from(deals) // was the demo data\n}' },
     { title: 'Give it a real model', line: 'Swap the script for any AI SDK model: here, npm i @ai-sdk/anthropic and ANTHROPIC_API_KEY in .env.local. The tools stay as they are, and approvals still wait for a person.', file: 'components/detent/templates/rapport/ai/route.ts', code: model('scripted(deals, probs, policy)') },
-    { title: 'Put in your data', line: 'Deals, people, companies, tasks and the inbox are plain arrays in rapport/data.ts. Read yours from your database in the same shape, and the tools in ai/tools.ts answer from them.' },
-    { title: 'Make it your product', line: 'Colours and type come from your shadcn theme already. The name is written into the screens, so search the rapport folder for “Rapport” and put yours.' },
   ],
   tandem: [
     { title: 'Install it', line: 'Tandem lands as real pages in app/dashboard: the overview, revenue, customers and each customer, invoices, Ask Tandem, agents, settings and sign-in, with a loading and an error state, and its AI route at app/api/tandem. The app they share goes in components/detent/templates/tandem.', code: 'npx shadcn add @detent-pro/template-tandem' },
