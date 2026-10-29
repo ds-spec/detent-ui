@@ -3,15 +3,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import dynamic from 'next/dynamic'
-import { useRouter } from 'next/navigation'
 import { MotionGlobalConfig } from 'motion/react'
-import { CATEGORIES, ENTRIES } from '@/catalog/meta'
-import { isProComponent } from '@/catalog/pro'
-import type { Command } from '@/lab/components/command/CommandMenu'
-import { CategoryIcon } from './icons'
 
-// The palette is only fetched the first time someone asks for it.
-const CommandMenu = dynamic(() => import('@/lab/components/command/CommandMenu').then((m) => m.CommandMenu), { ssr: false })
+// The palette, and the catalogue it lists, are only fetched the first time someone asks for search.
+const Search = dynamic(() => import('./Search').then((m) => m.Search), { ssr: false })
 
 type Site = {
   openSearch: () => void
@@ -25,7 +20,6 @@ const SiteContext = createContext<Site | null>(null)
 export const useSite = () => useContext(SiteContext)!
 
 export function Providers({ children }: { children: ReactNode }) {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [loaded, setLoaded] = useState(false)
   const [sound, setSound] = useState(false)
@@ -39,6 +33,26 @@ export function Providers({ children }: { children: ReactNode }) {
     } catch {
       /* storage unavailable */
     }
+  }, [])
+
+  // Fetch the palette as soon as someone shows they might want it: a pointer or focus on a search
+  // button, or ⌘/Ctrl held down. Never on load, so its catalogue stays off ordinary page loads.
+  useEffect(() => {
+    const warm = () => {
+      void import('./Search')
+      off()
+    }
+    const near = (e: Event) => (e.target as Element | null)?.closest?.('[data-search]') && warm()
+    const held = (e: KeyboardEvent) => (e.key === 'Meta' || e.key === 'Control') && warm()
+    const off = () => {
+      document.removeEventListener('pointerover', near)
+      document.removeEventListener('focusin', near)
+      window.removeEventListener('keydown', held)
+    }
+    document.addEventListener('pointerover', near)
+    document.addEventListener('focusin', near)
+    window.addEventListener('keydown', held)
+    return off
   }, [])
 
   const openSearch = useCallback(() => {
@@ -99,40 +113,12 @@ export function Providers({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('detent:tap', on)
   }, [sound, tick])
 
-  const commands = useMemo<Command[]>(() => {
-    const go = (href: string) => () => router.push(href)
-    return [
-      { id: 'home', label: 'Home', group: 'Site', hint: 'Page', onSelect: go('/') },
-      { id: 'all', label: 'All components', group: 'Site', hint: 'Page', onSelect: go('/components') },
-      { id: 'system', label: 'System', group: 'Site', hint: 'Page', keywords: 'type materials motion shape tokens', onSelect: go('/system') },
-      ...ENTRIES.map((e) => {
-        const c = CATEGORIES.find((x) => x.id === e.category)!
-        return { id: e.id, label: e.name, group: c.name, icon: <CategoryIcon name={c.icon} size={15} />, hint: isProComponent(e.id) ? 'Pro' : e.tags?.includes('New') ? 'New' : undefined, keywords: `${c.name} ${e.line}`, onSelect: go(`/components/${e.id}`) }
-      }),
-      {
-        id: 'theme',
-        label: 'Switch theme',
-        group: 'Settings',
-        onSelect: () => {
-          const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'
-          document.documentElement.dataset.theme = next
-          try {
-            localStorage.setItem('theme', next)
-          } catch {
-            /* storage unavailable */
-          }
-        },
-      },
-      { id: 'sound', label: sound ? 'Turn sound off' : 'Turn sound on', group: 'Settings', onSelect: toggleSound },
-    ]
-  }, [router, sound, toggleSound])
-
   const value = useMemo(() => ({ openSearch, sound, toggleSound, tick }), [openSearch, sound, toggleSound, tick])
 
   return (
     <SiteContext.Provider value={value}>
       {children}
-      {loaded && <CommandMenu open={open} onOpenChange={setOpen} commands={commands} placeholder="Search components…" />}
+      {loaded && <Search open={open} onOpenChange={setOpen} sound={sound} toggleSound={toggleSound} />}
     </SiteContext.Provider>
   )
 }

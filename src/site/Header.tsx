@@ -81,6 +81,7 @@ export function Header() {
           <button
             type="button"
             onClick={openSearch}
+            data-search
             aria-label="Search components (⌘K)"
             title="Search  ⌘K"
             className="ring-focus grid size-9 place-items-center rounded-full text-ink-2 transition-[background-color,box-shadow,color] duration-300 hover:text-ink"

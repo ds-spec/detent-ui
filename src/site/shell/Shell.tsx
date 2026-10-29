@@ -53,7 +53,7 @@ export function Shell({ list, bar, children }: { list: ReactNode; bar: ReactNode
             <span className="text-[15px] font-medium tracking-[-0.02em] text-ink">Detent</span>
           </Link>
           <span className="flex-1" />
-          <button type="button" onClick={openSearch} aria-label="Search (⌘K)" title="Search  ⌘K" className="ring-focus grid size-8 place-items-center rounded-[8px] text-ink-3 transition-colors hover:bg-[var(--shell-hover)] hover:text-ink">
+          <button type="button" onClick={openSearch} data-search aria-label="Search (⌘K)" title="Search  ⌘K" className="ring-focus grid size-8 place-items-center rounded-[8px] text-ink-3 transition-colors hover:bg-[var(--shell-hover)] hover:text-ink">
             <Search size={15} />
           </button>
         </div>

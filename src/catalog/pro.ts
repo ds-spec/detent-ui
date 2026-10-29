@@ -52,14 +52,7 @@ export const KITS: Record<string, { name: string; line: string; items: string[] 
   },
 }
 
-/**
- * Where the site lives, for install commands that work with no setup. Set NEXT_PUBLIC_SITE_URL
- * to the real domain before launch; in development it's the local server.
- */
-export const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.NODE_ENV === 'development' ? 'http://localhost:5300' : 'https://detentui.com')).replace(/\/$/, '')
-
-/** The command that installs something: from the public registry when it's free, the private one when it's Pro. */
-export const installCommand = (id: string, free: boolean) => (free ? `npx shadcn add ${SITE}/r/${id}` : `npx shadcn add @detent-pro/${id}`)
+export { SITE, installCommand } from './site'
 
 /**
  * Where each plan is bought. Set these to your store's checkout links (Lemon Squeezy, Polar,

@@ -7,7 +7,7 @@ import { Check, Copy, Moon, Search, Sun } from '@/lab/icons'
 import { ease, press } from '@/lab/lib/motion'
 import { useTheme } from '@/lab/lib/hooks'
 import { Kbd } from '@/lab/ui/Kbd'
-import { installCommand } from '@/catalog/pro'
+import { installCommand } from '@/catalog/site'
 import { useSite } from './Providers'
 
 // The load click plays once a visit, not every time a page mounts the header.
@@ -72,6 +72,7 @@ export function SearchButton() {
       type="button"
       whileTap={press}
       onClick={openSearch}
+      data-search
       aria-label="Search components"
       className="ring-focus flex h-8 items-center gap-2 rounded-full bg-surface pl-3 pr-1.5 text-footnote text-ink-3 shadow-border transition-[color,box-shadow] duration-150 hover:text-ink-2 hover:shadow-[var(--elev-raised-hover)] max-xl:size-8 max-xl:justify-center max-xl:p-0 xl:w-[200px]"
     >

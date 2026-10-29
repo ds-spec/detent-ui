@@ -301,6 +301,7 @@ export function SearchPill() {
     <button
       type="button"
       onClick={openSearch}
+      data-search
       className="ring-focus flex h-11 items-center gap-2.5 rounded-full bg-surface pl-4 pr-2 text-callout font-medium text-ink shadow-raised transition-shadow duration-150 hover:shadow-[var(--elev-raised-hover)] max-sm:pr-5"
     >
       <Search size={15} className="text-ink-3" />

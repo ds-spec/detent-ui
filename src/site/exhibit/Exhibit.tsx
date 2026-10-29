@@ -16,6 +16,7 @@ import { ModelAnnotated } from '../annotated/ModelAnnotated'
 import { Code } from '../browser/Code'
 import { InspectLayer } from '../browser/Inspect'
 import { Fit } from '../Fit'
+import { useNear } from '../near'
 import { Footer } from '../Footer'
 import { Header } from '../Header'
 import { Install } from '../parts'
@@ -368,6 +369,9 @@ function Neighbour({ e, dir, onGo }: { e: (typeof ENTRIES)[number]; dir: 'prev' 
   const back = dir === 'prev'
   const family = CATEGORIES.find((c) => c.id === e.category)!
   const Demo = DEMOS[e.id]
+  // It sits at the foot of the page, so it only runs once it's scrolled near.
+  const well = useRef<HTMLSpanElement | null>(null)
+  const near = useNear(well)
   return (
     // A link-role div, not a button: the live demo inside has buttons of its own, and a button can't hold one.
     <div
@@ -377,8 +381,8 @@ function Neighbour({ e, dir, onGo }: { e: (typeof ENTRIES)[number]; dir: 'prev' 
       onKeyDown={(k) => k.key === 'Enter' && onGo()}
       className={`ring-focus group/n flex cursor-pointer items-center gap-4 rounded-[26px] bg-surface p-2 text-left shadow-[var(--card-edge)] transition-shadow duration-300 hover:shadow-[var(--card-lift)] max-sm:p-4 ${back ? 'pr-5' : 'flex-row-reverse pl-5 text-right'}`}
     >
-      <span aria-hidden inert className="pointer-events-none relative hidden h-28 w-40 shrink-0 overflow-hidden rounded-[20px] shadow-[inset_0_0_0_1px_var(--line)] sm:block lg:w-48" style={{ background: wellOf(FAMILY_TONE[family.id] ?? 'blue') }}>
-        {Demo ? (
+      <span ref={well} aria-hidden inert className="pointer-events-none relative hidden h-28 w-40 shrink-0 overflow-hidden rounded-[20px] shadow-[inset_0_0_0_1px_var(--line)] sm:block lg:w-48" style={{ background: wellOf(FAMILY_TONE[family.id] ?? 'blue') }}>
+        {Demo && near ? (
           <Fit pad={10} max={0.42} min={0.18}>
             <Demo />
           </Fit>

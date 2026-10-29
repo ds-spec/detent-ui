@@ -166,14 +166,19 @@ function Plates({ onOpen, className = '' }: { onOpen?: (id: string) => void; cla
 function Plate({ c, on, mounted, wide, onAim, onPick }: { c: Card; on: boolean; mounted: boolean; wide: boolean; onAim: () => void; onPick: () => void }) {
   const reduce = useReducedMotion()
   const Demo = DEMOS[c.id]
-  const layer: CSSProperties = wide ? { width: LAYER, left: '50%', marginLeft: -LAYER / 2 } : { width: '100%', left: 0 }
+  // The colour layer is fixed-width on a laptop so nothing repaints as a plate opens; full width on a phone. Set in CSS, so the server's HTML already matches the screen.
+  const layer = 'left-0 w-full lg:left-1/2 lg:w-[var(--layer)] lg:ml-[calc(var(--layer)/-2)]'
+  const layerVar = { '--layer': `${LAYER}px` } as CSSProperties
 
   return (
+    // On a phone the plates stack and their height comes from CSS, so the server's HTML is already
+    // the right size at any width and nothing below moves once the page wakes up. On a laptop they
+    // share the row, and Motion springs their widths.
     <motion.div
-      className="relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-[24px] p-1.5"
+      className={`relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-[24px] p-1.5 max-lg:!grow-0 max-lg:!basis-auto max-lg:transition-[height] max-lg:duration-500 max-lg:[transition-timing-function:cubic-bezier(0.2,0,0,1)] motion-reduce:transition-none ${on ? 'max-lg:h-[520px]' : 'max-lg:h-[168px]'}`}
       style={{ background: 'var(--mount)', boxShadow: 'inset 0 0 0 1px var(--line)', contain: 'layout paint' }}
       initial={false}
-      animate={wide ? { flexGrow: on ? 2.8 : 1, flexBasis: '0px', height: 'auto' } : { flexGrow: 0, flexBasis: 'auto', height: on ? 520 : 168 }}
+      animate={wide ? { flexGrow: on ? 2.8 : 1, flexBasis: '0px' } : { flexGrow: 0, flexBasis: 'auto' }}
       transition={reduce ? { duration: 0 } : OPEN}
       onPointerEnter={onAim}
     >
@@ -188,7 +193,7 @@ function Plate({ c, on, mounted, wide, onAim, onPick }: { c: Card; on: boolean; 
 
       {/* The window of colour, set into the mount behind a thin bezel. */}
       <div className="relative isolate min-h-0 flex-1 overflow-hidden rounded-[19px]" style={{ boxShadow: '0 0 0 4px var(--bezel), 0 0 0 5px var(--line)' }}>
-        <div aria-hidden className="pointer-events-none absolute inset-y-0 -z-10" style={{ ...layer, background: c.paint }}>
+        <div aria-hidden className={`pointer-events-none absolute inset-y-0 -z-10 ${layer}`} style={{ ...layerVar, background: c.paint }}>
           <div className={`absolute -inset-[20%] ${on && !reduce ? 'plates-drift' : ''}`} style={{ background: `radial-gradient(32% 26% at 64% 30%, ${c.sheen}, transparent 70%)`, opacity: on ? 0.55 : 0.3, transition: 'opacity 600ms cubic-bezier(0.2,0,0,1)' }} />
           <div className="plates-grain absolute inset-0" />
         </div>
@@ -208,8 +213,8 @@ function Plate({ c, on, mounted, wide, onAim, onPick }: { c: Card; on: boolean; 
         {mounted && (
           <motion.div
             data-theme="light"
-            className="absolute bottom-12 top-3"
-            style={{ ...layer, width: wide ? LAYER : '100%', contentVisibility: on ? 'visible' : 'hidden', background: 'transparent', contain: 'strict' }}
+            className={`absolute bottom-12 top-3 ${layer}`}
+            style={{ ...layerVar, contentVisibility: on ? 'visible' : 'hidden', background: 'transparent', contain: 'strict' }}
             inert={!on}
             initial={false}
             animate={on ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
