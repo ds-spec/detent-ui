@@ -19,7 +19,8 @@ import { Code } from '../browser/Code'
 import { Modes, Tool } from '../exhibit/Exhibit'
 import { Install } from '../parts'
 import { PropRows, PropsSection } from '../PropsTable'
-import { ProTag } from './ProTag'
+import { isProBlock } from '@/catalog/pro'
+import { FreeTag, ProTag } from './ProTag'
 import { Rail } from '../exhibit/Rail'
 import { Shell, Trail } from '../shell/Shell'
 import type { RailGroup } from '../exhibit/Rail'
@@ -39,7 +40,7 @@ const first = (s: string) => s.split(/(?<=\.)\s/)[0]
 
 /** Every block for the list down the side, kind by kind. */
 const KIND_LOOK = { app: { icon: <Layers size={12} />, color: 'var(--data)' }, flow: { icon: <Node size={12} />, color: 'var(--agents)' }, section: { icon: <Note size={12} />, color: 'var(--marketing)' } } as const
-const RAIL: RailGroup[] = BLOCK_GROUPS.filter((g) => g.items.length).map((g) => ({ id: g.k, name: `${KINDS[g.k]}s`, ...KIND_LOOK[g.k], items: g.items.map((b) => ({ id: b.id, name: b.name, line: b.short })) }))
+const RAIL: RailGroup[] = BLOCK_GROUPS.filter((g) => g.items.length).map((g) => ({ id: g.k, name: `${KINDS[g.k]}s`, ...KIND_LOOK[g.k], items: g.items.map((b) => ({ id: b.id, name: b.name, line: b.short, pro: isProBlock(b.id), free: !isProBlock(b.id) })) }))
 
 /**
  * A block on its desk. The frame is the block's container, and the block sizes itself by it,
@@ -87,7 +88,7 @@ export function BlockViewer({ id }: { id: string }) {
       <header className="pt-8 sm:pt-10">
         <div className="flex flex-wrap items-center gap-2.5">
           <span className="text-[13px] text-ink-2">{KINDS[b.kind]}</span>
-          <ProTag />
+          {isProBlock(b.id) ? <ProTag /> : <FreeTag />}
           <span className="lg:hidden">
             <Switcher current={b.id} prev={prev} next={next} />
           </span>
@@ -98,7 +99,7 @@ export function BlockViewer({ id }: { id: string }) {
             <span className="block text-quiet">{b.short}</span>
           </h1>
           <div className="w-full shrink-0 sm:w-[400px] lg:w-[460px]">
-            <Install id={b.id} free={false} />
+            <Install id={b.id} free={!isProBlock(b.id)} />
           </div>
         </div>
       </header>
@@ -107,7 +108,7 @@ export function BlockViewer({ id }: { id: string }) {
       <div className="relative mt-8">
         <div className="mb-3 flex items-center justify-between">
           <span className="flex rounded-full bg-surface-2 p-1">
-            <Modes mode={mode} setMode={setMode} pro />
+            <Modes mode={mode} setMode={setMode} pro={isProBlock(b.id)} />
           </span>
           <span className="flex items-center gap-0.5">
             <Tool label="Replay" onClick={() => setRun((r) => r + 1)}>
@@ -351,7 +352,12 @@ const LINKED: Record<string, Record<string, string>> = {
 }
 
 /** The block itself, kept out of the viewer's renders: dragging the frame only resizes its box. */
-const Live = memo(function Live({ id }: { id: string })
+const Live = memo(function Live({ id }: { id: string }) {
+  const router = useRouter()
+  const View = BLOCK_VIEWS[id] as ComponentType<{ onNavigate?: (page: string) => void }>
+  const links = LINKED[id]
+  return links ? <View onNavigate={(page) => links[page] && router.push(`/blocks/${links[page]}`, { scroll: false })} /> : <View />
+})
 
 /**
  * The desk: a backdrop, a ruler, and whatever it shows in a window you can resize, from a phone's

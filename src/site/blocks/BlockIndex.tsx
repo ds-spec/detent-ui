@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
 import { ArrowRight } from '@/lab/icons'
 import { BLOCK_GROUPS, BLOCK_ORDER, KINDS } from '@/catalog/blocks'
+import { isProBlock } from '@/catalog/pro'
 import type { Block } from '@/catalog/blocks'
 import { BLOCK_VIEWS } from '@pro'
 import { watchLine } from '../line'
@@ -19,7 +20,7 @@ import { Backdrop, Window } from './Studio'
  * them in its own window, at the size the window gives it. Nothing changes until you scroll or
  * press a name; the scroll has detents, so each name settles on the line. Press it again, or its
  * Open, to go to its page; what's running is named above the window, so the way in is always in
- * view. Every block is Pro. Below 1024px each name carries its block underneath it instead.
+ * view. All but three blocks are Pro. Below 1024px each name carries its block underneath it instead.
  */
 
 const GROUPS = BLOCK_GROUPS
@@ -161,7 +162,11 @@ function Caption({ b }: { b: Block }) {
           <motion.div key={b.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.2 }}>
             <p className="flex items-center gap-2 text-callout font-medium text-ink">
               {b.name}
-              <span className="rounded-full bg-ink px-1.5 text-[10.5px] font-semibold leading-[17px] text-surface">Pro</span>
+              {isProBlock(b.id) ? (
+                <span className="rounded-full bg-ink px-1.5 text-[10.5px] font-semibold leading-[17px] text-surface">Pro</span>
+              ) : (
+                <span className="rounded-full px-1.5 text-[10.5px] font-semibold leading-[17px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line-strong)]">Free</span>
+              )}
               <span className="text-caption font-normal text-ink-3">{KINDS[b.kind]}</span>
             </p>
             <p className="mt-0.5 truncate text-footnote text-ink-3">{first(b.line)}</p>

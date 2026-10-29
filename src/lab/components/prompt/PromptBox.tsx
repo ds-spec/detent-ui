@@ -39,10 +39,14 @@ const LIFT = 'shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_40px_-18px_rgba(0,0,0,0.
 const CARD = 'bg-surface dark:bg-[#161618]'
 const LINE = 23
 const MAX_LINES = 6
-/** Height of the box at rest: the lit edge, the label, two lines for the words, and the keys. The component reserves exactly this. */
+/** Height of the box at rest: the lit edge, the mono line, two lines for the words, and the keys. The component reserves exactly this. */
 const BASE = 1 + 14 + 16 + 12 + LINE * 2 + 12 + 32 + 14 + 1
+/** The same box with no label or model, so no mono line across its top. */
+const BARE = BASE - 16 - 12
 /** The height a PromptBox takes at rest, for a host that reserves its room. */
 export const PROMPT_H = BASE
+/** The height at rest of a PromptBox given no label or model. */
+export const PROMPT_H_BARE = BARE
 const ROW = 48
 const sizeOf = (b: number) => (b < 1024 ? `${b} B` : b < 1024 ** 2 ? `${Math.round(b / 1024)} KB` : `${(b / 1024 ** 2).toFixed(1)} MB`)
 const fromFile = (f: File): Attachment => ({
@@ -55,9 +59,10 @@ const fromFile = (f: File): Attachment => ({
 })
 
 /**
- * A prompt box for AI products. One card whose edge catches light from the top left. A small mono line
- * across its top says what the message goes with: the files attached, each removable, or while it
- * answers, what it's doing and for how long; the model sits at its right with its mark. The placeholder
+ * A prompt box for AI products. One card whose edge catches light from the top left. Given a label or a
+ * model, a small mono line across its top says what the message goes with, or while it answers, what
+ * it's doing and for how long; the model sits at its right with its mark. Given neither, there's no
+ * line, and the words start at the top. The placeholder
  * is a two-tone sentence. Under the words, a row of keys: attach, mention, how hard it thinks (a ramp of
  * dots lit up to the level, which opens the modes), and Send, an ink key in the same set that turns to
  * Stop while it answers.
@@ -141,7 +146,10 @@ export function PromptBox({
   const reduce = useReducedMotion()
 
   // The box follows its content's height and grows upward, because it hangs from the bottom of a fixed footprint.
-  const h = useMotionValue(BASE)
+  // The mono line only shows when it has something to say at rest; without it the box sits shorter.
+  const head = !!(label || model)
+  const base = head ? BASE : BARE
+  const h = useMotionValue(base)
   const grew = useRef(onGrow)
   useLayoutEffect(() => {
     grew.current = onGrow
@@ -151,18 +159,18 @@ export function PromptBox({
     if (!el) return
     let placed = false
     const ro = new ResizeObserver(() => {
-      const next = Math.max(BASE, el.offsetHeight + 2)
+      const next = Math.max(base, el.offsetHeight + 2)
       if (!placed || reduce) h.set(next)
       else animate(h, next, spring.smooth)
       placed = true
     })
     ro.observe(el)
-    const off = h.on('change', (v) => grew.current?.(v - BASE))
+    const off = h.on('change', (v) => grew.current?.(v - base))
     return () => {
       ro.disconnect()
       off()
     }
-  }, [h, reduce])
+  }, [h, reduce, base])
   const menuBottom = useTransform(h, (v) => v + 8)
 
   // Grow the textarea with its text, from two lines up to six; past that it scrolls.
@@ -243,7 +251,7 @@ export function PromptBox({
   const current = modes.find((m) => m.id === mode) ?? modes[0]
 
   return (
-    <div ref={setLayer} className="relative" style={{ width, maxWidth: '100%', height: BASE }}>
+    <div ref={setLayer} className="relative" style={{ width, maxWidth: '100%', height: base }}>
       {/* The card, hung from the bottom of the footprint: it grows upward. Its edge catches light from the top left. */}
       <motion.div
         className={`${LIT} ${LIFT} absolute inset-x-0 top-full -translate-y-full rounded-[22px] p-px`}
@@ -268,6 +276,7 @@ export function PromptBox({
         <div className={`${CARD} relative h-full overflow-hidden rounded-[21px] transition-shadow duration-200`} style={{ boxShadow: focused ? 'inset 0 0 0 1px var(--line-strong)' : undefined }}>
           <div ref={content} className="absolute inset-x-0 bottom-0 px-4 pb-3.5 pt-3.5">
             {/* The line across the top: what goes with the message, or what it's doing; the model on the right. */}
+            {head && (
             <div className={`${MONO} flex h-4 items-center gap-3 text-ink-3`}>
               <div className="relative flex h-full min-w-0 flex-1 items-center">
                 <AnimatePresence initial={false} mode="popLayout">
@@ -295,11 +304,13 @@ export function PromptBox({
               )}
             </div>
 
+            )}
+
             {/* Files: a row of cards above the words; many scroll sideways inside the card. */}
             <AnimatePresence initial={false}>
               {files.length > 0 && (
-                <motion.div key="files" className="overflow-hidden" initial={{ height: 0, opacity: 0 }} animate={{ height: 56, opacity: 1 }} exit={{ height: 0, opacity: 0, transition: { duration: 0.18, ease: ease.out } }} transition={spring.smooth}>
-                  <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pt-3 [scrollbar-width:none]" style={files.length > 2 ? { maskImage: 'linear-gradient(90deg, #000 calc(100% - 28px), transparent)' } : undefined}>
+                <motion.div key="files" className="overflow-hidden" initial={{ height: 0, opacity: 0 }} animate={{ height: head ? 56 : 44, opacity: 1 }} exit={{ height: 0, opacity: 0, transition: { duration: 0.18, ease: ease.out } }} transition={spring.smooth}>
+                  <div className={`-mx-1 flex gap-2 overflow-x-auto px-1 [scrollbar-width:none] ${head ? 'pt-3' : ''}`} style={files.length > 2 ? { maskImage: 'linear-gradient(90deg, #000 calc(100% - 28px), transparent)' } : undefined}>
                     <AnimatePresence initial={false} mode="popLayout">
                       {files.map((f, i) => (
                         <File key={f.id} file={f} index={i} onRemove={() => remove(f.id)} />
@@ -311,7 +322,7 @@ export function PromptBox({
             </AnimatePresence>
 
             {/* The words. */}
-            <div className="relative mt-3">
+            <div className={`relative ${head || files.length ? 'mt-3' : ''}`}>
               {/* The placeholder's slot: a two-tone sentence, or suggestions rolling through it like an odometer. */}
               <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 overflow-hidden" style={{ height: LINE }}>
                 <AnimatePresence initial={false}>

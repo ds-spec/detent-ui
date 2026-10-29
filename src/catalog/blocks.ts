@@ -1,6 +1,6 @@
 /**
- * Pro blocks: whole screens built from Detent components, playing live. Plain data, safe for
- * the server; the blocks themselves are looked up by id in src/pro/blocks/registry, via `@pro`.
+ * Blocks: whole screens built from Detent components, playing live. Plain data, safe for the
+ * server; the blocks themselves are looked up by id through `@pro`. Which are free is FREE_BLOCKS in pro.ts.
  */
 import { BLOCK_IDS } from './block-ids'
 import type { BlockId } from './block-ids'
@@ -532,7 +532,6 @@ export const BLOCKS: Block[] = [
       'One question at a time, set in the middle of the page in two tones, with its answer and the way on right under it; four segments at the top fill as steps finish.',
       'Beside the steps, the workspace is a real window that comes alive: tools land in its sidebar, people join, the agent appears, and its activity says what you did, ending with the first run, live.',
       'Below 1024px the window folds away and the first run plays beside the question instead.',
-
     ],
     props: [
       { ...product, note: 'The product being set up.' },

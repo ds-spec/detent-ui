@@ -14,14 +14,14 @@ export const metadata: Metadata = page({
 
 const long = (d: string) => new Date(`${d}T00:00:00`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
 const day = (d: string) => new Date(`${d}T00:00:00`).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+const slug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 
 /** What shipped, by day: each day's date stays beside its releases while you read them. */
 export default function Changelog() {
   const days = [...new Set(RELEASES.map((r) => r.date))]
-  // The list down the side: each day that shipped, by year, newest first.
-  const years = [...new Set(days.map((d) => d.slice(0, 4)))]
-  const rail: RailGroup[] = years.map((y) => ({ id: y, name: y, items: days.filter((d) => d.startsWith(y)).map((d) => ({ id: d, name: day(d) })) }))
-  const links = Object.fromEntries(days.map((d) => [d, `#d-${d}`]))
+  // The list down the side: each release by name, under the day it shipped, newest first.
+  const rail: RailGroup[] = days.map((d) => ({ id: d, name: day(d), items: RELEASES.filter((r) => r.date === d).map((r) => ({ id: slug(r.title), name: r.name })) }))
+  const links = Object.fromEntries(RELEASES.map((r) => [slug(r.title), `#${slug(r.title)}`]))
   return (
     <LinkShell label="Changelog" groups={rail} links={links} trail={['Changelog']}>
       <main className="mx-auto max-w-[1280px] px-4 pb-16 sm:px-8">
@@ -34,7 +34,7 @@ export default function Changelog() {
         </section>
         <div className="mt-16">
           {days.map((d) => (
-            <section key={d} id={`d-${d}`} aria-label={long(d)} className="grid scroll-mt-24 gap-4 py-12 shadow-[inset_0_1px_0_var(--line)] lg:grid-cols-[220px_minmax(0,760px)] lg:gap-20">
+            <section key={d} aria-label={long(d)} className="grid scroll-mt-24 gap-4 py-12 shadow-[inset_0_1px_0_var(--line)] lg:grid-cols-[220px_minmax(0,760px)] lg:gap-20">
               <div>
                 <time dateTime={d} className="sticky top-24 block text-footnote font-medium text-ink-3">
                   {long(d)}
@@ -42,7 +42,7 @@ export default function Changelog() {
               </div>
               <div className="flex flex-col gap-12">
                 {RELEASES.filter((r) => r.date === d).map((r) => (
-                  <article key={r.title}>
+                  <article key={r.title} id={slug(r.title)} className="scroll-mt-24">
                     <h2 className="text-title text-ink">{r.title}</h2>
                     <p className="mt-2 max-w-[620px] text-body text-ink-3">{r.line}</p>
                     <ul className="mt-5 flex flex-wrap gap-2">

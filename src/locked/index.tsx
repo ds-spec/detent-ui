@@ -4,10 +4,11 @@ import type { ComponentType } from 'react'
 import { BLOCKS } from '@/catalog/blocks'
 import { PRO_COMPONENTS } from '@/catalog/pro'
 import { TEMPLATES } from '@/catalog/templates'
+import { FREE_BLOCK_VIEWS } from '@/lab/blocks/registry'
 
 /*
  * What `@pro` resolves to when Detent Pro isn't checked out at src/pro. Every Pro component,
- * block and template is here under its own id, each standing in as a quiet note, so the site
+ * block and template is here under its own id, the free blocks as themselves and the rest each standing in as a quiet note, so the site
  * builds and every page renders from the public source alone. Same exports as src/pro/index.ts.
  */
 
@@ -28,7 +29,8 @@ export const PRO_DEMOS: Record<string, ComponentType> = each(PRO_COMPONENTS, Loc
 /** No spotlights: the gallery falls back to each component's demo, which is locked. */
 export const SPOTS: Record<string, ComponentType> = {}
 
-export const BLOCK_VIEWS: Record<string, ComponentType<{ autoplay?: boolean }>> = each(BLOCKS.map((b) => b.id), Locked)
+/** The free blocks are public source, so they play here too. */
+export const BLOCK_VIEWS: Record<string, ComponentType<{ autoplay?: boolean }>> = { ...each(BLOCKS.map((b) => b.id), Locked), ...FREE_BLOCK_VIEWS }
 
 export const TEMPLATE_VIEWS: Record<string, ComponentType> = each(TEMPLATES.map((t) => t.id), Locked)
 

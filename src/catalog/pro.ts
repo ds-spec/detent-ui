@@ -45,11 +45,15 @@ export const PRO_COMPONENTS = PRO_CODE.filter((id) => !UNLISTED.has(id))
 
 export const isProComponent = (id: string) => PRO_CODE.includes(id)
 
-/** Every block is Pro: whole screens are what the licence buys. The free tier is components. */
-export const PRO_BLOCK_COUNT = BLOCK_IDS.length
+/** The blocks anyone can install: sections every library gives away, so the free tier has whole screens to try. The rest are what the licence buys. */
+export const FREE_BLOCKS: string[] = ['faq', 'testimonials', 'sign-in']
 
-/** Anything whose source is Pro: a Pro component, any block, any template. */
-export const isLockedSource = (slug: string, blocks: string[]) => isProComponent(slug) || blocks.includes(slug) || slug.startsWith('template-')
+export const isProBlock = (id: string) => (BLOCK_IDS as readonly string[]).includes(id) && !FREE_BLOCKS.includes(id)
+
+export const PRO_BLOCK_COUNT = BLOCK_IDS.length - FREE_BLOCKS.length
+
+/** Anything whose source is Pro: a Pro component, a Pro block, any template. */
+export const isLockedSource = (slug: string, blocks: string[]) => isProComponent(slug) || (blocks.includes(slug) && !FREE_BLOCKS.includes(slug)) || slug.startsWith('template-')
 
 /** Sets anyone can install in one go. */
 export const KITS: Record<string, { name: string; line: string; items: string[] }> = {

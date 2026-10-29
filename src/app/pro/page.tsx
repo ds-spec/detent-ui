@@ -20,7 +20,7 @@ export const metadata: Metadata = page({
 const FAQ: [string, string][] = [
   ['Who is it for?', 'Developers and small teams building an AI product in React: a chat, an agent, a copilot, or a SaaS with AI inside. If you already use shadcn and the AI SDK, it drops straight in.'],
   ['Is it a subscription?', 'No. You pay once and keep it, along with every update that ships after you buy.'],
-  ['What’s the difference between the plans?', 'Pro is what you build the product with: the Pro components and every block. Pro + Templates adds the templates: whole apps to start from, including every template still to come. Team is everything, for up to five people.'],
+  ['What’s the difference between the plans?', 'Pro is what you build the product with: the Pro components and the Pro blocks. Pro + Templates adds the templates: whole apps to start from, including every template still to come. Team is everything, for up to five people.'],
   ['Does it work with the AI SDK?', 'Yes. useDetentChat takes what useChat gives you and returns the props for the streaming answer, the run waterfall and the approval card, so reasoning, tools, approvals and sources each land where they belong. The Agent chat block and Tandem run on it.'],
   ['Will it match my design?', 'Installed with shadcn, Detent takes on your theme: your primary becomes its accent, it uses your background, borders and muted text, and .dark turns it dark. Your fonts stay yours.'],
   ['How do I install Pro?', 'With the shadcn CLI, from Detent’s private registry. Add the registry and your licence key to the project once, as below, then install like anything else: npx shadcn add @detent-pro/diff. The source lands in your project.'],

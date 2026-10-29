@@ -12,7 +12,7 @@ import { ENTRIES, entry } from '@/catalog/meta'
 import { BLOCKS } from '@/catalog/blocks'
 import { TEMPLATES } from '@/catalog/templates'
 import { RELEASES, CONTACT } from '@/catalog/trust'
-import { PLANS, PRO_COMPONENTS, PRO_BLOCK_COUNT, SITE } from '@/catalog/pro'
+import { FREE_BLOCKS, PLANS, PRO_COMPONENTS, PRO_BLOCK_COUNT, SITE } from '@/catalog/pro'
 import { NAME, DESCRIPTION, TAGLINE, FREE_COUNT } from '@/site/seo'
 import { abs, envelope, fmtDate, itemList, kvTable, today } from './format'
 
@@ -156,12 +156,12 @@ function renderBlocks(): string {
     '',
     itemList(BLOCKS.map((b) => ({ label: b.name, href: abs(`/blocks/${b.id}`), desc: b.line }))),
     '',
-    'Every block is Pro. Install from the private registry after setting up a licence key.',
+    `Free: ${BLOCKS.filter((b) => FREE_BLOCKS.includes(b.id)).map((b) => b.name).join(', ')}, from the public registry. Every other block is Pro: install it from the private registry after setting up a licence key.`,
   ].join('\n')
 
   return envelope({
     title: `${NAME} Blocks — whole screens`,
-    summary: `${BLOCKS.length} whole-screen React blocks built from Detent components. Pro licence required.`,
+    summary: `${BLOCKS.length} whole-screen React blocks built from Detent components. ${FREE_BLOCKS.length} are free; the rest need a Pro licence.`,
     path: '/blocks',
     body,
     related: [{ label: 'Pro', href: abs('/pro') }, { label: 'Templates', href: abs('/templates') }],

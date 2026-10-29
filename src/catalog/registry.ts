@@ -4,7 +4,7 @@ import path from 'node:path'
 import { BLOCKS } from '@/catalog/blocks'
 import { ENTRIES } from './meta'
 import { FILES } from './source'
-import { KITS, SITE, isProComponent } from './pro'
+import { FREE_BLOCKS, KITS, SITE, isProBlock, isProComponent } from './pro'
 import { TEMPLATES } from './templates'
 
 /*
@@ -40,17 +40,17 @@ export type RegistryItem = {
 }
 type CssTree = { [key: string]: string | CssTree }
 
-/** Everything anyone can install, by name: free components and kits. Blocks are Pro. */
+/** Everything anyone can install, by name: free components, the free blocks and kits. */
 export function freeNames() {
-  return [...ENTRIES.filter((e) => !isProComponent(e.id)).map((e) => e.id), ...Object.keys(KITS)]
+  return [...ENTRIES.filter((e) => !isProComponent(e.id)).map((e) => e.id), ...FREE_BLOCKS, ...Object.keys(KITS)]
 }
 
 /** The name of a Pro thing, so the registry can say so instead of a plain not-found. */
-export const isProName = (name: string) => isProComponent(name) || BLOCKS.some((b) => b.id === name) || name.startsWith('template-')
+export const isProName = (name: string) => isProComponent(name) || isProBlock(name) || name.startsWith('template-')
 
-/** Everything a licence installs, by name: Pro components, every block, and the templates. */
+/** Everything a licence installs, by name: Pro components, the Pro blocks, and the templates. */
 export function proNames() {
-  return [...ENTRIES.filter((e) => isProComponent(e.id)).map((e) => e.id), ...BLOCKS.map((b) => b.id), ...TEMPLATES.map((t) => `template-${t.id}`)].filter((n) => !!FILES[n]?.length)
+  return [...ENTRIES.filter((e) => isProComponent(e.id)).map((e) => e.id), ...BLOCKS.filter((b) => isProBlock(b.id)).map((b) => b.id), ...TEMPLATES.map((t) => `template-${t.id}`)].filter((n) => !!FILES[n]?.length)
 }
 
 /** Renames the two tokens that clash with shadcn's, in source and in CSS alike. */
