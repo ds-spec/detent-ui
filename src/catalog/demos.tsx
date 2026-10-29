@@ -10,7 +10,7 @@ const FREE: Record<string, ComponentType> = {
   rings: dynamic(() => import('@/lab/demos/rings').then((m) => m.RingsDemo), { ssr: false }),
   waffle: dynamic(() => import('@/lab/demos/waffle').then((m) => m.WaffleDemo), { ssr: false }),
   meter: dynamic(() => import('@/lab/demos/gauge').then((m) => m.GaugeDemo), { ssr: false }),
-  stats: dynamic(() => import('@/lab/demos/stats').then((m) => m.StatsDemo), { ssr: false }),
+  metric: dynamic(() => import('@/lab/demos/metric').then((m) => m.MetricDemo), { ssr: false }),
   history: dynamic(() => import('@/lab/demos/timeline').then((m) => m.TimelineDemo), { ssr: false }),
   toaster: dynamic(() => import('@/lab/demos/toaster').then((m) => m.ToasterDemo), { ssr: false }),
   signature: dynamic(() => import('@/lab/demos/signature').then((m) => m.SignatureDemo), { ssr: false }),

@@ -43,7 +43,7 @@ export const FILES: Record<string, string[]> = {
   rings: ['components/charts/GoalNumerals.tsx', 'ui/DotType.tsx', 'components/charts/parts.tsx', 'components/charts/ChartCard.tsx'],
   waffle: ['components/charts/Waffle.tsx', 'components/charts/parts.tsx', 'components/charts/ChartCard.tsx'],
   meter: ['components/charts/Gauge.tsx', 'components/charts/ChartCard.tsx', 'ui/RollingText.tsx'],
-  stats: ['components/charts/StatTile.tsx', 'components/charts/parts.tsx', 'ui/RollingText.tsx', 'lib/hooks.ts'],
+  metric: ['components/metric/MetricExplainer.tsx', 'ui/RollingText.tsx', 'lib/motion.ts'],
   codeblock: ['../pro/components/code/CodeBlock.tsx'],
   sidebar: ['../pro/components/sidebar/AppSidebar.tsx', 'components/overlays/Tooltip.tsx', 'lib/layer.tsx'],
   history: ['components/timeline/Timeline.tsx'],
