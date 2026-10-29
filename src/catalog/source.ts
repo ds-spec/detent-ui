@@ -8,6 +8,7 @@ export const FILES: Record<string, string[]> = {
   scaffold: ['components/scaffold/AgentScaffold.tsx', 'components/terminal/Terminal.tsx', 'components/tree/FileTree.tsx'],
   answer: ['../pro/components/answer/StreamingAnswer.tsx'],
   ask: ['../pro/components/ask/AskSearch.tsx'],
+  docchat: ['../pro/components/docchat/DocChat.tsx'],
   images: ['components/images/ImageSearch.tsx'],
   askchart: ['../pro/components/askchart/AskChart.tsx'],
   bridge: ['../pro/components/bridge/RevenueBridge.tsx'],

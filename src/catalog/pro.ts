@@ -9,6 +9,7 @@ import { UNLISTED } from './unlisted'
 const PRO_CODE = [
   'answer',
   'ask',
+  'docchat',
   'askchart',
   'bridge',
   'funnel',
