@@ -529,9 +529,7 @@ export const BLOCKS: Block[] = [
       'Teammates already in your GitHub organization are suggested, each with their orb; one press adds them, one more sends the invites.',
       'Templates show which of their tools you’ve connected and fade the ones you haven’t, so the right first agent is obvious.',
       'The new agent does its first job in front of you, step by step, before you hand it anything real.',
-      'The checklist ticks itself off around a progress ring that turns green when it closes; every step is one size, so moving between them moves nothing else.',
-      'Beside the steps, the workspace takes shape: each tool, teammate and the first agent lands in a place already held for it, so the preview never reflows.',
-      'Below 1152px the preview folds away; below 768px the checklist folds into a progress line above the step.',
+
     ],
     props: [
       { ...product, note: 'The product being set up.' },
