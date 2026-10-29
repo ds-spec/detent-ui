@@ -1,3 +1,5 @@
+import { UNLISTED } from './unlisted'
+
 /**
  * Every component in the library: what it is, where it lives, what makes it, its keys.
  * Plain data, safe for the server; the live demos are looked up by id in ./demos.
@@ -1395,11 +1397,7 @@ const ALL: Entry[] = [
   },
 ]
 
-/**
- * Basics that left the catalog on 2026-10-24. shadcn and Radix cover them, so Detent doesn't sell
- * them; the code stays, because blocks and templates are built from it.
- */
-export const UNLISTED = new Set(['buttons', 'tabs', 'select', 'stepper', 'code', 'toaster', 'dialog', 'confirm', 'popover', 'tooltip', 'dropdown', 'context-menu', 'hovercard', 'combobox', 'command', 'carousel', 'sidebar'])
+export { UNLISTED }
 
 export const ENTRIES: Entry[] = ALL.filter((e) => !UNLISTED.has(e.id))
 

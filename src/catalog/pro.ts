@@ -2,8 +2,8 @@
  * What's in Detent Pro, what it costs, and where to buy it. Plain data, safe for the server.
  * Change a price, a plan's list or a checkout link here and every page follows.
  */
-import { BLOCKS } from '@/catalog/blocks'
-import { UNLISTED } from '@/catalog/meta'
+import { BLOCK_IDS } from './block-ids'
+import { UNLISTED } from './unlisted'
 
 /** The free components that are Pro: the big stateful surfaces that take weeks to get right. */
 const PRO_CODE = [
@@ -38,7 +38,7 @@ export const PRO_COMPONENTS = PRO_CODE.filter((id) => !UNLISTED.has(id))
 export const isProComponent = (id: string) => PRO_CODE.includes(id)
 
 /** Every block is Pro: whole screens are what the licence buys. The free tier is components. */
-export const PRO_BLOCK_COUNT = BLOCKS.length
+export const PRO_BLOCK_COUNT = BLOCK_IDS.length
 
 /** Anything whose source is Pro: a Pro component, any block, any template. */
 export const isLockedSource = (slug: string, blocks: string[]) => isProComponent(slug) || blocks.includes(slug) || slug.startsWith('template-')

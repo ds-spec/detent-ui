@@ -5,13 +5,13 @@ import type { CSSProperties, ReactNode } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { DEMOS } from '@/catalog/demos'
-import { CATEGORIES, ENTRIES } from '@/catalog/meta'
 import { PLANS, installCommand, isProComponent } from '@/catalog/pro'
 import { ArrowRight, ArrowUpRight, Layers, Mic, Note, Prompt } from '@/lab/icons'
 import { Fit } from '@/site/Fit'
 import { CopyCommand } from '@/site/parts'
 import { BRIDGE, CARDS, GRAIN, LAYER, useWide } from './lights'
 import type { Card } from './lights'
+import type { LibItem } from './library'
 
 /*
  * The home page's first sheet. The sentence sits in the middle: what's new above it, one quiet
@@ -31,10 +31,7 @@ const DWELL = 6500
 const JOIN = 22
 const ICON: Record<string, ReactNode> = { prompt: <Prompt size={15} />, activity: <Note size={15} />, models: <Layers size={15} />, voice: <Mic size={15} /> }
 
-const nameOf = (id: string) => ENTRIES.find((e) => e.id === id)?.name ?? id
-const familyOf = (id: string) => CATEGORIES.find((c) => c.id === ENTRIES.find((e) => e.id === id)?.category)?.name ?? ''
-
-export function HomeHero() {
+export function HomeHero({ lib }: { lib: LibItem[] }) {
   const [open, setOpen] = useState(CARDS[0].id)
   const dot = CARDS.find((c) => c.id === open)?.dot
   return (
@@ -56,7 +53,7 @@ export function HomeHero() {
               <span className="sr-only">.</span>
             </h1>
             <p className="rise mt-6 max-w-[540px] text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
-              The UI kit for AI products. <span className="text-ink">{ENTRIES.length} components</span> for streaming answers, tool{' '}calls, approvals and everything around them. Every state worked out, wired to the AI{'\u00a0'}SDK, styled by your theme.
+              The UI kit for AI products. <span className="text-ink">{lib.length} components</span> for streaming answers, tool{' '}calls, approvals and everything around them. Every state worked out, wired to the AI{'\u00a0'}SDK, styled by your theme.
             </p>
             <div className="rise mt-8 flex items-center gap-2.5" style={{ animationDelay: '200ms' }}>
               <Link href="/components" className="ring-focus group/go flex h-11 items-center whitespace-nowrap gap-1.5 rounded-full bg-ink pl-5 pr-4 text-[14px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.97]">
@@ -68,7 +65,7 @@ export function HomeHero() {
               </Link>
             </div>
           </div>
-          <Plates onOpen={setOpen} className="rise mt-12 lg:mt-14 lg:h-[clamp(480px,calc(100svh-300px),620px)]" />
+          <Plates lib={lib} onOpen={setOpen} className="rise mt-12 lg:mt-14 lg:h-[clamp(480px,calc(100svh-300px),620px)]" />
         </div>
         <Bridge id={open} />
       </div>
@@ -109,7 +106,7 @@ function Bridge({ id }: { id: string }) {
 }
 
 /** The row of four plates. `onOpen` hears which part is open; `className` places the row. */
-function Plates({ onOpen, className = '' }: { onOpen?: (id: string) => void; className?: string }) {
+function Plates({ lib, onOpen, className = '' }: { lib: LibItem[]; onOpen?: (id: string) => void; className?: string }) {
   const reduce = useReducedMotion()
   const wide = useWide()
   const [open, setOpen] = useState(0)
@@ -157,15 +154,16 @@ function Plates({ onOpen, className = '' }: { onOpen?: (id: string) => void; cla
     >
       <style>{CSS}</style>
       {CARDS.map((c, k) => (
-        <Plate key={c.id} c={c} on={k === open} mounted={seen.includes(k)} wide={wide} onAim={() => aim(k)} onPick={() => show(k)} />
+        <Plate key={c.id} c={c} item={lib.find((x) => x.id === c.id)} on={k === open} mounted={seen.includes(k)} wide={wide} onAim={() => aim(k)} onPick={() => show(k)} />
       ))}
     </div>
   )
 }
 
-function Plate({ c, on, mounted, wide, onAim, onPick }: { c: Card; on: boolean; mounted: boolean; wide: boolean; onAim: () => void; onPick: () => void }) {
+function Plate({ c, item, on, mounted, wide, onAim, onPick }: { c: Card; item?: LibItem; on: boolean; mounted: boolean; wide: boolean; onAim: () => void; onPick: () => void }) {
   const reduce = useReducedMotion()
   const Demo = DEMOS[c.id]
+  const name = item?.name ?? c.id
   // The colour layer is fixed-width on a laptop so nothing repaints as a plate opens; full width on a phone. Set in CSS, so the server's HTML already matches the screen.
   const layer = 'left-0 w-full lg:left-1/2 lg:w-[var(--layer)] lg:ml-[calc(var(--layer)/-2)]'
   const layerVar = { '--layer': `${LAYER}px` } as CSSProperties
@@ -185,8 +183,8 @@ function Plate({ c, on, mounted, wide, onAim, onPick }: { c: Card; on: boolean; 
       {/* The mount: its name, its family under it, and its icon in a framed square. */}
       <div className="flex h-[52px] shrink-0 items-center gap-3 px-2.5">
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[14px] leading-5 text-ink">{nameOf(c.id)}</p>
-          <p className="truncate text-[12px] leading-4 text-ink-3">{familyOf(c.id)}</p>
+          <p className="truncate text-[14px] leading-5 text-ink">{name}</p>
+          <p className="truncate text-[12px] leading-4 text-ink-3">{item?.family}</p>
         </div>
         <span className="flex size-8 shrink-0 items-center justify-center rounded-[9px] bg-surface text-ink-2 shadow-raised">{ICON[c.id]}</span>
       </div>
@@ -208,7 +206,7 @@ function Plate({ c, on, mounted, wide, onAim, onPick }: { c: Card; on: boolean; 
         >
           {c.emblem}
         </motion.div>
-        {!on && <button type="button" onClick={onPick} aria-label={`Open ${nameOf(c.id)}`} className="ring-focus absolute inset-0 rounded-[19px]" />}
+        {!on && <button type="button" onClick={onPick} aria-label={`Open ${name}`} className="ring-focus absolute inset-0 rounded-[19px]" />}
 
         {mounted && (
           <motion.div

@@ -2,13 +2,16 @@
  * Pro blocks: whole screens built from Detent components, playing live. Plain data, safe for
  * the server; the blocks themselves are looked up by id in src/pro/blocks/registry, via `@pro`.
  */
+import { BLOCK_IDS } from './block-ids'
+import type { BlockId } from './block-ids'
+
 export type BlockKind = 'app' | 'flow' | 'section'
 
 /** One prop, as the block page documents it. */
 export type Prop = { name: string; type: string; default?: string; note: string }
 
 export type Block = {
-  id: string
+  id: BlockId
   name: string
   /** The component's export name, for the usage line. */
   component: string
@@ -652,6 +655,9 @@ export const BLOCKS: Block[] = [
 ]
 
 /** What's being built next, shown honestly as coming. */
+// Each id is typed against BLOCK_IDS; this catches the other way round, an id left there after its block went.
+if (process.env.NODE_ENV !== 'production' && BLOCK_IDS.length !== BLOCKS.length) console.error(`block-ids.ts lists ${BLOCK_IDS.length} blocks, blocks.ts has ${BLOCKS.length}. Keep them in step.`)
+
 export const SOON: { name: string; kind: BlockKind; line: string }[] = []
 
 export const block = (id: string) => BLOCKS.find((b) => b.id === id)

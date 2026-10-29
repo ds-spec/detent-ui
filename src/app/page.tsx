@@ -8,6 +8,7 @@ import { Header } from '@/site/Header'
 import { HomeHero } from '@/site/home/HomeHero'
 import { HomeLibrary } from '@/site/home/HomeLibrary'
 import { BRIDGE } from '@/site/home/bridge'
+import { libraryIndex } from '@/site/home/library'
 import { Plans } from '@/site/pro/Plans'
 import { DESCRIPTION, JsonLd, NAME, page, siteGraph } from '@/site/seo'
 
@@ -19,14 +20,15 @@ export const metadata: Metadata = page({ title: `${NAME} — the UI kit for AI p
  * runs on the AI SDK, and Pro, each on a sheet of its own.
  */
 export default function Home() {
+  const lib = libraryIndex()
   return (
     <div className="min-h-dvh" style={{ background: 'var(--ground)' }}>
       <Header />
       <main>
         <JsonLd data={siteGraph()} />
-        <HomeHero />
+        <HomeHero lib={lib} />
         <div style={{ height: BRIDGE }} />
-        <HomeLibrary />
+        <HomeLibrary lib={lib} />
 
         {/* The proof: a real AI SDK conversation, drawn by Detent, and three plain facts. */}
         <section id="ai-sdk" aria-labelledby="ai-sdk-title" className="mt-3 scroll-mt-20 px-2.5 sm:px-5">
