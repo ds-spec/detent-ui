@@ -102,7 +102,7 @@ function renderPro(): string {
     '',
     `**Will it match my design?** Installed with shadcn, Detent reads your theme: your primary becomes its accent, and \`.dark\` turns it dark.`,
     '',
-    `**How do I install Pro?** \`npx shadcn add @detent-pro/<component-id>\` — set up your licence key once, then install any piece.`,
+    `**How do I install Pro?** \`npx shadcn add @detent-pro/<component-id>\` — set up your key once, then install any piece.`,
     '',
     `## Pro components (${PRO_COMPONENTS.length})`,
     '',
@@ -563,6 +563,7 @@ export const SKIPPED_ROUTES: Record<string, string> = {
   '/preview-fit': 'Unlisted preview pages — noindex, not for crawlers',
   '/api': 'API routes — machine endpoints, not content pages',
   '/r': 'shadcn registry — JSON endpoints, not content pages',
+  '/account': 'Sign-in and keys — private, noindex',
 }
 
 export function assertAllRoutesCovered(publicRoutes: string[]): string[] {

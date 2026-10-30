@@ -62,7 +62,7 @@ export default function Licence() {
             <>
               <P>A Pro licence covers the {PRO_COMPONENTS.length} Pro components, every block that isn’t free and, with Pro + Templates or Team, every template, landing page or app: everything sold now and every update that follows.</P>
               <P>
-                <Strong>Pro</Strong> and <Strong>Pro + Templates</Strong> are for one person. <Strong>Team</Strong> is for up to five people in one company, each with a key of their own, plus one key for CI and shared repositories.
+                <Strong>Pro</Strong> and <Strong>Pro + Templates</Strong> are for one person. <Strong>Team</Strong> is for up to five people in one company, each with keys of their own, including keys for CI and shared repositories.
               </P>
             </>
           ),
@@ -93,7 +93,7 @@ export default function Licence() {
                 'Sell, give away or publish the Pro source on its own, or as part of a component library, UI kit, template, theme or starter, whether it’s changed or not.',
                 'Make something whose main purpose is to let others build with Pro, like a page builder or a design tool that hands out the components.',
                 'Put Pro files in a public repository. In an open-source project, keep them out of the public code.',
-                'Share your licence key with people it doesn’t cover.',
+                'Share your key with people it doesn’t cover.',
                 'Use Pro to train or fine-tune a model that generates components.',
               ]}
             />

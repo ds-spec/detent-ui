@@ -38,7 +38,7 @@ export default function Refunds() {
         {
           id: 'what',
           title: 'What happens next',
-          body: <List items={['Your licence key stops working with the private registry.', 'Code you installed should come out of your projects, and you agree not to keep using it.', 'If you buy again later, you start a new licence on the same terms as everyone else.']} />,
+          body: <List items={['Your keys stop working with the private registry.', 'Code you installed should come out of your projects, and you agree not to keep using it.', 'If you buy again later, you start a new licence on the same terms as everyone else.']} />,
         },
         {
           id: 'after',

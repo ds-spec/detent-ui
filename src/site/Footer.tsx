@@ -7,6 +7,7 @@ const LINKS = [
   { href: '/templates', label: 'Templates' },
   { href: '/system', label: 'System' },
   { href: '/#install', label: 'Install' },
+  { href: '/account', label: 'Account' },
 ]
 
 /** The pages that say what you're agreeing to, and what's changed. */

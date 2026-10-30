@@ -21,9 +21,9 @@ const STEPS: Step[] = [
   },
   {
     title: 'Add your key',
-    line: 'Your licence key is in the email from your purchase. Keep it out of git: put it in .env.local here, and give CI and your host the same variable.',
+    line: 'Sign in at /account with the email you bought with and generate a key. Keep it out of git: put it in .env.local here, and give CI and your host the same variable.',
     file: '.env.local',
-    code: 'DETENT_PRO_KEY=your-licence-key\n',
+    code: 'DETENT_PRO_KEY=dtnt_your-key\n',
   },
   {
     title: 'Install anything',
@@ -34,10 +34,11 @@ const STEPS: Step[] = [
 
 /** What the registry says when it says no, and what to do about it. */
 const NO: [string, string][] = [
-  ['Needs your licence key', 'The key isn’t reaching it. Check .env.local has DETENT_PRO_KEY, and that the header in components.json reads it.'],
-  ['That licence key isn’t one of ours', 'Copy it again from the purchase email, without spaces. Still no? Write to us and we’ll sort it.'],
+  ['Needs your key', 'The key isn’t reaching it. Check .env.local has DETENT_PRO_KEY, and that the header in components.json reads it.'],
+  ['That key isn’t one of ours', 'It may have been removed. Generate a new one in your account.'],
+  ['No Pro purchase on this email yet', 'Sign in with the address on your receipt. Bought with another one? Write to us and we’ll move it.'],
   ['Comes with Pro + Templates', 'Templates are in Pro + Templates and Team. Upgrading keeps your key.'],
-  ['Couldn’t check your licence just now', 'The store didn’t answer. Try again in a minute.'],
+  ['Couldn’t check your key just now', 'Try again in a minute.'],
 ]
 
 export function Install() {

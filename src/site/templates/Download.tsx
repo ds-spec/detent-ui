@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Check } from '@/lab/icons'
 
 /**
- * Starting fresh: the template as a whole project, zipped, for the licence key that bought it. The
+ * Starting fresh: the template as a whole project, zipped, for a key whose email bought it. The
  * key goes in a header, never the address, and isn't kept; the zip is made from the same source
  * `npx shadcn add` installs.
  */
@@ -12,7 +12,7 @@ export function DownloadStarter({ id, name }: { id: string; name: string }) {
   const [key, setKey] = useState('')
   const [state, setState] = useState<{ kind: 'idle' | 'busy' | 'done' } | { kind: 'error'; text: string }>({ kind: 'idle' })
   const download = async () => {
-    if (!key.trim()) return setState({ kind: 'error', text: 'Paste your licence key first. It’s in the email from your purchase.' })
+    if (!key.trim()) return setState({ kind: 'error', text: 'Paste your key first. You can generate one in your account.' })
     setState({ kind: 'busy' })
     try {
       const res = await fetch(`/r/pro/starter/${id}`, { method: 'POST', headers: { authorization: `Bearer ${key.trim()}` } })
@@ -41,8 +41,8 @@ export function DownloadStarter({ id, name }: { id: string; name: string }) {
           type="password"
           value={key}
           onChange={(e) => (setKey(e.target.value), state.kind === 'error' && setState({ kind: 'idle' }))}
-          placeholder="Your licence key"
-          aria-label="Licence key"
+          placeholder="Your key"
+          aria-label="Your key"
           autoComplete="off"
           spellCheck={false}
           className="ring-focus h-9 rounded-[10px] bg-surface-2 px-3 font-mono text-footnote text-ink placeholder:font-sans placeholder:text-ink-3"

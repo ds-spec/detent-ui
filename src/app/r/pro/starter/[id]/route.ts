@@ -15,12 +15,12 @@ const answer = (status: number, error: string) => Response.json({ error }, { sta
 
 async function send(req: Request, id: string) {
   const key = req.headers.get('authorization')?.replace(/^Bearer\s+/i, '').trim()
-  if (!key) return answer(401, 'Enter your licence key to download the project. It’s in the email from your purchase.')
+  if (!key) return answer(401, `Enter your key to download the project. Generate one at ${SITE}/account`)
   let check
   try {
     check = await checkLicence(key)
   } catch {
-    return answer(503, 'Couldn’t check your licence just now. Try again in a minute.')
+    return answer(503, 'Couldn’t check your key just now. Try again in a minute.')
   }
   if (!check.ok) return answer(403, check.reason)
   if (check.plan === 'pro') return answer(403, `Templates come with Pro + Templates. Upgrade at ${SITE}/pro`)

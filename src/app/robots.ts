@@ -25,7 +25,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/preview/', '/preview-fit/', '/api/'],
+        disallow: ['/preview/', '/preview-fit/', '/api/', '/account'],
       },
       // AI search & answer bots: explicitly allowed on all public content
       {
@@ -38,7 +38,7 @@ export default function robots(): MetadataRoute.Robots {
           'Perplexity-User',
         ],
         allow: '/',
-        disallow: ['/preview/', '/preview-fit/', '/api/'],
+        disallow: ['/preview/', '/preview-fit/', '/api/', '/account'],
       },
       // Training crawlers (uncomment to block if you don't want AI training on your code/docs):
       // {

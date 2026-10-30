@@ -11,6 +11,6 @@ export async function GET(_req: Request, { params }: { params: Promise<{ name: s
   if (name === 'theme') return Response.json(await registryTheme())
   const item = await registryItem(name)
   if (item) return Response.json(item)
-  if (isProName(name)) return Response.json({ error: `${name} is part of Detent Pro. Install it from the Pro registry with your licence key: npx shadcn add @detent-pro/${name}` }, { status: 403 })
+  if (isProName(name)) return Response.json({ error: `${name} is part of Detent Pro. Install it from the Pro registry with your key: npx shadcn add @detent-pro/${name}` }, { status: 403 })
   return Response.json({ error: `There's no ${name} in Detent.` }, { status: 404 })
 }

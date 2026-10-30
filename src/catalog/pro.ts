@@ -71,7 +71,7 @@ export { SITE, installCommand } from './site'
 
 /**
  * Where each plan is bought. Set these to your store's checkout links (Lemon Squeezy, Polar,
- * Gumroad, Stripe Payment Links, anything that hands over a licence key) before launch.
+ * Gumroad, Stripe Payment Links, anything that reports the order to /api/polar) before launch.
  */
 export const CHECKOUT = {
   pro: process.env.NEXT_PUBLIC_CHECKOUT_PRO ?? '#checkout',
@@ -124,7 +124,7 @@ export const PLANS: Plan[] = [
     line: 'Everything, for everyone building it with you.',
     cta: 'Get Team',
     href: CHECKOUT.team,
-    features: ['Everything in Pro + Templates', 'A licence key for each person, up to five', 'One more key for CI and shared repos', 'Company invoices, with VAT handled', 'Every update, for life', 'Unlimited projects'],
+    features: ['Everything in Pro + Templates', 'A key for each person, up to five', 'Keys for CI and shared repos', 'Company invoices, with VAT handled', 'Every update, for life', 'Unlimited projects'],
   },
 ]
 

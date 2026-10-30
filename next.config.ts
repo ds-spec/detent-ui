@@ -10,6 +10,7 @@ const proServer = existsSync("src/pro/server.ts") ? "./src/pro/server.ts" : "./s
 const proRegistry = existsSync(".detent/pro-registry.json") ? "./.detent/pro-registry.json" : "./src/locked/pro-registry.json";
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['@libsql/client', 'libsql'],
   // Pieces that were replaced keep their old address working.
   async redirects() {
     return [
