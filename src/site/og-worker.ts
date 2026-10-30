@@ -1,0 +1,6 @@
+/* What `@/site/og` is in a Worker: the images are static files, so these routes are never reached. */
+export const OG = { width: 1200, height: 630 }
+export const CONTENT_TYPE = 'image/png'
+const gone = async () => new Response(null, { status: 404 })
+export const homeImage = gone
+export const pageImage = gone

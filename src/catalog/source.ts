@@ -1,6 +1,4 @@
-import { readFile } from 'node:fs/promises'
-import path from 'node:path'
-import { codeToHtml } from 'shiki'
+import { asset } from '@/lib/asset'
 import { isProComponent } from './pro'
 
 /** The files that make up each component, as they ship. */
@@ -273,36 +271,12 @@ export const FILES: Record<string, string[]> = {
 export type SourceFile = { name: string; lines: number; code: string; html: string; teaser?: boolean }
 
 /** How much of a Pro file the public site shows: the imports and the opening comment. */
-const TEASER = 18
+export const TEASER = 18
 
 /** Pro source: a Pro component, any block (their files live in src/pro), any template. */
 export const locked = (id: string) => process.env.DETENT_UNLOCK !== '1' && (isProComponent(id) || id.startsWith('template-') || !!FILES[id]?.[0]?.startsWith('../pro/'))
 
-const highlight = (code: string, f: string) =>
-  codeToHtml(code, {
-    lang: f.endsWith('.ts') ? 'ts' : 'tsx',
-    themes: { light: 'github-light', dark: 'github-dark-default' },
-    defaultColor: false,
-  })
-
-/**
- * Reads a component's files and highlights them for both themes. Cached: it runs once per
- * component, at build time. Pro source never leaves the build whole: the first file's opening
- * lines are highlighted as a teaser, the rest are only named and counted.
- */
+/** A component's files as highlighted at build time. Pro files are a teaser or only named. */
 export async function source(id: string): Promise<SourceFile[]> {
-  'use cache'
-  const gated = locked(id)
-  return Promise.all(
-    (FILES[id] ?? []).map(async (f, i) => {
-      const name = f.split('/').pop()!
-      // Without the Pro source checked out, a Pro file is only named.
-      const code = await readFile(path.join(process.cwd(), 'src/lab', f), 'utf8').catch(() => null)
-      if (code === null) return { name, lines: 0, code: '', html: '', teaser: true }
-      const lines = code.split('\n').length
-      if (!gated) return { name, lines, code, html: await highlight(code, f) }
-      const head = i === 0 ? await highlight(code.split('\n').slice(0, TEASER).join('\n'), f) : ''
-      return { name, lines, code: '', html: head, teaser: true }
-    }),
-  )
+  return (FILES[id] && (await asset<SourceFile[]>(`source/${id}.json`))) || []
 }

@@ -1,5 +1,3 @@
-import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
 import { ImageResponse } from 'next/og'
 import type { ReactNode } from 'react'
 
@@ -16,7 +14,7 @@ import type { ReactNode } from 'react'
  */
 
 let font: Promise<Buffer> | null = null
-const geist = () => (font ??= readFile(join(process.cwd(), 'src/site/fonts/geist-og.ttf')))
+const geist = () => (font ??= import('../../.detent/og-font.json').then((m) => Buffer.from(m.default.data, 'base64')))
 const options = async () => ({ ...OG, fonts: [{ name: 'Geist', data: await geist(), weight: 400 as const, style: 'normal' as const }] })
 
 export const OG = { width: 1200, height: 630 }

@@ -49,3 +49,7 @@ next-env.d.ts
 /shots/
 /RESEARCH.md
 /src/app/preview/
+/dist/
+.vinext/
+.wrangler/
+/public/_data/
