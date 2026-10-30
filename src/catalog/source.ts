@@ -81,6 +81,7 @@ export const FILES: Record<string, string[]> = {
   checklist: ['components/checklist/Checklist.tsx', 'lib/grain.ts'],
   readalong: ['components/readalong/ReadAlong.tsx'],
   secret: ['components/secret/SecretField.tsx'],
+  halo: ['components/halo/HaloBands.tsx', 'lib/grain.ts'],
   versions: ['components/small/Versions.tsx'],
   context: ['components/small/ContextRing.tsx'],
   run: ['components/small/RunButton.tsx'],

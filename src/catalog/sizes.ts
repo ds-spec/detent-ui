@@ -65,6 +65,7 @@ export const SIZE: Record<string, [number, number]> = {
   checklist: [620, 600],
   readalong: [620, 560],
   secret: [620, 560],
+  halo: [860, 560],
   confirm: [580, 400],
   dialog: [600, 440],
   signature: [520, 365],

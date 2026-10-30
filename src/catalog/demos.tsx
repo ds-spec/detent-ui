@@ -49,6 +49,7 @@ const FREE: Record<string, ComponentType> = {
   checklist: dynamic(() => import('@/lab/demos/finish').then((m) => m.ChecklistDemo), { ssr: false }),
   readalong: dynamic(() => import('@/lab/demos/finish').then((m) => m.ReadAlongDemo), { ssr: false }),
   secret: dynamic(() => import('@/lab/demos/finish').then((m) => m.SecretDemo), { ssr: false }),
+  halo: dynamic(() => import('@/lab/demos/finish').then((m) => m.HaloDemo), { ssr: false }),
   versions: dynamic(() => import('@/lab/demos/small').then((m) => m.VersionsDemo), { ssr: false }),
   context: dynamic(() => import('@/lab/demos/small').then((m) => m.ContextDemo), { ssr: false }),
   run: dynamic(() => import('@/lab/demos/small').then((m) => m.RunDemo), { ssr: false }),

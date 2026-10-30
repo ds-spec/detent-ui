@@ -2,6 +2,7 @@
 
 import { Checklist } from '../components/checklist/Checklist'
 import type { ChecklistStep } from '../components/checklist/Checklist'
+import { HaloBands } from '../components/halo/HaloBands'
 import { PhotoBar } from '../components/photobar/PhotoBar'
 import { ReadAlong } from '../components/readalong/ReadAlong'
 import { SecretField } from '../components/secret/SecretField'
@@ -91,5 +92,22 @@ export function SecretDemo() {
         <SecretField name="CI" scope="Install only" value="dtnt_Xa91mRtLw3qZk8YhJc2VbNf0d7Pe" used="Last used on Oct 27 from GitHub Actions" copiedLabel="Copied. Paste it into .env.local" />
       </div>
     </Light>
+  )
+}
+
+export function HaloDemo() {
+  return (
+    <HaloBands className="size-full min-h-[560px] !rounded-none lg:min-w-[860px]">
+      <div className="flex h-full min-h-[560px] flex-col items-center justify-center px-6 text-center">
+        <h2 className="text-[clamp(38px,5vw,60px)] font-normal leading-[1.03] tracking-[-0.05em] text-ink">
+          Things that
+          <span className="block text-ink-3">click into place.</span>
+        </h2>
+        <p className="mt-4 text-body text-ink-3">Move through the glass. Press to change the light.</p>
+        <button type="button" className="ring-focus mt-7 h-11 rounded-full bg-ink px-6 text-callout font-medium text-surface transition-transform duration-150 active:scale-[0.96]">
+          Get started
+        </button>
+      </div>
+    </HaloBands>
   )
 }

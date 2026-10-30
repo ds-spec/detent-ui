@@ -1714,6 +1714,16 @@ const ALL: Entry[] = [
     details: ['There’s no “show” state to leave on while someone looks over your shoulder.', 'Copying works without ever revealing it.', 'The start and end of the key stay visible, so you can tell keys apart.'],
     keys: [['Space', 'Hold to read the key']],
   },
+  {
+    id: 'halo',
+    name: 'Halo bands',
+    short: 'Light through glass',
+    category: 'marketing',
+    feel: ['press'],
+    bleed: true,
+    line: 'Colour restarts at every curved edge, so one glow reads as glass. It follows your pointer.',
+    details: ['Wrap a hero, a stat or a call to action: your content sits in the clear middle.', 'The light drifts on its own and glides after the pointer, each band a beat behind the last.', 'A press melts in the next palette, and the shapes never move.', 'The glow moves on the GPU, so it stays smooth, and it follows your theme in light and dark.'],
+  },
 ]
 
 export { UNLISTED }
