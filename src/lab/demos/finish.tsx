@@ -6,6 +6,8 @@ import { HaloBands } from '../components/halo/HaloBands'
 import { PhotoBar } from '../components/photobar/PhotoBar'
 import { ReadAlong } from '../components/readalong/ReadAlong'
 import { SecretField } from '../components/secret/SecretField'
+import { SliceText } from '../components/slices/SliceText'
+import { ThreadHero } from '../components/threads/ThreadHero'
 import { GRAIN } from '../lib/grain'
 
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
@@ -109,5 +111,22 @@ export function HaloDemo() {
         </button>
       </div>
     </HaloBands>
+  )
+}
+
+export function SlicesDemo() {
+  return (
+    <div className="flex size-full min-h-[560px] items-center justify-center overflow-hidden bg-black px-6 lg:min-w-[860px]">
+      <SliceText text="Cut to fit." fill="linear-gradient(180deg, #ffffff 18%, #d9dbe2 52%, #8c8f99 88%)" className="text-[clamp(64px,11vw,150px)] font-semibold tracking-[-0.05em]" />
+    </div>
+  )
+}
+
+
+export function ThreadsDemo() {
+  return (
+    <div className="size-full" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", var(--font-sans)' }}>
+      <ThreadHero title="Everything, finally connected." sub="Your tools, your team and your data, pulled together in one place." action="Get started" sentLabel="You’re in" />
+    </div>
   )
 }

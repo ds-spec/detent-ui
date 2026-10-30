@@ -41,6 +41,8 @@ const PRO_CODE = [
   'codeblock',
   'sidebar',
   'carousel',
+  'region',
+  'reveal',
 ]
 
 /** The Pro components in the catalog. Unlisted ones stay Pro, so their source stays locked. */
