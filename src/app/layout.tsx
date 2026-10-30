@@ -11,7 +11,7 @@ const mono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', dis
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
-  title: { default: `${NAME} — React components for AI products`, template: `%s · ${NAME}` },
+  title: { default: `${NAME} — premium React components, AI included`, template: `%s · ${NAME}` },
   description: DESCRIPTION,
   applicationName: NAME,
   keywords: ['React components', 'AI UI components', 'shadcn', 'Tailwind CSS', 'Next.js', 'chat UI', 'AI chat components', 'agent UI', 'streaming answer', 'model picker', 'component library', 'React templates'],

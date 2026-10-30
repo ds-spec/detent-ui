@@ -45,7 +45,7 @@ export function HomeHero({ lib }: { lib: LibItem[] }) {
               <ArrowRight size={12} className="text-ink-3 transition-transform duration-150 group-hover/new:translate-x-0.5" />
             </Link>
             <h1 className="focus-in mt-7 text-[clamp(42px,5vw,74px)] font-normal leading-[1.01] tracking-[-0.055em] text-ink">
-              Most AI apps feel like demos.
+              Most apps look the same.
               <br />
               <span className="text-quiet">Yours won’t</span>
               {/* The full stop, in the colour of the open light. */}
@@ -53,7 +53,7 @@ export function HomeHero({ lib }: { lib: LibItem[] }) {
               <span className="sr-only">.</span>
             </h1>
             <p className="rise mt-6 max-w-[540px] text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
-              The UI kit for AI products. <span className="text-ink">{lib.length} components</span> for streaming answers, tool{' '}calls, approvals and everything around them. Every state worked out, wired to the AI{'\u00a0'}SDK, styled by your theme.
+              Premium React components, with AI as their strongest suit. <span className="text-ink">{lib.length} components</span> for boards, charts, media, agents and everything around them. Every state worked out, styled by your{'\u00a0'}theme.
             </p>
             <div className="rise mt-8 flex items-center gap-2.5" style={{ animationDelay: '200ms' }}>
               <Link href="/components" className="ring-focus group/go flex h-11 items-center whitespace-nowrap gap-1.5 rounded-full bg-ink pl-5 pr-4 text-[14px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.97]">

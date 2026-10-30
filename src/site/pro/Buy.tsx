@@ -325,7 +325,7 @@ export function HeroHead() {
         </span>
       </h1>
       <p className="rise mt-6 max-w-[520px] text-balance text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
-        The hard parts of an AI app, finished: every state, both themes, every width. Installed as source you own.
+        The hard parts of an app, finished: every state, both themes, every width. Installed as source you own.
       </p>
     </div>
   )

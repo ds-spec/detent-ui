@@ -15,7 +15,7 @@ export const TAGLINE = 'Interfaces that click into place'
 export const FREE_COUNT = ENTRIES.length - PRO_COMPONENTS.length
 
 /** What Detent is, in one sentence: the default description, and the one structured data uses. */
-export const DESCRIPTION = `The UI kit for AI products: ${ENTRIES.length} React components, full screens and whole apps for streaming answers, tool calls, approvals and agents. Wired to the AI SDK, styled by your shadcn theme. ${FREE_COUNT} are free.`
+export const DESCRIPTION = `Premium React components, full screens and whole apps: ${ENTRIES.length} components for boards, charts, media, agents and approvals. AI SDK ready, styled by your shadcn theme. ${FREE_COUNT} are free.`
 
 export const url = (path = '/') => `${SITE}${path === '/' ? '' : path}`
 
@@ -84,7 +84,7 @@ export const proGraph = (faq: [string, string][]) => ({
     {
       '@type': 'Product',
       name: `${NAME} Pro`,
-      description: `${PRO_COMPONENTS.length} advanced React components, ${BLOCKS.length} whole screens and ${TEMPLATES.length} templates for AI products, installed as source you own.`,
+      description: `${PRO_COMPONENTS.length} advanced React components, ${BLOCKS.length} whole screens and ${TEMPLATES.length} templates, installed as source you own.`,
       brand: { '@type': 'Brand', name: NAME },
       url: url('/pro'),
       image: url('/pro/opengraph-image'),

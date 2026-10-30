@@ -19,7 +19,7 @@ export const metadata: Metadata = page({
 })
 
 const FAQ: [string, string][] = [
-  ['Who is it for?', 'Developers and small teams building an AI product in React: a chat, an agent, a copilot, or a SaaS with AI inside. If you already use shadcn and the AI SDK, it drops straight in.'],
+  ['Who is it for?', 'Developers and small teams building a product in React who want it to look finished: a SaaS, a dashboard, a marketplace, or an app with AI inside. If you already use shadcn, it drops straight in, and the AI pieces are wired to the AI SDK.'],
   ['Is it a subscription?', 'No. You pay once and keep it, along with every update that ships after you buy.'],
   ['What’s the difference between the plans?', 'Pro is what you build the product with: the Pro components and the Pro blocks. Pro + Templates adds the templates: whole apps to start from, including every template still to come. Team is everything, for up to five people.'],
   ['Does it work with the AI SDK?', 'Yes. useDetentChat takes what useChat gives you and returns the props for the streaming answer, the run waterfall and the approval card, so reasoning, tools, approvals and sources each land where they belong. The Agent chat block and Tandem run on it.'],

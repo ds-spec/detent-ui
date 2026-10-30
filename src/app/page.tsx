@@ -12,7 +12,7 @@ import { libraryIndex } from '@/site/home/library'
 import { Plans } from '@/site/pro/Plans'
 import { DESCRIPTION, JsonLd, NAME, page, siteGraph } from '@/site/seo'
 
-export const metadata: Metadata = page({ title: `${NAME} — the UI kit for AI products`, absolute: true, description: DESCRIPTION, path: '/' })
+export const metadata: Metadata = page({ title: `${NAME} — premium React components, AI included`, absolute: true, description: DESCRIPTION, path: '/' })
 
 /*
  * The home page: sheets laid on a soft ground. The first holds the sentence and the four lights,

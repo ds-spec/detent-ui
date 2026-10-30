@@ -208,7 +208,7 @@ export async function homeImage() {
   return new ImageResponse(
     <Stage u={23} sink={10} head={<Name />}>
       <Words text="Interfaces that click into place." size={30} color={INK} tracking={-0.025} leading={1.3} />
-      <Words text="React components for AI products." size={30} color={QUIET} tracking={-0.025} leading={1.3} />
+      <Words text="Premium React components, AI included." size={30} color={QUIET} tracking={-0.025} leading={1.3} />
     </Stage>,
     await options(),
   )
