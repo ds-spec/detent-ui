@@ -271,9 +271,15 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
             >
               {/* Faded here, not on the moving layer above: Motion's own opacity there would win over a class. */}
               <div className={`absolute inset-0 flex flex-col transition-opacity duration-300 ${mode === 'code' ? 'pointer-events-none opacity-0' : ''}`}>
-                <Fit pad={STAGE_PAD} max={e.zoom ?? 1.25} min={0.62}>
-                  <Demo />
-                </Fit>
+                {e.bleed ? (
+                  <div className="absolute inset-0">
+                    <Demo />
+                  </div>
+                ) : (
+                  <Fit pad={STAGE_PAD} max={e.zoom ?? 1.25} min={0.62}>
+                    <Demo />
+                  </Fit>
+                )}
               </div>
             </motion.div>
           </AnimatePresence>
