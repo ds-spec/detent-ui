@@ -12,7 +12,7 @@ export const SIZE: Record<string, [number, number]> = {
   images: [780, 536],
   askchart: [720, 548],
   bridge: [720, 408],
-  funnel: [760, 362],
+  funnel: [760, 384],
   radar: [640, 412],
   donut: [640, 360],
   scatter: [700, 418],
