@@ -72,8 +72,7 @@ export const KITS: Record<string, { name: string; line: string; items: string[] 
 export { SITE, installCommand } from './site'
 
 /**
- * Where each plan is bought. Set these to your store's checkout links (Lemon Squeezy, Polar,
- * Gumroad, Stripe Payment Links, anything that reports the order to /api/polar) before launch.
+ * Where each plan is bought: the store's checkout links. Dodo reports each order to /api/dodo.
  */
 export const CHECKOUT = {
   pro: process.env.NEXT_PUBLIC_CHECKOUT_PRO ?? '#checkout',

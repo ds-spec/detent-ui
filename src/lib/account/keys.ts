@@ -80,10 +80,11 @@ export async function removeSeat(owner: string, email: string) {
 }
 
 /** Records an order from the store. The store can send the same one twice, and that's fine. */
+/** Keeps a refund once it's seen: the store may deliver or retry a paid event after it. */
 export async function recordPurchase(order: { id: string; email: string; plan: Plan; refunded: boolean }) {
   await (await db()).execute({
     sql: `insert into purchase (order_id, email, plan, refunded, created_at) values (?, ?, ?, ?, ?)
-          on conflict (order_id) do update set refunded = excluded.refunded`,
+          on conflict (order_id) do update set refunded = max(refunded, excluded.refunded)`,
     args: [order.id, order.email, order.plan, order.refunded ? 1 : 0, Date.now()],
   })
 }
