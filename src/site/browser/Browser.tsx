@@ -114,7 +114,7 @@ function Index({ id }: { id: string }) {
   }, [id])
 
   return (
-    <aside className="sticky top-16 hidden h-[calc(100dvh-4rem)] flex-col lg:flex">
+    <aside className="sticky top-[76px] hidden h-[calc(100dvh-76px)] flex-col lg:flex">
       <nav
         ref={nav}
         aria-label="Components"

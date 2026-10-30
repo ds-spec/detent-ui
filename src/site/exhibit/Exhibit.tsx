@@ -122,11 +122,15 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
     setSeen(i)
     setDir(Math.abs(d) > ENTRIES.length / 2 ? -Math.sign(d) : Math.sign(d) || 1)
   }
-  // Arriving from another page, Next scrolls the panel to this route's own part, the props, which sit
-  // below the stage. The component comes first, so arrival starts at the top.
+  // Arriving from another page, Next scrolls to this route's own part, the props, which sit below
+  // the stage. The component comes first, so arrival starts at the top: of the panel on a laptop,
+  // and of the page on anything smaller. A reload or a link to a part stays where it's going.
   useEffect(() => {
+    const entry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined
+    if (location.hash || entry?.type === 'reload') return
     const panel = scroller()
     if (panel) panel.scrollTop = 0
+    window.scrollTo({ top: 0, behavior: 'instant' })
   }, [])
   // Each move clicks, if sound is on, and brings the new component back into view. Arriving doesn't.
   const last = useRef(i)

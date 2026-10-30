@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Search } from '@/lab/icons'
@@ -15,6 +15,9 @@ import { Search } from '@/lab/icons'
 /** `pro` marks it Pro; `free`, where a list mixes both, says so too. Components only mark Pro. */
 export type RailItem = { id: string; name: string; line?: string; pro?: boolean; free?: boolean }
 export type RailGroup = { id: string; name: string; icon?: ReactNode; color?: string; items: RailItem[] }
+
+/** Where each list was left, so moving between pages doesn't send it back to the top. */
+const left = new Map<string, number>()
 
 export function Rail({ groups, current, onPick, label, preview }: { groups: RailGroup[]; current: string; onPick: (id: string) => void; label: string; preview?: (id: string, onReady: () => void) => ReactNode }) {
   const reduce = useReducedMotion()
@@ -33,10 +36,22 @@ export function Rail({ groups, current, onPick, label, preview }: { groups: Rail
   const words = q.trim().toLowerCase()
   const shown = groups.map((g) => ({ ...g, items: g.items.filter((x) => !words || `${x.name} ${x.line ?? ''}`.toLowerCase().includes(words)) })).filter((g) => g.items.length)
 
-  // The one on show stays in sight in the list.
-  useEffect(() => {
-    list.current?.querySelector<HTMLElement>(`[data-id="${current}"]`)?.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' })
-  }, [current, reduce])
+  // The one on show stays in sight in the list. Only the list moves, never the page behind it:
+  // arriving, it's already in place before anything paints; after that, it glides.
+  const arrived = useRef(false)
+  useLayoutEffect(() => {
+    const box = list.current
+    const el = box?.querySelector<HTMLElement>(`[data-id="${current}"]`)
+    if (!box) return
+    if (!arrived.current) box.scrollTop = left.get(label) ?? 0
+    if (el) {
+      const at = el.getBoundingClientRect()
+      const frame = box.getBoundingClientRect()
+      const by = at.top < frame.top ? at.top - frame.top : at.bottom > frame.bottom ? at.bottom - frame.bottom : 0
+      if (by) box.scrollTo({ top: box.scrollTop + by, behavior: arrived.current && !reduce ? 'smooth' : 'auto' })
+    }
+    arrived.current = true
+  }, [current, reduce, label])
   useEffect(() => () => clearTimeout(timer.current), [])
 
   const aim = (id: string, el: HTMLElement) => {
@@ -69,7 +84,7 @@ export function Rail({ groups, current, onPick, label, preview }: { groups: Rail
         </label>
       )}
 
-      <div ref={list} onPointerLeave={leave} className="min-h-0 flex-1 overflow-y-auto pb-6 pr-3 [mask-image:linear-gradient(to_bottom,transparent,black_8px,black_calc(100%-24px),transparent)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div ref={list} onPointerLeave={leave} onScroll={(e) => left.set(label, e.currentTarget.scrollTop)} className="min-h-0 flex-1 overflow-y-auto pb-6 pr-3 [mask-image:linear-gradient(to_bottom,transparent,black_8px,black_calc(100%-24px),transparent)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {shown.map((g) => {
           const open = words.length > 0 || !shut.includes(g.id)
           return (

@@ -56,12 +56,12 @@ export function Header() {
   return (
     <header className="pointer-events-none sticky top-0 z-50 h-[72px] px-2.5 sm:px-5">
       <div
-        className="pointer-events-auto relative mx-auto grid grid-cols-[1fr_auto] items-center transition-[max-width,height,margin,padding,background-color,box-shadow,border-radius] duration-500 lg:grid-cols-[1fr_auto_1fr]"
+        className="pointer-events-auto relative mx-auto grid grid-cols-[1fr_auto] items-center transition-[max-width,height,padding,transform,background-color,box-shadow,border-radius] duration-500 lg:grid-cols-[1fr_auto_1fr]"
         style={{
           transitionTimingFunction: UI,
           maxWidth: stuck ? 980 : 1440,
           height: stuck ? 54 : 72,
-          marginTop: stuck ? 9 : 0,
+          transform: stuck ? 'translateY(20px)' : 'none',
           padding: stuck ? '0 8px 0 18px' : '0 10px 0 24px',
           borderRadius: stuck ? 999 : 0,
           background: stuck ? 'color-mix(in oklch, var(--leaf) 90%, transparent)' : 'transparent',

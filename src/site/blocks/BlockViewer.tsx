@@ -167,7 +167,9 @@ function Switcher({ current, prev, next }: { current: string; prev: Block; next:
     const down = (e: PointerEvent) => !box.current?.contains(e.target as Node) && setOpen(false)
     window.addEventListener('pointerdown', down)
     // The one you're on, in view as the list opens.
-    list.current?.querySelector<HTMLElement>('[aria-selected="true"]')?.scrollIntoView({ block: 'center' })
+    const menu = list.current
+    const on = menu?.querySelector<HTMLElement>('[aria-selected="true"]')
+    if (menu && on) menu.scrollTop += on.getBoundingClientRect().top - menu.getBoundingClientRect().top - (menu.clientHeight - on.offsetHeight) / 2
     return () => window.removeEventListener('pointerdown', down)
   }, [open])
   return (
