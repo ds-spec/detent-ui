@@ -103,7 +103,7 @@ export const FILES: Record<string, string[]> = {
   calendar: ['../pro/blocks/calendar/Calendar.tsx', '../pro/blocks/calendar/content.ts', 'blocks/kit/props.tsx', 'ui/DetentMark.tsx'],
   'data-table': ['../pro/blocks/table/ConversationTable.tsx', '../pro/blocks/table/content.ts', '../pro/blocks/analytics/Sidebar.tsx', 'blocks/kit/Segmented.tsx', '../pro/ui/Stream.tsx', 'blocks/kit/props.tsx', 'ui/DetentMark.tsx'],
   analytics: ['../pro/blocks/analytics/Analytics.tsx', '../pro/blocks/analytics/Sidebar.tsx', '../pro/blocks/analytics/content.ts', 'blocks/kit/Segmented.tsx', '../lab/lib/hooks.ts', '../lab/ui/Count.tsx', 'blocks/kit/props.tsx', 'ui/DetentMark.tsx'],
-  pricing: ['../pro/blocks/pricing/Pricing.tsx', 'blocks/kit/Segmented.tsx', '../lab/ui/Count.tsx', 'blocks/kit/props.tsx'],
+  pricing: ['../pro/blocks/pricing/Pricing.tsx', 'blocks/kit/Segmented.tsx', 'blocks/kit/props.tsx'],
   'live-features': ['../pro/blocks/bento/FeatureBento.tsx', '../pro/blocks/bento/tiles.tsx', 'blocks/kit/Segmented.tsx', '../pro/ui/Stream.tsx', '../lab/ui/Count.tsx', 'blocks/kit/props.tsx', 'ui/DetentMark.tsx'],
   onboarding: ['../pro/blocks/onboarding/Onboarding.tsx', 'blocks/kit/props.tsx', 'ui/DetentMark.tsx'],
   evals: ['../pro/blocks/evals/Evals.tsx', '../pro/blocks/evals/content.ts', '../lab/ui/Count.tsx', 'blocks/kit/props.tsx'],
