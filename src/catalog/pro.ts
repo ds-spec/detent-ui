@@ -25,6 +25,7 @@ const PRO_CODE = [
   'rewrite',
   'filter',
   'chart',
+  'models',
   'usage',
   'dates',
   'extract',

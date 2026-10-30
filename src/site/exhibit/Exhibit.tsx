@@ -12,7 +12,6 @@ import { SITE, installCommand, isProComponent } from '@/catalog/pro'
 import { Check, Copy, Expand, Moon, Refresh, Sun } from '@/lab/icons'
 import { useTheme } from '@/lab/lib/hooks'
 import { Kbd } from '@/lab/ui/Kbd'
-import { ModelAnnotated } from '../annotated/ModelAnnotated'
 import { Code } from '../browser/Code'
 import { InspectLayer } from '../browser/Inspect'
 import { Fit } from '../Fit'
@@ -43,7 +42,6 @@ const glide = { type: 'spring', stiffness: 360, damping: 40 } as const
 /** Air around a demo on the stage. */
 const STAGE_PAD = 48
 
-const ANNOTATED: Record<string, (p: { className?: string }) => ReactNode> = { models: ModelAnnotated }
 
 const first = (s: string) => s.split(/(?<=\.)\s/)[0]
 
@@ -147,13 +145,12 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
   const next = ENTRIES[(i + 1) % ENTRIES.length]
   const family = CATEGORIES.find((c) => c.id === e.category)!
   const Demo = DEMOS[e.id]
-  const Story = ANNOTATED[e.id]
   const shown = stageTheme ?? page
   // Tall enough for the demo at 90% or more, whatever the window: a short window scrolls to it
   // rather than shrinking it until it can't be read.
-  const need = SIZE[e.id] && !Story ? Math.ceil(SIZE[e.id][1] * 0.9 + STAGE_PAD * 2 + 64) : 0
+  const need = SIZE[e.id] ? Math.ceil(SIZE[e.id][1] * 0.9 + STAGE_PAD * 2 + 64) : 0
   // On a phone the stage follows the demo instead: as tall as it is at the width it gets, plus room for the dock.
-  const phone = SIZE[e.id] && !Story ? `max(380px, calc(min(${SIZE[e.id][1]}px, (100vw - ${40 + STAGE_PAD * 2}px) * ${(SIZE[e.id][1] / SIZE[e.id][0]).toFixed(4)}) + ${STAGE_PAD * 2 + 64}px))` : '520px'
+  const phone = SIZE[e.id] ? `max(380px, calc(min(${SIZE[e.id][1]}px, (100vw - ${40 + STAGE_PAD * 2}px) * ${(SIZE[e.id][1] / SIZE[e.id][0]).toFixed(4)}) + ${STAGE_PAD * 2 + 64}px))` : '520px'
 
   const go = (to: string) => {
     if (to === id) return
@@ -270,13 +267,9 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
             >
               {/* Faded here, not on the moving layer above: Motion's own opacity there would win over a class. */}
               <div className={`absolute inset-0 flex flex-col transition-opacity duration-300 ${mode === 'code' ? 'pointer-events-none opacity-0' : ''}`}>
-                {Story ? (
-                  <Story className="min-h-0 flex-1" />
-                ) : (
-                  <Fit pad={STAGE_PAD} max={e.zoom ?? 1.25} min={0.62}>
-                    <Demo />
-                  </Fit>
-                )}
+                <Fit pad={STAGE_PAD} max={e.zoom ?? 1.25} min={0.62}>
+                  <Demo />
+                </Fit>
               </div>
             </motion.div>
           </AnimatePresence>

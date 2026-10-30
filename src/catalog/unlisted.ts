@@ -10,6 +10,8 @@
  * up (run button, context ring, model & effort). Diff review followed it out.
  *
  * On 2026-10-30 Detent stopped being AI-only, so eight came back on merit: kanban, cropper, video,
- * tour, bridge, donut, funnel and diff. What stays here is commodity, a double, or waiting on a redesign.
+ * tour, bridge, donut, funnel and diff. What stays here is commodity or a double.
+ *
+ * Later that day chart, trend, carousel and model & effort came back, redesigned.
  */
-export const UNLISTED = new Set(['buttons', 'tabs', 'select', 'stepper', 'code', 'toaster', 'dialog', 'confirm', 'popover', 'tooltip', 'dropdown', 'context-menu', 'hovercard', 'combobox', 'command', 'carousel', 'sidebar', 'chips', 'retry', 'typing', 'bars', 'waffle', 'run', 'context', 'models', 'chart', 'trend'])
+export const UNLISTED = new Set(['buttons', 'tabs', 'select', 'stepper', 'code', 'toaster', 'dialog', 'confirm', 'popover', 'tooltip', 'dropdown', 'context-menu', 'hovercard', 'combobox', 'command', 'sidebar', 'chips', 'retry', 'typing', 'bars', 'waffle', 'run', 'context'])

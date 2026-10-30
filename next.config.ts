@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: '/components/stats', destination: '/components/metric', permanent: true },
-      ...['chips', 'retry', 'typing', 'bars', 'waffle', 'run', 'context', 'models', 'chart', 'trend'].map((id) => ({ source: `/components/${id}`, destination: '/components', permanent: true })),
+      ...['chips', 'retry', 'typing', 'bars', 'waffle', 'run', 'context'].map((id) => ({ source: `/components/${id}`, destination: '/components', permanent: true })),
     ]
   },
   cacheComponents: true,

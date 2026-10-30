@@ -30,7 +30,6 @@ const FREE: Record<string, ComponentType> = {
   dock: dynamic(() => import('@/lab/demos/dock').then((m) => m.DockDemo), { ssr: false }),
   time: dynamic(() => import('@/lab/demos/time').then((m) => m.TimeDemo), { ssr: false }),
   composer: dynamic(() => import('@/lab/demos/composer').then((m) => m.ComposerDemo), { ssr: false }),
-  models: dynamic(() => import('@/lab/demos/models').then((m) => m.ModelsDemo), { ssr: false }),
   voice: dynamic(() => import('@/lab/demos/voice').then((m) => m.VoiceDemo), { ssr: false }),
   select: dynamic(() => import('@/lab/demos/menus').then((m) => m.SelectDemo), { ssr: false }),
   rename: dynamic(() => import('@/lab/demos/menus').then((m) => m.RenameDemo), { ssr: false }),
