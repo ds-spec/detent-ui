@@ -4,6 +4,8 @@
  * found too big and shrunk once it's on screen.
  */
 export const SIZE: Record<string, [number, number]> = {
+  thread: [760, 600],
+  toolcall: [640, 420],
   scaffold: [720, 328],
   answer: [720, 480],
   ask: [640, 504],
