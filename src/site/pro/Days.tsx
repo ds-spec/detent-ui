@@ -41,7 +41,7 @@ export function Days() {
   return (
     <div className="rounded-[28px] bg-surface p-5 shadow-[var(--card-edge)] sm:p-8">
       {/* One segment per piece, each as wide as its days. */}
-      <div className="flex h-20 gap-[2px] sm:h-28" onPointerLeave={() => setAt(null)}>
+      <div className="flex h-20 gap-px sm:h-28 sm:gap-[2px]" onPointerLeave={() => setAt(null)}>
         {PIECES.map((p) => {
           const on = counted(p)
           const lit = at?.id === p.id
@@ -52,8 +52,12 @@ export function Days() {
               aria-label={`${p.name}, ${LABEL[p.group].toLowerCase()}, about ${p.days} days`}
               onPointerEnter={() => setAt(p)}
               onFocus={() => setAt(p)}
+              onClick={(e) => {
+                // Too thin to aim for by touch: a tap reads the piece out, and the line below goes to it.
+                if (matchMedia('(pointer: coarse)').matches) e.preventDefault()
+              }}
               onBlur={() => setAt(null)}
-              className="ring-focus group/seg relative min-w-[3px] rounded-[5px] transition-[transform,opacity] duration-200 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:-translate-y-1"
+              className="ring-focus group/seg relative min-w-[2px] rounded-[2px] transition-[transform,opacity] sm:min-w-[3px] sm:rounded-[5px] duration-200 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:-translate-y-1"
               style={{ flexGrow: p.days, flexBasis: 0, opacity: at && !lit ? 0.55 : 1 }}
             >
               <span
@@ -70,12 +74,14 @@ export function Days() {
       </div>
 
       {/* What the hand is on, in a line of fixed height so nothing below it moves. */}
-      <div aria-live="polite" className="mt-4 flex h-6 items-center gap-2 truncate text-[14.5px]">
+      <div aria-live="polite" className="mt-4 flex h-12 items-center gap-2 overflow-hidden text-[14.5px] sm:h-6">
         {at ? (
           <>
             <span className="size-2 shrink-0 rounded-full" style={{ background: HUE[at.group] }} />
-            <span className="text-ink">{at.name}</span>
-            <span className="truncate text-quiet">— {at.line}</span>
+            <Link href={at.href} className="truncate text-ink">
+              {at.name}
+            </Link>
+            <span className="hidden min-w-0 truncate text-quiet sm:inline">— {at.line}</span>
             <span className="tnum ml-auto shrink-0 text-ink-2">{at.days} days</span>
           </>
         ) : (
@@ -124,10 +130,10 @@ export function DaysHead({ className }: { className: string }) {
   return (
     <h2 id="inside-title" className={className}>
       <span className="sr-only">Where {days} days went. Point at any piece.</span>
-      <span aria-hidden className="flex flex-wrap items-center">
-        Where&nbsp;
+      <span aria-hidden className="flex flex-wrap items-center gap-x-[0.22em]">
+        Where
         <RollingText text={String(days)} proportional />
-        &nbsp;days went.
+        <span>days went.</span>
       </span>
       <span aria-hidden className="block text-quiet">Point at any piece.</span>
     </h2>

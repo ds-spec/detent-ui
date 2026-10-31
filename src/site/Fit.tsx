@@ -19,9 +19,13 @@ const SETTLE = 110
 const SETTLE_MAX = 420
 /** Below this stage width a demo is laid out at the stage's width, with this much air. */
 const PHONE = 640
-const PHONE_PAD = 16
+/** Below this a component's stage does the same: the rail leaves it too narrow to scale. */
+const LAPTOP = 1280
+const PHONE_PAD = 10
+const CARD_PAD = 8
+const CARD_MIN = 0.5
 
-export function Fit({ children, pad = 28, max = 1, min = 0.2, onPhone }: { children: ReactNode; pad?: number; max?: number; min?: number; /** Says how tall the demo is on a phone, where it takes the stage's width instead of being scaled. */ onPhone?: (height: number | null) => void }) {
+export function Fit({ children, pad = 28, max = 1, min = 0.2, onPhone, stage = false }: { children: ReactNode; pad?: number; max?: number; min?: number; /** A component's own stage, which lays its demo out up to a narrow laptop. */ stage?: boolean; /** Says how tall the demo is on a phone, where it takes the stage's width instead of being scaled. */ onPhone?: (height: number | null) => void }) {
   const outer = useRef<HTMLDivElement>(null)
   const inner = useRef<HTMLDivElement>(null)
   const [zoom, setZoom] = useState(1)
@@ -30,6 +34,7 @@ export function Fit({ children, pad = 28, max = 1, min = 0.2, onPhone }: { child
   const [crop, setCrop] = useState<{ x: boolean; y: boolean }>({ x: false, y: false })
   const [phone, setPhone] = useState<number | null>(null)
   const zoomRef = useRef(1)
+  const tries = useRef(0)
   const firstSeen = useRef(0)
   const reveal = useRef<ReturnType<typeof setTimeout> | null>(null)
   const unzoom = useCallback((p: { x: number; y: number }) => ({ x: p.x / zoom, y: p.y / zoom }), [zoom])
@@ -46,14 +51,30 @@ export function Fit({ children, pad = 28, max = 1, min = 0.2, onPhone }: { child
       // Nothing to measure yet (not laid out, or the demo is still loading): try again on the next resize.
       if (!o.offsetWidth || !o.offsetHeight || !r.width || !r.height) return
       // On a phone the demo gets the stage's width and sets its height, so it lays itself out instead of shrinking.
-      const room = onPhone && o.offsetWidth < PHONE ? o.offsetWidth - PHONE_PAD * 2 : null
-      setPhone(room)
-      if (room) {
-        if (zoomRef.current !== 1) {
+      const vw = window.innerWidth
+      const room = onPhone && vw < (stage ? LAPTOP : PHONE) ? o.offsetWidth - PHONE_PAD * 2 : null
+      // A card can't grow, so on a phone its demo is laid out at the card's width, then scaled to its height: never cropped.
+      const card = !onPhone && vw < PHONE
+      if (card) {
+        const wide = o.offsetWidth - CARD_PAD * 2
+        const h = r.height / ownScale / zoomRef.current
+        const next = Math.max(CARD_MIN, Math.min(1, (o.offsetHeight - CARD_PAD * 2) / h))
+        if (Math.abs(next - zoomRef.current) > 0.02 && tries.current < 4) {
+          tries.current += 1
+          zoomRef.current = next
+          setZoom(next)
+        }
+        setPhone(wide / zoomRef.current)
+      } else {
+        setPhone(room)
+        if (!room) onPhone?.(null)
+      }
+      if (room || card) {
+        if (room && zoomRef.current !== 1) {
           zoomRef.current = 1
           setZoom(1)
         }
-        onPhone?.(i.offsetHeight + PHONE_PAD * 2)
+        if (room) onPhone?.(i.offsetHeight + PHONE_PAD * 2)
         setCrop((c) => (c.x || c.y ? { x: false, y: false } : c))
         if (!firstSeen.current) firstSeen.current = performance.now()
         if (reveal.current) clearTimeout(reveal.current)
@@ -85,7 +106,7 @@ export function Fit({ children, pad = 28, max = 1, min = 0.2, onPhone }: { child
       ro.disconnect()
       if (reveal.current) clearTimeout(reveal.current)
     }
-  }, [pad, max, min, onPhone])
+  }, [pad, max, min, onPhone, stage])
 
   // When it can't all fit, show the start of it and let the overflowing edges fade away.
   const fade = [crop.x && 'linear-gradient(to right, #000 calc(100% - 56px), transparent)', crop.y && 'linear-gradient(to bottom, #000 calc(100% - 56px), transparent)'].filter(Boolean).join(', ')
@@ -95,7 +116,7 @@ export function Fit({ children, pad = 28, max = 1, min = 0.2, onPhone }: { child
       className={`absolute inset-0 flex overflow-hidden ${crop.x ? 'justify-start' : 'justify-center'} ${crop.y ? 'items-start' : 'items-center'}`}
       style={{ padding: crop.x || crop.y ? pad : undefined, maskImage: fade || undefined, maskComposite: crop.x && crop.y ? 'intersect' : undefined }}
     >
-      <div ref={inner} data-fit className={`${phone ? '' : 'w-max'} shrink-0 transition-opacity duration-200 ease-out`} style={{ width: phone ?? undefined, zoom, opacity: ready ? 1 : 0, visibility: ready ? 'visible' : 'hidden' }}>
+      <div ref={inner} data-fit className="w-max shrink-0 transition-opacity duration-200 ease-out" style={{ maxWidth: phone ?? undefined, zoom, opacity: ready ? 1 : 0, visibility: ready ? 'visible' : 'hidden' }}>
         <MotionConfig transformPagePoint={unzoom}>{children}</MotionConfig>
       </div>
     </div>

@@ -55,7 +55,7 @@ export function TreeDemo() {
   const b = useBench()
   const [selected, setSelected] = useState<string | null>('northwind-agent/tools/issue-refund.ts')
   return (
-    <div className="flex h-[420px] w-[300px] flex-col gap-4">
+    <div className="flex h-[420px] w-[300px] max-w-full flex-col gap-4">
       <CopyCommand command="npx create-agent@latest" />
       <div className="rounded-row bg-surface p-1.5 shadow-float">
         <FileTree nodes={PROJECT} defaultOpen={['northwind-agent', 'northwind-agent/tools']} selected={selected} onSelect={b.on('onSelect', setSelected)} label={b.get('label', 'Agent files')} />

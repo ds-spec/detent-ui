@@ -25,7 +25,9 @@ export function NotFound() {
   return (
     <main className="mx-auto max-w-[1360px] px-5 sm:px-6">
       <section className="flex flex-col items-center pt-20 text-center sm:pt-32">
-        <Missing />
+        <div className="max-[400px]:[zoom:0.8]">
+          <Missing />
+        </div>
         <div className="mt-6 flex max-w-full justify-center">
           <Nearest pages={PAGES} />
         </div>

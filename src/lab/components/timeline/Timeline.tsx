@@ -119,13 +119,16 @@ export function Timeline({ events: initial, now: start, height = 440, ref }: { e
   const counts = { all: events.length, talk: events.filter((e) => TALK.has(e.kind)).length, changes: events.filter((e) => !TALK.has(e.kind)).length }
 
   return (
-    <div className="w-full">
+    <div className="@container w-full">
       <div role="radiogroup" aria-label="Show" className="-mx-1 flex gap-1 overflow-x-auto px-1 [scrollbar-width:none]">
         {(['all', 'talk', 'changes'] as Filter[]).map((f) => (
           <button key={f} type="button" role="radio" aria-checked={filter === f} onClick={() => (tap(), setFilter(f))} className="ring-focus relative flex h-8 pointer-coarse:h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 text-footnote">
             {filter === f && <motion.span layoutId={plate} className="absolute inset-0 rounded-full bg-surface-2" transition={reduce ? { duration: 0 } : spring.move} />}
-            <span className={`relative ${filter === f ? 'font-medium text-ink' : 'text-ink-3 hover:text-ink-2'}`}>{f === 'all' ? 'Everything' : f === 'talk' ? 'Conversation' : 'Changes'}</span>
-            <span className="relative min-w-[2ch] text-caption tabular-nums text-ink-3">{counts[f]}</span>
+            <span className={`relative ${filter === f ? 'font-medium text-ink' : 'text-ink-3 hover:text-ink-2'}`}>
+              <span className="@max-[260px]:hidden">{f === 'all' ? 'Everything' : f === 'talk' ? 'Conversation' : 'Changes'}</span>
+              <span className="hidden @max-[260px]:inline">{f === 'all' ? 'All' : f === 'talk' ? 'Talk' : 'Changes'}</span>
+            </span>
+            <span className="relative min-w-[2ch] text-caption tabular-nums text-ink-3 @max-[360px]:hidden">{counts[f]}</span>
           </button>
         ))}
       </div>
@@ -282,7 +285,9 @@ function Run({ events, now, open, onToggle }: { events: Event[]; now: number; op
           <Code size={13} />
         </Mark>
         <span className="flex min-w-0 flex-1 items-center gap-1.5 text-footnote text-ink-2">
-          <span className="font-medium text-ink">{first.who.name}</span> {what}
+          <span className="min-w-0">
+            <span className="font-medium text-ink">{first.who.name}</span> {what}
+          </span>
           <motion.span className="text-ink-3" animate={{ rotate: open ? 90 : 0 }} transition={reduce ? { duration: 0 } : spring.snappy}>
             <ChevronRight size={13} />
           </motion.span>

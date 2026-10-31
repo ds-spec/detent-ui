@@ -272,8 +272,8 @@ export function TimePicker({
     const typing = draft?.which === which
     const v = valueOf(which)
     return (
-      <div ref={which === 'start' ? startAnchor : endAnchor} className="relative">
-        <span aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-3">
+      <div ref={which === 'start' ? startAnchor : endAnchor} className={`@container relative ${range ? 'min-w-0 flex-1' : 'w-[124px]'}`}>
+        <span aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-3 @max-[108px]:hidden">
           <Clock minutes={typing && reading !== null ? reading : v} />
         </span>
         <input
@@ -303,7 +303,7 @@ export function TimePicker({
             if (draft?.which === which && reading !== null) set(which, reading)
             setDraft(null)
           }}
-          className="ring-focus h-10 w-[124px] rounded-[10px] bg-surface pl-9 pr-2 text-callout tabular-nums text-ink shadow-[0_0_0_1px_var(--line-strong)] outline-none transition-shadow focus:shadow-field"
+          className="ring-focus h-10 w-full rounded-[10px] bg-surface pl-9 pr-2 text-callout @max-[108px]:pl-3 tabular-nums text-ink shadow-[0_0_0_1px_var(--line-strong)] outline-none transition-shadow focus:shadow-field"
         />
         {/* What the typing reads as, before it's committed. */}
         <AnimatePresence>
@@ -331,11 +331,14 @@ export function TimePicker({
   return (
     <div className="inline-flex max-w-full flex-col">
       <div className="flex flex-wrap items-center gap-2">
-        {field('start')}
+        {!range && field('start')}
         {range && (
           <>
-            <ArrowRight size={14} className="shrink-0 text-ink-3" />
-            {field('end')}
+            <div className="flex w-[278px] max-w-full items-center gap-2">
+              {field('start')}
+              <ArrowRight size={14} className="shrink-0 text-ink-3" />
+              {field('end')}
+            </div>
             {/* The length, in a fixed slot so a longer one doesn't push anything. */}
             <span className="relative ml-1 h-6 w-[92px] overflow-hidden">
               <AnimatePresence mode="popLayout" initial={false}>

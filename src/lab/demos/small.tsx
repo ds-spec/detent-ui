@@ -359,7 +359,7 @@ export function ToastsDemo() {
   })
   const draft = events.find((e) => e.id === 'draft')?.status
   return (
-    <div className="relative h-[420px] w-[640px] max-w-full overflow-hidden rounded-[24px] bg-surface shadow-float" {...handlers}>
+    <div className="@container relative h-[420px] w-[640px] max-w-full overflow-hidden rounded-[24px] bg-surface shadow-float" {...handlers}>
       <div className="flex h-12 items-center justify-between px-5 shadow-[inset_0_-1px_0_var(--line)]">
         <span className="text-footnote font-medium text-ink">Open tickets</span>
         <span className="tnum text-caption text-ink-3">{draft === 'done' ? 3 : 4} waiting</span>
@@ -378,7 +378,7 @@ export function ToastsDemo() {
                 <span className="block truncate text-footnote font-medium text-ink">{t.who}</span>
                 <span className="block truncate text-caption text-ink-3">{t.subject}</span>
               </span>
-              <span className="tnum w-12 text-right font-mono text-caption text-ink-3">#{t.id}</span>
+              <span className="tnum hidden w-12 text-right font-mono text-caption text-ink-3 @min-[420px]:block">#{t.id}</span>
               {/* The row says what the toast says, in the same place every time. */}
               <span className="grid w-[104px] justify-items-end text-caption font-medium">
                 {(['open', 'running', 'done'] as const).map((s) => (
@@ -396,7 +396,7 @@ export function ToastsDemo() {
           )
         })}
       </ul>
-      <div className="absolute bottom-4 right-4">
+      <div className="absolute bottom-4 left-4 right-4 flex justify-end">
         <AgentToasts events={events} agent={{ name: 'Detent', avatar: <DetentMark size={30} round /> }} expanded={b.get('expanded', false) || open} max={b.get('max', 3)} onAction={b.on('onAction')} onDismiss={b.on('onDismiss')} />
       </div>
     </div>

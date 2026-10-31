@@ -54,7 +54,7 @@ function Tile({ name, line, children }: { name: string; line: string; children: 
 export function Materials() {
   const [down, setDown] = useState(false)
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <Tile name="Base" line="The page, and the cards that sit on it.">
         <span className="text-callout text-ink-3">The card is the base</span>
       </Tile>
@@ -107,7 +107,7 @@ function Intelligence() {
   return (
     <div>
       <div className="relative flex h-[220px] items-center justify-center overflow-hidden rounded-[28px] bg-card">
-        <div className="relative w-[340px]">
+        <div className="relative w-[340px] max-w-[calc(100%-32px)]">
           <Glow on={on} layer="halo" radius={28} style={{ height: 56, bottom: 'auto' }} />
           <div className="relative flex h-14 items-center gap-3 rounded-full bg-surface pl-5 pr-5 shadow-float">
             <span className="relative block h-5 min-w-0 flex-1 overflow-hidden text-headline">
@@ -144,7 +144,7 @@ export function Motion() {
     return () => clearInterval(t)
   }, [])
   return (
-    <div className="grid gap-4 md:grid-cols-3">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-3">
       <Tile name="Move" line="The plate travels to its new place; nothing fades out and back.">
         <div className="flex h-12 items-center rounded-full bg-surface-2 p-1">
           {['Unified', 'Split'].map((l, i) => (
@@ -187,7 +187,7 @@ export function Motion() {
 
 export function Shape() {
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
       <Tile name="Concentric radii" line="An inner radius is the outer one minus the padding between: 28 − 8 = 20, 20 − 4 = 16, 16 − 4 = 12.">
         <div className="rounded-[28px] bg-surface p-2 shadow-float">
           <div className="rounded-[20px] bg-surface-2 p-1">

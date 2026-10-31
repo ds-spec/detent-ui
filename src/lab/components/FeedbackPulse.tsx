@@ -118,7 +118,7 @@ export function FeedbackPulse({
       </div>
     ),
     open: (
-      <div className="w-[372px] max-w-full p-[18px]">
+      <div className="@container w-[372px] max-w-[calc(100cqw-16px)] p-[18px]">
         <div className="flex h-7 items-center justify-between">
           <Swap k={`s${score}`} className="w-[190px] text-headline pointer-coarse:w-[166px]">
             {labels[Math.max(0, score - 1)]}
@@ -129,7 +129,7 @@ export function FeedbackPulse({
           {ASK[tier]}
         </Swap>
         {/* Fixed-height chip area: switching tiers never changes the card's size. */}
-        <div className="relative mt-2.5 h-[76px] pointer-coarse:h-[80px]">
+        <div className="relative mt-2.5 h-[76px] pointer-coarse:h-[80px] @max-[330px]:h-[120px] @max-[260px]:h-[162px]">
           <AnimatePresence initial={false}>
             <motion.div
               key={tier}

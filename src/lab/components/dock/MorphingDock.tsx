@@ -60,9 +60,12 @@ export function MorphingDock({
   const [open, setOpen] = useState<string | null>(null)
   const [hover, setHover] = useState<string | null>(null)
   const surface = useRef<HTMLDivElement>(null)
+  const root = useRef<HTMLDivElement>(null)
+  const [room, setRoom] = useState(Infinity)
   const tool = tools.find((t) => t.id === open) ?? null
   const dockWidth = tools.length * 48 + 12
-  const w = tool ? width : dockWidth
+  const panel = Math.min(width, room - 16)
+  const w = tool ? panel : dockWidth
   const h = tool ? tool.height + ROW : ROW
 
   const set = (id: string | null) => {
@@ -86,6 +89,14 @@ export function MorphingDock({
   })
 
   useEffect(() => {
+    const el = root.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setRoom(el.clientWidth))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  useEffect(() => {
     if (!open) return
     const key = (e: KeyboardEvent) => e.key === 'Escape' && set(null)
     const away = (e: PointerEvent) => !surface.current?.contains(e.target as Node) && set(null)
@@ -99,7 +110,7 @@ export function MorphingDock({
   }, [open])
 
   return (
-    <div className="relative size-full overflow-hidden">
+    <div ref={root} className="relative size-full overflow-hidden">
       <motion.div
         className="absolute inset-0"
         initial={false}
@@ -144,7 +155,7 @@ export function MorphingDock({
           animate={{ width: w, height: h, borderRadius: tool ? 22 : 26 }}
           transition={reduce ? { duration: 0 } : MORPH}
         >
-          <div className="absolute top-0" style={{ width, height: h - ROW, left: '50%', marginLeft: -width / 2 }}>
+          <div className="absolute top-0" style={{ width: panel, height: h - ROW, left: '50%', marginLeft: -panel / 2 }}>
             <AnimatePresence mode="popLayout" initial={false}>
               {tool && (
                 <motion.div

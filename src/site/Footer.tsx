@@ -31,9 +31,9 @@ export function Footer() {
           <span className="text-ink-3">
             © 2026 <span className="font-medium text-ink">Detent</span>
           </span>
-          <nav aria-label="Footer" className="flex flex-wrap items-center gap-x-6 gap-y-2">
+          <nav aria-label="Footer" className="flex flex-wrap items-center gap-x-6 gap-y-2 pointer-coarse:gap-y-0">
             {LINKS.map((l) => (
-              <Link key={l.href} href={l.href} className="ring-focus rounded-[4px] text-ink-3 transition-colors duration-150 hover:text-[var(--accent-ink)]">
+              <Link key={l.href} href={l.href} className="ring-focus rounded-[4px] text-ink-3 transition-colors duration-150 hover:text-[var(--accent-ink)] pointer-coarse:inline-flex pointer-coarse:h-9 pointer-coarse:items-center">
                 {l.label}
               </Link>
             ))}
@@ -43,9 +43,9 @@ export function Footer() {
             <ThemeSwitch />
           </span>
         </div>
-        <nav aria-label="Licence and policies" className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-caption">
+        <nav aria-label="Licence and policies" className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-caption pointer-coarse:gap-y-0">
           {TRUST.map((l) => (
-            <Link key={l.href} href={l.href} className="ring-focus rounded-[4px] text-ink-3 transition-colors duration-150 hover:text-[var(--accent-ink)]">
+            <Link key={l.href} href={l.href} className="ring-focus rounded-[4px] text-ink-3 transition-colors duration-150 hover:text-[var(--accent-ink)] pointer-coarse:inline-flex pointer-coarse:h-9 pointer-coarse:items-center">
               {l.label}
             </Link>
           ))}

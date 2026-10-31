@@ -244,7 +244,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
       {present && <motion.div className="fixed inset-0 z-[45] bg-bg" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setPresent(false)} />}
       <BenchProvider key={id}>
       <div className="mt-4 grid gap-3">
-      <div className="relative flex h-[var(--stage-phone)] flex-col lg:h-[var(--stage)] " style={{ ['--stage' as string]: `max(clamp(540px, calc(100dvh - 290px), 760px), ${need}px)`, ['--stage-phone' as string]: demoHeight ? `${demoHeight + 48 + 64}px` : phone }}>
+      <div className="relative flex h-[var(--stage-phone)] flex-col lg:h-[var(--stage)] " style={{ ['--stage' as string]: demoHeight ? `max(540px, ${demoHeight + 48 + 64}px)` : `max(clamp(540px, calc(100dvh - 290px), 760px), ${need}px)`, ['--stage-phone' as string]: demoHeight ? `${demoHeight + 48 + 64}px` : phone }}>
         <motion.section
           ref={stage}
           layout
@@ -279,7 +279,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
                     <Demo />
                   </div>
                 ) : (
-                  <Fit pad={STAGE_PAD} max={e.zoom ?? 1.25} min={0.62} onPhone={setDemoHeight}>
+                  <Fit pad={STAGE_PAD} max={e.zoom ?? 1.25} min={0.62} onPhone={setDemoHeight} stage>
                     <Demo />
                   </Fit>
                 )}

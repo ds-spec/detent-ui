@@ -74,9 +74,9 @@ const ROWS: [string, ReactNode, ReactNode, ReactNode, ReactNode][] = [
 export function Compare() {
   const heads = ['Free', pro.name, all.name, team.name]
   return (
-    <div className="-mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
-      <table className="w-full min-w-[720px] table-fixed border-collapse text-left">
-        <thead>
+    <div className="md:overflow-x-auto">
+      <table className="block w-full table-fixed border-collapse text-left md:table md:min-w-[720px]">
+        <thead className="hidden md:table-header-group">
           <tr>
             <th className="w-[26%] pb-4" />
             {heads.map((h, i) => (
@@ -86,14 +86,15 @@ export function Compare() {
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="block md:table-row-group">
           {ROWS.map(([label, ...cells]) => (
-            <tr key={label} className="shadow-[inset_0_1px_0_var(--line)]">
-              <th scope="row" className="py-3.5 pr-6 text-[14px] font-normal text-ink-3">
+            <tr key={label} className="grid grid-cols-2 gap-x-4 gap-y-3 py-4 shadow-[inset_0_1px_0_var(--line)] md:table-row md:py-0">
+              <th scope="row" className="col-span-2 block text-[14px] font-normal text-ink-3 md:table-cell md:py-3.5 md:pr-6">
                 {label}
               </th>
               {cells.map((c, i) => (
-                <td key={i} className="tnum py-3.5 pr-4 text-[14px] text-ink">
+                <td key={i} className="tnum block text-[14px] text-ink md:table-cell md:py-3.5 md:pr-4">
+                  <span className="mb-0.5 block text-[12px] text-ink-3 md:hidden">{heads[i]}</span>
                   {c}
                 </td>
               ))}

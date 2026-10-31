@@ -314,7 +314,7 @@ export function Signature({
   const micro = `Signature · ${value.trim() || 'Your name'} · `.toUpperCase()
 
   return (
-    <motion.div animate={thud} className="relative w-[520px] max-w-full rounded-[24px] bg-surface p-6 pb-5 shadow-raised">
+    <motion.div animate={thud} className="@container relative w-[520px] max-w-full rounded-[24px] bg-surface p-6 pb-5 shadow-raised">
       {/* Paper grain, just enough to feel. */}
       <svg aria-hidden className="pointer-events-none absolute inset-0 size-full rounded-[24px] opacity-[0.07] mix-blend-multiply dark:opacity-[0.05] dark:mix-blend-screen">
         <filter id={`${inputId}-grain`}>
@@ -325,10 +325,10 @@ export function Signature({
       </svg>
 
       {/* The document's head: what it is and its reference, the date, in fine capitals; then what it agrees to. */}
-      <div className="relative flex items-center justify-between font-mono text-[10.5px] uppercase tracking-[0.12em] text-ink-3">
+      <div className="relative flex items-center justify-between whitespace-nowrap font-mono text-[10.5px] uppercase tracking-[0.12em] text-ink-3">
         <span>
           {title}
-          {reference && <span className="text-ink-2"> · {reference}</span>}
+          {reference && <span className="text-ink-2 @max-[260px]:hidden"> · {reference}</span>}
         </span>
         <span className="tnum">{day(sealed ?? today)}</span>
       </div>
@@ -402,9 +402,9 @@ export function Signature({
       <div className="relative mt-4 flex h-12 items-center justify-end gap-1 overflow-hidden border-t border-line pt-3">
         <AnimatePresence initial={false} mode="wait">
           {sealed ? (
-            <motion.div key="sealed" className="flex items-center gap-2 text-footnote" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: ease.out } }} exit={{ opacity: 0, y: -10, transition: { duration: 0.12, ease: ease.exit } }}>
+            <motion.div key="sealed" className="flex items-center gap-2 whitespace-nowrap text-footnote" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: ease.out } }} exit={{ opacity: 0, y: -10, transition: { duration: 0.12, ease: ease.exit } }}>
               <span className="text-ink">Signed and sealed</span>
-              <span className="tnum text-ink-3">{sealed.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
+              <span className="tnum text-ink-3 @max-[260px]:hidden">{sealed.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
               <motion.button type="button" whileTap={press} onPointerDown={tap} onClick={clear} className="ring-focus ml-2 h-8 pointer-coarse:h-9 rounded-full px-3 font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink">
                 Start over
               </motion.button>

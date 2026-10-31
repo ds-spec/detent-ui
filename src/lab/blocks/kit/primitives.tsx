@@ -159,9 +159,9 @@ export function useLatest<T>(v: T) {
  * text that fills on hover. Controls are told apart by fill, not by borders.
  */
 export const btn = {
-  primary: 'ring-focus inline-flex h-8 items-center justify-center gap-1.5 rounded-[7px] bg-ink px-3 text-footnote font-medium text-surface shadow-[inset_0_1px_0_rgb(255_255_255/0.14),0_1px_2px_rgb(0_0_0/0.18)] transition-opacity hover:opacity-90 disabled:opacity-40',
-  secondary: 'lit ring-focus inline-flex h-8 items-center justify-center gap-1.5 rounded-[7px] bg-[color-mix(in_oklch,var(--ink)_5.5%,transparent)] px-3 text-footnote font-medium text-ink transition-colors hover:bg-[color-mix(in_oklch,var(--ink)_9%,transparent)] disabled:text-ink-3',
-  ghost: 'ring-focus inline-flex h-8 items-center justify-center gap-1.5 rounded-[7px] px-2.5 text-footnote font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink',
+  primary: 'ring-focus inline-flex h-8 pointer-coarse:h-9 items-center justify-center gap-1.5 rounded-[7px] bg-ink px-3 text-footnote font-medium text-surface shadow-[inset_0_1px_0_rgb(255_255_255/0.14),0_1px_2px_rgb(0_0_0/0.18)] transition-opacity hover:opacity-90 disabled:opacity-40',
+  secondary: 'lit ring-focus inline-flex h-8 pointer-coarse:h-9 items-center justify-center gap-1.5 rounded-[7px] bg-[color-mix(in_oklch,var(--ink)_5.5%,transparent)] px-3 text-footnote font-medium text-ink transition-colors hover:bg-[color-mix(in_oklch,var(--ink)_9%,transparent)] disabled:text-ink-3',
+  ghost: 'ring-focus inline-flex h-8 pointer-coarse:h-9 items-center justify-center gap-1.5 rounded-[7px] px-2.5 text-footnote font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink',
 }
 
 /** Where you are in a list: a soft wash of the app's accent with its text in the accent's ink, and light on its top edge. */

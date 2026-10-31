@@ -79,6 +79,17 @@ type Tile = { id: string; x: number; y: number; w: number; h: number }
 /** How many images the spread holds: one hero, four beside it, four along the foot. */
 const SLOTS = 9
 
+/** On a narrow stage: three columns, the hero two wide and two tall, the next two beside it, six below. */
+function stack(width: number): { tiles: Tile[]; height: number } {
+  const cw = (width - GAP * 2) / 3
+  const rh = Math.round(cw * 0.92)
+  const at = (c: number, r: number, cs = 1, rs = 1) => ({ id: '', x: c * (cw + GAP), y: r * (rh + GAP), w: cs * cw + (cs - 1) * GAP, h: rs * rh + (rs - 1) * GAP })
+  return {
+    tiles: [at(0, 0, 2, 2), at(2, 0), at(2, 1), ...[0, 1, 2].map((c) => at(c, 2)), ...[0, 1, 2].map((c) => at(c, 3))],
+    height: 4 * rh + 3 * GAP,
+  }
+}
+
 /**
  * The spread: rank is size. The best match takes the hero, half the width and two rows tall;
  * the next four sit beside it, two by two; the next four run along the foot.
@@ -171,7 +182,9 @@ export function ImageSearch({
     return ranked.map((i) => i.id)
   }, [images, scored, score])
   const found = scored ? scored.filter((m) => m.score >= 0.34).length : images.length
-  const slots = useMemo(() => spread(w, height - 16), [w, height])
+  const compact = w > 0 && w < 520
+  const slots = useMemo(() => (compact ? stack(w).tiles : spread(w, height - 16)), [w, height, compact])
+  const stage = compact ? stack(w).height + 16 : height
   // The spread holds the best nine; near misses only fill it when too few match, faded so they read as second.
   const shown = order.slice(0, SLOTS)
   const tiles = shown.map((id, i) => ({ ...slots[i], id }))
@@ -240,7 +253,7 @@ export function ImageSearch({
                 else setLikeId(null)
               } else if (e.key === 'Backspace' && !query && like) setLikeId(null)
             }}
-            placeholder={like ? 'Add words, or search just by the image' : placeholder}
+            placeholder={like ? (w < 340 ? 'Add words' : 'Add words, or search just by the image') : w > 0 && w < 340 && placeholder.length > 22 ? 'Describe a photo' : placeholder}
             aria-label="Search images"
             aria-controls={`${uid}-grid`}
             className="relative h-full w-full bg-transparent text-[16px] text-transparent caret-[var(--ink)] outline-none selection:bg-[color-mix(in_oklch,var(--accent)_22%,transparent)] selection:text-transparent placeholder:text-ink-3"
@@ -249,7 +262,7 @@ export function ImageSearch({
       </div>
 
       {/* The spread: rank is size, the hero first. */}
-      <div className="p-2" style={{ height }}>
+      <div className="p-2" style={{ height: stage }}>
         <div ref={box} id={`${uid}-grid`} role="list" className="relative size-full">
           <AnimatePresence initial={false}>
             {w > 0 &&
@@ -293,7 +306,7 @@ export function ImageSearch({
                       />
                       {/* The hero carries what the model saw in it, set small like a caption in a magazine. */}
                       {hero && (
-                        <span aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 flex h-24 items-end bg-gradient-to-t from-[rgb(0_0_0/0.45)] to-transparent p-4">
+                        <span aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 flex h-24 items-end bg-gradient-to-t text-left from-[rgb(0_0_0/0.45)] to-transparent p-4">
                           <AnimatePresence mode="popLayout" initial={false}>
                             <motion.span key={img.id} className="text-footnote leading-5 text-white/90" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
                               {img.alt}
@@ -308,7 +321,7 @@ export function ImageSearch({
                       type="button"
                       onClick={() => setLikeId(t.id)}
                       onFocus={() => setAim(t.id)}
-                      className={`ring-focus absolute right-2 top-2 flex h-7 pointer-coarse:h-9 items-center gap-1.5 rounded-full bg-[rgb(255_255_255/0.88)] pl-2 pr-2.5 text-caption font-medium text-[#18181b] shadow-[0_2px_8px_rgb(0_0_0/0.18)] backdrop-blur-md transition-[opacity,transform] duration-200 focus-visible:opacity-100 ${pointed && likeId !== t.id && t.w > 110 ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-1 opacity-0'}`}
+                      className={`ring-focus absolute right-2 top-2 flex h-7 pointer-coarse:h-9 items-center gap-1.5 rounded-full bg-[rgb(255_255_255/0.88)] pl-2 pr-2.5 text-caption font-medium text-[#18181b] shadow-[0_2px_8px_rgb(0_0_0/0.18)] backdrop-blur-md transition-[opacity,transform] duration-200 focus-visible:opacity-100 ${pointed && likeId !== t.id && t.w > 88 ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-1 opacity-0'}`}
                     >
                       <Spark size={11} />
                       Similar

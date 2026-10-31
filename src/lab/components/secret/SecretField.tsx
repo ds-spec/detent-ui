@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { AnimatePresence, animate, motion, useReducedMotion } from 'motion/react'
 import { Check, Copy } from '../../icons'
 import { tap } from '../../lib/feel'
@@ -9,9 +9,26 @@ const SECONDS = 0.72
 
 function Key({ value, lead, tail, shown }: { value: string; lead: number; tail: number; shown: number }) {
   const reduce = useReducedMotion()
+  const code = useRef<HTMLElement>(null)
+  // A narrow field folds the hidden middle shorter, so the end of the key is never cut off.
+  const [skip, setSkip] = useState(0)
+  useLayoutEffect(() => {
+    const field = code.current?.parentElement
+    if (!field) return
+    const fit = () => {
+      const room = field.clientWidth - 24
+      const char = code.current?.firstElementChild?.getBoundingClientRect().width || 7.2
+      setSkip(Math.max(0, value.length - Math.floor(room / char)))
+    }
+    fit()
+    const watch = new ResizeObserver(fit)
+    watch.observe(field)
+    return () => watch.disconnect()
+  }, [value])
   return (
-    <code aria-label={`Key ending ${value.slice(-tail)}`} className="flex min-w-0 font-mono text-[12px] leading-[20px]">
+    <code ref={code} aria-label={`Key ending ${value.slice(-tail)}`} className="flex min-w-0 font-mono text-[12px] leading-[20px]">
       {[...value].map((ch, i) => {
+        if (i >= lead && i < lead + skip) return null
         const open = i < lead || i >= value.length - tail
         const up = open || i < shown
         return (

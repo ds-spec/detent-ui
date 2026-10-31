@@ -253,10 +253,10 @@ export function DiffReview({
             review: (
               <span className="flex gap-1.5">
                 <Button size="sm" variant="ghost" disabled={!ready} onClick={() => all('rejected')}>
-                  Reject all
+                  Reject<span className="@max-[420px]:hidden"> all</span>
                 </Button>
                 <Button size="sm" variant="primary" disabled={!ready} onClick={() => all('accepted')}>
-                  Accept all
+                  Accept<span className="@max-[420px]:hidden"> all</span>
                 </Button>
               </span>
             ),
@@ -268,7 +268,7 @@ export function DiffReview({
             ),
             applied: (
               <Button size="sm" variant="secondary">
-                Open {file.split('/').pop()}
+                Open<span className="@max-[420px]:hidden"> {file.split('/').pop()}</span>
                 <ArrowUpRight size={13} className="text-ink-3" />
               </Button>
             ),
@@ -387,7 +387,7 @@ function HunkView({
           <span aria-hidden className="italic text-ink-3">
             ƒ
           </span>
-          {h.scope}
+          <span className="truncate">{h.scope}</span>
         </span>
         <span className="shrink-0 text-caption text-ink-3 @max-[520px]:hidden">
           Lines {h.n}–{h.n + Math.max(0, nc - 1)}
@@ -527,7 +527,8 @@ function Status({ text }: { text: string }) {
   return m ? (
     <span>
       <span className="text-ink">{m[1]}</span>
-      {m[2]}
+      {m[2].replace(/ to review$/, '')}
+      {m[2].endsWith(' to review') && <span className="@max-[320px]:hidden"> to review</span>}
     </span>
   ) : (
     <span className="text-ink-2">{text}</span>
@@ -540,7 +541,7 @@ function Verdicts({ verdict, writing, canDecide, focused, onDecide }: { verdict:
   const state = writing ? 'writing' : verdict !== 'pending' ? verdict : canDecide ? 'ask' : 'wait'
   return (
     // One fixed slot: the buttons, the stamp and the writing state all live in the same space.
-    <span className="relative flex h-6 w-[172px] shrink-0 items-center justify-end">
+    <span className="relative flex h-6 w-[172px] @max-[420px]:w-[132px] shrink-0 items-center justify-end">
       <AnimatePresence initial={false} mode="popLayout">
         {state === 'writing' && (
           <motion.span key="writing" className="flex items-center gap-1.5 pr-1.5 text-caption text-ink-3" {...fade}>
@@ -597,14 +598,14 @@ function Small({ onClick, hint, focused, strong, children }: { onClick: () => vo
       whileTap={{ scale: 0.96 }}
       onPointerDown={(e) => e.stopPropagation()}
       onClick={onClick}
-      className={`ring-focus relative flex h-6 items-center gap-1 rounded-[7px] pl-1.5 pr-1 text-caption font-medium [@media(pointer:coarse)]:after:absolute [@media(pointer:coarse)]:after:-inset-x-1 [@media(pointer:coarse)]:after:-inset-y-2 [@media(pointer:coarse)]:after:content-[''] transition-[background-color,color,box-shadow] duration-150 ${
+      className={`ring-focus relative flex h-6 items-center gap-1 rounded-[7px] pl-1.5 pr-1 text-caption font-medium pointer-coarse:pr-1.5 @max-[420px]:pr-1.5 [@media(pointer:coarse)]:after:absolute [@media(pointer:coarse)]:after:-inset-x-1 [@media(pointer:coarse)]:after:-inset-y-2 [@media(pointer:coarse)]:after:content-[''] transition-[background-color,color,box-shadow] duration-150 ${
         strong && focused ? 'bg-ink text-surface hover:opacity-90' : strong ? 'bg-surface text-ink shadow-[0_0_0_1px_var(--line-strong)] hover:bg-surface-2' : 'text-ink-2 hover:bg-surface-2 hover:text-ink'
       }`}
     >
       {children}
       {/* The shortcut is always there, only brighter on the hunk you're on, so nothing shifts. */}
       <span
-        className={`ml-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-[5px] px-1 font-mono text-[10.5px] leading-none transition-opacity duration-200 ${strong && focused ? 'bg-[color-mix(in_oklch,var(--surface)_18%,transparent)] text-surface' : 'bg-surface-2 text-ink-3'}`}
+        className={`ml-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-[5px] px-1 font-mono pointer-coarse:hidden @max-[420px]:hidden text-[10.5px] leading-none transition-opacity duration-200 ${strong && focused ? 'bg-[color-mix(in_oklch,var(--surface)_18%,transparent)] text-surface' : 'bg-surface-2 text-ink-3'}`}
         style={{ opacity: focused ? 1 : 0.45 }}
       >
         {hint}

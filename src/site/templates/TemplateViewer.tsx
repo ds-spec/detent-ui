@@ -110,7 +110,7 @@ export function TemplateViewer({ id }: { id: string }) {
             All templates
           </Link>
         </div>
-        <div className="mt-4 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mt-4 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between lg:flex-col lg:items-start xl:flex-row xl:items-end">
           <h1 className="min-w-0 text-[clamp(32px,3.8vw,48px)] font-normal leading-[1.08] tracking-[-0.045em] text-ink">
             {t.name}
             <span className="block text-quiet">For {t.suits}.</span>

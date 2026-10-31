@@ -138,8 +138,8 @@ function Shots({ shots, tone, wide = false }: { shots: Shot[]; tone: 'amber' | '
 
   return (
     <motion.div initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1, transition: { duration: 0.35, ease: UI } }} onPointerEnter={() => setHeld(true)} onPointerLeave={() => setHeld(false)}>
-      {/* Shaped like the screen it holds on a phone, so the screen fills it; as tall as the panel beside it on a laptop. */}
-      <div className={`relative isolate overflow-hidden ${wide ? 'aspect-[4/3] rounded-[24px] sm:aspect-auto sm:h-[clamp(380px,62vh,660px)] sm:rounded-[36px]' : 'aspect-[4/3] rounded-[22px] sm:aspect-[16/10] sm:rounded-[28px] lg:aspect-auto lg:h-[clamp(300px,58vh,620px)]'}`}>
+      {/* Tall on a phone, where the screen is laid out at the phone's own width to stay readable; as tall as the panel beside it on a laptop. */}
+      <div className={`relative isolate overflow-hidden ${wide ? 'aspect-[4/5] rounded-[24px] sm:aspect-auto sm:h-[clamp(380px,62vh,660px)] sm:rounded-[36px]' : 'aspect-[4/5] rounded-[22px] sm:aspect-[16/10] sm:rounded-[28px] lg:aspect-auto lg:h-[clamp(300px,58vh,620px)]'}`}>
         <Backdrop tone={tone} />
         <AnimatePresence initial={false} mode="popLayout">
           <motion.div
@@ -151,7 +151,7 @@ function Shots({ shots, tone, wide = false }: { shots: Shot[]; tone: 'amber' | '
             exit={{ opacity: 0, transition: { duration: 0.15, ease: UI } }}
           >
             <Fit pad={wide ? 44 : 20} max={wide ? 1.12 : 1} min={0.2}>
-              <div style={{ width: 1000, height: 660 }}>
+              <div className="h-[calc(125vw-66px)] w-[calc(100vw-56px)] sm:h-[660px] sm:w-[1000px]">
                 <Window title={s.title} chrome={s.chrome}>
                   <div className="h-full overflow-hidden">
                     <View />
@@ -315,10 +315,10 @@ export function HeroHead() {
         <span className="sr-only">
           Skip {days} days of work. Pay ${plan.price}, once.
         </span>
-        <span aria-hidden className="flex flex-wrap items-center justify-center">
-          Skip&nbsp;
+        <span aria-hidden className="flex flex-wrap items-center justify-center gap-x-[0.22em]">
+          Skip
           <RollingText text={String(days)} proportional />
-          &nbsp;days of work.
+          <span>days of work.</span>
         </span>
         <span aria-hidden className="block text-quiet">
           Pay <RollingText text={`$${plan.price}`} proportional />, once.

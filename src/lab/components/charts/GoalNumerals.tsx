@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useImperativeHandle, useRef, useState } from 'react'
-import type { KeyboardEvent, PointerEvent, Ref } from 'react'
+import type { KeyboardEvent, PointerEvent, ReactNode, Ref } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { DotType } from '@/lab/ui/DotType'
 import { RollingText } from '@/lab/ui/RollingText'
+import { useSize } from '@/lab/lib/hooks'
 import { compact } from './parts'
 
 export { ChartCard } from './ChartCard'
@@ -16,8 +17,13 @@ export type GoalsHandle = { point(id: string | null): void; scrub(day: number | 
 
 const DOT = 5
 const GAP = 2.5
-/** The numerals' height: seven rows of dots. */
-const TALL = 7 * (DOT + GAP) - GAP
+/** What follows the count: after a dot, or on its own line where the row is narrow. */
+const Note = ({ className = '', children }: { className?: string; children: ReactNode }) => (
+  <span className={`${className} @max-[380px]:block`}>
+    <span className="@max-[380px]:hidden"> · </span>
+    {children}
+  </span>
+)
 
 /**
  * Goals as their own numbers. Each percentage is set large in a dot matrix and is its own bar: the
@@ -67,6 +73,12 @@ export function GoalNumerals({
 
   // A finger can't leave: what it touched stays shown until a tap lands somewhere else.
   const root = useRef<HTMLDivElement>(null)
+  // On a narrow card the numerals shrink so the goal's name and figures keep their room.
+  const rw = useSize(root).w
+  const narrow = rw > 0 && rw < 260
+  const dot = narrow ? 3.5 : DOT
+  const gap = narrow ? 2 : GAP
+  const tall = 7 * (dot + gap) - gap
   const touched = at !== null || day !== null
   useEffect(() => {
     if (!touched) return
@@ -103,9 +115,9 @@ export function GoalNumerals({
               >
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-callout text-ink">{g.label}</span>
-                  <span className="tnum mt-0.5 block truncate text-footnote text-ink-3">
+                  <span className="tnum mt-0.5 block truncate text-footnote text-ink-3 @max-[380px]:whitespace-normal">
                     {f(v)} of {f(g.goal)}
-                    {over ? <span className="text-warn-ink"> · {pct - 100}% over</span> : ahead ? <span className="text-ink-2"> · ahead of pace</span> : even ? <span> · on pace</span> : null}
+                    {over ? <Note className="text-warn-ink">{pct - 100}% over</Note> : ahead ? <Note className="text-ink-2">ahead of pace</Note> : even ? <Note>on pace</Note> : null}
                   </span>
                 </span>
                 <span className="relative flex items-end gap-1.5">
@@ -117,12 +129,12 @@ export function GoalNumerals({
                     viewBox="0 0 5 7"
                     className="absolute -left-2.5 bottom-0 text-ink-3"
                     initial={false}
-                    animate={{ y: -Math.min(1, pace) * TALL + 3.5, opacity: shown ? 1 : 0 }}
+                    animate={{ y: -Math.min(1, pace) * tall + 3.5, opacity: shown ? 1 : 0 }}
                     transition={reduce || scrubbing ? { duration: reduce ? 0 : 0.09 } : { type: 'spring', stiffness: 260, damping: 30 }}
                   >
                     <path d="M0 0.5 L4.5 3.5 L0 6.5 Z" fill="currentColor" />
                   </motion.svg>
-                  <DotType text={`${pct}`} slots={3} dot={DOT} gap={GAP} level={shown ? Math.min(1, p) : 0} over={shown && over ? p - 1 : 0} quick={scrubbing} />
+                  <DotType text={`${pct}`} slots={3} dot={dot} gap={gap} level={shown ? Math.min(1, p) : 0} over={shown && over ? p - 1 : 0} quick={scrubbing} />
                   <span className="text-title font-normal leading-none text-ink-3">%</span>
                 </span>
               </button>

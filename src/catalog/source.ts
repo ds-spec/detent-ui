@@ -4,11 +4,8 @@ import { isProComponent } from './pro'
 /** The files that make up each component, as they ship. */
 export const FILES: Record<string, string[]> = {
   scaffold: ['components/scaffold/AgentScaffold.tsx', 'components/terminal/Terminal.tsx', 'components/tree/FileTree.tsx'],
-  thread: ['../pro/components/thread/Thread.tsx', '../pro/components/thread/ToolCall.tsx'],
-  toolcall: ['../pro/components/thread/ToolCall.tsx'],
   answer: ['../pro/components/answer/StreamingAnswer.tsx'],
   ask: ['../pro/components/ask/AskSearch.tsx'],
-  docchat: ['../pro/components/docchat/DocChat.tsx'],
   images: ['components/images/ImageSearch.tsx'],
   askchart: ['../pro/components/askchart/AskChart.tsx'],
   bridge: ['../pro/components/bridge/RevenueBridge.tsx'],

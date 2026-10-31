@@ -132,7 +132,7 @@ export function AgentScaffold({ name, files, icons = {}, command = `npx create-a
               </motion.span>
             </AnimatePresence>
           </span>
-          <span className="tnum flex w-8 justify-end text-ink-3">
+          <span className="tnum flex w-8 justify-end text-ink-3 @max-[300px]:hidden">
             <RollingText text={`0:${String(seconds).padStart(2, '0')}`} />
           </span>
         </span>

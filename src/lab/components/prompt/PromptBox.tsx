@@ -273,7 +273,7 @@ export function PromptBox({
           add(e.dataTransfer.files)
         }}
       >
-        <div className={`${CARD} relative h-full overflow-hidden rounded-[21px] transition-shadow duration-200`} style={{ boxShadow: focused ? 'inset 0 0 0 1px var(--line-strong)' : undefined }}>
+        <div className={`${CARD} @container relative h-full overflow-hidden rounded-[21px] transition-shadow duration-200`} style={{ boxShadow: focused ? 'inset 0 0 0 1px var(--line-strong)' : undefined }}>
           <div ref={content} className="absolute inset-x-0 bottom-0 px-4 pb-3.5 pt-3.5">
             {/* The line across the top: what goes with the message, or what it's doing; the model on the right. */}
             {head && (
@@ -394,12 +394,14 @@ export function PromptBox({
                 </svg>
               </Key>
               <input ref={picker} type="file" multiple hidden onChange={(e) => (e.target.files && add(e.target.files), (e.target.value = ''))} />
+              <span className="contents @max-[300px]:hidden">
               <Key label="Mention" onClick={mention}>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="8" cy="8" r="2.4" />
                   <path d="M10.4 8v.9a1.6 1.6 0 0 0 3.2 0V8A5.6 5.6 0 1 0 11 12.8" />
                 </svg>
               </Key>
+              </span>
               <ModePicker modes={modes} current={current} open={menu} setOpen={setMenu} onPick={setMode} bottom={menuBottom} layer={layer} />
               <span className="flex-1" />
               {onVoice && (
@@ -644,7 +646,7 @@ function ModePicker({
       >
         <span className="flex text-ink-2">{mark(current)}</span>
         <span>{current.name}</span>
-        {current.aside && <span className="-ml-0.5 text-ink-3">{current.aside}</span>}
+        {current.aside && <span className="-ml-0.5 hidden text-ink-3 @min-[380px]:inline">{current.aside}</span>}
       </button>
 
       {layer &&

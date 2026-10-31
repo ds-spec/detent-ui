@@ -45,7 +45,9 @@ export function VoiceNoteDemo() {
         <span className="mb-1 flex">
           <DetentMark size={28} round />
         </span>
-        <VoiceNote ref={note} words={WORDS} duration={DURATION} />
+        <div className="min-w-0 flex-1">
+          <VoiceNote ref={note} words={WORDS} duration={DURATION} />
+        </div>
       </div>
     </div>
   )

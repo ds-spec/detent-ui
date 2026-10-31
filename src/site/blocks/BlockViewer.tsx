@@ -464,7 +464,7 @@ export function Desk({ title, chrome, run, mode, theme, present, onExit, view, c
       <div data-desk data-theme={theme ?? undefined} className="relative mt-6 rounded-[32px] px-3 pb-3 pt-3 text-ink sm:px-8 sm:pb-8 sm:pt-0">
         <Backdrop />
         <Ruler max={max} width={width} stops={stops} here={here} onPick={to} />
-        <div ref={track} className="relative h-[clamp(560px,calc(100dvh-320px),840px)]">
+        <div ref={track} className="relative h-[clamp(560px,calc(100dvh-320px),840px)] max-sm:h-[max(560px,calc(100dvh-150px))]">
           {max > 0 && (
             <Window title={title} chrome={chrome} width={width} compact={width < 520}>
               <div key={run} className={`h-full transition-opacity duration-300 ${mode === 'code' ? 'pointer-events-none opacity-0' : ''}`}>

@@ -123,15 +123,20 @@ export function PresenceDemo() {
           setFollowing(null)
         }
       }}
-      className="flex h-[420px] w-[440px] max-w-full flex-col overflow-hidden rounded-[24px] bg-surface shadow-float"
+      className="@container flex h-[420px] w-[440px] max-w-full flex-col overflow-hidden rounded-[24px] bg-surface shadow-float"
     >
       <header className="flex h-16 shrink-0 items-center gap-3 pl-5 pr-3 shadow-[inset_0_-1px_0_var(--line)]">
         <div className="min-w-0 flex-1">
           <p className="truncate text-headline text-ink">Q3 refund rules</p>
           <p className="tnum truncate text-caption text-ink-3">Edited just now · {here.length} here</p>
         </div>
-        <HereNow people={people} following={following} onFollow={b.on('onFollow', setFollowing)} open={fan} max={b.get('max', 4)} />
-        <Button size="sm" variant="primary" className="rounded-full">
+        <div className="@max-[400px]:hidden">
+          <HereNow people={people} following={following} onFollow={b.on('onFollow', setFollowing)} open={fan} max={b.get('max', 4)} />
+        </div>
+        <div className="hidden @max-[400px]:block">
+          <HereNow people={people} following={following} onFollow={b.on('onFollow', setFollowing)} open={fan} max={Math.min(2, b.get('max', 4))} />
+        </div>
+        <Button size="sm" variant="primary" className="rounded-full @max-[300px]:hidden">
           Share
         </Button>
       </header>

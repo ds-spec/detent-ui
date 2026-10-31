@@ -129,7 +129,7 @@ export function MetricExplainer({
                   role="tab"
                   aria-selected={on}
                   onClick={() => pick(x.id)}
-                  className={`ring-focus relative h-8 shrink-0 rounded-full px-3 text-footnote transition-colors duration-150 ${on ? 'text-ink' : 'text-ink-3 hover:text-ink-2'}`}
+                  className={`ring-focus relative h-8 shrink-0 rounded-full px-3 text-footnote transition-colors duration-150 pointer-coarse:h-9 @max-[400px]:px-2 ${on ? 'text-ink' : 'text-ink-3 hover:text-ink-2'}`}
                 >
                   {on && <motion.span layoutId="metric-tab" className="absolute inset-0 rounded-full bg-surface-2" transition={spring.snappy} />}
                   <span className="relative">{x.name}</span>

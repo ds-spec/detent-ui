@@ -115,13 +115,13 @@ export function Gap() {
 
       <div className="flex min-w-0 flex-col rounded-[28px] bg-surface p-2 shadow-[var(--card-edge)]">
         {/* The stage: today, or with Detent. */}
-        <div className="relative isolate h-[460px] overflow-hidden rounded-[22px] sm:h-[540px]" style={{ background: on ? wellOf(c.tone) : 'var(--surface-2)' }}>
+        <div className="relative isolate h-[516px] overflow-hidden rounded-[22px] sm:h-[540px]" style={{ background: on ? wellOf(c.tone) : 'var(--surface-2)' }}>
           <div aria-hidden className="absolute inset-0 rounded-[22px] shadow-[inset_0_0_0_1px_var(--line)]" />
           <AnimatePresence initial={false} mode="popLayout">
             <motion.div
               key={`${c.id}-${on}`}
               inert={!on}
-              className="absolute inset-0"
+              className="absolute inset-x-0 bottom-0 top-14 sm:top-0"
               initial={reduce ? false : { opacity: 0, scale: on ? 0.985 : 1 }}
               animate={{ opacity: 1, scale: 1, transition: { duration: 0.45, ease: UI } }}
               exit={{ opacity: 0, transition: { duration: 0.14, ease: UI } }}
@@ -207,7 +207,7 @@ const MONO = 'font-mono text-[12.5px] leading-[1.6]'
 
 function Answer() {
   return (
-    <div className={`w-[560px] ${SYS} text-[14px] leading-[1.6] text-ink-2`}>
+    <div className={`w-[560px] max-w-full ${SYS} text-[14px] leading-[1.6] text-ink-2`}>
       <div className="ml-auto w-fit max-w-[380px] rounded-[10px] bg-[var(--line)] px-3 py-2 text-ink">What’s our refund policy for annual plans?</div>
       <div className="mt-5 text-ink-3">Thinking...</div>
       <div className="mt-3 whitespace-pre-wrap">
@@ -230,7 +230,7 @@ function Run() {
     '{"type":"finish","finishReason":"tool-calls","usage":{"promptTokens":4127,"completionTokens":388}}',
   ]
   return (
-    <div className={`w-[620px] ${MONO} text-ink-2`}>
+    <div className={`w-[620px] max-w-full ${MONO} text-ink-2`}>
       {lines.map((l, i) => (
         <div key={i} className="break-all border-b border-dashed border-[var(--line)] py-1.5 last:border-0">
           {l}
@@ -242,8 +242,8 @@ function Run() {
 
 function Confirm() {
   return (
-    <div className="flex h-[360px] w-[560px] items-start justify-center pt-6">
-      <div className={`w-[420px] rounded-[12px] bg-surface p-5 ${SYS} shadow-[0_12px_40px_rgb(0_0_0/0.18),0_0_0_1px_var(--line)]`}>
+    <div className="flex h-[360px] w-[560px] max-w-full items-start justify-center pt-6">
+      <div className={`w-[420px] max-w-full rounded-[12px] bg-surface p-5 ${SYS} shadow-[0_12px_40px_rgb(0_0_0/0.18),0_0_0_1px_var(--line)]`}>
         <p className="text-[13px] font-semibold text-ink">localhost:3000 says</p>
         <p className="mt-3 text-[14px] leading-[1.5] text-ink-2">The agent wants to run issueRefund({'{'} invoice: &quot;INV-2041&quot;, amount: 320 {'}'}). Allow?</p>
         <div className="mt-5 flex justify-end gap-2">
@@ -257,7 +257,7 @@ function Confirm() {
 
 function Lookup() {
   return (
-    <div className={`w-[520px] ${SYS}`}>
+    <div className={`w-[520px] max-w-full ${SYS}`}>
       <div className="flex h-10 items-center gap-2 rounded-[8px] bg-surface px-3 text-[14px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line-strong)]">
         how do I rotate an API key?
         <span className="ml-auto rounded-[6px] bg-[#0a66ff] px-2.5 py-1 text-[12px] text-white">Ask AI</span>

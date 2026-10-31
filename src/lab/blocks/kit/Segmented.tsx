@@ -44,7 +44,7 @@ export function Segmented({ label, options, at, onPick, handlers }: {
           aria-label={o.name}
           tabIndex={i === at ? 0 : -1}
           onClick={() => (tap(), onPick(i))}
-          className="ring-focus relative h-7 min-w-9 shrink-0 whitespace-nowrap rounded-full px-2.5 text-caption font-medium"
+          className="ring-focus relative h-7 min-w-9 pointer-coarse:h-9 shrink-0 whitespace-nowrap rounded-full px-2.5 text-caption font-medium"
         >
           {i === at && <motion.span layoutId={plate} transition={spring.move} className="absolute inset-0 rounded-full bg-surface shadow-raised" />}
           <span className={`relative z-[1] transition-colors ${i === at ? 'text-ink' : 'text-ink-3 hover:text-ink-2'}`}>{o.label}</span>

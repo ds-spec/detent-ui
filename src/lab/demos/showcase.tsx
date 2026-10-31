@@ -190,7 +190,7 @@ export function FeedbackDemo() {
   }, [])
 
   return (
-    <div className="relative h-[420px] w-[420px] max-w-full max-sm:overflow-x-clip" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="@container relative h-[420px] w-[420px] max-w-full max-sm:overflow-x-clip" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
       {/* The end of a docs page, so the widget has something to be about. */}
       <div className="absolute inset-x-0 top-6 px-1" style={{ maskImage: 'linear-gradient(to bottom, #000 55%, transparent 92%)' }}>
         <p className="text-footnote text-ink-3">Docs / Billing</p>

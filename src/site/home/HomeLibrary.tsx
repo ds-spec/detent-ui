@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion, useInView, useReducedMotion } from 'motion/react'
 import { DEMOS } from '@/catalog/demos'
@@ -78,12 +78,17 @@ export function HomeLibrary({ lib }: { lib: LibItem[] }) {
   )
 }
 
+/** Room for a plate's caption and its edge. */
+const CAPTION = 132
+
 function Plate({ e, n, wide }: { e: LibItem; n: number; wide: boolean }) {
   const reduce = useReducedMotion()
   const box = useRef<HTMLDivElement | null>(null)
   const near = useInView(box, { margin: '400px' })
   const Demo = DEMOS[e.id]
   const { pro, family } = e
+  // On a phone the plate grows to hold its part at full size.
+  const [tall, setTall] = useState<number | null>(null)
   return (
     <motion.div
       ref={box}
@@ -92,6 +97,7 @@ function Plate({ e, n, wide }: { e: LibItem; n: number; wide: boolean }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ type: 'spring', stiffness: 220, damping: 30 }}
+      style={{ height: tall ? tall + CAPTION : undefined }}
     >
       <Link href={`/components/${e.id}`} aria-label={`${e.name}: ${e.line}`} className="ring-focus absolute inset-0 z-[1] rounded-[inherit]" />
 
@@ -101,7 +107,7 @@ function Plate({ e, n, wide }: { e: LibItem; n: number; wide: boolean }) {
         <div aria-hidden className="absolute inset-0 rounded-[22px] shadow-[inset_0_0_0_1px_var(--line)]" />
         <div className="absolute inset-0 transition-transform duration-700 [transition-timing-function:cubic-bezier(0.2,0,0,1)] group-hover/plate:scale-[1.015]">
           {near && Demo ? (
-            <Fit pad={44} max={1} min={0.5}>
+            <Fit pad={44} max={1} min={0.5} onPhone={setTall}>
               <Demo />
             </Fit>
           ) : null}

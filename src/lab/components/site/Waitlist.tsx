@@ -96,7 +96,7 @@ export function Waitlist({
   }))
 
   return (
-    <div className="w-[420px] max-w-full">
+    <div className="@container w-[420px] max-w-full">
       <motion.div animate={shake}>
         <motion.form
           layout
@@ -173,7 +173,7 @@ export function Waitlist({
                       initial={{ x: 10, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ ...spring.snappy, delay: 0.1 + i * 0.04 }}
-                      className="rounded-full"
+                      className="rounded-full @max-[300px]:hidden"
                       style={{ boxShadow: '0 0 0 2px var(--surface)' }}
                     >
                       <Avatar name={p.name} hue={p.hue} size={32} />
@@ -190,7 +190,7 @@ export function Waitlist({
                     {email[0]?.toUpperCase()}
                   </motion.span>
                 </div>
-                <span className="text-callout text-ink-2">
+                <span className="whitespace-nowrap text-callout text-ink-2">
                   You’re{' '}
                   <span className="font-semibold text-ink">
                     <RollingText text={`#${spot.toLocaleString('en-US')}`} />
@@ -203,7 +203,7 @@ export function Waitlist({
         </motion.form>
       </motion.div>
 
-      <div className="relative h-7">
+      <div className="relative h-7 @max-[340px]:h-12">
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.p
             key={state === 'done' ? 'done' : error ? 'error' : 'hint'}
