@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'motion/react'
 import { Check, Copy } from '@/lab/icons'
+import { daysFor } from '@/catalog/days'
 import { PLANS } from '@/catalog/pro'
 import type { SourceFile } from '@/catalog/source'
 import { ProTag } from '../blocks/ProTag'
@@ -14,6 +15,9 @@ const load = (id: string) => {
   if (!cache.has(id)) cache.set(id, fetch(`/source/${id}`).then((r) => r.json()))
   return cache.get(id)!
 }
+
+/** Fetches a component's source ahead of the Code tab, so the panel opens full. */
+export const warmSource = (id: string) => void load(id).catch(() => cache.delete(id))
 
 /** The component's real source, highlighted, with a tab per file and a copy button. */
 export function Code({ id }: { id: string }) {
@@ -67,7 +71,7 @@ export function Code({ id }: { id: string }) {
         ))}
         <span className="flex-1" />
         {file && <span className="tnum mr-2 font-mono text-caption text-ink-3">{file.lines} lines</span>}
-        <button type="button" onClick={copy} disabled={!file} className="ring-focus flex h-8 w-[84px] items-center justify-center gap-1.5 rounded-full text-caption font-medium text-ink-2 transition-colors duration-150 hover:bg-card hover:text-ink">
+        <button type="button" onClick={copy} disabled={!file} className="ring-focus flex h-8 w-[84px] items-center justify-center gap-1.5 rounded-full text-caption font-medium text-ink-2 transition-[background-color,color,transform] duration-150 hover:bg-card hover:text-ink active:scale-[0.97]">
           <AnimatePresence initial={false} mode="popLayout">
             <motion.span key={copied ? 'y' : 'n'} className={`flex items-center gap-1.5 ${copied ? 'text-ok' : ''}`} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} transition={{ duration: 0.16 }}>
               {copied ? <Check size={12} strokeWidth={2.6} /> : <Copy size={12} style={{ ['--icon-cutout' as string]: 'var(--surface)' }} />}
@@ -98,6 +102,7 @@ export function Code({ id }: { id: string }) {
 function Locked({ id, files }: { id: string; files: SourceFile[] }) {
   const plan = PLANS.find((p) => p.id === (id.startsWith('template-') ? 'all' : 'pro'))!
   const total = files.reduce((n, f) => n + f.lines, 0)
+  const days = daysFor(id.replace(/^template-/, ''))
   return (
     <div className="absolute inset-x-3 bottom-3 top-[68px] flex flex-col overflow-hidden rounded-[20px] bg-surface shadow-border">
       <div className="flex h-12 shrink-0 items-center gap-1 px-2.5 shadow-[inset_0_-1px_0_var(--line)]">
@@ -108,7 +113,7 @@ function Locked({ id, files }: { id: string; files: SourceFile[] }) {
             </span>
           ))}
         </div>
-        <span className="tnum mr-2 shrink-0 font-mono text-caption text-ink-3">{total.toLocaleString('en-US')} lines</span>
+        <span className="tnum mr-2 shrink-0 font-mono text-caption text-ink-3">{total.toLocaleString('en-US')} lines<span className="max-sm:hidden"> · about {days} days to build</span></span>
       </div>
       <div className="relative min-h-0 flex-1 overflow-hidden">
         <div className="code px-2 py-4 font-mono text-footnote leading-5 [mask-image:linear-gradient(to_bottom,#000_20%,transparent_78%)]" aria-hidden dangerouslySetInnerHTML={{ __html: files[0].html }} />
@@ -118,18 +123,18 @@ function Locked({ id, files }: { id: string; files: SourceFile[] }) {
             className="w-full max-w-[400px] rounded-[24px] bg-surface p-6 text-center shadow-modal"
             initial={{ opacity: 0, y: 10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.4, ease: [0.2, 0.9, 0.25, 1] }}
+            transition={{ duration: 0.22, ease: [0.2, 0.9, 0.25, 1] }}
           >
             <ProTag />
             <p className="mt-4 text-title text-ink">The source is in {plan.name}.</p>
             <p className="mx-auto mt-2 max-w-[310px] text-callout text-ink-3">
-              {total.toLocaleString('en-US')} lines across {files.length === 1 ? 'one file' : `${files.length} files`}. Install it from the private registry and it&rsquo;s yours to read, change and keep.
+              {total.toLocaleString('en-US')} lines across {files.length === 1 ? 'one file' : `${files.length} files`}, about {days} days to build. Install it from the private registry and it&rsquo;s yours to read, change and keep.
             </p>
             <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
-              <Link href="/pro#pricing" className="ring-focus flex h-10 items-center justify-center rounded-full bg-ink px-5 text-footnote font-medium text-surface transition-opacity duration-150 hover:opacity-90">
+              <Link href="/pro#pricing" className="ring-focus flex h-10 items-center justify-center rounded-full bg-ink px-5 text-footnote font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]">
                 {plan.cta} · ${plan.price}
               </Link>
-              <Link href="/pro" className="ring-focus flex h-10 items-center justify-center rounded-full bg-surface-2 px-5 text-footnote font-medium text-ink transition-colors duration-150 hover:bg-card">
+              <Link href="/pro" className="ring-focus flex h-10 items-center justify-center rounded-full bg-surface-2 px-5 text-footnote font-medium text-ink transition-[background-color,transform] duration-150 hover:bg-card active:scale-[0.97]">
                 What&rsquo;s in Pro
               </Link>
             </div>

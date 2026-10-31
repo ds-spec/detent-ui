@@ -3,7 +3,7 @@
 import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ComponentType, ReactNode } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { AnimatePresence, animate, motion } from 'motion/react'
 import type { AnimationPlaybackControls } from 'motion/react'
 import { ArrowLeft, ArrowRight, Check, Close, Copy, Expand, Layers, Moon, Node, Note, Refresh, Sun } from '@/lab/icons'
@@ -17,13 +17,14 @@ import { Kbd } from '@/lab/ui/Kbd'
 import { Hover } from '@/lab/ui/Hover'
 import { Code } from '../browser/Code'
 import { Modes, Tool } from '../exhibit/Exhibit'
-import { Install } from '../parts'
+import { Install } from '../Install'
 import { PropRows, PropsSection } from '../PropsTable'
 import { isProBlock } from '@/catalog/pro'
 import { FreeTag, ProTag } from './ProTag'
 import { Rail } from '../exhibit/Rail'
 import { Pager } from '../shell/Pager'
 import { Shell, Trail } from '../shell/Shell'
+import { useWant } from '../shell/want'
 import type { RailGroup } from '../exhibit/Rail'
 import { Backdrop, Window } from './Studio'
 
@@ -39,20 +40,49 @@ const settle = { type: 'spring', stiffness: 460, damping: 44 } as const
 
 const first = (s: string) => s.split(/(?<=\.)\s/)[0]
 
+/** A plain click moves in place; a click that means a new tab stays a link. */
+const movesTo = (go: (id: string) => void, id: string) => (e: React.MouseEvent) => {
+  if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return
+  e.preventDefault()
+  go(id)
+}
+
 /** Every block for the list down the side, kind by kind. */
 const KIND_LOOK = { app: { icon: <Layers size={12} />, color: 'var(--data)' }, flow: { icon: <Node size={12} />, color: 'var(--agents)' }, section: { icon: <Note size={12} />, color: 'var(--marketing)' } } as const
 const RAIL: RailGroup[] = BLOCK_GROUPS.filter((g) => g.items.length).map((g) => ({ id: g.k, name: `${KINDS[g.k]}s`, ...KIND_LOOK[g.k], items: g.items.map((b) => ({ id: b.id, name: b.name, line: b.short, pro: isProBlock(b.id), free: !isProBlock(b.id) })) }))
+
+/**
+ * The blocks' layout: the frame stays put and only the block in it changes, so moving between them
+ * is one continuous page. `children` is the route's own part, which adds nothing visible.
+ */
+export function BlockExhibit({ children }: { children: ReactNode }) {
+  const router = useRouter()
+  const { id, go } = useWant(usePathname().split('/')[2] ?? '', '/blocks')
+  const b = BLOCKS.find((x) => x.id === id)
+  const at = b ? BLOCK_ORDER.indexOf(b) : -1
+  const prev = BLOCK_ORDER[(at - 1 + BLOCK_ORDER.length) % BLOCK_ORDER.length].id
+  const next = BLOCK_ORDER[(at + 1) % BLOCK_ORDER.length].id
+  useEffect(() => {
+    router.prefetch(`/blocks/${next}`)
+    router.prefetch(`/blocks/${prev}`)
+  }, [router, next, prev])
+  if (!b) return children
+  return (
+    <Shell list={<Rail label="Blocks" groups={RAIL} current={b.id} onPick={go} />} bar={<Trail steps={['Blocks', `${KINDS[b.kind]}s`, b.name]} />}>
+      <BlockViewer key={b.id} b={b} go={go} />
+      {children}
+    </Shell>
+  )
+}
 
 /**
  * A block on its desk. The frame is the block's container, and the block sizes itself by it,
  * so dragging the handle shows the real responsive behaviour, not a scaled picture. The ruler
  * above clicks into the common widths, the way the library's name says things should.
  */
-export function BlockViewer({ id }: { id: string }) {
-  const b = BLOCKS.find((x) => x.id === id)!
+function BlockViewer({ b, go }: { b: Block; go: (id: string) => void }) {
   // Previous and next follow the order the site lists them in.
   const at = BLOCK_ORDER.indexOf(b)
-  const router = useRouter()
   const [mode, setMode] = useState<'preview' | 'code'>('preview')
   const [run, setRun] = useState(0)
   const [present, setPresent] = useState(false)
@@ -77,21 +107,20 @@ export function BlockViewer({ id }: { id: string }) {
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
       const t = e.target as HTMLElement
       if (t.closest?.('input, textarea, select, [contenteditable], [role="slider"], [role="radiogroup"], [role="listbox"], [data-desk]')) return
-      router.push(`/blocks/${(e.key === 'ArrowLeft' ? prev : next).id}`)
+      go((e.key === 'ArrowLeft' ? prev : next).id)
     }
     window.addEventListener('keydown', on)
     return () => window.removeEventListener('keydown', on)
-  }, [router, prev, next, present])
+  }, [go, prev, next, present])
 
   return (
-    <Shell list={<Rail label="Blocks" groups={RAIL} current={b.id} onPick={(to) => router.push(`/blocks/${to}`)} />} bar={<Trail steps={['Blocks', `${KINDS[b.kind]}s`, b.name]} />}>
     <main className="mx-auto max-w-[1280px] px-4 pb-24 sm:px-8 lg:pb-16">
       <header className="pt-8 sm:pt-10">
         <div className="flex flex-wrap items-center gap-2.5">
           <span className="text-[13px] text-ink-2">{KINDS[b.kind]}</span>
           {isProBlock(b.id) ? <ProTag /> : <FreeTag />}
           <span className="lg:hidden">
-            <Switcher current={b.id} prev={prev} next={next} />
+            <Switcher current={b.id} prev={prev} next={next} go={go} />
           </span>
         </div>
         <div className="mt-5 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
@@ -132,12 +161,11 @@ export function BlockViewer({ id }: { id: string }) {
 
       {/* The way on: the blocks either side, small enough to pass, plain enough to press. */}
       <nav aria-label="More blocks" className="mt-28 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Neighbour b={prev} dir="prev" />
-        <Neighbour b={next} dir="next" />
+        <Neighbour b={prev} dir="prev" go={go} />
+        <Neighbour b={next} dir="next" go={go} />
       </nav>
-      {!present && <Pager prev={{ name: prev.name, href: `/blocks/${prev.id}` }} next={{ name: next.name, href: `/blocks/${next.id}` }} />}
+      {!present && <Pager prev={{ name: prev.name, href: prev.id }} next={{ name: next.name, href: next.id }} onPick={go} />}
     </main>
-    </Shell>
   )
 }
 
@@ -148,7 +176,7 @@ export function BlockViewer({ id }: { id: string }) {
  * either side of "All blocks" and no frame around them. "/" opens the list, grouped the way the
  * Blocks page groups it, with the one you're on in view.
  */
-function Switcher({ current, prev, next }: { current: string; prev: Block; next: Block }) {
+function Switcher({ current, prev, next, go }: { current: string; prev: Block; next: Block; go: (id: string) => void }) {
   const [open, setOpen] = useState(false)
   const box = useRef<HTMLDivElement>(null)
   const list = useRef<HTMLDivElement>(null)
@@ -176,7 +204,7 @@ function Switcher({ current, prev, next }: { current: string; prev: Block; next:
   }, [open])
   return (
     <div ref={box} className="relative flex items-center gap-0.5">
-      <Step b={prev} dir="prev" />
+      <Step b={prev} dir="prev" go={go} />
       <button
         type="button"
         aria-expanded={open}
@@ -187,7 +215,7 @@ function Switcher({ current, prev, next }: { current: string; prev: Block; next:
         All blocks
         <Kbd>/</Kbd>
       </button>
-      <Step b={next} dir="next" />
+      <Step b={next} dir="next" go={go} />
       <AnimatePresence>
         {open && (
           <motion.div
@@ -208,7 +236,7 @@ function Switcher({ current, prev, next }: { current: string; prev: Block; next:
                     {KINDS[k]}s <span className="tnum ml-1.5">{items.length}</span>
                   </p>
                   {items.map((x) => (
-                    <Link key={x.id} href={`/blocks/${x.id}`} role="option" aria-selected={x.id === current} data-row onClick={() => setOpen(false)} className="ring-focus relative flex h-9 items-center gap-3 rounded-[9px] px-2.5">
+                    <Link key={x.id} href={`/blocks/${x.id}`} role="option" aria-selected={x.id === current} data-row onClick={(e) => (setOpen(false), movesTo(go, x.id)(e))} className="ring-focus relative flex h-9 items-center gap-3 rounded-[9px] px-2.5">
                       <span className={`min-w-0 flex-1 truncate text-footnote ${x.id === current ? 'font-medium text-ink' : 'text-ink-2'}`}>{x.name}</span>
                       {x.id === current && <Check size={14} className="shrink-0 text-ink" />}
                     </Link>
@@ -224,11 +252,11 @@ function Switcher({ current, prev, next }: { current: string; prev: Block; next:
 }
 
 /** An arrow to the next or previous block, naming it under the pointer. */
-function Step({ b, dir }: { b: Block; dir: 'prev' | 'next' }) {
+function Step({ b, dir, go }: { b: Block; dir: 'prev' | 'next'; go: (id: string) => void }) {
   const [tip, setTip] = useState(false)
   return (
     <span className="relative" onPointerEnter={() => setTip(true)} onPointerLeave={() => setTip(false)}>
-      <Link href={`/blocks/${b.id}`} aria-label={`${dir === 'prev' ? 'Previous' : 'Next'} block: ${b.name}`} className="ring-focus flex size-8 items-center justify-center rounded-full text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink">
+      <Link href={`/blocks/${b.id}`} onClick={movesTo(go, b.id)} aria-label={`${dir === 'prev' ? 'Previous' : 'Next'} block: ${b.name}`} className="ring-focus flex size-8 items-center justify-center rounded-full text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink">
         {dir === 'prev' ? <ArrowLeft size={14} /> : <ArrowRight size={14} />}
       </Link>
       <AnimatePresence>
@@ -250,12 +278,13 @@ function Step({ b, dir }: { b: Block; dir: 'prev' | 'next' }) {
 }
 
 /** The block either side, at the foot of the page: its name and what it is, and an arrow that leans the way you'd go. */
-function Neighbour({ b, dir }: { b: Block; dir: 'prev' | 'next' }) {
+function Neighbour({ b, dir, go }: { b: Block; dir: 'prev' | 'next'; go: (id: string) => void }) {
   const back = dir === 'prev'
   return (
     <Link
       href={`/blocks/${b.id}`}
-      className={`ring-focus group/n flex items-center gap-4 rounded-[18px] p-5 shadow-[inset_0_0_0_1px_var(--line)] transition-[background-color,box-shadow] duration-200 hover:bg-[color-mix(in_oklch,var(--accent)_5%,transparent)] hover:shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--accent)_30%,transparent)] ${back ? '' : 'flex-row-reverse text-right'}`}
+      onClick={movesTo(go, b.id)}
+      className={`ring-focus group/n flex items-center gap-4 rounded-[18px] p-5 shadow-[inset_0_0_0_1px_var(--line)] transition-[background-color,box-shadow] duration-200 active:bg-[color-mix(in_oklch,var(--accent)_9%,transparent)] hover:bg-[color-mix(in_oklch,var(--accent)_5%,transparent)] hover:shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--accent)_30%,transparent)] ${back ? '' : 'flex-row-reverse text-right'}`}
     >
       <span
         className={`flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-2 text-ink-2 transition-[transform,color,background-color] duration-300 ease-[cubic-bezier(0.2,0.9,0.25,1)] group-hover/n:bg-accent group-hover/n:text-white ${back ? 'group-hover/n:-translate-x-1' : 'group-hover/n:translate-x-1'}`}
@@ -303,7 +332,7 @@ function Usage({ b }: { b: Block }) {
             setCopied(true)
             setTimeout(() => setCopied(false), 1400)
           }}
-          className="ring-focus grid size-8 shrink-0 place-items-center rounded-full text-ink-3 transition-colors hover:bg-surface hover:text-ink"
+          className="ring-focus grid size-8 shrink-0 place-items-center rounded-full text-ink-3 transition-[background-color,color,transform] duration-150 hover:bg-surface hover:text-ink active:scale-[0.97]"
         >
           <span className={`col-start-1 row-start-1 transition-opacity ${copied ? 'opacity-0' : ''}`}>
             <Copy size={14} />
@@ -482,7 +511,8 @@ export function Desk({ title, chrome, run, mode, theme, present, onExit, view, c
   return (
     <>
       {/* The desk: the block's own backdrop, a ruler, and the block in a window you can resize. */}
-      <div data-desk data-theme={theme ?? undefined} className="relative mt-6 rounded-[32px] px-1.5 pb-1.5 pt-1.5 text-ink max-sm:-mx-3 sm:px-8 sm:pb-8 sm:pt-0">
+      {/* The wallpaper's sheen sits 15% past the desk, so as a section grows to hold its block the percentage would move it. Set in vh, it stays put. */}
+      <div data-desk data-theme={theme ?? undefined} className="relative mt-6 rounded-[32px] px-1.5 pb-1.5 pt-1.5 text-ink max-sm:-mx-3 sm:px-8 sm:pb-8 sm:pt-0 [&>span>span:first-child]:top-[-15vh]">
         <Backdrop />
         <Ruler max={max} width={width} stops={stops} here={here} onPick={to} />
         <div ref={track} className="relative h-[clamp(560px,calc(100dvh-320px),840px)] max-sm:h-[max(560px,calc(100dvh-150px))]" style={{ height: tall ?? undefined }}>
@@ -516,7 +546,7 @@ export function Desk({ title, chrome, run, mode, theme, present, onExit, view, c
               className="ring-focus group/h absolute top-1/2 hidden h-20 w-5 -translate-y-1/2 cursor-ew-resize touch-none items-center justify-center rounded-full sm:flex"
               style={{ left: width + 4 }}
             >
-              <span className={`h-12 w-[5px] rounded-full transition-[background-color,height] duration-200 group-hover/h:h-16 group-hover/h:bg-ink-2 ${dragging ? 'h-16 bg-ink' : 'bg-[color-mix(in_oklch,var(--ink)_30%,transparent)]'}`} />
+              <span className={`h-16 w-[5px] rounded-full transition-[background-color,transform] duration-200 group-hover/h:scale-y-100 group-hover/h:bg-ink-2 ${dragging ? 'bg-ink' : 'scale-y-75 bg-[color-mix(in_oklch,var(--ink)_30%,transparent)]'}`} />
             </button>
           )}
         </div>

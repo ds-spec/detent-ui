@@ -30,6 +30,14 @@ const STEPS: Step[] = [
     line: 'Components and blocks by name, and with Pro + Templates the templates too, as template-tandem, template-rapport and template-detent. The source lands in your project, yours to change.',
     code: 'npx shadcn add @detent-pro/approval',
   },
+  {
+    title: 'Respect reduced motion',
+    line: 'Wrap your app in this once, around everything in your root layout. For anyone who asks their device for less motion, things stop moving and fades stay.',
+    file: 'app/layout.tsx',
+    code: `import { MotionConfig } from 'motion/react'
+
+<MotionConfig reducedMotion="user">{children}</MotionConfig>`,
+  },
 ]
 
 /** What the registry says when it says no, and what to do about it. */

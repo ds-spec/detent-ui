@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { FIRST_COMPONENT } from '@/catalog/site'
 import { usePathname } from 'next/navigation'
 import { useReducedMotion } from 'motion/react'
 import { ENTRIES } from '@/catalog/meta'
@@ -154,7 +155,7 @@ export function Recap() {
           )
         })}
       </p>
-      <div className={`mt-8 flex flex-wrap items-center gap-x-4 gap-y-3 transition-opacity duration-500 ${said && shown >= total && total ? '' : 'opacity-0'}`}>
+      <div className={`mt-8 flex flex-wrap items-center gap-x-4 gap-y-3 transition-opacity duration-250 ${said && shown >= total && total ? '' : 'opacity-0'}`}>
         {said?.last ? (
           <>
             <span className="text-footnote text-ink-3">
@@ -165,7 +166,7 @@ export function Recap() {
             </span>
           </>
         ) : (
-          <Link href="/components" className="ring-focus rounded-[4px] text-footnote text-ink-2 transition-colors hover:text-[var(--accent-ink)]">
+          <Link href={FIRST_COMPONENT} className="ring-focus rounded-[4px] text-footnote text-ink-2 transition-colors hover:text-[var(--accent-ink)]">
             Start with the components, every one of them live →
           </Link>
         )}

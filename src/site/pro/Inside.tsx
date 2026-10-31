@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
+import { BLOCKS } from '@/catalog/blocks'
 import { BLOCK_DAYS, COMPONENT_DAYS, PRO_BLOCKS, TEMPLATE_DAYS } from '@/catalog/effort'
 import { ENTRIES, entry } from '@/catalog/meta'
-import { PLANS, PRO_COMPONENTS } from '@/catalog/pro'
+import { FREE_BLOCKS, PLANS, PRO_COMPONENTS } from '@/catalog/pro'
 import { TEMPLATES } from '@/catalog/templates'
 import { Check } from '@/lab/icons'
 
@@ -62,7 +63,7 @@ const NO = (
 const ROWS: [string, ReactNode, ReactNode, ReactNode, ReactNode][] = [
   ['Price', '$0', `$${pro.price} once`, `$${all.price} once`, `$${team.price} once`],
   ['Components', FREE, `All ${ENTRIES.length}`, `All ${ENTRIES.length}`, `All ${ENTRIES.length}`],
-  ['Blocks, whole screens', NO, PRO_BLOCKS.length, PRO_BLOCKS.length, PRO_BLOCKS.length],
+  ['Blocks, whole screens', FREE_BLOCKS.length, `All ${BLOCKS.length}`, `All ${BLOCKS.length}`, `All ${BLOCKS.length}`],
   ['App templates', NO, NO, `${TEMPLATES.length}, and every new one`, `${TEMPLATES.length}, and every new one`],
   ['AI SDK adapter', NO, YES, YES, YES],
   ['Takes your shadcn theme', YES, YES, YES, YES],

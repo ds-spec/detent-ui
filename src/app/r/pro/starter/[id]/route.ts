@@ -1,6 +1,5 @@
-import registry from '@pro-registry'
 import { checkLicence } from '@/catalog/licence'
-import type { RegistryItem } from '@/catalog/registry'
+import { proItemByName } from '@/catalog/pro-items'
 import { SITE } from '@/catalog/pro'
 import { starterFiles, zip } from '@/catalog/starter'
 
@@ -10,7 +9,6 @@ import { starterFiles, zip } from '@/catalog/starter'
  * on request, for a key whose plan includes the templates; nothing here is a public file.
  */
 
-const items = (registry as { items: Record<string, RegistryItem> }).items
 const answer = (status: number, error: string) => Response.json({ error }, { status, headers: { 'cache-control': 'private, no-store' } })
 
 async function send(req: Request, id: string) {
@@ -24,9 +22,10 @@ async function send(req: Request, id: string) {
   }
   if (!check.ok) return answer(403, check.reason)
   if (check.plan === 'pro') return answer(403, `Templates come with Pro + Templates. Upgrade at ${SITE}/pro`)
-  const item = items[`template-${id}`]
-  if (!item || !items.theme) return answer(404, `There’s no ${id} template to download.`)
-  const body = zip(starterFiles(id, item, items.theme), `${id}-app`)
+  const item = proItemByName(`template-${id}`)
+  const theme = proItemByName('theme')
+  if (!item || !theme) return answer(404, `There’s no ${id} template to download.`)
+  const body = zip(starterFiles(id, item, theme), `${id}-app`)
   return new Response(body, {
     headers: {
       'content-type': 'application/zip',

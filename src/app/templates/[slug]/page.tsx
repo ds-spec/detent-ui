@@ -2,7 +2,6 @@ import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { TEMPLATES, template } from '@/catalog/templates'
-import { TemplateViewer } from '@/site/templates/TemplateViewer'
 import { JsonLd, crumbs, page, short } from '@/site/seo'
 
 export function generateStaticParams() {
@@ -17,7 +16,7 @@ export async function generateMetadata({ params }: PageProps<'/templates/[slug]'
 
 export default function TemplatePage({ params }: PageProps<'/templates/[slug]'>) {
   return (
-    <Suspense fallback={<div className="min-h-[100dvh]" />}>
+    <Suspense fallback={null}>
       <Shown params={params} />
     </Suspense>
   )
@@ -28,14 +27,11 @@ async function Shown({ params }: { params: PageProps<'/templates/[slug]'>['param
   const t = template(slug)
   if (!t) notFound()
   return (
-    <>
-      <JsonLd
-        data={crumbs([
-          ['Templates', '/templates'],
-          [t.name, `/templates/${t.id}`],
-        ])}
-      />
-      <TemplateViewer id={slug} />
-    </>
+    <JsonLd
+      data={crumbs([
+        ['Templates', '/templates'],
+        [t.name, `/templates/${t.id}`],
+      ])}
+    />
   )
 }

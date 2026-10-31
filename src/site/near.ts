@@ -15,6 +15,9 @@ export function useNear(ref: RefObject<Element | null>, enter = '160px 0px', lea
     const el = ref.current
     if (!el) return
     let cancel: (() => void) | null = null
+    // A margin only reaches as far as the root, so on a laptop the root is the panel that scrolls.
+    const panel = el.closest('[data-scroller]')
+    const root = panel && getComputedStyle(panel).overflowY !== 'visible' ? panel : null
     const on = new IntersectionObserver(
       ([e]) => {
         if (!e.isIntersecting || cancel) return
@@ -23,7 +26,7 @@ export function useNear(ref: RefObject<Element | null>, enter = '160px 0px', lea
           setNear(true)
         })
       },
-      { rootMargin: enter },
+      { root, rootMargin: enter },
     )
     const off = new IntersectionObserver(
       ([e]) => {
@@ -32,7 +35,7 @@ export function useNear(ref: RefObject<Element | null>, enter = '160px 0px', lea
         cancel = null
         setNear(false)
       },
-      { rootMargin: leave },
+      { root, rootMargin: leave },
     )
     on.observe(el)
     off.observe(el)

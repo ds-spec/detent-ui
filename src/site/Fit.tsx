@@ -1,8 +1,9 @@
 'use client'
 
-import { useCallback, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { MotionConfig } from 'motion/react'
+import { InPlay } from '@/lab/blocks/kit/director'
 
 /**
  * Shows a demo at its natural size, scaled down only if it would not fit the stage.
@@ -12,7 +13,8 @@ import { MotionConfig } from 'motion/react'
  *
  * Zoom does scale what getBoundingClientRect reports, and a transform inside a zoomed box is
  * scaled again, so Motion is told the zoom: its layout animations then start exactly where
- * the element was, and drags follow the pointer.
+ * the element was, and drags follow the pointer. It also tells the demo inside when it's scrolled
+ * away, through InPlay, so a self-playing demo holds its place instead of running unseen.
  */
 /** How long a demo's size must hold still before it's shown, and the most it waits. */
 const SETTLE = 110
@@ -110,6 +112,15 @@ export function Fit({ children, pad = 28, max = 1, min = 0.2, onPhone, stage = f
     }
   }, [pad, max, min, onPhone, stage])
 
+  const onPage = useContext(InPlay)
+  const [seen, setSeen] = useState(true)
+  useEffect(() => {
+    if (!outer.current) return
+    const io = new IntersectionObserver(([e]) => setSeen(e.isIntersecting), { rootMargin: '120px' })
+    io.observe(outer.current)
+    return () => io.disconnect()
+  }, [])
+
   // When it can't all fit, show the start of it and let the overflowing edges fade away.
   const fade = [crop.x && 'linear-gradient(to right, #000 calc(100% - 56px), transparent)', crop.y && 'linear-gradient(to bottom, #000 calc(100% - 56px), transparent)'].filter(Boolean).join(', ')
   return (
@@ -119,7 +130,9 @@ export function Fit({ children, pad = 28, max = 1, min = 0.2, onPhone, stage = f
       style={{ padding: crop.x || crop.y ? pad : stage && phone ? `${window.innerWidth < PHONE ? PHONE_AIR : PHONE_PAD}px 0 0` : undefined, maskImage: fade || undefined, maskComposite: crop.x && crop.y ? 'intersect' : undefined }}
     >
       <div ref={inner} data-fit className="w-max shrink-0 transition-opacity duration-200 ease-out" style={{ maxWidth: phone ?? undefined, zoom, opacity: ready ? 1 : 0, visibility: ready ? 'visible' : 'hidden' }}>
-        <MotionConfig transformPagePoint={unzoom}>{children}</MotionConfig>
+        <MotionConfig transformPagePoint={unzoom} reducedMotion="user">
+          <InPlay.Provider value={onPage && seen}>{children}</InPlay.Provider>
+        </MotionConfig>
       </div>
     </div>
   )

@@ -10,7 +10,6 @@ const NEW = [
   { href: '/templates/tandem', name: 'Tandem, with AI' },
   { href: '/blocks/agent-chat', name: 'Agent chat' },
   { href: '/blocks/integrations', name: 'Integrations' },
-  { href: '/blocks/feature-story', name: 'Feature story' },
 ]
 
 /** The announcement pill: the newest things take turns, rolling through a masked slot that never changes size, always at full ink. */

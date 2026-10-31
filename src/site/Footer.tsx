@@ -1,12 +1,13 @@
 import Link from 'next/link'
+import { FIRST_BLOCK, FIRST_COMPONENT } from '@/catalog/site'
 import { ShiftReadout, ThemeSwitch, Wordmark } from './FooterParts'
 
 const LINKS = [
-  { href: '/components', label: 'Components' },
-  { href: '/blocks', label: 'Blocks' },
+  { href: FIRST_COMPONENT, label: 'Components' },
+  { href: FIRST_BLOCK, label: 'Blocks' },
   { href: '/templates', label: 'Templates' },
   { href: '/system', label: 'System' },
-  { href: '/#install', label: 'Install' },
+  { href: '/components/prompt', label: 'Install' },
   { href: '/account', label: 'Account' },
 ]
 
@@ -33,7 +34,7 @@ export function Footer() {
           </span>
           <nav aria-label="Footer" className="flex flex-wrap items-center gap-x-6 gap-y-2 pointer-coarse:gap-y-0">
             {LINKS.map((l) => (
-              <Link key={l.href} href={l.href} className="ring-focus rounded-[4px] text-ink-3 transition-colors duration-150 hover:text-[var(--accent-ink)] pointer-coarse:inline-flex pointer-coarse:h-9 pointer-coarse:items-center">
+              <Link key={l.href} href={l.href} prefetch={false} className="ring-focus rounded-[4px] text-ink-3 transition-colors duration-150 hover:text-[var(--accent-ink)] pointer-coarse:inline-flex pointer-coarse:h-9 pointer-coarse:items-center">
                 {l.label}
               </Link>
             ))}
@@ -45,7 +46,7 @@ export function Footer() {
         </div>
         <nav aria-label="Licence and policies" className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-caption pointer-coarse:gap-y-0">
           {TRUST.map((l) => (
-            <Link key={l.href} href={l.href} className="ring-focus rounded-[4px] text-ink-3 transition-colors duration-150 hover:text-[var(--accent-ink)] pointer-coarse:inline-flex pointer-coarse:h-9 pointer-coarse:items-center">
+            <Link key={l.href} href={l.href} prefetch={false} className="ring-focus rounded-[4px] text-ink-3 transition-colors duration-150 hover:text-[var(--accent-ink)] pointer-coarse:inline-flex pointer-coarse:h-9 pointer-coarse:items-center">
               {l.label}
             </Link>
           ))}

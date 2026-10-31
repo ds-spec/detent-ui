@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation'
-import { ENTRIES } from '@/catalog/meta'
+import { FIRST_COMPONENT } from '@/catalog/site'
 
-// The components page always has a component open, with every other one down its side; start
-// with the first.
+// The components page always has a component open, with every other one down its side; it opens
+// on the best one.
 export default function ComponentsPage() {
-  redirect(`/components/${ENTRIES[0].id}`)
+  redirect(FIRST_COMPONENT)
 }

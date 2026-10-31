@@ -1,5 +1,6 @@
 'use client'
 
+import { FIRST_COMPONENT } from '@/catalog/site'
 import { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { CATEGORIES, ENTRIES } from '@/catalog/meta'
@@ -18,7 +19,7 @@ export function Search({ open, onOpenChange, sound, toggleSound }: { open: boole
     const go = (href: string) => () => router.push(href)
     return [
       { id: 'home', label: 'Home', group: 'Site', hint: 'Page', onSelect: go('/') },
-      { id: 'all', label: 'All components', group: 'Site', hint: 'Page', onSelect: go('/components') },
+      { id: 'all', label: 'All components', group: 'Site', hint: 'Page', onSelect: go(FIRST_COMPONENT) },
       { id: 'system', label: 'System', group: 'Site', hint: 'Page', keywords: 'type materials motion shape tokens', onSelect: go('/system') },
       ...ENTRIES.map((e) => {
         const c = CATEGORIES.find((x) => x.id === e.category)!

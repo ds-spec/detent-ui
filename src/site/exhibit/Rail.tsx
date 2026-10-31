@@ -111,7 +111,7 @@ export function Rail({ groups, current, onPick, label, preview }: { groups: Rail
                           onPointerEnter={(e) => aim(x.id, e.currentTarget)}
                           onFocus={(e) => aim(x.id, e.currentTarget)}
                           onBlur={leave}
-                          className={`ring-focus flex h-8 w-full items-center gap-2 rounded-[8px] px-2 text-left text-[13.5px] transition-colors duration-150 ${on ? 'bg-[var(--shell-on)] text-ink' : 'text-ink-2 hover:bg-[var(--shell-hover)] hover:text-ink'}`}
+                          className={`ring-focus flex h-8 w-full items-center gap-2 rounded-[8px] px-2 text-left text-[13.5px] transition-colors duration-150 ${on ? 'bg-[var(--shell-on)] text-ink' : 'text-ink-2 hover:bg-[var(--shell-hover)] hover:text-ink active:bg-[var(--shell-on)]'}`}
                         >
                           <span className="min-w-0 flex-1 truncate">{x.name}</span>
                           {x.pro ? <span className="text-[11px] text-ink-3">Pro</span> : x.free && <span className="text-[11px] text-ink-3">Free</span>}

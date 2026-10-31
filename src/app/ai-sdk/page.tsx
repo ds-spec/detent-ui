@@ -83,7 +83,7 @@ export default async function AiSdk() {
           <div className="rise" style={{ animationDelay: '240ms' }}>
             <p className="text-lead text-ink-3">Reasoning, tool calls, approvals and sources each land in the component built for them, timed as they stream. The window below runs on a real AI SDK route: ask it something, or approve the refund.</p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link href="/pro#pricing" className="ring-focus flex h-11 items-center rounded-full bg-ink px-6 text-callout font-medium text-surface transition-opacity duration-150 hover:opacity-90">
+              <Link href="/pro#pricing" className="ring-focus flex h-11 items-center rounded-full bg-ink px-6 text-callout font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]">
                 {pro.cta} · ${pro.price}
               </Link>
               <Link href="#code" className="ring-focus flex h-11 items-center rounded-full bg-surface-2 px-6 text-callout font-medium text-ink transition-colors duration-150 hover:bg-card">
@@ -141,10 +141,10 @@ export default async function AiSdk() {
             <p className="mt-1 max-w-[520px] text-callout text-ink-3">With the adapter, the answer, the run waterfall and the approval card it’s made from, and every other block.</p>
           </div>
           <div className="flex shrink-0 flex-wrap gap-3">
-            <Link href="/blocks/agent-chat" className="ring-focus flex h-11 items-center rounded-full bg-surface px-6 text-callout font-medium text-ink shadow-border transition-colors duration-150 hover:bg-card">
+            <Link href="/blocks/agent-chat" className="ring-focus flex h-11 items-center rounded-full bg-surface px-6 text-callout font-medium text-ink shadow-border transition-[background-color,transform] duration-150 hover:bg-card active:scale-[0.97]">
               Open the block
             </Link>
-            <Link href="/pro#pricing" className="ring-focus flex h-11 items-center rounded-full bg-ink px-6 text-callout font-medium text-surface transition-opacity duration-150 hover:opacity-90">
+            <Link href="/pro#pricing" className="ring-focus flex h-11 items-center rounded-full bg-ink px-6 text-callout font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]">
               {pro.cta} · ${pro.price}
             </Link>
           </div>

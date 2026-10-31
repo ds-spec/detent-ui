@@ -1,9 +1,9 @@
 'use client'
 
 import { memo, useEffect, useRef, useState } from 'react'
-import type { RefObject } from 'react'
+import type { ReactNode, RefObject } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { motion, useReducedMotion } from 'motion/react'
 import { ArrowRight, Check, Copy, Expand, Moon, Refresh, Sun } from '@/lab/icons'
 import { useTheme } from '@/lab/lib/hooks'
@@ -14,13 +14,15 @@ import { START } from '@/catalog/template-start'
 import type { Step } from '@/catalog/template-start'
 import { Code } from '../browser/Code'
 import { Modes, Rule, Tool } from '../exhibit/Exhibit'
-import { CopyCommand, Install } from '../parts'
+import { CopyCommand } from '../parts'
+import { Install } from '../Install'
 import { Desk } from '../blocks/BlockViewer'
 import { ProTag } from '../blocks/ProTag'
 import { Rail } from '../exhibit/Rail'
 import { DownloadStarter } from './Download'
 import { Pager } from '../shell/Pager'
 import { Shell, Trail } from '../shell/Shell'
+import { useWant } from '../shell/want'
 import { TEMPLATE_RAIL } from './rail'
 
 /** The template, scrolling in its own window, kept out of the viewer's renders so resizing stays smooth. */
@@ -33,15 +35,34 @@ const Page = memo(function Page({ id, scroller, onScroll, theme }: { id: string;
 })
 
 /**
+ * The templates' layout: the frame stays put and only what's in it changes. It holds the list of
+ * templates and each template; the running app at /live is the one page with no frame at all.
+ */
+export function TemplateExhibit({ children }: { children: ReactNode }) {
+  const [, , slug = '', own] = usePathname().split('/')
+  const { id, go } = useWant(slug, '/templates')
+  const t = template(id)
+  if (own || (id && !t)) return children
+  return (
+    <Shell list={<Rail label="Templates" groups={TEMPLATE_RAIL} current={id} onPick={go} />} bar={<Trail steps={t ? ['Templates', t.name] : ['Templates']} />}>
+      {t && <TemplateViewer key={t.id} id={t.id} go={go} />}
+      {/* The list's page while it's the one open; a template's own part draws nothing. */}
+      <div className="contents" style={{ display: id === slug ? undefined : 'none' }}>
+        {children}
+      </div>
+    </Shell>
+  )
+}
+
+/**
  * A template on the desk: the whole site live in a browser window you can resize from a phone's
  * width to the desk's, scroll, switch to dark, or read as code. Below, every section in order;
  * pick one and the page on the desk scrolls to it, and the list follows the page as you scroll.
  * An app fills the window instead of scrolling, so its parts are listed rather than jumped to.
  */
-export function TemplateViewer({ id }: { id: string }) {
+function TemplateViewer({ id, go }: { id: string; go: (id: string) => void }) {
   const t = template(id)!
   const app = t.form === 'app'
-  const router = useRouter()
   const reduce = useReducedMotion()
   const place = TEMPLATES.findIndex((x) => x.id === id)
   const prev = TEMPLATES[(place - 1 + TEMPLATES.length) % TEMPLATES.length]
@@ -89,7 +110,6 @@ export function TemplateViewer({ id }: { id: string }) {
   }
 
   return (
-    <Shell list={<Rail label="Templates" groups={TEMPLATE_RAIL} current={t.id} onPick={(to) => router.push(`/templates/${to}`)} />} bar={<Trail steps={['Templates', t.name]} />}>
     <main className="mx-auto max-w-[1280px] px-4 pb-24 sm:px-8 lg:pb-16">
       <header className="pt-8 sm:pt-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -144,7 +164,7 @@ export function TemplateViewer({ id }: { id: string }) {
             target="_blank"
             rel="noreferrer"
             aria-label={app ? 'Open the app in a new tab' : 'Open the page in a new tab'}
-            className="ring-focus flex h-9 items-center gap-1.5 rounded-full px-3 text-footnote font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink sm:px-3.5"
+            className="ring-focus flex h-9 items-center gap-1.5 rounded-full px-3 text-footnote font-medium text-ink-2 transition-[background-color,color,transform] duration-150 hover:bg-surface-2 hover:text-ink active:scale-[0.97] sm:px-3.5"
           >
             <span className="hidden sm:inline">{app ? 'Open the app' : 'Open the page'}</span>
             <ArrowRight size={14} className="-rotate-45" />
@@ -216,9 +236,8 @@ export function TemplateViewer({ id }: { id: string }) {
           </ol>
         </section>
       )}
-      {TEMPLATES.length > 1 && !present && <Pager prev={{ name: prev.name, href: `/templates/${prev.id}` }} next={{ name: next.name, href: `/templates/${next.id}` }} />}
+      {TEMPLATES.length > 1 && !present && <Pager prev={{ name: prev.name, href: prev.id }} next={{ name: next.name, href: next.id }} onPick={go} />}
     </main>
-    </Shell>
   )
 }
 

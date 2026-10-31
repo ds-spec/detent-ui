@@ -4,8 +4,6 @@ import { ProTag } from '@/site/blocks/ProTag'
 import { TemplateCard } from '@/site/templates/TemplateCard'
 import { JsonLd, list, page } from '@/site/seo'
 import { Band, BandHead, card } from '@/site/sheets'
-import { LinkShell } from '@/site/shell/Shell'
-import { TEMPLATE_LINKS, TEMPLATE_RAIL } from '@/site/templates/rail'
 
 export const metadata: Metadata = page({
   title: 'Templates — apps for AI products, AI built in',
@@ -15,7 +13,7 @@ export const metadata: Metadata = page({
 
 export default function TemplatesPage() {
   return (
-    <LinkShell label="Templates" groups={TEMPLATE_RAIL} links={TEMPLATE_LINKS} trail={['Templates']}>
+    <>
       <Band>
         <BandHead
           as="h1"
@@ -53,6 +51,6 @@ export default function TemplatesPage() {
           </ul>
         </Band>
       )}
-    </LinkShell>
+    </>
   )
 }

@@ -268,7 +268,7 @@ export function ShiftReadout() {
   )
   const shown = v >= 0
   return (
-    <span className={`flex items-center gap-2 text-ink-3 transition-opacity duration-500 ${shown ? '' : 'opacity-0'}`} title="Measured live in your browser by the Layout Instability API, since you arrived." aria-hidden={!shown}>
+    <span className={`flex items-center gap-2 text-ink-3 transition-opacity duration-250 ${shown ? '' : 'opacity-0'}`} title="Measured live in your browser by the Layout Instability API, since you arrived." aria-hidden={!shown}>
       <span className={`size-1.5 rounded-full ${v < 0.001 ? 'bg-ok' : 'bg-[var(--warn)]'}`} />
       <span className="tnum font-mono text-[12px] text-ink-2">{Math.max(0, v).toFixed(3)}</span>
       layout shift this visit

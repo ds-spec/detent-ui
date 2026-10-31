@@ -7,7 +7,6 @@ import { Check, Copy, Moon, Search, Sun } from '@/lab/icons'
 import { ease, press } from '@/lab/lib/motion'
 import { useTheme } from '@/lab/lib/hooks'
 import { Kbd } from '@/lab/ui/Kbd'
-import { installCommand } from '@/catalog/site'
 import { useSite } from './Providers'
 
 // The load click plays once a visit, not every time a page mounts the header.
@@ -111,7 +110,7 @@ export function ThemeButton() {
 }
 
 /** An install command you copy with one click; a sweep of colour confirms it. */
-export function CopyCommand({ command, fill = false }: { command: string; /** Take the full width of its slot, so a font swap can never move its edges. */ fill?: boolean }) {
+export function CopyCommand({ command, fill = false, onCopy }: { command: string; /** Take the full width of its slot, so a font swap can never move its edges. */ fill?: boolean; onCopy?: () => void }) {
   const [copied, setCopied] = useState(0)
   const timer = useRef(0)
   useEffect(() => () => clearTimeout(timer.current), [])
@@ -122,6 +121,7 @@ export function CopyCommand({ command, fill = false }: { command: string; /** Ta
       /* Clipboard blocked: the command is still there to select. */
     }
     setCopied((n) => n + 1)
+    onCopy?.()
     clearTimeout(timer.current)
     timer.current = window.setTimeout(() => setCopied(0), 1600)
   }
@@ -151,37 +151,6 @@ export function CopyCommand({ command, fill = false }: { command: string; /** Ta
           </motion.span>
         </AnimatePresence>
       </button>
-    </div>
-  )
-}
-
-/**
- * The install command for one thing and, under it, what installing it means: free things say
- * they bring their files and the theme; Pro things say they need a licence and where to get one.
- * Both lines are one fixed height, so a free page and a Pro page sit the same.
- */
-export function Install({ id, free }: { id: string; free: boolean }) {
-  return (
-    <div className="w-full">
-      <CopyCommand fill command={installCommand(id, free)} />
-      <p className="mt-2 flex h-4 items-center gap-1 px-1 text-caption text-ink-3 sm:justify-end">
-        {free ? (
-          <>
-            <span className="font-medium text-ink-2">Free</span> ·
-            <Link href="/licence#free" className="ring-focus rounded-[4px] underline-offset-2 hover:text-ink hover:underline">
-              MIT
-            </Link>
-            · brings its files and the theme
-          </>
-        ) : (
-          <>
-            Needs a Pro licence ·
-            <Link href="/pro" className="ring-focus rounded-[4px] font-medium text-ink-2 underline-offset-2 hover:text-ink hover:underline">
-              Get Pro
-            </Link>
-          </>
-        )}
-      </p>
     </div>
   )
 }

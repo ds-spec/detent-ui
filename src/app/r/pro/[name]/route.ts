@@ -1,6 +1,5 @@
-import registry from '@pro-registry'
 import { checkLicence } from '@/catalog/licence'
-import type { RegistryItem } from '@/catalog/registry'
+import { hasProItems, proItemByName } from '@/catalog/pro-items'
 import { SITE } from '@/catalog/pro'
 
 /*
@@ -11,7 +10,6 @@ import { SITE } from '@/catalog/pro'
  * on the way.
  */
 
-const items = (registry as { items: Record<string, RegistryItem> }).items
 const SETUP = `${SITE}/pro#install`
 const answer = (status: number, error: string) => Response.json({ error }, { status, headers: { 'cache-control': 'private, no-store' } })
 
@@ -26,8 +24,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ name: st
     return answer(503, 'Couldn’t check your key just now. Try again in a minute.')
   }
   if (!check.ok) return answer(403, `${check.reason} Your keys are at ${SITE}/account, or write to us.`)
-  const item = items[name]
-  if (!item) return answer(404, Object.keys(items).length ? `There’s no ${name} in Detent Pro.` : 'The Pro registry isn’t available on this build.')
+  const item = proItemByName(name)
+  if (!item) return answer(404, hasProItems() ? `There’s no ${name} in Detent Pro.` : 'The Pro registry isn’t available on this build.')
   if (name.startsWith('template-') && check.plan === 'pro') return answer(403, `${item.title} comes with Pro + Templates. Upgrade at ${SITE}/pro`)
   return Response.json(item, { headers: { 'cache-control': 'private, no-store' } })
 }

@@ -137,7 +137,7 @@ function Shots({ shots, tone, wide = false }: { shots: Shot[]; tone: 'amber' | '
   const View = s.view
 
   return (
-    <motion.div initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1, transition: { duration: 0.35, ease: UI } }} onPointerEnter={() => setHeld(true)} onPointerLeave={() => setHeld(false)}>
+    <motion.div initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1, transition: { duration: 0.28, ease: UI } }} onPointerEnter={() => setHeld(true)} onPointerLeave={() => setHeld(false)}>
       {/* Tall on a phone, where the screen is laid out at the phone's own width to stay readable; as tall as the panel beside it on a laptop. */}
       <div className={`relative isolate overflow-hidden ${wide ? 'aspect-[4/5] rounded-[24px] sm:aspect-auto sm:h-[clamp(380px,62vh,660px)] sm:rounded-[36px]' : 'aspect-[4/5] rounded-[22px] sm:aspect-[16/10] sm:rounded-[28px] lg:aspect-auto lg:h-[clamp(300px,58vh,620px)]'}`}>
         <Backdrop tone={tone} />
@@ -147,7 +147,7 @@ function Shots({ shots, tone, wide = false }: { shots: Shot[]; tone: 'amber' | '
             inert
             className={wide ? 'absolute inset-x-0 top-0 h-full sm:h-[calc(100%+120px)]' : 'absolute inset-0'}
             initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0, transition: { duration: 0.45, ease: UI } }}
+            animate={{ opacity: 1, y: 0, transition: { duration: 0.28, ease: UI } }}
             exit={{ opacity: 0, transition: { duration: 0.15, ease: UI } }}
           >
             <Fit pad={wide ? 44 : 20} max={wide ? 1.12 : 1} min={0.2}>
@@ -172,12 +172,12 @@ function Shots({ shots, tone, wide = false }: { shots: Shot[]; tone: 'amber' | '
         <span className="hidden shrink-0 text-[13px] text-ink-3 sm:inline">{s.count}</span>
         <span className="flex shrink-0">
           {shots.map((x, k) => (
-            <button key={x.id} type="button" aria-label={`Show ${x.name}`} aria-pressed={k === n} onClick={() => setN(k)} className="ring-focus grid h-7 w-6 place-items-center rounded-full">
-              <span className={`h-1.5 rounded-full transition-[width,background-color] duration-300 ${k === n ? 'w-4 bg-ink' : 'w-1.5 bg-[var(--line-strong)]'}`} />
+            <button key={x.id} type="button" aria-label={`Show ${x.name}`} aria-pressed={k === n} onClick={() => setN(k)} className="ring-focus grid h-7 w-6 place-items-center rounded-full transition-transform duration-150 active:scale-[0.9]">
+              <span className={`h-1.5 w-4 origin-center rounded-full transition-[transform,background-color] duration-200 ${k === n ? 'bg-ink' : 'scale-x-[0.375] bg-[var(--line-strong)]'}`} />
             </button>
           ))}
         </span>
-        <Link href={s.href} className="ring-focus group/open flex h-8 shrink-0 items-center gap-1 rounded-full px-3 text-[13px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)] transition-colors hover:text-ink">
+        <Link href={s.href} className="ring-focus group/open flex h-8 shrink-0 items-center gap-1 rounded-full px-3 text-[13px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)] transition-[color,transform] duration-150 hover:text-ink active:scale-[0.97]">
           Open
           <ArrowUpRight size={12} className="transition-transform duration-150 group-hover/open:-translate-y-px group-hover/open:translate-x-px" />
         </Link>
@@ -394,7 +394,7 @@ function Seg({ label, value, onPick, options }: { label: string; value: string; 
             aria-checked={on}
             disabled={disabled}
             onClick={() => onPick(v)}
-            className={`ring-focus relative h-9 whitespace-nowrap rounded-full px-4 text-[14px] transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${on ? 'text-ink' : 'text-ink-3 enabled:hover:text-ink'}`}
+            className={`ring-focus relative h-9 whitespace-nowrap rounded-full px-4 text-[14px] transition-[color,transform] duration-150 enabled:active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 ${on ? 'text-ink' : 'text-ink-3 enabled:hover:text-ink'}`}
           >
             {on && <motion.span layoutId={`seg-${label}`} className="absolute inset-0 rounded-full bg-surface shadow-[var(--card-edge)]" transition={{ type: 'spring', stiffness: 520, damping: 42 }} />}
             <span className="relative">{name}</span>

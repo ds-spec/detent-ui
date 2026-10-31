@@ -1,11 +1,13 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import Link from 'next/link'
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react'
+import type { MotionValue } from 'motion/react'
 import { DEMOS } from '@/catalog/demos'
 import { PLANS, installCommand, isProComponent } from '@/catalog/pro'
+import { FIRST_COMPONENT } from '@/catalog/site'
 import { ArrowRight, ArrowUpRight, Chart, Note, Play, Prompt } from '@/lab/icons'
 import { Fit } from '@/site/Fit'
 import { CopyCommand } from '@/site/parts'
@@ -24,11 +26,20 @@ import type { LibItem } from './library'
  * carries the install command for the open light.
  */
 
+// The first plate's part is certain to show, so its code starts downloading before the page wakes.
+if (typeof window !== 'undefined') void import('@/lab/demos/inputs')
+
 const UI = [0.2, 0, 0, 1] as const
 const OPEN = { type: 'spring', stiffness: 280, damping: 34 } as const
 const DWELL = 6500
 /** The radius of the curves that join the bridge to the sheets. */
 const JOIN = 22
+/** How much wider the open plate is than a closed one, and the air between plates. */
+const GROW = 1.8
+const GAP = 8
+/** A closed plate's width on a laptop. The plates' widths and places are all multiples of it, in CSS, so the server's HTML is right at any width. */
+const UNIT = `var(--plate)`
+const widthOf = (open: number) => `calc(${UNIT} * ${(1 + GROW * open).toFixed(4)})`
 const ICON: Record<string, ReactNode> = { prompt: <Prompt size={15} />, activity: <Note size={15} />, voicenote: <Play size={15} />, metric: <Chart size={15} /> }
 
 export function HomeHero({ lib }: { lib: LibItem[] }) {
@@ -39,9 +50,9 @@ export function HomeHero({ lib }: { lib: LibItem[] }) {
       <div className="relative rounded-[26px] sm:rounded-[36px]" style={{ background: 'var(--leaf)', boxShadow: 'var(--leaf-edge)' }}>
         <div className="mx-auto max-w-[1440px] px-4 pb-3 pt-12 sm:px-8 sm:pb-4 sm:pt-16">
           <div className="flex flex-col items-center px-2 text-center">
-            <Link href="/templates/rapport" className="rise ring-focus group/new inline-flex h-8 items-center gap-2 rounded-full bg-surface pl-1 pr-3 text-[13px] text-ink-2 shadow-raised transition-shadow duration-200 hover:shadow-[var(--elev-raised-hover)]">
+            <Link href="/components/region" prefetch={false} className="rise ring-focus group/new inline-flex h-8 items-center gap-2 whitespace-nowrap rounded-full bg-surface pl-1 pr-3 text-[13px] max-[359px]:text-[12px] text-ink-2 shadow-raised transition-[box-shadow,transform] duration-200 hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97]">
               <span className="rounded-full bg-[color-mix(in_oklch,var(--accent)_12%,transparent)] px-2 text-[11.5px] font-medium leading-6 text-[var(--accent-ink)]">New</span>
-              Rapport, a CRM that follows up
+              Region wheel, lit by today’s sun
               <ArrowRight size={12} className="text-ink-3 transition-transform duration-150 group-hover/new:translate-x-0.5" />
             </Link>
             <h1 className="focus-in mt-7 text-[clamp(42px,5vw,74px)] font-normal leading-[1.01] tracking-[-0.055em] text-ink">
@@ -56,11 +67,11 @@ export function HomeHero({ lib }: { lib: LibItem[] }) {
               Premium React components, with AI as their strongest suit. <span className="text-ink">{lib.length} components</span> for boards, charts, media, agents and everything around them. Every state worked out, styled by your{'\u00a0'}theme.
             </p>
             <div className="rise mt-8 flex items-center gap-2.5" style={{ animationDelay: '200ms' }}>
-              <Link href="/components" className="ring-focus group/go flex h-11 items-center whitespace-nowrap gap-1.5 rounded-full bg-ink pl-5 pr-4 text-[14px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.97]">
+              <Link href={FIRST_COMPONENT} className="ring-focus group/go flex h-11 items-center whitespace-nowrap gap-1.5 rounded-full bg-ink pl-5 pr-4 text-[14px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.97] max-[359px]:pl-4 max-[359px]:pr-3">
                 Browse components
                 <ArrowRight size={14} className="transition-transform duration-150 group-hover/go:translate-x-0.5" />
               </Link>
-              <Link href="/pro" className="ring-focus flex h-11 items-center whitespace-nowrap rounded-full bg-surface px-5 text-[14px] font-medium text-ink shadow-raised transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97]">
+              <Link href="/pro" className="ring-focus flex h-11 items-center whitespace-nowrap rounded-full bg-surface px-5 text-[14px] font-medium text-ink shadow-raised transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4">
                 Get Pro<span className="hidden sm:inline">&nbsp;· ${PLANS[0].price}</span>
               </Link>
             </div>
@@ -111,6 +122,16 @@ function Plates({ lib, onOpen, className = '' }: { lib: LibItem[]; onOpen?: (id:
   const wide = useWide()
   const [open, setOpen] = useState(0)
   const [held, setHeld] = useState(false)
+  // How open each plate is, 0 to 1. Everything that moves as a plate opens is worked out from these.
+  const a = useMotionValue(1)
+  const b = useMotionValue(0)
+  const c = useMotionValue(0)
+  const d = useMotionValue(0)
+  const grow = useMemo(() => [a, b, c, d], [a, b, c, d])
+  useEffect(() => {
+    const going = grow.map((v, k) => animate(v, k === open ? 1 : 0, reduce ? { duration: 0 } : OPEN))
+    return () => going.forEach((g) => g.stop())
+  }, [grow, open, reduce])
   // The first part is there from the start; the rest mount one at a time once the page has settled.
   const [seen, setSeen] = useState<number[]>([0])
   const intent = useRef(0)
@@ -143,7 +164,7 @@ function Plates({ lib, onOpen, className = '' }: { lib: LibItem[]; onOpen?: (id:
 
   return (
     <div
-      className={`flex flex-col gap-2 lg:flex-row ${className}`}
+      className={`relative flex flex-col gap-2 lg:block lg:[--plate:calc((100cqw-24px)/5.8)] lg:[container-type:inline-size] ${className}`}
       onPointerEnter={() => setHeld(true)}
       onPointerLeave={() => {
         clearTimeout(intent.current)
@@ -154,77 +175,93 @@ function Plates({ lib, onOpen, className = '' }: { lib: LibItem[]; onOpen?: (id:
     >
       <style>{CSS}</style>
       {CARDS.map((c, k) => (
-        <Plate key={c.id} c={c} item={lib.find((x) => x.id === c.id)} on={k === open} mounted={seen.includes(k)} wide={wide} onAim={() => aim(k)} onPick={() => show(k)} />
+        <Plate key={c.id} c={c} k={k} grow={grow} item={lib.find((x) => x.id === c.id)} on={k === open} mounted={seen.includes(k)} wide={wide} onAim={() => aim(k)} onPick={() => show(k)} />
       ))}
     </div>
   )
 }
 
-function Plate({ c, item, on, mounted, wide, onAim, onPick }: { c: Card; item?: LibItem; on: boolean; mounted: boolean; wide: boolean; onAim: () => void; onPick: () => void }) {
+/**
+ * Opening a plate moves its neighbours, and a browser counts anything that changes place in layout
+ * as a shift, however gently. So on a laptop each plate stands at the row's left edge and is carried
+ * to its place by a transform; only its width is laid out, which moves nothing inside it that starts
+ * at its left edge, and what's centred or right-aligned inside is carried by a transform too.
+ */
+function Plate({ c, k, grow, item, on, mounted, wide, onAim, onPick }: { c: Card; k: number; grow: MotionValue<number>[]; item?: LibItem; on: boolean; mounted: boolean; wide: boolean; onAim: () => void; onPick: () => void }) {
   const reduce = useReducedMotion()
   const Demo = DEMOS[c.id]
   const name = item?.name ?? c.id
+  const width = useTransform(grow[k], widthOf)
+  const across = useTransform(grow, (v: number[]) => {
+    const before = v.slice(0, k).reduce((n, x) => n + 1 + GROW * x, 0)
+    return `translateX(calc(${UNIT} * ${before.toFixed(4)} + ${k * GAP}px))`
+  })
+  // The icon stays at the mount's right, and the colour and the part stay centred in the window.
+  const icon = useTransform(grow[k], (v) => `translateX(calc(${widthOf(v).slice(5, -1)} - 54px))`)
+  const centre = useTransform(grow[k], (v) => `translateX(calc((${widthOf(v).slice(5, -1)} - 12px - ${LAYER}px) / 2))`)
   // The colour layer is fixed-width on a laptop so nothing repaints as a plate opens; full width on a phone. Set in CSS, so the server's HTML already matches the screen.
-  const layer = 'left-0 w-full lg:left-1/2 lg:w-[var(--layer)] lg:ml-[calc(var(--layer)/-2)]'
+  const layer = 'left-0 w-full lg:w-[var(--layer)]'
   const layerVar = { '--layer': `${LAYER}px` } as CSSProperties
+  const carried = 'max-lg:![transform:none]'
 
   return (
     // On a phone the plates stack and their height comes from CSS, so the server's HTML is already
-    // the right size at any width and nothing below moves once the page wakes up. On a laptop they
-    // share the row, and Motion springs their widths.
+    // the right size at any width and nothing below moves once the page wakes up.
     <motion.div
-      className={`relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-[24px] p-1.5 max-lg:!grow-0 max-lg:!basis-auto max-lg:transition-[height] max-lg:duration-500 max-lg:[transition-timing-function:cubic-bezier(0.2,0,0,1)] motion-reduce:transition-none ${on ? 'max-lg:h-[520px]' : 'max-lg:h-[168px]'}`}
-      style={{ background: 'var(--mount)', boxShadow: 'inset 0 0 0 1px var(--line)', contain: 'layout paint' }}
-      initial={false}
-      animate={wide ? { flexGrow: on ? 2.8 : 1, flexBasis: '0px' } : { flexGrow: 0, flexBasis: 'auto' }}
-      transition={reduce ? { duration: 0 } : OPEN}
+      className={`relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-[24px] p-1.5 max-lg:!w-full max-lg:![transform:none] max-lg:transition-[height] max-lg:duration-500 max-lg:[transition-timing-function:cubic-bezier(0.2,0,0,1)] motion-reduce:transition-none lg:absolute lg:left-0 lg:top-0 lg:h-full ${on ? 'max-lg:h-[520px]' : 'max-lg:h-[168px]'}`}
+      style={{ background: 'var(--mount)', boxShadow: 'inset 0 0 0 1px var(--line)', contain: 'layout paint', width, transform: across }}
       onPointerEnter={onAim}
     >
       {/* The mount: its name, its family under it, and its icon in a framed square. */}
-      <div className="flex h-[52px] shrink-0 items-center gap-3 px-2.5">
-        <div className="min-w-0 flex-1">
+      <div className="relative flex h-[52px] shrink-0 items-center gap-3 px-2.5">
+        <div className="min-w-0 flex-1 lg:pr-10">
           <p className="truncate text-[14px] leading-5 text-ink">{name}</p>
           <p className="truncate text-[12px] leading-4 text-ink-3">{item?.family}</p>
         </div>
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-[9px] bg-surface text-ink-2 shadow-raised">{ICON[c.id]}</span>
+        <motion.span className={`flex size-8 shrink-0 items-center justify-center rounded-[9px] bg-surface text-ink-2 shadow-raised lg:absolute lg:left-0 ${carried}`} style={{ transform: icon }}>
+          {ICON[c.id]}
+        </motion.span>
       </div>
 
       {/* The window of colour, set into the mount behind a thin bezel. */}
       <div className="relative isolate min-h-0 flex-1 overflow-hidden rounded-[19px]" style={{ boxShadow: '0 0 0 4px var(--bezel), 0 0 0 5px var(--line)' }}>
-        <div aria-hidden className={`pointer-events-none absolute inset-y-0 -z-10 ${layer}`} style={{ ...layerVar, background: c.paint }}>
-          <div className={`absolute -inset-[20%] ${on && !reduce ? 'plates-drift' : ''}`} style={{ background: `radial-gradient(32% 26% at 64% 30%, ${c.sheen}, transparent 70%)`, opacity: on ? 0.55 : 0.3, transition: 'opacity 600ms cubic-bezier(0.2,0,0,1)' }} />
+        <motion.div aria-hidden className={`pointer-events-none absolute inset-y-0 -z-10 ${layer} ${carried}`} style={{ ...layerVar, background: c.paint, transform: centre }}>
+          <div className={`absolute -inset-[20%] ${on && !reduce ? 'plates-drift' : ''}`} style={{ background: `radial-gradient(32% 26% at 64% 30%, ${c.sheen}, transparent 70%)`, opacity: on ? 0.55 : 0.3, transition: 'opacity 300ms cubic-bezier(0.2,0,0,1)' }} />
           <div className="plates-grain absolute inset-0" />
-        </div>
+        </motion.div>
         <div aria-hidden className="pointer-events-none absolute inset-0 rounded-[19px]" style={{ boxShadow: 'inset 0 1px 0 rgb(255 255 255 / 0.3)' }} />
 
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 flex items-center justify-center"
-          initial={false}
-          animate={on ? { opacity: 0, scale: 1.05 } : { opacity: 1, scale: wide ? 0.86 : 0.5 }}
-          transition={on ? { duration: 0.14, ease: UI } : { duration: 0.3, ease: UI, delay: 0.12 }}
-        >
-          {c.emblem}
+        <motion.div aria-hidden className={`pointer-events-none absolute inset-y-0 ${layer} ${carried}`} style={{ ...layerVar, transform: centre }}>
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center"
+            initial={false}
+            animate={on ? { opacity: 0, scale: 1.05 } : { opacity: 1, scale: wide ? 0.86 : 0.5 }}
+            transition={on ? { duration: 0.14, ease: UI } : { duration: 0.3, ease: UI, delay: 0.12 }}
+          >
+            {c.emblem}
+          </motion.div>
         </motion.div>
         {!on && <button type="button" onClick={onPick} aria-label={`Open ${name}`} className="ring-focus absolute inset-0 rounded-[19px]" />}
 
         {mounted && (
-          <motion.div
-            data-theme="light"
-            className={`absolute bottom-12 top-3 ${layer}`}
-            style={{ ...layerVar, contentVisibility: on ? 'visible' : 'hidden', background: 'transparent', contain: 'strict' }}
-            inert={!on}
-            initial={false}
-            animate={on ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
-            transition={on ? { duration: 0.32, ease: UI, delay: 0.14 } : { duration: 0.1, ease: UI }}
-          >
-            <div className="absolute left-1/2 top-0 h-full w-[min(600px,100%)] -translate-x-1/2">
-              {Demo ? (
-                <Fit pad={16} max={1}>
-                  <Demo />
-                </Fit>
-              ) : null}
-            </div>
+          <motion.div className={`pointer-events-none absolute bottom-12 top-3 ${layer} ${carried}`} style={{ ...layerVar, transform: centre }}>
+            <motion.div
+              data-theme="light"
+              className="pointer-events-auto absolute inset-0"
+              style={{ contentVisibility: on ? 'visible' : 'hidden', background: 'transparent', contain: 'strict' }}
+              inert={!on}
+              initial={false}
+              animate={on ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
+              transition={on ? { duration: 0.32, ease: UI, delay: 0.14 } : { duration: 0.1, ease: UI }}
+            >
+              <div className="plates-part absolute left-1/2 top-0 h-full w-[min(600px,100%)] -translate-x-1/2">
+                {Demo ? (
+                  <Fit pad={16} max={1}>
+                    <Demo />
+                  </Fit>
+                ) : null}
+              </div>
+            </motion.div>
           </motion.div>
         )}
 
@@ -238,7 +275,7 @@ function Plate({ c, item, on, mounted, wide, onAim, onPick }: { c: Card; item?: 
               exit={{ opacity: 0, transition: { duration: 0.08 } }}
             >
               <span className="min-w-0 flex-1 truncate text-white/85">{c.line}</span>
-              <Link href={`/components/${c.id}`} className="ring-focus group/open flex h-7 shrink-0 items-center gap-1 rounded-full bg-white/15 px-3 text-white backdrop-blur-sm transition-colors duration-150 hover:bg-white/25">
+              <Link href={`/components/${c.id}`} className="ring-focus group/open flex h-7 shrink-0 items-center gap-1 rounded-full bg-white/15 px-3 text-white backdrop-blur-sm transition-[background-color,transform] duration-150 hover:bg-white/25 active:scale-[0.97]">
                 Open
                 <ArrowUpRight size={12} className="transition-transform duration-150 group-hover/open:-translate-y-px group-hover/open:translate-x-px" />
               </Link>
@@ -254,4 +291,7 @@ const CSS = `
 .plates-grain { background-image: ${GRAIN}; opacity: 0.1; mix-blend-mode: overlay; }
 @keyframes plates-drift { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-8%, 10%) scale(1.12); } }
 .plates-drift { animation: plates-drift 9s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; will-change: transform; }
+/* The board's roster has no ground of its own, and here the ground is paint: it sits on a sheet, and on a phone the stage plays alone. */
+@media (min-width: 640px) { .plates-part .agent-activity { padding: 12px; border-radius: 40px; background: var(--surface); box-shadow: var(--elev-float); } }
+@media (max-width: 639px) { .plates-part .agent-activity-roster { display: none; } }
 `

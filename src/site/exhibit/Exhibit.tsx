@@ -1,28 +1,30 @@
 'use client'
 
-import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { flushSync } from 'react-dom'
 import { usePathname, useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'motion/react'
-import { DEMOS } from '@/catalog/demos'
+import { BESIDE } from '@/catalog/beside'
+import { DEMOS, preloadDemo } from '@/catalog/demos'
 import { CATEGORIES, ENTRIES } from '@/catalog/meta'
 import { SIZE } from '@/catalog/sizes'
 import { SITE, installCommand, isProComponent } from '@/catalog/pro'
 import { Check, Copy, Expand, Moon, Refresh, Sun } from '@/lab/icons'
 import { useTheme } from '@/lab/lib/hooks'
 import { Kbd } from '@/lab/ui/Kbd'
-import { Code } from '../browser/Code'
+import { Code, warmSource } from '../browser/Code'
 import { InspectLayer } from '../browser/Inspect'
 import { Fit } from '../Fit'
 import { Pager } from '../shell/Pager'
 import { Mini } from '../Mini'
 import { Footer } from '../Footer'
 import { Header } from '../Header'
-import { Install } from '../parts'
+import { Install } from '../Install'
 import { useSite } from '../Providers'
 import { BenchProvider } from '../bench/state'
 import { ProTag } from '../blocks/ProTag'
+import { Beside } from './Beside'
 import { Index } from './Index'
 import { Rail } from './Rail'
 import { Shell, Trail, scroller } from '../shell/Shell'
@@ -31,6 +33,9 @@ import { CategoryIcon } from '../icons'
 import { ExitFull } from '../blocks/BlockViewer'
 import { wellOf } from '../wells'
 import type { Tone } from '../home/lights'
+
+// On a direct visit the component's own demo is certain to show, so its code starts before the page wakes.
+if (typeof window !== 'undefined') preloadDemo(location.pathname.split('/')[2] ?? '')
 
 /** Each family's light, for the stage a component runs on. */
 const FAMILY_TONE: Record<string, Tone> = { agents: 'blue', data: 'amber', inputs: 'rose', feedback: 'violet', essentials: 'violet', overlays: 'rose', marketing: 'amber' }
@@ -42,6 +47,8 @@ const glide = { type: 'spring', stiffness: 360, damping: 40 } as const
 /** Components that explain themselves on the stage. The rest stand on their own. */
 /** Air around a demo on the stage. */
 const STAGE_PAD = 48
+/** Demos that bleed to the stage's edges and hold their own height: nothing scales them, so a phone's stage is as tall as they are. */
+const HOLDS_HEIGHT = new Set(['checklist', 'readalong', 'secret', 'halo', 'slices'])
 
 
 const first = (s: string) => s.split(/(?<=\.)\s/)[0]
@@ -105,6 +112,8 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
   const [inspect, setInspect] = useState(false)
   const [present, setPresent] = useState(false)
   const [index, setIndex] = useState(false)
+  // Goes up when Copy prompt copies a Pro install, so the line under the command can say what it needs.
+  const [promptCopied, setPromptCopied] = useState(0)
   const page = useTheme()
   const stage = useRef<HTMLElement>(null)
   // How tall the demo gets on a phone, where it sets the stage's height. It only grows, so a demo
@@ -131,15 +140,27 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
     setSeen(i)
     setDir(Math.abs(d) > ENTRIES.length / 2 ? -Math.sign(d) : Math.sign(d) || 1)
   }
-  // Arriving from another page, Next scrolls to this route's own part, the props, which sit below
-  // the stage. The component comes first, so arrival starts at the top: of the panel on a laptop,
-  // and of the page on anything smaller. A reload or a link to a part stays where it's going.
-  useEffect(() => {
+  // Arriving from another page, the router scrolls to this route's own part, the props, which sit
+  // below the stage. The component comes first, so arrival starts at the top: of the panel on a
+  // laptop, and of the page on anything smaller. The router's scroll runs in a microtask after this
+  // commit, which is why this runs in a layout effect and again after it; the later two catch a
+  // router that takes longer. A reload of this page or a link to a part stays where it's going.
+  useLayoutEffect(() => {
     const entry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined
-    if (location.hash || entry?.type === 'reload') return
-    const panel = scroller()
-    if (panel) panel.scrollTop = 0
-    window.scrollTo({ top: 0, behavior: 'instant' })
+    if (location.hash || (entry?.type === 'reload' && entry.name === location.href)) return
+    const undo = () => {
+      const panel = scroller()
+      if (panel) panel.scrollTop = 0
+      window.scrollTo({ top: 0, behavior: 'instant' })
+    }
+    undo()
+    queueMicrotask(undo)
+    const frame = requestAnimationFrame(() => requestAnimationFrame(undo))
+    const t = setTimeout(undo, 120)
+    return () => {
+      cancelAnimationFrame(frame)
+      clearTimeout(t)
+    }
   }, [])
   // Each move clicks, if sound is on, and brings the new component back into view. Arriving doesn't.
   const last = useRef(i)
@@ -163,7 +184,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
   // rather than shrinking it until it can't be read.
   const need = SIZE[e.id] ? Math.ceil(SIZE[e.id][1] * 0.9 + STAGE_PAD * 2 + 64) : 0
   // On a phone the stage follows the demo instead: as tall as it is at the width it gets, plus room for the dock.
-  const phone = SIZE[e.id] ? `max(380px, calc(min(${SIZE[e.id][1]}px, (100vw - ${40 + STAGE_PAD * 2}px) * ${(SIZE[e.id][1] / SIZE[e.id][0]).toFixed(4)}) + ${STAGE_PAD * 2 + 64}px))` : '520px'
+  const phone = HOLDS_HEIGHT.has(e.id) ? `${SIZE[e.id][1] + 48 + 64}px` : SIZE[e.id] ? `max(380px, calc(min(${SIZE[e.id][1]}px, (100vw - ${40 + STAGE_PAD * 2}px) * ${(SIZE[e.id][1] / SIZE[e.id][0]).toFixed(4)}) + ${STAGE_PAD * 2 + 64}px))` : '520px'
 
   const go = (to: string) => {
     if (to === id) return
@@ -176,7 +197,16 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
   useEffect(() => {
     router.prefetch(`/components/${next.id}`)
     router.prefetch(`/components/${prev.id}`)
+    const t = setTimeout(() => preloadDemo(next.id), 2000)
+    return () => clearTimeout(t)
   }, [router, next.id, prev.id])
+  // A finger can't warm the Pro code card by pointing at Code, so it's fetched once the stage has settled.
+  const pro = isProComponent(e.id)
+  useEffect(() => {
+    if (!pro || !matchMedia('(pointer: coarse)').matches) return
+    const t = setTimeout(() => warmSource(e.id), 1500)
+    return () => clearTimeout(t)
+  }, [pro, e.id])
 
   // Keys, unless a field or a component that uses them has focus.
   const latest = useRef({ go, prev, next })
@@ -211,7 +241,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
     <main className="mx-auto max-w-[1280px] px-4 pb-20 sm:px-8 lg:pb-0">
       <div className="pb-6 sm:pb-8">
       {/* The title: which family, where you are in the forty, and what this one is. */}
-      <header className="flex flex-col gap-6 pt-8 sm:pt-10 2xl:flex-row 2xl:items-end 2xl:justify-between">
+      <header className="flex flex-col gap-6 pt-8 sm:pt-10 xl:flex-row xl:items-end xl:justify-between xl:gap-10">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2.5">
             <span className="chip inline-flex h-7 items-center gap-1.5 rounded-full px-2.5 text-footnote font-medium transition-[color,background-color,box-shadow] duration-300" style={{ color: `var(--${family.id})`, ['--chip' as string]: `var(--${family.id})` }}>
@@ -224,25 +254,25 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
               <Kbd>/</Kbd>
             </button>
           </div>
-          <h1 className="mt-5 text-[clamp(36px,4vw,56px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink">
+          <h1 className="mt-5 text-[clamp(36px,4vw,56px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink xl:text-[44px] 2xl:text-[52px]">
             <span className="relative block h-[1.08em] overflow-hidden">
               <Glide k={e.id} dir={dir}>
                 {e.name}
               </Glide>
             </span>
-            <span className="relative block overflow-hidden text-quiet lg:h-[1.08em]">
+            <span className="relative block overflow-hidden text-quiet lg:h-[1.08em] xl:h-[2.16em]">
               <Glide k={e.id} dir={dir} delay={0.05} wrap>
                 {e.short ?? first(e.line)}
               </Glide>
             </span>
           </h1>
         </div>
-        <div className="flex w-full max-w-[460px] shrink-0 flex-col gap-3 2xl:w-[460px]">
+        <div className="flex w-full max-w-[460px] shrink-0 flex-col gap-3 xl:w-[380px] 2xl:w-[460px]">
           {/* Hand it to your agent. */}
-          <div className="flex items-center 2xl:justify-end">
-            <CopyPrompt name={e.name} line={e.line} command={installCommand(e.id, !isProComponent(e.id))} page={`${SITE}/components/${e.id}.md`} />
+          <div className="flex items-center xl:justify-end">
+            <CopyPrompt name={e.name} line={e.line} command={installCommand(e.id, !pro)} page={`${SITE}/components/${e.id}.md`} pro={pro} onCopy={() => setPromptCopied((n) => n + 1)} />
           </div>
-          <Install id={e.id} free={!isProComponent(e.id)} />
+          <Install id={e.id} free={!pro} copied={promptCopied} />
         </div>
       </header>
 
@@ -276,7 +306,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
               initial="enter"
               animate="still"
               exit="leave"
-              transition={{ duration: 0.45, ease }}
+              transition={{ duration: 0.28, ease }}
             >
               {/* Faded here, not on the moving layer above: Motion's own opacity there would win over a class. */}
               <div className={`absolute inset-0 flex flex-col transition-opacity duration-300 ${mode === 'code' ? 'pointer-events-none opacity-0' : ''}`}>
@@ -308,7 +338,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
         {/* Above the stage, quietly: what you're looking at on the left, and two small tools on the right. The rest are keys. */}
         <div className="absolute inset-x-0 top-0 flex h-12 items-start justify-between">
           <span className="flex rounded-full bg-surface-2 p-1">
-            <Modes mode={mode} setMode={setMode} pro={isProComponent(e.id)} />
+            <Modes mode={mode} setMode={setMode} pro={pro} onWarm={() => warmSource(e.id)} />
           </span>
           <span className="flex items-center gap-0.5">
             <Tool label="Replay" onClick={() => setRun((r) => r + 1)}>
@@ -354,6 +384,9 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
         </section>
       )}
 
+      {/* What a free part usually sits beside, from Pro, running. */}
+      {!present && BESIDE[e.id] && <Beside key={`beside-${e.id}`} id={BESIDE[e.id]} />}
+
       {!present && <Pager prev={{ name: prev.name, href: prev.id }} next={{ name: next.name, href: next.id }} onPick={go} />}
 
       <Index
@@ -373,18 +406,19 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
 
 
 /** Hands the component to a coding agent: a prompt with what it is, the command that installs it, and the page that documents it. */
-function CopyPrompt({ name, line, command, page }: { name: string; line: string; command: string; page: string }) {
+function CopyPrompt({ name, line, command, page, pro, onCopy }: { name: string; line: string; command: string; page: string; pro: boolean; onCopy: () => void }) {
   const [done, setDone] = useState(false)
   const timer = useRef(0)
   useEffect(() => () => clearTimeout(timer.current), [])
   const copy = async () => {
-    const text = `Add the ${name} component from Detent to this project. ${line}\n\nInstall it with:\n${command}\n\nIts props, usage and details are at ${page}. Fit it to the project's theme and use it where it belongs.`
+    const text = `Add the ${name} component from Detent to this project. ${line}\n\nInstall it with:\n${command}\n${pro ? '\nThis needs a Detent Pro key.\n' : ''}\nIts props, usage and details are at ${page}. Fit it to the project's theme and use it where it belongs.`
     try {
       await navigator.clipboard.writeText(text)
     } catch {
       /* Clipboard blocked: nothing to show. */
     }
     setDone(true)
+    if (pro) onCopy()
     clearTimeout(timer.current)
     timer.current = window.setTimeout(() => setDone(false), 1600)
   }
@@ -409,7 +443,7 @@ function Glide({ k, dir = 1, delay = 0, wrap = false, children }: { k: string; d
     <AnimatePresence mode="popLayout" initial={false} custom={dir}>
       <motion.span
         key={k}
-        className={wrap ? 'block lg:truncate' : 'block truncate'}
+        className={wrap ? 'block lg:truncate xl:overflow-visible xl:whitespace-normal' : 'block truncate'}
         custom={dir}
         variants={{
           in: (d: number) => ({ x: d * 56, opacity: 0 }),
@@ -464,7 +498,7 @@ export function Tool({ label, keys, on, onClick, children, className = '' }: { l
 }
 
 /** Preview or source; a plate glides between them. */
-export function Modes({ mode, setMode, pro = false }: { mode: 'preview' | 'code'; setMode: (m: 'preview' | 'code') => void; /** The code is Pro: a small lock rides beside the word. */ pro?: boolean }) {
+export function Modes({ mode, setMode, pro = false, onWarm }: { mode: 'preview' | 'code'; setMode: (m: 'preview' | 'code') => void; /** The code is Pro: a small lock rides beside the word. */ pro?: boolean; /** The hand is heading for Code: fetch it now. */ onWarm?: () => void }) {
   const id = useId()
   return (
     <span role="radiogroup" aria-label="Show" className="flex h-9 items-center">
@@ -475,7 +509,9 @@ export function Modes({ mode, setMode, pro = false }: { mode: 'preview' | 'code'
           role="radio"
           aria-checked={mode === m}
           onClick={() => setMode(m)}
-          className={`ring-focus relative h-9 rounded-full px-4 text-footnote font-medium capitalize transition-colors duration-200 ${mode === m ? 'text-ink' : 'text-ink-3 hover:text-ink-2'}`}
+          onPointerEnter={m === 'code' ? onWarm : undefined}
+          onPointerDown={m === 'code' ? onWarm : undefined}
+          className={`ring-focus relative h-9 rounded-full px-4 text-footnote font-medium capitalize transition-[color,transform] duration-200 active:scale-[0.97] ${mode === m ? 'text-ink' : 'text-ink-3 hover:text-ink-2'}`}
         >
           {mode === m && <motion.span layoutId={id} className="absolute inset-0 rounded-full bg-plate shadow-raised" transition={{ type: 'spring', stiffness: 500, damping: 38 }} />}
           <span className="relative flex items-center gap-1.5">

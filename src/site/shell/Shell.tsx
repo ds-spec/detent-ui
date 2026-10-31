@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { PLANS } from '@/catalog/pro'
+import { FIRST_BLOCK, FIRST_COMPONENT } from '@/catalog/site'
 import { ArrowRight, Clock, Folder, Layers, Orbit, Search, Sliders, Table } from '@/lab/icons'
 import { Rail } from '../exhibit/Rail'
 import type { RailGroup } from '../exhibit/Rail'
@@ -24,12 +25,12 @@ import { useSite } from '../Providers'
  */
 
 const NAV = [
-  { href: '/components', label: 'Components', icon: <Layers size={16} /> },
-  { href: '/blocks', label: 'Blocks', icon: <Table size={16} /> },
-  { href: '/templates', label: 'Templates', icon: <Folder size={16} /> },
-  { href: '/ai-sdk', label: 'AI SDK', icon: <Orbit size={16} /> },
-  { href: '/system', label: 'System', icon: <Sliders size={16} /> },
-  { href: '/changelog', label: 'Changelog', icon: <Clock size={16} /> },
+  { href: FIRST_COMPONENT, section: '/components', label: 'Components', icon: <Layers size={16} /> },
+  { href: FIRST_BLOCK, section: '/blocks', label: 'Blocks', icon: <Table size={16} /> },
+  { href: '/templates', section: '/templates', label: 'Templates', icon: <Folder size={16} /> },
+  { href: '/ai-sdk', section: '/ai-sdk', label: 'AI SDK', icon: <Orbit size={16} /> },
+  { href: '/system', section: '/system', label: 'System', icon: <Sliders size={16} /> },
+  { href: '/changelog', section: '/changelog', label: 'Changelog', icon: <Clock size={16} /> },
 ]
 
 /** The scrolling panel, for anything that needs to scroll the page. */
@@ -53,15 +54,15 @@ export function Shell({ list, bar, children }: { list: ReactNode; bar: ReactNode
             <span className="text-[15px] font-medium tracking-[-0.02em] text-ink">Detent</span>
           </Link>
           <span className="flex-1" />
-          <button type="button" onClick={openSearch} data-search aria-label="Search (⌘K)" title="Search  ⌘K" className="ring-focus grid size-8 place-items-center rounded-[8px] text-ink-3 transition-colors hover:bg-[var(--shell-hover)] hover:text-ink">
+          <button type="button" onClick={openSearch} data-search aria-label="Search (⌘K)" title="Search  ⌘K" className="ring-focus grid size-8 place-items-center rounded-[8px] text-ink-3 transition-[background-color,color,transform] duration-150 hover:bg-[var(--shell-hover)] hover:text-ink active:scale-[0.97]">
             <Search size={15} />
           </button>
         </div>
         <nav aria-label="Main" className="mt-3 flex flex-col gap-px pr-3">
           {NAV.map((n) => {
-            const on = path.startsWith(n.href)
+            const on = path.startsWith(n.section)
             return (
-              <Link key={n.href} href={n.href} aria-current={on ? 'page' : undefined} className={`ring-focus flex h-8 items-center gap-2.5 rounded-[8px] px-2 text-[13.5px] transition-colors ${on ? 'bg-[var(--shell-on)] text-ink' : 'text-ink-2 hover:bg-[var(--shell-hover)] hover:text-ink'}`}>
+              <Link key={n.href} href={n.href} aria-current={on ? 'page' : undefined} className={`ring-focus flex h-8 items-center gap-2.5 rounded-[8px] px-2 text-[13.5px] transition-colors ${on ? 'bg-[var(--shell-on)] text-ink' : 'text-ink-2 hover:bg-[var(--shell-hover)] hover:text-ink active:bg-[var(--shell-on)]'}`}>
                 <span className={on ? 'text-ink' : 'text-ink-3'}>{n.icon}</span>
                 {n.label}
               </Link>
@@ -70,7 +71,7 @@ export function Shell({ list, bar, children }: { list: ReactNode; bar: ReactNode
         </nav>
         <div className="my-3 mr-3 h-px bg-[var(--line)]" />
         <div className="flex min-h-0 flex-1 flex-col">{list}</div>
-        <Link href="/pro" className="ring-focus group/pro mr-3 mt-2 flex items-center gap-2 rounded-[10px] px-2.5 py-2 text-[12.5px] text-ink-2 transition-colors hover:bg-[var(--shell-hover)] hover:text-ink">
+        <Link href="/pro" className="ring-focus group/pro mr-3 mt-2 flex items-center gap-2 rounded-[10px] px-2.5 py-2 text-[12.5px] text-ink-2 transition-colors hover:bg-[var(--shell-hover)] hover:text-ink active:bg-[var(--shell-on)]">
           <span className="rounded-[5px] bg-ink px-1.5 text-[10.5px] font-medium leading-[18px] text-surface">Pro</span>
           Pricing
           <span className="ml-auto text-ink-3">from ${PLANS[0].price}</span>

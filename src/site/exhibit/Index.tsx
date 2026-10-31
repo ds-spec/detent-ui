@@ -79,7 +79,7 @@ export function Index({ open, current, onPick, onClose }: { open: boolean; curre
               {CATEGORIES.map((c, ci) => {
                 const items = ENTRIES.filter((e) => e.category === c.id)
                 return (
-                  <motion.section key={c.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease, delay: 0.04 * ci }}>
+                  <motion.section key={c.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease, delay: 0.04 * ci }}>
                     <h2 className="flex items-center gap-2 text-footnote text-ink-3">
                       <span className="size-2 rounded-full" style={{ background: `var(--${c.id})` }} />
                       {c.name}

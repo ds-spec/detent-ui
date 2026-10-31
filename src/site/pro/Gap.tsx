@@ -104,7 +104,7 @@ export function Gap() {
               role="tab"
               aria-selected={at}
               onClick={() => pick(k)}
-              className={`ring-focus relative shrink-0 rounded-[18px] px-4 py-3 text-left transition-colors duration-150 lg:px-5 lg:py-4 ${at ? 'bg-surface shadow-[var(--card-edge)]' : 'hover:bg-surface-2'}`}
+              className={`ring-focus relative shrink-0 rounded-[18px] px-4 py-3 text-left transition-colors duration-150 lg:px-5 lg:py-4 ${at ? 'bg-surface shadow-[var(--card-edge)]' : 'hover:bg-surface-2 active:bg-surface-2'}`}
             >
               <span className={`block text-[15px] tracking-[-0.01em] lg:text-[17px] ${at ? 'text-ink' : 'text-ink-3'}`}>{x.tab}</span>
               <span className={`hidden overflow-hidden text-[14px] leading-[1.55] text-ink-3 transition-[max-height,opacity,margin] duration-300 lg:block ${at ? 'mt-1.5 max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>{x.pain}</span>
@@ -123,7 +123,7 @@ export function Gap() {
               inert={!on}
               className="absolute inset-x-0 bottom-0 top-14 sm:top-0"
               initial={reduce ? false : { opacity: 0, scale: on ? 0.985 : 1 }}
-              animate={{ opacity: 1, scale: 1, transition: { duration: 0.45, ease: UI } }}
+              animate={{ opacity: 1, scale: 1, transition: { duration: 0.28, ease: UI } }}
               exit={{ opacity: 0, transition: { duration: 0.14, ease: UI } }}
             >
               {on ? (
@@ -163,7 +163,7 @@ export function Gap() {
                   role="radio"
                   aria-checked={on === v}
                   onClick={() => flip(v)}
-                  className={`ring-focus relative h-8 whitespace-nowrap rounded-full px-3.5 text-[13px] transition-colors duration-150 ${on === v ? 'text-surface' : 'text-ink-3 hover:text-ink'}`}
+                  className={`ring-focus relative h-8 whitespace-nowrap rounded-full px-3.5 text-[13px] transition-[color,transform] duration-150 active:scale-[0.97] ${on === v ? 'text-surface' : 'text-ink-3 hover:text-ink'}`}
                 >
                   {on === v && <motion.span layoutId="gap-switch" className="absolute inset-0 rounded-full bg-ink" transition={{ type: 'spring', stiffness: 520, damping: 40 }} />}
                   <span className="relative sm:hidden">{short}</span>
