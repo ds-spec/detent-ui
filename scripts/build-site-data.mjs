@@ -16,6 +16,7 @@ const { EXAMPLES } = await jiti.import('../src/catalog/examples.ts')
 const { AI_FILES } = await jiti.import('../src/site/ai/snippets.ts')
 const { FILES } = await jiti.import('../src/catalog/source.ts')
 const { buildSource } = await jiti.import('../src/catalog/source-build.ts')
+const { isProBlock, isProComponent } = await jiti.import('../src/catalog/pro.ts')
 const { apiFromSource } = await jiti.import('../src/catalog/api.ts')
 const { freeNames, registryItem, registryTheme, registryIndex } = await jiti.import('../src/catalog/registry.ts')
 
@@ -28,6 +29,16 @@ for (const id of Object.keys(FILES)) {
   try { code = readFileSync(path.join(root, 'src/lab', f), 'utf8') } catch {}
   api[id] = code === null ? null : apiFromSource(code, f)
 }
+// How long each Pro piece is, for the line under its install command: the same count its locked
+// code card gives. Without Pro checked out there's nothing to count, so the last counts stand.
+const linesFile = path.join(root, 'src/catalog/lines.json')
+const lines = JSON.parse(readFileSync(linesFile, 'utf8'))
+for (const [id, files] of Object.entries(source)) {
+  if (!isProComponent(id) && !isProBlock(id) && !id.startsWith('template-')) continue
+  const total = files.reduce((n, f) => n + f.lines, 0)
+  if (total && files.every((f) => f.lines)) lines[id] = total
+}
+writeFileSync(linesFile, `${JSON.stringify(Object.fromEntries(Object.entries(lines).sort(([a], [b]) => a.localeCompare(b))), null, 2)}\n`)
 const items = {}
 for (const name of freeNames()) {
   const item = await registryItem(name)

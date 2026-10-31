@@ -1,5 +1,50 @@
-/** A whole page for each chart: real data, every prop that matters, ready to paste and run. */
+/** A whole page for each chart and board: real data, every prop that matters, ready to paste and run. */
 export const EXAMPLES: Record<string, string> = {
+  activity: `"use client"
+
+import { AgentActivity } from "@/components/detent/components/activity/AgentActivity"
+import type { AgentRun } from "@/components/detent/components/activity/AgentActivity"
+import { useState } from "react"
+
+const start: AgentRun[] = [
+  {
+    id: "support",
+    agent: "Support",
+    hue: 262,
+    status: "waiting",
+    line: "Refund $86.40 to Dana Ruiz",
+    thought: "Charged twice on Oct 28. It’s over the $50 it can send alone.",
+    when: "14m",
+    day: "Today",
+  },
+  {
+    id: "dunning",
+    agent: "Dunning",
+    hue: 40,
+    status: "running",
+    line: "Retrying the charges",
+    when: "2m",
+    day: "Today",
+    steps: [
+      { id: "find", title: "Finding failed invoices", status: "done" },
+      { id: "retry", title: "Retrying the charges", status: "running" },
+      { id: "write", title: "Writing to who still owes", status: "pending" },
+    ],
+  },
+  { id: "weekly", agent: "Monday report", hue: 220, status: "done", line: "MRR up 4.2%, sent to #revenue", when: "9:00", day: "Yesterday" },
+]
+
+export default function Page() {
+  const [runs, setRuns] = useState(start)
+  const settle = (id: string) => setRuns((all) => all.map((r) => (r.id === id ? { ...r, status: "done", thought: undefined, when: "now" } : r)))
+
+  return (
+    <main className="flex min-h-screen items-center justify-center p-6">
+      <AgentActivity runs={runs} onApprove={settle} onRetry={settle} />
+    </main>
+  )
+}
+`,
   rings: `"use client"
 
 import { ChartCard, GoalNumerals, compact } from "@/components/detent/components/charts/GoalNumerals"
@@ -308,6 +353,7 @@ async function ask(question: string): Promise<ChartAnswer> {
       { id: "us", label: "United States", values: [1_120_000, 1_160_000, 1_140_000, 1_180_000] },
       { id: "eu", label: "Europe", values: [760_000, 880_000, 960_000, 1_050_000] },
     ],
+    lead: "eu",
     format: "currency",
     kind: "bars",
     source: "Sales ledger",

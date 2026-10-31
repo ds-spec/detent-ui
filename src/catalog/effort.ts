@@ -1,72 +1,12 @@
 import { BLOCKS } from '@/catalog/blocks'
 import { TEMPLATES } from '@/catalog/templates'
-import { PRO_COMPONENTS } from './pro'
+import { daysFor } from './days'
+import { FREE_BLOCKS, PRO_COMPONENTS } from './pro'
 
-/**
- * Roughly how many working days it takes a good engineer to build each piece of Pro to this
- * standard: every state, the keyboard, both themes, every width, and nothing on the page ever
- * jumping. Estimates, and said so wherever they're shown; the Pro page adds them up.
- */
-export const DAYS: Record<string, number> = {
-  // Components
-  answer: 10,
-  ask: 8,
-  images: 9,
-  askchart: 12,
-  bridge: 7,
-  funnel: 8,
-  radar: 6,
-  donut: 5,
-  scatter: 8,
-  histogram: 7,
-  activity: 7,
-  trace: 12,
-  approval: 8,
-  rewrite: 8,
-  filter: 8,
-  chart: 8,
-  usage: 6,
-  dates: 8,
-  extract: 9,
-  lens: 5,
-  flow: 15,
-  kanban: 10,
-  forecast: 7,
-  video: 8,
-  cropper: 8,
-  tour: 8,
-  // Blocks
-  'live-features': 8,
-  pricing: 6,
-  testimonials: 4,
-  faq: 4,
-  cta: 4,
-  calendar: 12,
-  'data-table': 10,
-  analytics: 10,
-  'prompt-playground': 14,
-  'agent-chat': 12,
-  'task-to-merge': 15,
-  'voice-mode': 15,
-  evals: 12,
-  'support-inbox': 15,
-  onboarding: 8,
-  'sign-in': 5,
-  billing: 10,
-  settings: 10,
-  'code-review': 12,
-  // Templates
-  lumen: 12,
-  kiln: 15,
-  detent: 24,
-  tandem: 24,
-  rapport: 30,
-}
+export { DAYS, daysFor } from './days'
 
-export const daysFor = (id: string) => DAYS[id] ?? 8
-
-/** Everything in Pro, added up. */
-export const PRO_BLOCKS = BLOCKS
+/** Everything in Pro, added up. The blocks anyone can install for free aren't in it. */
+export const PRO_BLOCKS = BLOCKS.filter((b) => !FREE_BLOCKS.includes(b.id))
 const sum = (ids: string[]) => ids.reduce((n, id) => n + daysFor(id), 0)
 /** Each part of Pro added up, so a page can say what a plan with or without the templates is worth. */
 export const COMPONENT_DAYS = sum(PRO_COMPONENTS)

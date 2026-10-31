@@ -59,6 +59,77 @@ export const brand = (text: string) =>
     .replace(/--(color-)?(accent|card)\b/g, '--$1dt-$2')
     .replace(/\b(bg|text|border|ring|ring-offset|outline|fill|stroke|from|via|to|decoration|caret|divide|shadow|accent)-(accent|card)\b(?![-\w])/g, '$1-dt-$2')
 
+/** Where the string or template opening at `i` ends, or -1 if it isn't one: an apostrophe in JSX text opens nothing. */
+function literalEnd(code: string, i: number): number {
+  const q = code[i]
+  for (let k = i + 1; k < code.length; k++) {
+    const ch = code[k]
+    if (ch === '\\') k++
+    else if (ch === q) return k + 1
+    else if (q !== '`' && ch === '\n') return -1
+    else if (q === '`' && ch === '$' && code[k + 1] === '{') {
+      let depth = 1
+      for (k += 2; depth; k++) {
+        if (k >= code.length) return -1
+        const c = code[k]
+        if (c === '{') depth++
+        else if (c === '}') depth--
+        else if (c === "'" || c === '"' || c === '`') {
+          const end = literalEnd(code, k)
+          if (end > 0) k = end - 1
+        }
+      }
+      k--
+    }
+  }
+  return -1
+}
+
+/** Runs `change` over each string in a file, whole, however deep its templates go. Comments aren't strings. */
+function mapLiterals(code: string, change: (text: string) => string) {
+  let out = ''
+  let i = 0
+  while (i < code.length) {
+    const ch = code[i]
+    const comment = ch === '/' && code[i + 1] === '*' ? code.indexOf('*/', i) + 2 : ch === '/' && code[i + 1] === '/' && !/:$/.test(code.slice(Math.max(0, i - 1), i)) ? code.indexOf('\n', i) : 0
+    // A regex can hold a quote or a backtick, and one starts where a value would.
+    const regex = ch === '/' && !comment && /[(,=:[!&|?]\s*$/.test(code.slice(Math.max(0, i - 8), i)) ? code.slice(i).match(/^\/(?:[^/\\\n[]|\\.|\[(?:[^\]\\\n]|\\.)*\])+\/[a-z]*/)?.[0].length : 0
+    if (regex) {
+      out += code.slice(i, i + regex)
+      i += regex
+      continue
+    }
+    const end = comment > 0 ? comment : ch === "'" || ch === '"' || ch === '`' ? literalEnd(code, i) : -1
+    if (end <= i) {
+      if (comment < 0) return out + code.slice(i)
+      out += ch
+      i++
+      continue
+    }
+    out += comment > 0 ? code.slice(i, end) : change(code.slice(i, end))
+    i = end
+  }
+  return out
+}
+
+/** A Tailwind transition class, with any variant, where a class can sit. Arbitrary `[transition:…]` values name their own curve. */
+const TRANSITION = /(^|[\s'"`])((?:[\w-]+:)*transition(?:-(?:colors|opacity|shadow|transform|\[[^\]\s]+\]))?)(?=$|[\s'"`])/
+
+/**
+ * Names the curve on whatever animates, so the buyer gets the motion that was judged. This site
+ * sets the curve as Tailwind's default, which can't ship: it would change every transition in their
+ * app. So each string that starts a transition carries `ease-detent` itself, which reaches Detent's
+ * own elements and nothing else. Tailwind's `ease-out` was the same curve here and isn't there.
+ */
+export const curved = (code: string) =>
+  mapLiterals(code, (text) => {
+    if (!TRANSITION.test(text) || /(^|[\s'"`:])ease-\[/.test(text)) return text
+    const named = text.replace(/(^|[\s'"`:])ease-out(?=$|[\s'"`])/g, '$1ease-detent')
+    if (named.includes('ease-detent')) return named
+    // A string with branches can start a transition in each of them.
+    return named.replace(text.includes('${') ? new RegExp(TRANSITION, 'g') : TRANSITION, '$1$2 ease-detent')
+  })
+
 /** A template's routes: what lands in the buyer's own app/ folder rather than under components. */
 const ROUTE = /^pro\/(?:templates\/[^/]+|chat)\/(app\/.+)$/
 
@@ -184,7 +255,7 @@ async function build(name: string, theme: string): Promise<RegistryItem | null> 
     author: 'Detent',
     dependencies: [...deps].sort(),
     registryDependencies: [theme],
-    files: [...files].map(([rel, code]) => shipped(rel, brand(rewrite(rel, code)), about.type)),
+    files: [...files].map(([rel, code]) => shipped(rel, curved(brand(rewrite(rel, code))), about.type)),
   }
 }
 
@@ -277,8 +348,10 @@ function keep(stmts: Stmt[], words: Set<string>): string[] {
     const { head } = st
     if (!head || SKIP.test(head)) continue
     if (head.startsWith('@theme')) {
-      // Fonts stay the buyer's: the components set no typeface of their own.
-      out.push(st.text.replace(/\n[ \t]*--font-(sans|mono):[^;]*;/g, ''))
+      // Fonts stay the buyer's: the components set no typeface of their own. So do Tailwind's default
+      // curves: they'd change every transition in the buyer's app, so only this site sets them.
+      // `--ease-detent` stays: see `curved`.
+      out.push(st.text.replace(/\n[ \t]*--(font-(sans|mono)|ease-out|default-transition-timing-function):[^;]*;/g, ''))
     } else if (LIGHT.test(head) || DARK.test(head)) out.push(darkened(bridged(st.text)))
     else if ((head.startsWith('@media') || head.startsWith('@supports')) && st.body !== undefined) {
       const inner = keep(statements(st.body), words)
@@ -367,6 +440,7 @@ ${kept.join('').trim()}
     author: 'Detent',
     files: [{ path: `${BASE}/detent.css`, type: 'registry:file', target: `${BASE}/detent.css`, content: css }],
     css: { [`@import "../${BASE}/detent.css"`]: {} },
+    docs: 'Detent respects reduced motion when your app is wrapped once in <MotionConfig reducedMotion="user"> from motion/react, in your root layout.',
   }
 }
 

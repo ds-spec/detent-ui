@@ -19,16 +19,18 @@ Or the whole agent kit at once:
 npx shadcn add https://detentui.com/r/agent-kit
 ```
 
+To respect reduced motion, wrap your app once in `<MotionConfig reducedMotion="user">` from `motion/react`, around everything in your root layout.
+
 ## What's here
 
-- `src/lab` holds the 40 free components, their demos, and the motion and UI they share.
+- `src/lab` holds the 19 free components, their demos, and the motion and UI they share.
 - `src/catalog` says what every component, block and template is, and builds the public registry from the source.
 - `src/site` is the website around them: the gallery, the exhibit and the code browser.
 - `src/app` is its routes.
 
 ## Detent Pro
 
-29 more components, 18 blocks and 3 templates are [Detent Pro](https://detentui.com/pro). Their
+28 more components, 16 blocks and 3 templates are [Detent Pro](https://detentui.com/pro). Their
 source lives in a private repository, checked out at `src/pro` when it's there. Without it, `@pro`
 resolves to `src/locked` and each Pro preview builds as a locked stand-in, so the site runs from
 this repository alone.

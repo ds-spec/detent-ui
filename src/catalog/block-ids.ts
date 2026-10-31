@@ -6,7 +6,6 @@
 export const BLOCK_IDS = [
   'live-features',
   'pricing',
-  'feature-story',
   'integrations',
   'testimonials',
   'faq',
@@ -14,7 +13,6 @@ export const BLOCK_IDS = [
   'calendar',
   'data-table',
   'analytics',
-  'prompt-playground',
   'agent-chat',
   'task-to-merge',
   'voice-mode',

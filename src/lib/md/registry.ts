@@ -202,7 +202,6 @@ function renderAiSdk(): string {
       { label: 'Answer', href: abs('/components/answer'), desc: 'Streaming answer with sources and citations' },
       { label: 'Trace', href: abs('/components/trace'), desc: 'Agent run waterfall: steps, tools, timing' },
       { label: 'Approval', href: abs('/components/approval'), desc: 'Human-in-the-loop approval card' },
-      { label: 'Thinking', href: abs('/components/thinking'), desc: 'Streaming reasoning, collapsed by default' },
     ]),
     '',
     `## How it works`,

@@ -59,11 +59,10 @@ export const RELEASES: Release[] = [
   {
     date: '2026-10-25',
     name: 'Landing sections',
-    title: 'Two sections for the landing page',
-    line: 'Integrations, where your stack drifts under a lens of glass and connects where you press it. And a feature story told as one ticket on a clock you can scrub, each feature arriving at the second it happens.',
+    title: 'A section for the landing page',
+    line: 'Integrations, where your stack drifts under a lens of glass and connects where you press it.',
     items: [
       { label: 'Integrations', href: '/blocks/integrations', pro: true },
-      { label: 'Feature story', href: '/blocks/feature-story', pro: true },
     ],
   },
   {
@@ -74,8 +73,8 @@ export const RELEASES: Release[] = [
     items: [
       { label: 'Signature', href: '/components/signature' },
       { label: 'Voice note', href: '/components/voicenote' },
-      { label: 'Thinking indicator', href: '/components/thinking' },
-      { label: 'Voice input', href: '/components/voice' },
+      { label: 'Thinking indicator' },
+      { label: 'Voice input' },
     ],
   },
   {
@@ -85,7 +84,7 @@ export const RELEASES: Release[] = [
     line: 'A whole agent workspace to start from: sessions, a thread that shows its work, a composer that queues what you ask while it answers, reasoning set on a ramp of dots, and photos that open full size. And a prompt playground block, to compare models side by side.',
     items: [
       { label: 'Agent workspace template', href: '/templates/detent', pro: true },
-      { label: 'Prompt playground', href: '/blocks/prompt-playground', pro: true },
+      { label: 'Prompt playground', pro: true },
     ],
   },
   {
@@ -95,7 +94,7 @@ export const RELEASES: Release[] = [
     line: 'The chart kit split into components you can take on their own, each with its own page, and all of them redrawn as instruments.',
     items: [
       { label: 'Goal numerals', href: '/components/rings' },
-      { label: 'Tick meter', href: '/components/meter' },
+      { label: 'Tick meter' },
       { label: 'Stat tiles', href: '/components/metric' },
     ],
   },
@@ -105,7 +104,7 @@ export const RELEASES: Release[] = [
     title: 'The most asked-for pieces',
     line: 'The components people install a library for, each built to the same bar as the rest.',
     items: [
-      { label: 'Live code block', href: '/components/codeblock', pro: true },
+      { label: 'Live code block', pro: true },
       { label: 'Ticket history', href: '/components/history' },
       { label: 'Toasts' },
     ],
@@ -116,8 +115,8 @@ export const RELEASES: Release[] = [
     title: 'A free tier that installs for real',
     line: 'Every free component installs with one command from a public registry, bringing its files and the Detent theme without touching yours. A Team plan joins Pro.',
     items: [
-      { label: 'Public registry', href: '/#install' },
-      { label: 'Agent kit', href: '/#install' },
+      { label: 'Public registry', href: '/components/prompt' },
+      { label: 'Agent kit', href: '/components/scaffold' },
       { label: 'Team plan', href: '/pro#pricing' },
     ],
   },
@@ -128,7 +127,7 @@ export const RELEASES: Release[] = [
     line: 'The hard surfaces that take weeks to get right: a flow builder you wire by hand, and a composer that formats as you write.',
     items: [
       { label: 'Flow builder', href: '/components/flow', pro: true },
-      { label: 'Rich composer', href: '/components/composer' },
+      { label: 'Rich composer' },
     ],
   },
   {
@@ -142,7 +141,7 @@ export const RELEASES: Release[] = [
       { label: 'Approval tray', href: '/components/approval', pro: true },
       { label: 'Prompt box', href: '/components/prompt' },
       { label: 'Typed date range', href: '/components/dates', pro: true },
-      { label: 'Blocks', href: '/blocks' },
+      { label: 'Blocks', href: '/blocks/live-features' },
     ],
   },
   {
@@ -151,9 +150,9 @@ export const RELEASES: Release[] = [
     title: 'The first pieces',
     line: 'Where it started: a file tree and the inputs around it.',
     items: [
-      { label: 'File tree', href: '/components/tree' },
+      { label: 'File tree' },
       { label: 'Upload', href: '/components/upload' },
-      { label: 'Voice input', href: '/components/voice' },
+      { label: 'Voice input' },
       { label: 'Spend cap', href: '/components/usage', pro: true },
     ],
   },

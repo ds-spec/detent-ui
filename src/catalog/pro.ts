@@ -30,7 +30,6 @@ const PRO_CODE = [
   'kanban',
   'forecast',
   'video',
-  'cropper',
   'tour',
   'combobox',
   'trend',
@@ -61,8 +60,8 @@ export const isLockedSource = (slug: string, blocks: string[]) => isProComponent
 export const KITS: Record<string, { name: string; line: string; items: string[] }> = {
   'agent-kit': {
     name: 'Agent kit',
-    line: 'The free components for an agent product: the prompt box, the composer, the file tree, the scaffold and the small pieces around them.',
-    items: ['scaffold', 'prompt', 'tree', 'versions', 'thinking', 'toasts', 'composer'],
+    line: 'The free components for an agent product: the scaffold it builds in, the prompt box, the diff you review, and the history of what happened.',
+    items: ['scaffold', 'prompt', 'diff', 'history'],
   },
 }
 

@@ -26,6 +26,9 @@ const each = <T,>(ids: string[], view: T) => Object.fromEntries(ids.map((id) => 
 
 export const PRO_DEMOS: Record<string, ComponentType> = each(PRO_COMPONENTS, Locked)
 
+/** Nothing to download: the stand-in is already here. */
+export const preloadProDemo = (id: string) => void id
+
 /** No spotlights: the gallery falls back to each component's demo, which is locked. */
 export const SPOTS: Record<string, ComponentType> = {}
 

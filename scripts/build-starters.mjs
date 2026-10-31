@@ -10,7 +10,9 @@ import { createJiti } from 'jiti'
 const root = process.cwd()
 const jiti = createJiti(import.meta.url, { alias: { '@/': path.join(root, 'src/') } })
 const { starterFiles, zip } = await jiti.import('../src/catalog/starter.ts')
-const items = JSON.parse(readFileSync(path.join(root, '.detent/pro-registry.json'), 'utf8')).items
+const registry = JSON.parse(readFileSync(path.join(root, '.detent/pro-registry.json'), 'utf8'))
+const items = registry.items
+for (const item of Object.values(items)) for (const file of item.files ?? []) if (file.shared !== undefined) file.content = registry.shared[file.shared]
 const ids = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(items).filter((n) => n.startsWith('template-')).map((n) => n.slice(9))
 
 for (const id of ids) {
