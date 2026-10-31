@@ -11,6 +11,7 @@ import { accentVars } from '@/lab/blocks/kit/props'
 import type { BlockProps } from '@/lab/blocks/kit/props'
 import { QUOTES, STORIES } from './content'
 import type { Short, Story } from './content'
+import { ease, press } from '@/lab/lib/motion'
 
 /**
  * Testimonials with receipts. One customer at a time writes their quote in, word by word, the
@@ -117,7 +118,7 @@ export function Testimonials({
                     <ArrowRight size={15} className="mb-1.5 shrink-0 text-ink-3" />
                     <span>
                       <span className="block text-caption font-medium text-[var(--accent-ink)]">With {product}</span>
-                      <motion.span key={i === at ? run : 'rest'} className="tnum block text-[34px] leading-none tracking-[-0.04em] text-ink" initial={i === at ? { opacity: 0, y: 6 } : false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.25, ease: [0.2, 0.9, 0.25, 1] }}>
+                      <motion.span key={i === at ? run : 'rest'} className="tnum block text-[34px] leading-none tracking-[-0.04em] text-ink" initial={i === at ? { opacity: 0, y: 6 } : false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.25, ease: ease.out }}>
                         {s.after}
                       </motion.span>
                     </span>
@@ -129,7 +130,7 @@ export function Testimonials({
             {/* Who's next. The ring fills while the quote is up, and stops once someone picks. */}
             <div role="radiogroup" aria-label="Customer" className="flex gap-1.5" onPointerDownCapture={director.onPointerDownCapture} onPointerUpCapture={director.onPointerUpCapture} onKeyDownCapture={director.onKeyDownCapture}>
               {stories.map((s, i) => (
-                <button
+                <motion.button whileTap={press}
                   key={s.id}
                   type="button"
                   role="radio"
@@ -153,7 +154,7 @@ export function Testimonials({
                     {i === at && <motion.circle key={handed ? 'held' : run} cx="20" cy="20" r="18.75" fill="none" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" initial={{ pathLength: handed ? 1 : 0 }} animate={{ pathLength: 1 }} transition={{ duration: handed ? 0 : DWELL / 1000, ease: 'linear' }} />}
                   </svg>
                   <Orb seed={s.name} hue={s.hue} size={28} className={`transition-[filter,opacity] duration-300 ${i === at ? '' : 'opacity-70 grayscale-[0.5] hover:opacity-100 hover:grayscale-0'}`} />
-                </button>
+                </motion.button>
               ))}
             </div>
           </div>

@@ -4,6 +4,7 @@ import { useEffect, useImperativeHandle, useRef, useState } from 'react'
 import type { ReactNode, Ref } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Kbd } from '@/lab/ui/Kbd'
+import { ease, dur, spring } from '@/lab/lib/motion'
 
 export type DockTool = {
   id: string
@@ -23,7 +24,7 @@ export type DockTool = {
 export type DockHandle = { open(id: string | null): void }
 
 const ROW = 52
-const MORPH = { type: 'spring', stiffness: 380, damping: 34, mass: 0.9 } as const
+const MORPH = spring.move
 
 /**
  * A small floating toolbar at the foot of a page that becomes whatever its tools open. Press a
@@ -114,8 +115,8 @@ export function MorphingDock({
       <motion.div
         className="absolute inset-0"
         initial={false}
-        animate={tool && recede ? { scale: 0.97, opacity: 0.6, filter: 'blur(8px)' } : { scale: 1, opacity: 1, filter: 'blur(0px)' }}
-        transition={reduce ? { duration: 0 } : { duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
+        animate={tool && recede ? { scale: 0.985, opacity: 0.5 } : { scale: 1, opacity: 1 }}
+        transition={reduce ? { duration: 0 } : { duration: 0.45, ease: ease.out }}
         inert={!!tool}
       >
         {children}
@@ -131,8 +132,8 @@ export function MorphingDock({
               style={{ left: '50%', width: 0 }}
               initial={{ opacity: 0, y: 4, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 4, scale: 0.96, transition: { duration: 0.12 } }}
-              transition={{ duration: 0.16, ease: [0.2, 0.8, 0.2, 1] }}
+              exit={{ opacity: 0, y: 4, scale: 0.96, transition: { duration: dur.exit, ease: ease.out } }}
+              transition={{ duration: 0.16, ease: ease.out }}
             >
               <motion.span
                 className="flex h-8 items-center gap-2 whitespace-nowrap rounded-full bg-surface pl-3 pr-1.5 text-[12.5px] text-ink shadow-[0_0_0_1px_var(--line),0_8px_24px_-8px_rgb(0_0_0/0.18)]"
@@ -161,17 +162,17 @@ export function MorphingDock({
                 <motion.div
                   key={tool.id}
                   className="absolute inset-0"
-                  initial={reduce ? false : { opacity: 0, y: 10, filter: 'blur(4px)' }}
-                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  exit={{ opacity: 0, y: -6, filter: 'blur(4px)', transition: { duration: 0.12 } }}
-                  transition={{ duration: 0.24, ease: [0.2, 0.8, 0.2, 1], delay: 0.05 }}
+                  initial={reduce ? false : { opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6, transition: { duration: dur.exit, ease: ease.out } }}
+                  transition={{ duration: 0.24, ease: ease.out, delay: 0.05 }}
                 >
                   {tool.panel}
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
-          <motion.span aria-hidden className="absolute inset-x-3 h-px bg-line" style={{ bottom: ROW }} initial={false} animate={{ opacity: tool ? 1 : 0 }} transition={{ duration: 0.2 }} />
+          <motion.span aria-hidden className="absolute inset-x-3 h-px bg-line" style={{ bottom: ROW }} initial={false} animate={{ opacity: tool ? 1 : 0 }} transition={{ duration: 0.2, ease: ease.out }} />
           <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1 px-1.5" style={{ height: ROW }}>
             {tools.map((t) => {
               const on = open === t.id
@@ -197,10 +198,10 @@ export function MorphingDock({
                         key="badge"
                         aria-label={`${t.badge} new`}
                         className="tnum absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent)] px-1 text-[10px] font-semibold leading-none text-white shadow-[0_0_0_2px_var(--surface)]"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        transition={{ type: 'spring', stiffness: 600, damping: 26 }}
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.5, opacity: 0, transition: { duration: dur.exit, ease: ease.out } }}
+                        transition={spring.snappy}
                       >
                         {t.badge}
                       </motion.span>

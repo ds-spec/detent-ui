@@ -7,7 +7,7 @@ import { useLoop } from '@/lab/demos/loop'
 import { useBench } from '@/lab/demos/bench'
 
 /** Photos from Unsplash (Unsplash Licence), each with the tags a vision model might give it. */
-const P = (id: string, w: number, h: number, alt: string, tags: string) => ({ id, src: `/media/search/${id}.jpg`, width: w, height: h, alt, tags: tags.split(', ') })
+const P = (id: string, w: number, h: number, alt: string, tags: string) => ({ id, src: `/media/search/${id}.webp`, width: w, height: h, alt, tags: tags.split(', ') })
 export const PHOTOS: SearchImage[] = [
   P('sea-golden', 600, 400, 'The sea at golden hour under soft clouds', 'sea, ocean, water, waves, horizon, golden, golden hour, sunset, light, warm, clouds, sky, calm'),
   P('fog-forest', 600, 400, 'Pine trees fading into fog', 'forest, pine, trees, fog, mist, green, moody, calm, nature'),

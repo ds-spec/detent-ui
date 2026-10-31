@@ -4,7 +4,7 @@ import { useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } fro
 import type { ReactNode, Ref } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Check } from '../icons'
-import { ease, press } from '../lib/motion'
+import { ease, press, dur, spring } from '../lib/motion'
 import { Morph } from '../ui/Morph'
 import { Button } from '../ui/Button'
 
@@ -168,7 +168,7 @@ export function FeedbackPulse({
           <motion.span
             initial={{ scale: 0.4 }}
             animate={{ scale: 1 }}
-            transition={{ type: 'spring', bounce: 0.5, duration: 0.5, delay: 0.08 }}
+            transition={{ ...spring.pop, delay: 0.08 }}
             className="flex size-[26px] items-center justify-center rounded-full bg-ok text-white"
           >
             <Check size={15} strokeWidth={2.6} />
@@ -190,7 +190,7 @@ export function FeedbackPulse({
           anchor="bottom"
           radius={{ idle: PILL_H / 2, open: 22, sent: PILL_H / 2 }}
           className="bg-surface"
-          style={{ boxShadow: phase === 'open' ? 'var(--elev-float)' : 'var(--elev-raised)', transition: 'box-shadow 300ms' }}
+          style={{ boxShadow: phase === 'open' ? 'var(--elev-float)' : 'var(--elev-raised)', transition: 'box-shadow 300ms cubic-bezier(0.2,0.9,0.25,1)' }}
         />
       </div>
     </div>
@@ -200,7 +200,7 @@ export function FeedbackPulse({
 function ReasonChip({ label, on, onToggle }: { label: string; on: boolean; onToggle: () => void }) {
   return (
     <motion.button
-      variants={{ hidden: { opacity: 0, y: 4 }, shown: { opacity: 1, y: 0 }, gone: { opacity: 0, transition: { duration: 0.1 } } }}
+      variants={{ hidden: { opacity: 0, y: 4 }, shown: { opacity: 1, y: 0 }, gone: { opacity: 0, transition: { duration: dur.exit, ease: ease.out } } }}
       transition={{ duration: 0.24, ease: ease.out }}
       whileTap={press}
       aria-pressed={on}
@@ -215,10 +215,10 @@ function ReasonChip({ label, on, onToggle }: { label: string; on: boolean; onTog
           {on ? (
             <motion.span
               key="on"
-              initial={{ scale: 0.4, opacity: 0 }}
+              initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.4, opacity: 0 }}
-              transition={{ type: 'spring', bounce: 0.4, duration: 0.3 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={spring.pop}
               className="absolute"
             >
               <Check size={14} strokeWidth={2.6} />
@@ -226,10 +226,10 @@ function ReasonChip({ label, on, onToggle }: { label: string; on: boolean; onTog
           ) : (
             <motion.span
               key="off"
-              initial={{ scale: 0.4, opacity: 0 }}
+              initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 0.35 }}
-              exit={{ scale: 0.4, opacity: 0 }}
-              className="absolute size-[5px] rounded-full bg-current"
+              exit={{ scale: 0.8, opacity: 0 }}
+              className="absolute size-[5px] rounded-full bg-current" transition={{ duration: dur.enter, ease: ease.out }}
             />
           )}
         </AnimatePresence>
@@ -251,8 +251,8 @@ function Meter({ value, labels, onHover, onPick, quiet }: { value: number; label
             <motion.span
               className="absolute inset-0 rounded-full bg-ink"
               initial={false}
-              animate={{ scale: on ? 1 : 0.2, opacity: on ? (quiet ? 0.4 : 1) : 0 }}
-              transition={{ type: 'spring', bounce: 0.3, duration: 0.34, delay: on ? (n - 1) * 0.03 : (5 - n) * 0.015 }}
+              animate={{ scale: on ? 1 : 0.8, opacity: on ? (quiet ? 0.4 : 1) : 0 }}
+              transition={{ ...spring.pop, delay: on ? (n - 1) * 0.03 : (5 - n) * 0.015 }}
             />
           </span>
         )
@@ -266,7 +266,7 @@ function Meter({ value, labels, onHover, onPick, quiet }: { value: number; label
             role="radio"
             aria-checked={on && n === value}
             aria-label={labels[n - 1]}
-            onPointerEnter={() => onHover?.(n)}
+            onPointerEnter={(e) => e.pointerType !== 'touch' && onHover?.(n)}
             onFocus={() => onHover?.(n)}
             onBlur={() => onHover?.(0)}
             onClick={() => onPick?.(n)}

@@ -8,6 +8,7 @@ import { tap } from '../../lib/feel'
 import { GRAIN } from '../../lib/grain'
 import { RollingText } from '../../ui/RollingText'
 import { Spinner } from '../../ui/Spinner'
+import { ease, spring } from '../../lib/motion'
 
 export type ChecklistStep = {
   id: string
@@ -90,7 +91,7 @@ export function Checklist({
 
   return (
     <section aria-label="Setup checklist" className="relative w-[420px] max-w-full overflow-hidden rounded-[26px] bg-surface p-3 shadow-[0_0_0_1px_var(--line),0_34px_64px_-30px_rgb(50_20_60/0.45)]">
-      <motion.span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[150px]" style={{ background: `radial-gradient(90% 120% at 20% 0%, #aeeed5, transparent 70%), radial-gradient(90% 120% at 90% 0%, #bfe8ff, transparent 70%)` }} initial={false} animate={{ opacity: left ? 0 : 0.7 }} transition={{ duration: 0.6 }} />
+      <motion.span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[150px]" style={{ background: `radial-gradient(90% 120% at 20% 0%, #aeeed5, transparent 70%), radial-gradient(90% 120% at 90% 0%, #bfe8ff, transparent 70%)` }} initial={false} animate={{ opacity: left ? 0 : 0.7 }} transition={{ duration: 0.6, ease: ease.out }} />
       <div className="relative px-2.5 pb-3 pt-2.5">
         <h3 className="text-[25px] leading-[1.14] tracking-[-0.035em] text-ink" aria-live="polite">
           {left ? (
@@ -120,7 +121,7 @@ export function Checklist({
             <li key={s.id} className="relative overflow-hidden rounded-[16px]">
               <AnimatePresence initial={false}>
                 {on ? (
-                  <motion.span aria-hidden className="absolute inset-0" style={{ background: s.tint ?? TINTS[i % TINTS.length] }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                  <motion.span aria-hidden className="absolute inset-0" style={{ background: s.tint ?? TINTS[i % TINTS.length] }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3, ease: ease.out }}>
                     <span className="absolute inset-0 opacity-[0.3] mix-blend-overlay" style={{ backgroundImage: GRAIN }} />
                   </motion.span>
                 ) : null}
@@ -141,12 +142,12 @@ export function Checklist({
               </button>
               <AnimatePresence initial={false}>
                 {on ? (
-                  <motion.div className="relative overflow-hidden" initial={reduce ? false : { height: 0 }} animate={{ height: 'auto' }} exit={reduce ? undefined : { height: 0 }} transition={{ type: 'spring', stiffness: 440, damping: 38 }}>
+                  <motion.div className="relative overflow-hidden" initial={reduce ? false : { height: 0 }} animate={{ height: 'auto' }} exit={reduce ? undefined : { height: 0 }} transition={spring.move}>
                     <div className="pb-3 pl-[46px] pr-3">
                       <p className="text-[13.5px] leading-[19px] text-black/65">{s.line}</p>
                       <div className="mt-2.5 flex items-center justify-between gap-3">
                         <div className="min-w-0 flex-1 text-black">{s.preview}</div>
-                        <button type="button" onClick={() => void finish(s)} disabled={busy} className="ring-focus flex h-9 min-w-[104px] shrink-0 items-center justify-center rounded-[11px] bg-black px-3.5 text-[13px] font-medium text-white transition-transform duration-150 active:scale-[0.96]">
+                        <button type="button" onClick={() => void finish(s)} disabled={busy} className="ring-focus flex h-9 min-w-[104px] shrink-0 items-center justify-center rounded-[11px] bg-black px-3.5 text-[13px] font-medium text-white transition-transform duration-150 active:scale-[0.97]">
                           {busy ? <Spinner size={13} /> : s.action}
                         </button>
                       </div>

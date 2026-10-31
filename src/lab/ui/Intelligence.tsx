@@ -3,6 +3,7 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import type { MotionStyle } from 'motion/react'
+import { ease } from '@/lab/lib/motion'
 
 export type Tone = 'loud' | 'quiet'
 
@@ -65,7 +66,7 @@ export function Glow({
           className={`${layer === 'halo' ? 'ai-halo' : 'ai-ring'} ${tone === 'quiet' ? 'ai-quiet' : ''} ${className}`}
           style={{ borderRadius: radius, ...style }}
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1, transition: { duration: 0.5, ease: [0.2, 0.9, 0.25, 1] } }}
+          animate={{ opacity: 1, transition: { duration: 0.5, ease: ease.out } }}
           // Cooling down is slower than lighting up: the work is done, there's no hurry.
           exit={{ opacity: 0, transition: { duration: 0.9, ease: [0.4, 0, 0.2, 1] } }}
         />

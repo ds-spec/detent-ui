@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react'
 import type { MotionValue } from 'motion/react'
 import { ArrowUp } from '@/lab/icons'
-import { ease } from '@/lab/lib/motion'
+import { ease, spring } from '@/lab/lib/motion'
 
 /*
  * What the charts share: one validated set of colours, a number format, clean scales, curves that
@@ -30,7 +30,7 @@ export const compact = (n: number) => {
 
 /** Springs: a reading clicking into place, a shape settling into new data, a ring sweeping round. */
 export const detent = { type: 'spring', stiffness: 900, damping: 52, mass: 0.6 } as const
-export const morph = { type: 'spring', stiffness: 170, damping: 26 } as const
+export const morph = spring.data
 export const sweep = { type: 'spring', stiffness: 60, damping: 18, mass: 1 } as const
 
 const lerp = (a: number[], b: number[], t: number) => (a.length === b.length ? b.map((y, i) => a[i] + (y - a[i]) * t) : b)

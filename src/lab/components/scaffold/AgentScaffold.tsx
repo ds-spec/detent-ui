@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Folder } from '../../icons'
-import { ease } from '../../lib/motion'
+import { ease, spring } from '../../lib/motion'
 import { RollingText } from '../../ui/RollingText'
 import { Terminal } from '../terminal/Terminal'
 import type { Step } from '../terminal/Terminal'
@@ -102,6 +102,7 @@ export function AgentScaffold({ name, files, icons = {}, command = `npx create-a
 
   const nodes = useMemo(() => build(name, made, icons), [name, made, icons])
   const working = phase === 'scaffolding' || phase === 'installing'
+  const reduce = useReducedMotion()
 
   return (
     <div className="@container w-[720px] max-w-full overflow-hidden rounded-[24px] bg-surface shadow-float">
@@ -115,7 +116,7 @@ export function AgentScaffold({ name, files, icons = {}, command = `npx create-a
         {/* What the run is doing, and for how long. */}
         <span className="flex items-center gap-2 text-footnote" role="status">
           <span className="relative flex size-2">
-            {working && <motion.span className="absolute inset-0 rounded-full bg-ink-3" animate={{ scale: [1, 2.2], opacity: [0.5, 0] }} transition={{ duration: 1.2, repeat: Infinity, ease: 'easeOut' }} />}
+            {working && !reduce && <motion.span className="absolute inset-0 rounded-full bg-ink-3" animate={{ scale: [1, 2.2], opacity: [0.5, 0] }} transition={{ duration: 1.2, repeat: Infinity, ease: 'easeOut' }} />}
             <span className={`relative size-2 rounded-full transition-colors duration-300 ${phase === 'ready' ? 'bg-ok' : working ? 'bg-ink-2' : 'bg-line-strong'}`} />
           </span>
           <span className="relative h-[18px] w-[84px] overflow-hidden">
@@ -126,7 +127,7 @@ export function AgentScaffold({ name, files, icons = {}, command = `npx create-a
                 initial={{ y: '100%' }}
                 animate={{ y: 0 }}
                 exit={{ y: '-100%' }}
-                transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+                transition={spring.move}
               >
                 {LABEL[phase]}
               </motion.span>

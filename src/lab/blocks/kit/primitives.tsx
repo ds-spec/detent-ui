@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import type { Tone } from '@/lab/ui/Intelligence'
-import { ease, press } from '@/lab/lib/motion'
+import { ease, press, spring } from '@/lab/lib/motion'
 
 export { Hover } from '@/lab/ui/Hover'
 
@@ -37,7 +37,7 @@ export function Name({ title, tone = 'loud' }: { title: string | null; tone?: To
       </motion.span>
       <motion.span aria-hidden className={`absolute inset-0 block truncate ${tone === 'loud' ? 'ai-text' : 'text-ink-3'}`} initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ delay: settle, duration: 0.7, ease: ease.out }}>
         {letters.map((c, i) => (
-          <motion.span key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.022, duration: 0.18 }}>
+          <motion.span key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.022, duration: 0.18, ease: ease.out }}>
             {c}
           </motion.span>
         ))}
@@ -80,21 +80,28 @@ export type MenuItem = { id: string; label: string; note?: string; icon?: ReactN
  * label. Keyboard and pointer share one highlight. The owner positions it.
  */
 export function Menu({ items, active, onActive, onPick, title, className = '', plate }: { items: MenuItem[]; active: number; onActive: (i: number) => void; onPick: (i: number) => void; title?: string; className?: string; plate: string }) {
+  // The plate glides under the pointer, and is simply there for the keys.
+  const [via, setVia] = useState<'pointer' | 'keys'>('keys')
+  useEffect(() => {
+    const keys = () => setVia('keys')
+    window.addEventListener('keydown', keys, true)
+    return () => window.removeEventListener('keydown', keys, true)
+  }, [])
   return (
     <motion.div
       role="listbox"
-      className={`absolute z-30 rounded-[11px] bg-surface p-1.5 shadow-modal ${className}`}
+      className={`absolute z-30 origin-bottom-left rounded-[11px] bg-surface p-1.5 shadow-modal ${className}`}
       initial={{ opacity: 0, y: 6, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 4, scale: 0.98, transition: { duration: 0.12, ease: ease.exit } }}
-      transition={{ type: 'spring', stiffness: 520, damping: 38 }}
+      exit={{ opacity: 0, y: 4, scale: 0.98, transition: { duration: 0.12, ease: ease.out } }}
+      transition={spring.snappy}
       onPointerDown={(e) => e.preventDefault()}
     >
       {title && <p className="px-2.5 pb-1 pt-1.5 text-caption text-ink-3">{title}</p>}
       {items.length === 0 && <p className="px-2.5 py-2 text-footnote text-ink-3">Nothing matches</p>}
       {items.map((it, i) => (
-        <button key={it.id} type="button" role="option" aria-selected={i === active} onPointerEnter={() => onActive(i)} onClick={() => onPick(i)} className="relative flex w-full items-center gap-2.5 rounded-[7px] px-2.5 py-2 text-left">
-          {i === active && <motion.span layoutId={plate} className="absolute inset-0 rounded-[7px] bg-surface-2" transition={{ type: 'spring', stiffness: 700, damping: 48 }} />}
+        <button key={it.id} type="button" role="option" aria-selected={i === active} onPointerEnter={() => (setVia('pointer'), onActive(i))} onClick={() => onPick(i)} className="relative flex w-full items-center gap-2.5 rounded-[7px] px-2.5 py-2 text-left">
+          {i === active && <motion.span layoutId={plate} className="absolute inset-0 rounded-[7px] bg-surface-2" transition={via === 'pointer' ? spring.snappy : { duration: 0 }} />}
           {it.icon && <span className="relative flex shrink-0">{it.icon}</span>}
           <span className="relative min-w-0 flex-1">
             <span className="block truncate text-callout text-ink">{it.label}</span>

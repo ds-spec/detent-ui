@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { ChevronDown } from '../../icons'
 import { tap } from '../../lib/feel'
-import { ease, spring } from '../../lib/motion'
+import { ease, spring, dur } from '../../lib/motion'
 
 /** What a step is doing. It picks the pattern the dots play while the step runs. */
 export type ThoughtKind = 'think' | 'read' | 'search' | 'compare' | 'write'
@@ -232,7 +232,7 @@ export function Thinking({ steps, done, expanded = false }: {
               initial={{ y: '100%', opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '-100%', opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+              transition={spring.move}
             >
               <TwoTone text={done ? `Thought for ${secs(elapsed).replace('.0s', 's')}` : step} />
             </motion.span>
@@ -256,7 +256,7 @@ export function Thinking({ steps, done, expanded = false }: {
             className="glass absolute inset-x-0 top-[calc(100%+8px)] z-10 rounded-[22px] bg-surface p-1.5 shadow-modal"
             initial={{ opacity: 0, y: -4, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -4, transition: { duration: 0.12 } }}
+            exit={{ opacity: 0, y: -4, transition: { duration: dur.exit, ease: ease.out } }}
             transition={{ duration: 0.2, ease: ease.out }}
             style={{ transformOrigin: '50% 0%' }}
           >

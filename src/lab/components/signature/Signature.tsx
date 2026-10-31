@@ -4,7 +4,7 @@ import { useEffect, useId, useImperativeHandle, useRef, useState } from 'react'
 import type { Ref } from 'react'
 import { AnimatePresence, animate, motion, useAnimationControls, useMotionValue, useReducedMotion, useTransform } from 'motion/react'
 import { tap } from '../../lib/feel'
-import { ease, press } from '../../lib/motion'
+import { ease, press, dur } from '../../lib/motion'
 import { Kbd } from '../../ui/Kbd'
 
 /** For demos and tests: sign and seal as Enter would, or wipe the page. */
@@ -39,7 +39,7 @@ function Pencil({ down }: { down: boolean }) {
         style={{ left: -7, top: -149, transformOrigin: '7px 149px', rotate: 32 }}
         initial={false}
         animate={{ filter: down ? 'drop-shadow(-3px 3px 2.5px rgb(0 0 0 / 0.2))' : 'drop-shadow(-10px 13px 8px rgb(0 0 0 / 0.14))' }}
-        transition={{ duration: 0.22 }}
+        transition={{ duration: 0.22, ease: ease.out }}
       >
         <defs>
           <linearGradient id={id} x1="0" x2="1">
@@ -168,6 +168,7 @@ export function Signature({
   const drawn = useMotionValue(0)
   const drawnVisible = useTransform(drawn, (v) => (v > 0.001 ? 1 : 0))
   const flourishing = useRef(false)
+  const wake = useRef(() => {})
   const [today] = useState(() => new Date())
   // The page gives under the stamp: a small thud as the seal lands.
   const thud = useAnimationControls()
@@ -222,6 +223,7 @@ export function Signature({
       if (!value) s.at = 0
       if (s.at < s.start && value) s.at = s.start
       setLine({ base, width: Math.max(0, s.to - LEFT) })
+      wake.current()
     })
     return () => {
       live = false
@@ -241,7 +243,10 @@ export function Signature({
     let raf = 0
     let last = performance.now()
     let inking = false
+    let drawn = -1
+    // It runs only while the ink or the pen has somewhere to go; new ink wakes it.
     const frame = (now: number) => {
+      raf = 0
       const dt = Math.min(48, now - last)
       last = now
       const s = writing.current
@@ -250,7 +255,11 @@ export function Signature({
       if (moving) s.at += reduce ? gap : Math.sign(gap) * Math.min(Math.abs(gap), (gap > 0 ? WRITE : LIFT) * dt)
       const c = canvas.current
       // A soft wet edge where the ink is still arriving.
-      if (c) c.style.maskImage = `linear-gradient(to right, #000 ${Math.max(0, s.at) - 9}px, transparent ${Math.max(0, s.at) + 1}px)`
+      if (c && s.at !== drawn) {
+        c.style.maskImage = `linear-gradient(to right, #000 ${Math.max(0, s.at) - 9}px, transparent ${Math.max(0, s.at) + 1}px)`
+        drawn = s.at
+      }
+      let settling = false
       if (!flourishing.current) {
         // The pen's tip: at the ink's edge, on the stroke nearest where it was.
         const col = s.columns[Math.max(0, Math.min(s.columns.length - 1, Math.round(s.at)))] ?? []
@@ -258,16 +267,25 @@ export function Signature({
         const y = col.length ? col.reduce((a, b) => (Math.abs(b - was) < Math.abs(a - was) ? b : a)) : was
         tipX.set(Math.max(LEFT, s.at))
         tipY.set(was + (y - was) * 0.35)
+        settling = Math.abs(y - was) > 0.1
         const now2 = moving && gap > 0
         if (now2 !== inking) {
           inking = now2
           setDown(now2)
         }
       }
+      if (moving || settling) raf = requestAnimationFrame(frame)
+    }
+    wake.current = () => {
+      if (raf) return
+      last = performance.now()
       raf = requestAnimationFrame(frame)
     }
-    raf = requestAnimationFrame(frame)
-    return () => cancelAnimationFrame(raf)
+    wake.current()
+    return () => {
+      cancelAnimationFrame(raf)
+      wake.current = () => {}
+    }
   }, [reduce, tipX, tipY])
 
   const sign = async () => {
@@ -291,6 +309,7 @@ export function Signature({
       })
       setDown(false)
       flourishing.current = false
+      wake.current()
     }
     const at = new Date()
     setSealed(at)
@@ -348,7 +367,7 @@ export function Signature({
               style={{ left: Math.min(w - 88, LEFT + width - 8) }}
               initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 1.7, rotate: 6 }}
               animate={{ opacity: 0.94, scale: 1, rotate: -12 }}
-              exit={{ opacity: 0, scale: 0.92, transition: { duration: 0.2 } }}
+              exit={{ opacity: 0, scale: 0.92, transition: { duration: dur.exit, ease: ease.out } }}
               transition={{ type: 'spring', stiffness: 560, damping: 24, mass: 0.9 }}
             >
               <Seal initials={initialsOf(value)} rim={`Signed and sealed · ${day(sealed)} · `} fontFamily={fontFamily} />
@@ -356,7 +375,7 @@ export function Signature({
           )}
         </AnimatePresence>
         {pen && (
-          <motion.div aria-hidden className="pointer-events-none absolute left-0 top-0 z-10" style={{ x: tipX, y: tipY }} animate={{ opacity: sealed ? 0 : 1 }} transition={{ duration: 0.3 }}>
+          <motion.div aria-hidden className="pointer-events-none absolute left-0 top-0 z-10" style={{ x: tipX, y: tipY }} animate={{ opacity: sealed ? 0 : 1 }} transition={{ duration: 0.3, ease: ease.out }}>
             <Pencil down={down} />
           </motion.div>
         )}
@@ -402,7 +421,7 @@ export function Signature({
       <div className="relative mt-4 flex h-12 items-center justify-end gap-1 overflow-hidden border-t border-line pt-3">
         <AnimatePresence initial={false} mode="wait">
           {sealed ? (
-            <motion.div key="sealed" className="flex items-center gap-2 whitespace-nowrap text-footnote" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: ease.out } }} exit={{ opacity: 0, y: -10, transition: { duration: 0.12, ease: ease.exit } }}>
+            <motion.div key="sealed" className="flex items-center gap-2 whitespace-nowrap text-footnote" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: ease.out } }} exit={{ opacity: 0, y: -10, transition: { duration: 0.12, ease: ease.out } }}>
               <span className="text-ink">Signed and sealed</span>
               <span className="tnum text-ink-3 @max-[260px]:hidden">{sealed.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
               <motion.button type="button" whileTap={press} onPointerDown={tap} onClick={clear} className="ring-focus ml-2 h-8 pointer-coarse:h-9 rounded-full px-3 font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink">
@@ -410,7 +429,7 @@ export function Signature({
               </motion.button>
             </motion.div>
           ) : (
-            <motion.div key="actions" className="flex items-center gap-1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: ease.out } }} exit={{ opacity: 0, y: -10, transition: { duration: 0.12, ease: ease.exit } }}>
+            <motion.div key="actions" className="flex items-center gap-1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: ease.out } }} exit={{ opacity: 0, y: -10, transition: { duration: 0.12, ease: ease.out } }}>
               <motion.button type="button" whileTap={press} onPointerDown={tap} onClick={clear} disabled={!value} className="ring-focus h-8 pointer-coarse:h-9 rounded-full px-3 text-footnote font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink disabled:opacity-40">
                 Clear
               </motion.button>

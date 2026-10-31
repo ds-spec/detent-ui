@@ -4,7 +4,7 @@ import { useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } fro
 import type { ReactNode, Ref } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Check, Close, Upload as UploadIcon } from '../../icons'
-import { ease, spring } from '../../lib/motion'
+import { ease, spring, dur } from '../../lib/motion'
 import { Button } from '../../ui/Button'
 import { FileGlyph } from '../../ui/FileGlyph'
 import { RollingText } from '../../ui/RollingText'
@@ -175,7 +175,7 @@ export function Upload({
                 layout="position"
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, transition: { duration: 0.14 } }}
+                exit={{ opacity: 0, transition: { duration: dur.exit, ease: ease.out } }}
                 transition={{ duration: 0.3, ease: ease.out }}
                 className="flex items-center gap-3 rounded-row px-2.5"
                 style={{ height: ROW }}
@@ -201,7 +201,7 @@ export function Upload({
                         key="ok"
                         initial={{ scale: 0.3, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: 'spring', bounce: 0.5, duration: 0.45 }}
+                        transition={spring.pop}
                         className="absolute flex size-6 items-center justify-center rounded-full bg-ok text-white"
                       >
                         <Check size={14} strokeWidth={2.8} />
@@ -209,10 +209,10 @@ export function Upload({
                     ) : (
                       <motion.button
                         key="x"
-                        exit={{ scale: 0.4, opacity: 0 }}
+                        exit={{ scale: 0.8, opacity: 0 }}
                         aria-label={`Cancel ${i.name}`}
                         onClick={() => remove(i.id)}
-                        className="ring-focus absolute flex size-7 pointer-coarse:before:absolute pointer-coarse:before:-inset-1 pointer-coarse:before:content-[''] items-center justify-center rounded-full text-ink-3 transition-colors duration-150 hover:bg-surface-2 hover:text-ink"
+                        className="ring-focus absolute flex size-7 pointer-coarse:before:absolute pointer-coarse:before:-inset-1 pointer-coarse:before:content-[''] items-center justify-center rounded-full text-ink-3 transition-colors duration-150 hover:bg-surface-2 hover:text-ink" transition={{ duration: dur.enter, ease: ease.out }}
                       >
                         <Close size={15} />
                       </motion.button>
@@ -230,7 +230,7 @@ export function Upload({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-card text-footnote text-ink-3"
-              style={{ boxShadow: 'inset 0 0 0 1.5px var(--line)' }}
+              style={{ boxShadow: 'inset 0 0 0 1.5px var(--line)' }} transition={{ duration: dur.enter, ease: ease.out }}
             >
               Files you add will appear here
             </motion.div>
@@ -274,7 +274,7 @@ function Folder({ open, items, pct, busy }: { open: boolean; items: Item[]; pct:
               style={{ width: 172, height: 112, marginLeft: -86, boxShadow: 'inset 0 1px 0 rgb(255 255 255 / 0.6), 0 4px 10px -4px rgb(0 0 0 / 0.22)' }}
               initial={p.item ? { y: -150, rotate: rot * 3, opacity: 0, scale: 0.92 } : false}
               animate={{ y: (open ? -16 : 0) - depth * 6, x: dx, rotate: rot, opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, y: -20, transition: { duration: 0.18 } }}
+              exit={{ opacity: 0, y: -20, transition: { duration: dur.exit, ease: ease.out } }}
               transition={{ ...spring.soft, delay: p.item ? k * 0.08 : 0 }}
             >
               {p.item ? <SheetFace item={p.item} /> : <span className="flex-1 rounded-[7px] bg-[var(--sheet-line)] opacity-60" />}
@@ -288,9 +288,9 @@ function Folder({ open, items, pct, busy }: { open: boolean; items: Item[]; pct:
         className="absolute inset-x-0 bottom-0 h-[112px] rounded-[18px] bg-[var(--folder-front)]"
         style={{ transformOrigin: '50% 100%', boxShadow: 'inset 0 1px 0 light-dark(rgb(255 255 255 / 0.55), transparent), inset 0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.145)), 0 -8px 20px -12px rgb(0 0 0 / 0.25)' }}
         animate={{ rotateX: open ? -30 : 0 }}
-        transition={open ? spring.soft : { type: 'spring', bounce: 0.35, duration: 0.55 }}
+        transition={open ? spring.soft : spring.pop}
       >
-        <motion.div className="pointer-events-none absolute inset-0 rounded-[18px] bg-black" initial={false} animate={{ opacity: open ? 0.08 : 0 }} transition={{ duration: 0.3 }} />
+        <motion.div className="pointer-events-none absolute inset-0 rounded-[18px] bg-black" initial={false} animate={{ opacity: open ? 0.08 : 0 }} transition={{ duration: 0.3, ease: ease.out }} />
         <div className="absolute inset-x-0 top-[34px] flex justify-center text-[var(--folder-ink)]">
           <motion.span animate={{ y: open ? -3 : 0 }} transition={spring.snappy}>
             <UploadIcon size={26} />
@@ -301,8 +301,8 @@ function Folder({ open, items, pct, busy }: { open: boolean; items: Item[]; pct:
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0, transition: { delay: 0.4 } }}
-              className="absolute inset-x-6 bottom-5 h-[4px] overflow-hidden rounded-full bg-black/[0.08] dark:bg-white/[0.1]"
+              exit={{ opacity: 0, transition: { duration: dur.exit, ease: ease.out, delay: dur.enter } }}
+              className="absolute inset-x-6 bottom-5 h-[4px] overflow-hidden rounded-full bg-black/[0.08] dark:bg-white/[0.1]" transition={{ duration: dur.enter, ease: ease.out }}
             >
               <motion.div className="h-full rounded-full bg-[var(--folder-ink)]" initial={false} animate={{ width: `${pct}%` }} transition={spring.release} />
             </motion.div>

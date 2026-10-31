@@ -4,6 +4,7 @@ import { useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useRef
 import type { KeyboardEvent, PointerEvent, ReactNode, Ref } from 'react'
 import { AnimatePresence, animate, motion, useAnimationControls, useMotionValue, useMotionValueEvent, useReducedMotion, useSpring, useTransform } from 'motion/react'
 import { Check } from '../../icons'
+import { feedback } from '../../lib/detent'
 import { tap } from '../../lib/feel'
 import { ease, spring } from '../../lib/motion'
 import { Button } from '../../ui/Button'
@@ -202,6 +203,8 @@ export function Settle({
     onChange?.(v)
   }
 
+  const pace = useRef(1)
+  const moved = useRef(0)
   const seatAt = (s: number | null, user: boolean) => {
     if (s === seat.current) return
     seat.current = s
@@ -209,8 +212,8 @@ export function Settle({
     if (s === null) return
     // The click: a sound and a tap of haptics for real hands only, and a small dip of the knob for everyone.
     if (user) {
+      feedback.tick(false, pace.current)
       tap()
-      navigator.vibrate?.(8)
     }
     if (!reduce) click.start({ scale: [1, 0.88, 1], transition: { duration: 0.22, ease: ease.out } })
   }
@@ -333,6 +336,7 @@ export function Settle({
     const onKnob = !!(e.target as Element).closest('[data-knob]')
     if (!onKnob && (p.dist < R - W / 2 - 10 || p.dist > R + W / 2 + 20)) return
     e.preventDefault()
+    feedback.wake(true)
     e.currentTarget.setPointerCapture(e.pointerId)
     knobEl.current?.focus({ preventScroll: true })
     held.current = true
@@ -348,6 +352,9 @@ export function Settle({
     if (d > 180) d -= 360
     if (d < -180) d += 360
     last.current = p.deg
+    // How fast the hand turned it, as a share of a turn a second, is how loud the stops click.
+    pace.current = (Math.abs(d) / Math.max(1, e.timeStamp - moved.current)) * 2.8
+    moved.current = e.timeStamp
     turnTo(raw.current + d, true)
   }
   const up = () => {
@@ -359,6 +366,8 @@ export function Settle({
 
   const key = (e: KeyboardEvent) => {
     if (phaseRef.current !== 'idle') return
+    feedback.wake()
+    pace.current = 1
     const cur = amt.current
     const step = e.shiftKey ? 10 : 1
     const amounts = stops.map((s) => s.amount)
@@ -592,7 +601,7 @@ function Slot({ text }: { text: string }) {
           className="absolute inset-0 whitespace-nowrap text-center"
           initial={{ y: 14, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -14, opacity: 0, transition: { duration: 0.14, ease: ease.exit } }}
+          exit={{ y: -14, opacity: 0, transition: { duration: 0.14, ease: ease.out } }}
           transition={spring.snappy}
         >
           {text}
@@ -647,7 +656,7 @@ function Chip({ reading, live }: { reading: SettleReading; live: boolean }) {
           style={{ color }}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8, transition: { duration: 0.12, ease: ease.exit } }}
+          exit={{ opacity: 0, y: -8, transition: { duration: 0.12, ease: ease.out } }}
           transition={spring.snappy}
         >
           {body}

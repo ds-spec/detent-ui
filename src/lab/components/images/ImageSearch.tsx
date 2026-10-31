@@ -5,6 +5,7 @@ import type { Ref } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Close, Search, Spark } from '@/lab/icons'
 import { useSize } from '@/lab/lib/hooks'
+import { ease, dur, spring, press } from '@/lab/lib/motion'
 
 export type SearchImage = {
   id: string
@@ -25,7 +26,7 @@ export type ImageSearchHandle = { type(query: string): void; like(id: string | n
 const STOP = new Set(['the', 'and', 'with', 'over', 'into', 'from', 'for', 'that', 'this', 'some', 'very', 'any', 'are', 'its', 'off', 'out', 'onto', 'under', 'near', 'like', 'just', 'kind'])
 const NOT = /^(no|not|without|non)$/
 const GAP = 6
-const SPRING = { type: 'spring', stiffness: 260, damping: 30, mass: 0.9 } as const
+const SPRING = spring.release
 
 /** The query as words, each marked as a term to match, a term to avoid ("no people"), or filler. */
 function read(query: string) {
@@ -223,15 +224,15 @@ export function ImageSearch({
               className="flex h-8 shrink-0 items-center gap-1.5 rounded-[9px] bg-surface-2 pl-1 pr-1.5"
               initial={reduce ? false : { opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.14 } }}
+              exit={{ opacity: 0, scale: 0.8, transition: { duration: dur.exit, ease: ease.out } }}
               transition={SPRING}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={like.src} alt="" className="size-6 rounded-[6px] object-cover" />
+              <img loading="lazy" decoding="async" src={like.src} alt="" className="size-6 rounded-[6px] object-cover" />
               <span className="text-footnote text-ink-2">Like this</span>
-              <button type="button" aria-label="Stop finding images like this one" onClick={() => setLikeId(null)} className="ring-focus relative grid size-5 place-items-center rounded-full text-ink-3 transition-colors before:absolute before:-inset-2.5 before:content-[''] hover:bg-surface-3 hover:text-ink pointer-fine:before:hidden">
+              <motion.button whileTap={press} type="button" aria-label="Stop finding images like this one" onClick={() => setLikeId(null)} className="ring-focus relative grid size-5 place-items-center rounded-full text-ink-3 transition-colors before:absolute before:-inset-2.5 before:content-[''] hover:bg-surface-3 hover:text-ink pointer-fine:before:hidden">
                 <Close size={11} />
-              </button>
+              </motion.button>
             </motion.span>
           )}
         </AnimatePresence>
@@ -279,7 +280,7 @@ export function ImageSearch({
                     className="group absolute left-0 top-0"
                     initial={reduce ? false : { opacity: 0, scale: 0.94, x: t.x, y: t.y, width: t.w, height: t.h }}
                     animate={{ opacity: 1, scale: 1, x: t.x, y: t.y, width: t.w, height: t.h }}
-                    exit={{ opacity: 0, scale: 0.94, transition: { duration: 0.18 } }}
+                    exit={{ opacity: 0, scale: 0.94, transition: { duration: dur.exit, ease: ease.out } }}
                     transition={reduce ? { duration: 0 } : { ...SPRING, delay: i * 0.02 }}
                     onPointerEnter={() => setAim(t.id)}
                     onPointerLeave={(e) => e.pointerType !== 'touch' && setAim(null)}
@@ -298,6 +299,8 @@ export function ImageSearch({
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
+                        loading="lazy"
+                        decoding="async"
                         src={img.src}
                         alt=""
                         draggable={false}
@@ -308,7 +311,7 @@ export function ImageSearch({
                       {hero && (
                         <span aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 flex h-24 items-end bg-gradient-to-t text-left from-[rgb(0_0_0/0.45)] to-transparent p-4">
                           <AnimatePresence mode="popLayout" initial={false}>
-                            <motion.span key={img.id} className="text-footnote leading-5 text-white/90" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
+                            <motion.span key={img.id} className="text-footnote leading-5 text-white/90" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25, ease: ease.out }}>
                               {img.alt}
                             </motion.span>
                           </AnimatePresence>
@@ -317,7 +320,7 @@ export function ImageSearch({
                       <span aria-hidden className={`pointer-events-none absolute inset-0 shadow-[inset_0_0_0_1px_rgb(0_0_0/0.06)] ${hero ? 'rounded-[16px]' : 'rounded-[12px]'}`} />
                     </button>
                     {/* Find more like this: the one action on an image, there when you point at it. */}
-                    <button
+                    <motion.button whileTap={press}
                       type="button"
                       onClick={() => setLikeId(t.id)}
                       onFocus={() => setAim(t.id)}
@@ -325,7 +328,7 @@ export function ImageSearch({
                     >
                       <Spark size={11} />
                       Similar
-                    </button>
+                    </motion.button>
                   </motion.div>
                 )
               })}
@@ -348,9 +351,9 @@ export function ImageSearch({
           )}
         </span>
         {onSeeAll && (
-          <button type="button" onClick={onSeeAll} className="ring-focus ml-auto rounded-[6px] px-1.5 py-0.5 pointer-coarse:min-h-9 text-ink-2 transition-colors hover:text-ink">
+          <motion.button whileTap={press} type="button" onClick={onSeeAll} className="ring-focus ml-auto rounded-[6px] px-1.5 py-0.5 pointer-coarse:min-h-9 text-ink-2 transition-colors hover:text-ink">
             See all
-          </button>
+          </motion.button>
         )}
       </div>
     </div>

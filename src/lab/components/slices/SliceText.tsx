@@ -35,6 +35,7 @@ export function SliceText({
   const box = useRef<HTMLSpanElement>(null)
   const parts = useRef<(HTMLSpanElement | null)[]>([])
   const aim = useRef<number | null>(null)
+  const wake = useRef(() => {})
   const seen = useInView(box, { once: true, amount: 0.4 })
   const reduce = useReducedMotion()
   const mid = (strips - 1) / 2
@@ -62,26 +63,46 @@ export function SliceText({
     const now = Array.from({ length: strips }, () => 0)
     let raf = 0
     let last = 0
+    let shown = true
+    // It runs only while a strip has somewhere to go, and only on screen.
     const loop = (time: number) => {
+      raf = 0
       const dt = Math.min(0.05, (time - last) / 1000 || 0.016)
       last = time
+      let moving = false
       for (let i = 0; i < strips; i++) {
         const at = (i + 0.5) / strips
         const near = aim.current === null ? 0 : Math.exp(-(((at - aim.current) / 0.1) ** 2))
         const want = (i % 2 ? 1 : -1) * near * reach
         now[i] += (want - now[i]) * (1 - Math.exp(-dt * 11))
+        if (Math.abs(want - now[i]) < 0.02) now[i] = want
+        else moving = true
         const node = parts.current[i]
         if (node) node.style.transform = `translate3d(${now[i].toFixed(2)}px, 0, 0)`
       }
+      if (moving && shown) raf = requestAnimationFrame(loop)
+    }
+    wake.current = () => {
+      if (raf || !shown) return
+      last = performance.now()
       raf = requestAnimationFrame(loop)
     }
-    raf = requestAnimationFrame(loop)
-    return () => cancelAnimationFrame(raf)
+    const io = new IntersectionObserver(([e]) => {
+      shown = e.isIntersecting
+      if (shown) wake.current()
+    })
+    if (box.current) io.observe(box.current)
+    return () => {
+      cancelAnimationFrame(raf)
+      io.disconnect()
+      wake.current = () => {}
+    }
   }, [strips, reach, interactive, reduce])
 
   const aimAt = (e: PointerEvent<HTMLSpanElement>) => {
     const r = box.current!.getBoundingClientRect()
     aim.current = (e.clientY - r.top) / r.height
+    wake.current()
   }
 
   return (
@@ -93,6 +114,7 @@ export function SliceText({
       onPointerMove={aimAt}
       onPointerLeave={() => {
         aim.current = null
+        wake.current()
       }}
       className={`relative inline-block whitespace-nowrap leading-[1.12] ${className}`}
     >

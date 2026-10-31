@@ -123,9 +123,9 @@ export function PresenceDemo() {
           setFollowing(null)
         }
       }}
-      className="@container flex h-[420px] w-[440px] max-w-full flex-col overflow-hidden rounded-[24px] bg-surface shadow-float"
+      className="@container relative flex h-[420px] w-[440px] max-w-full flex-col overflow-hidden rounded-[24px] bg-surface shadow-float"
     >
-      <header className="flex h-16 shrink-0 items-center gap-3 pl-5 pr-3 shadow-[inset_0_-1px_0_var(--line)]">
+      <header className="relative z-10 flex h-16 shrink-0 items-center gap-3 pl-5 pr-3 shadow-[inset_0_-1px_0_var(--line)]">
         <div className="min-w-0 flex-1">
           <p className="truncate text-headline text-ink">Q3 refund rules</p>
           <p className="tnum truncate text-caption text-ink-3">Edited just now · {here.length} here</p>
@@ -182,33 +182,33 @@ export function PresenceDemo() {
             </AnimatePresence>
           </div>
         </div>
-
-        {/* Following: their colour frames the view, and a chip says whose view it is. */}
-        <AnimatePresence>
-          {followed && (
-            <motion.div
-              className="pointer-events-none absolute inset-0"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              style={{ boxShadow: `inset 0 0 0 1.5px ${tone(followed.hue)}` }}
-            >
-              <motion.span
-                className="absolute left-1/2 top-0 flex h-7 -translate-x-1/2 items-center gap-1.5 rounded-b-[12px] px-3 text-footnote font-medium text-white"
-                style={{ background: label(followed.hue) }}
-                initial={{ y: -28 }}
-                animate={{ y: 0 }}
-                exit={{ y: -28 }}
-                transition={{ duration: 0.25, ease: ease.out }}
-              >
-                Following {followed.name.split(' ')[0]}
-                <span className="opacity-70">· Esc to stop</span>
-              </motion.span>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
+
+      {/* Following: their colour frames the whole card, and a chip says whose view it is. */}
+      <AnimatePresence>
+        {followed && (
+          <motion.div
+            className="pointer-events-none absolute inset-0 z-20 rounded-[24px]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ boxShadow: `inset 0 0 0 1.5px ${tone(followed.hue)}` }}
+          >
+            <motion.span
+              className="absolute bottom-3 left-1/2 flex h-7 -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full px-3 text-footnote font-medium text-white"
+              style={{ background: label(followed.hue) }}
+              initial={{ y: 12, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 12, opacity: 0 }}
+              transition={{ duration: 0.25, ease: ease.out }}
+            >
+              Following {followed.name.split(' ')[0]}
+              <span className="opacity-70">· Esc to stop</span>
+            </motion.span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

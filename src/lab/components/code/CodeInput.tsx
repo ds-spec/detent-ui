@@ -130,7 +130,7 @@ export function CodeInput({
           className="absolute inset-0 overflow-hidden rounded-row"
           initial={false}
           animate={{ opacity: done ? 1 : 0 }}
-          transition={{ duration: 0.25, delay: done ? 0.12 : 0 }}
+          transition={{ duration: 0.25, delay: done ? 0.12 : 0, ease: ease.out }}
           style={{ background: 'color-mix(in oklch, var(--ok) 11%, var(--surface))', boxShadow: '0 0 0 1px color-mix(in oklch, var(--ok) 22%, transparent)' }}
         >
           {/* Verified: a glint of light crosses the bar once. */}
@@ -164,7 +164,7 @@ export function CodeInput({
                       ? '0 0 0 0px transparent, 0 0 0 0 transparent'
                       : 'var(--elev-raised)',
               }}
-              transition={{ ...spring.smooth, opacity: { duration: 0.2, delay: done ? 0.22 : 0 }, boxShadow: { duration: 0.2 } }}
+              transition={{ ...spring.smooth, opacity: { duration: 0.2, delay: done ? 0.22 : 0, ease: ease.out }, boxShadow: { duration: 0.2, ease: ease.out } }}
               style={{ height: H }}
             >
               <AnimatePresence initial={false} custom={clearing ? (length - 1 - i) * 0.05 : 0}>
@@ -186,7 +186,7 @@ export function CodeInput({
                     <motion.span
                       className="block"
                       animate={status === 'checking' && !reduce ? { opacity: [1, 0.3, 1] } : { opacity: 1 }}
-                      transition={status === 'checking' ? { duration: 0.9, repeat: Infinity, delay: i * 0.09, ease: ease.inOut } : { duration: 0.15 }}
+                      transition={status === 'checking' ? { duration: 0.9, repeat: Infinity, delay: i * 0.09, ease: ease.inOut } : { duration: 0.15, ease: ease.out }}
                     >
                       {ch}
                     </motion.span>
@@ -209,7 +209,7 @@ export function CodeInput({
           }}
           initial={false}
           animate={{ x: x(active), opacity: showRing ? 1 : 0 }}
-          transition={{ x: spring.snappy, opacity: { duration: 0.15 } }}
+          transition={{ x: spring.snappy, opacity: { duration: 0.15, ease: ease.out } }}
         >
           <span className="h-6 w-[2px] rounded-full bg-ink motion-safe:animate-[caret_1.05s_infinite]" />
         </motion.div>
@@ -224,7 +224,7 @@ export function CodeInput({
               <motion.span
                 className="flex size-[22px] items-center justify-center rounded-full bg-ok text-white"
                 initial={{ scale: 0.5 }}
-                animate={{ scale: 1, transition: { type: 'spring', bounce: 0.45, duration: 0.5, delay: 0.32 } }}
+                animate={{ scale: 1, transition: { ...spring.pop, delay: 0.32 } }}
               >
                 <DrawnCheck size={13} delay={0.5} />
               </motion.span>

@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { spring } from '@/lab/lib/motion'
+import { spring, ease } from '@/lab/lib/motion'
 
 export type Table = { head: string[]; rows: (string | number)[][] }
 
@@ -45,11 +45,11 @@ export function ChartCard({ title, headline, actions, table, className = '', chi
       <div className="relative mt-4 flex flex-1 flex-col">
         <AnimatePresence mode="popLayout" initial={false}>
           {view === 'chart' ? (
-            <motion.div key="chart" ref={body} className="flex flex-1 flex-col" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
+            <motion.div key="chart" ref={body} className="flex flex-1 flex-col" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18, ease: ease.out }}>
               {children}
             </motion.div>
           ) : (
-            <motion.div key="table" className="overflow-auto overscroll-contain" style={{ height: h || undefined }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
+            <motion.div key="table" className="overflow-auto overscroll-contain" style={{ height: h || undefined }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18, ease: ease.out }}>
               {table && (
                 <table className="w-full border-collapse text-left text-footnote">
                   <thead className="sticky top-0 bg-surface">

@@ -35,7 +35,7 @@ export function ContextMenu({
   className?: string
   ref?: Ref<ContextMenuHandle>
 }) {
-  const [state, setState] = useState<{ via: 'pointer' | 'keys'; quiet: boolean; point: Box } | null>(null)
+  const [state, setState] = useState<{ via: 'pointer' | 'keys'; quiet: boolean; point: Box; instant: boolean } | null>(null)
   const [at, setAt] = useState<ReturnType<typeof place> | null>(null)
   const area = useRef<HTMLDivElement>(null)
   const layer = useRef<HTMLDivElement>(null)
@@ -44,10 +44,10 @@ export function ContextMenu({
   const hold = useRef<{ t: number; x: number; y: number } | null>(null)
   const { contained, frame } = useHost()
 
-  const openAtClient = (x: number, y: number, via: 'pointer' | 'keys', quiet: boolean) => {
+  const openAtClient = (x: number, y: number, via: 'pointer' | 'keys', quiet: boolean, instant = via === 'keys') => {
     const f = frameOf(frame)
     setAt(null)
-    setState({ via, quiet, point: inFrame({ left: x, top: y, width: 0, height: 0 }, f) })
+    setState({ via, quiet, instant, point: inFrame({ left: x, top: y, width: 0, height: 0 }, f) })
   }
   const close = () => {
     const quiet = state?.quiet
@@ -103,7 +103,7 @@ export function ContextMenu({
         onContextMenu={(e) => {
           e.preventDefault()
           cancel()
-          openAtClient(e.clientX, e.clientY, 'pointer', false)
+          openAtClient(e.clientX, e.clientY, 'pointer', false, true)
         }}
         onPointerDown={down}
         onPointerMove={moved}
@@ -117,7 +117,7 @@ export function ContextMenu({
       <Layer>
         <div ref={layer} className={`${fill(contained)} pointer-events-none z-50`}>
           <AnimatePresence>
-            {state && <MenuPanel key={`${state.point.x},${state.point.y}`} items={items} label={label} via={state.via} quiet={state.quiet} at={at} side={at?.side ?? 'bottom'} arrow={at ? state.point.x - at.x : 0} control={control} panelRef={(el) => void (panel.current = el)} onClose={close} />}
+            {state && <MenuPanel key={`${state.point.x},${state.point.y}`} items={items} label={label} via={state.via} instant={state.instant} quiet={state.quiet} at={at} side={at?.side ?? 'bottom'} arrow={at ? state.point.x - at.x : 0} control={control} panelRef={(el) => void (panel.current = el)} onClose={close} />}
           </AnimatePresence>
         </div>
       </Layer>

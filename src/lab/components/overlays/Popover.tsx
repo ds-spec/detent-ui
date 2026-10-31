@@ -4,7 +4,7 @@ import { cloneElement, useEffect, useImperativeHandle, useLayoutEffect, useRef, 
 import type { ReactElement, ReactNode, Ref } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { tap } from '../../lib/feel'
-import { ease } from '../../lib/motion'
+import { ease, spring } from '../../lib/motion'
 import { Layer, fill, frameOf, inFrame, originOf, place, useDismiss, useHost, useReposition } from '../../lib/layer'
 import type { Align, Side } from '../../lib/layer'
 
@@ -126,8 +126,8 @@ export function Popover({
                 style={{ x: at?.x ?? 0, y: at?.y ?? 0, visibility: at ? 'visible' : 'hidden', transformOrigin: at ? originOf(at.side, at.arrow) : undefined, pointerEvents: 'auto' }}
                 initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.94 }}
                 animate={at ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.94 }}
-                exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.13, ease: ease.exit } }}
-                transition={{ type: 'spring', stiffness: 520, damping: 36, mass: 0.7 }}
+                exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.13, ease: ease.out } }}
+                transition={spring.snappy}
               >
                 {arrow && at && <Arrow side={at.side} at={at.arrow} />}
                 {children}

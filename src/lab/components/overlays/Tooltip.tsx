@@ -3,8 +3,8 @@
 import { cloneElement, createContext, useContext, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { ReactElement, ReactNode, Ref } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { ease, spring } from '../../lib/motion'
-import { Layer, fill, frameOf, inFrame, place, useHost } from '../../lib/layer'
+import { ease, spring, dur } from '../../lib/motion'
+import { Layer, fill, frameOf, inFrame, originOf, place, useHost } from '../../lib/layer'
 import type { Side } from '../../lib/layer'
 import { keyLabel } from '../../ui/Kbd'
 
@@ -152,9 +152,9 @@ export function TooltipGroup({
                 className="absolute left-0 top-0 h-7 rounded-[9px] bg-ink text-caption font-medium text-surface shadow-float"
                 initial={{ x: pos.x, y: pos.y + (pos.side === 'top' ? 3 : pos.side === 'bottom' ? -3 : 0), width: pos.w, opacity: 0, scale: reduce ? 1 : 0.96 }}
                 animate={{ x: pos.x, y: pos.y, width: pos.w, opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, transition: { duration: 0.1, ease: ease.exit } }}
-                transition={glide && !reduce ? { ...spring.move, opacity: { duration: 0.12 } } : { duration: 0.14, ease: ease.out }}
-                style={{ transformOrigin: pos.side === 'top' ? '50% 100%' : '50% 0%' }}
+                exit={{ opacity: 0, transition: { duration: 0.1, ease: ease.out } }}
+                transition={glide && !reduce ? { ...spring.move, opacity: { duration: 0.12, ease: ease.out } } : { duration: 0.14, ease: ease.out }}
+                style={{ transformOrigin: originOf(pos.side, pos.arrow) }}
               >
                 <span className="relative block h-full overflow-hidden rounded-[inherit]">
                   <AnimatePresence initial={false} mode="popLayout">
@@ -163,7 +163,7 @@ export function TooltipGroup({
                       className="absolute inset-y-0 left-0 flex items-center gap-1.5 whitespace-nowrap px-2"
                       initial={{ opacity: 0, x: dir * 10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: dir * -10, transition: { duration: 0.1 } }}
+                      exit={{ opacity: 0, x: dir * -10, transition: { duration: dur.exit, ease: ease.out } }}
                       transition={{ duration: 0.18, ease: ease.out }}
                     >
                       <Label tip={tip} />

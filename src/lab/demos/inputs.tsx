@@ -10,6 +10,7 @@ import { Mail } from '../icons'
 import { ease, press } from '../lib/motion'
 import { useBench } from './bench'
 import { hover, pressed } from '@/lab/lib/hand'
+import { useAway } from './loop'
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
@@ -133,6 +134,8 @@ export function PromptDemo() {
   const box = useRef<PromptHandle>(null)
   const held = useRef(false)
   const touched = useRef(false)
+  const stage = useRef<HTMLDivElement>(null)
+  useAway(held, stage)
 
   const onSend = (m: Message) =>
     new Promise<void>((done) => {
@@ -190,6 +193,7 @@ export function PromptDemo() {
 
   return (
     <div
+      ref={stage}
       className="flex h-[500px] w-[540px] max-w-full flex-col overflow-hidden rounded-[28px] bg-card shadow-border"
       {...hover(held)}
       {...pressed(() => (touched.current = true))}
@@ -207,7 +211,7 @@ export function PromptDemo() {
         </span>
       </div>
       {/* Attachments sit in the box, so the thread only needs a little room; anything taller floats over it. */}
-      <div className="relative flex flex-1 flex-col justify-end px-6" style={{ paddingBottom: 20 + grown }}>
+      <div className="relative flex flex-1 flex-col justify-end px-6 pb-5" style={{ transform: `translate3d(0,${-grown}px,0)` }}>
         <AnimatePresence mode="popLayout" initial={false}>
           {turn ? (
             <motion.div key={turn.id} exit={{ opacity: 0, transition: { duration: 0.15 } }}>

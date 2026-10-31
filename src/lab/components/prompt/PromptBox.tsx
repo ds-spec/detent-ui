@@ -7,7 +7,7 @@ import type { ReactNode, Ref } from 'react'
 import type { MotionValue } from 'motion/react'
 import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react'
 import { ArrowUp, Check, Close, Upload } from '../../icons'
-import { ease, press, spring } from '../../lib/motion'
+import { ease, press, spring, dur } from '../../lib/motion'
 
 export type Attachment = {
   id: string
@@ -274,19 +274,19 @@ export function PromptBox({
         }}
       >
         <div className={`${CARD} @container relative h-full overflow-hidden rounded-[21px] transition-shadow duration-200`} style={{ boxShadow: focused ? 'inset 0 0 0 1px var(--line-strong)' : undefined }}>
-          <div ref={content} className="absolute inset-x-0 bottom-0 px-4 pb-3.5 pt-3.5">
+          <div ref={content} className="absolute inset-x-0 top-full -translate-y-full px-4 pb-3.5 pt-3.5">
             {/* The line across the top: what goes with the message, or what it's doing; the model on the right. */}
             {head && (
             <div className={`${MONO} flex h-4 items-center gap-3 text-ink-3`}>
               <div className="relative flex h-full min-w-0 flex-1 items-center">
                 <AnimatePresence initial={false} mode="popLayout">
                   {busy ? (
-                    <motion.span key="busy" className="flex min-w-0 items-center gap-2" initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.1 } }} transition={{ duration: 0.2, ease: ease.out }}>
+                    <motion.span key="busy" className="flex min-w-0 items-center gap-2" initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0 } }} transition={{ duration: 0.2, ease: ease.out }}>
                       <span className="ai-text ai-quiet truncate">{status}</span>
                       <Elapsed />
                     </motion.span>
                   ) : label ? (
-                    <motion.span key="label" className="truncate" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.1 } }}>
+                    <motion.span key="label" className="truncate" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0 } }} transition={{ duration: dur.enter, ease: ease.out }}>
                       {label}
                     </motion.span>
                   ) : null}
@@ -420,8 +420,8 @@ export function PromptBox({
                 style={{ boxShadow: 'inset 0 0 0 1.5px var(--line-strong)' }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0, transition: { duration: 0.12 } }}
-                transition={{ duration: 0.15 }}
+                exit={{ opacity: 0, transition: { duration: dur.exit, ease: ease.out } }}
+                transition={{ duration: 0.15, ease: ease.out }}
               >
                 <Upload size={15} />
                 Drop to attach
@@ -441,7 +441,7 @@ export function PromptBox({
             style={{ left: 17, right: 17, bottom: 1 + 14 + 32 + 12 + LINE, lineHeight: `${LINE}px` }}
             initial={{ opacity: 1, y: 0 }}
             animate={reduce ? { opacity: 0 } : { opacity: 0, y: -34 }}
-            transition={{ duration: 0.45, ease: ease.out, opacity: { duration: 0.42, ease: [0.4, 0, 0.6, 1] } }}
+            transition={{ duration: 0.45, ease: ease.out, opacity: { duration: 0.42, ease: ease.inOut } }}
             onAnimationComplete={() => setLifts((all) => all.filter((x) => x.id !== l.id))}
           >
             {l.text}
@@ -514,7 +514,7 @@ function Ramp({ level }: { level: number }) {
     <svg width="22" height="14" viewBox="0 0 22 14" aria-hidden>
       {[2, 3, 4, 5].map((n, c) =>
         Array.from({ length: n }, (_, r) => (
-          <rect key={`${c}-${r}`} x={c * 5.6 + 1} y={14 - (r + 1) * 2.8 + 0.4} width="2" height="2" rx="0.6" fill={c < level ? 'var(--accent)' : 'color-mix(in oklch, var(--ink) 14%, transparent)'} style={{ transition: `fill 160ms ${c * 30}ms` }} />
+          <rect key={`${c}-${r}`} x={c * 5.6 + 1} y={14 - (r + 1) * 2.8 + 0.4} width="2" height="2" rx="0.6" fill={c < level ? 'var(--accent)' : 'color-mix(in oklch, var(--ink) 14%, transparent)'} style={{ transition: `fill 160ms cubic-bezier(0.2,0.9,0.25,1) ${c * 30}ms` }} />
         )),
       )}
     </svg>
@@ -540,7 +540,7 @@ function File({ file, index, onRemove }: { file: Attachment; index: number; onRe
       className="group/file relative flex h-11 w-[188px] shrink-0 items-center gap-2.5 rounded-[12px] pl-1.5 pr-3 shadow-[inset_0_0_0_1px_var(--line)]"
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0, transition: { duration: 0.24, ease: ease.out, delay: Math.min(index, 4) * 0.03 } }}
-      exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.14 } }}
+      exit={{ opacity: 0, scale: 0.96, transition: { duration: dur.exit, ease: ease.out } }}
       transition={spring.smooth}
     >
       <span className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-[8px] bg-surface-2 bg-cover bg-center font-mono text-[9px] tracking-[0.04em] text-ink-2 dark:bg-surface-3" style={file.url ? { backgroundImage: `url("${file.url}")` } : undefined}>

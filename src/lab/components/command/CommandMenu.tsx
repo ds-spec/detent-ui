@@ -5,6 +5,7 @@ import type { KeyboardEvent, ReactNode, Ref } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { Search } from '../../icons'
+import { byKey } from '../../lib/feel'
 import { ease, spring } from '../../lib/motion'
 import { Kbd } from '../../ui/Kbd'
 
@@ -73,6 +74,13 @@ export function CommandMenu({
   const list = useRef<HTMLDivElement>(null)
   const returnTo = useRef<HTMLElement | null>(null)
   const id = useId()
+  // What a key opens is simply there; a pointer gets its beat. Read once, as it opens.
+  const [opened, setOpened] = useState(open)
+  const [instant, setInstant] = useState(byKey)
+  if (open !== opened) {
+    setOpened(open)
+    if (open) setInstant(byKey())
+  }
 
   const q = query.trim().toLowerCase()
   const results = useMemo(() => commands.map((c) => ({ c, ...match(c, q) })).filter((r) => r.hit), [commands, q])
@@ -257,7 +265,7 @@ export function CommandMenu({
       {open && (
         <motion.div
           className="fixed inset-0 z-[100] flex justify-center px-4 pt-[16vh]"
-          initial={{ opacity: 0 }}
+          initial={instant ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0.12 } }}
           transition={{ duration: 0.14 }}
@@ -267,7 +275,7 @@ export function CommandMenu({
             role="dialog"
             aria-label="Command menu"
             className="glass relative flex h-fit w-full max-w-[580px] flex-col overflow-hidden rounded-[18px] bg-surface shadow-modal"
-            initial={{ opacity: 0, scale: 0.98, y: -6 }}
+            initial={instant ? false : { opacity: 0, scale: 0.98, y: -6 }}
             animate={{ opacity: 1, scale: 1, y: 0, transition: { duration: 0.16, ease: ease.out } }}
             exit={{ opacity: 0, scale: 0.99, transition: { duration: 0.12, ease: ease.out } }}
             style={{ transformOrigin: '50% 0%' }}

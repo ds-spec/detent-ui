@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { animate, motion, useMotionValue } from 'motion/react'
+import { spring } from '@/lab/lib/motion'
 
-const knob = { type: 'spring', stiffness: 700, damping: 40, mass: 0.7 } as const
+const knob = spring.snappy
 
 /**
  * A switch whose knob stretches while pressed, the way a finger would squish it, then

@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode, RefObject } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { ArrowLeft, Check, ChevronDown, Lock, Mail, Plus } from '@/lab/blocks/kit/icons'
-import { ease, press, spring } from '@/lab/lib/motion'
+import { ease, press, spring, dur } from '@/lab/lib/motion'
 import { tap } from '@/lab/lib/feel'
 import { CodeInput } from '@/lab/components/code/CodeInput'
 import type { CodeHandle } from '@/lab/components/code/CodeInput'
@@ -191,7 +191,7 @@ export function SignIn({ autoplay = true, accent, product = 'Detent', providers 
               className="absolute inset-0 flex items-center justify-center px-6"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0, transition: { duration: 0.4, ease: ease.out, delay: 0.08 } }}
-              exit={{ opacity: 0, y: -8, transition: { duration: 0.18, ease: ease.exit } }}
+              exit={{ opacity: 0, y: -8, transition: { duration: 0.18, ease: ease.out } }}
             >
               <div className="w-full max-w-[360px]">
                 {stage === 'start' && <Start email={email} setEmail={(v) => (setEmail(v), setError(null))} error={error} sending={sending} providers={providers} onGitHub={github} onEmail={() => (tap(), sendCode())} />}
@@ -283,9 +283,9 @@ function Start({ email, setEmail, error, sending, providers, onGitHub, onEmail }
           </span>
         </motion.button>
       </form>
-      <button type="button" className="ring-focus mt-3 h-9 w-full rounded-[7px] text-footnote text-[var(--accent-ink)] hover:underline">
+      <motion.button whileTap={press} type="button" className="ring-focus mt-3 h-9 w-full rounded-[7px] text-footnote text-[var(--accent-ink)] hover:underline">
         Use single sign-on
-      </button>
+      </motion.button>
       <p className="mt-6 text-center text-footnote text-ink-3">
         New to {product}? <span className="font-medium text-[var(--accent-ink)]">Create a workspace</span>
       </p>
@@ -296,10 +296,10 @@ function Start({ email, setEmail, error, sending, providers, onGitHub, onEmail }
 function Code({ email, codeRef, onBack, onVerified, suggest }: { email: string; codeRef: RefObject<CodeHandle | null>; onBack: () => void; onVerified: () => void; suggest: boolean }) {
   return (
     <div>
-      <button type="button" onClick={onBack} className="ring-focus -ml-2 flex h-8 items-center gap-1.5 rounded-full px-2 text-footnote text-ink-2 hover:bg-surface-2 hover:text-ink">
+      <motion.button whileTap={press} type="button" onClick={onBack} className="ring-focus -ml-2 flex h-8 items-center gap-1.5 rounded-full px-2 text-footnote text-ink-2 hover:bg-surface-2 hover:text-ink">
         <ArrowLeft size={14} />
         Back
-      </button>
+      </motion.button>
       <span className="mt-5 flex size-11 items-center justify-center rounded-[10px] bg-surface text-ink-2 shadow-raised">
         <Mail size={19} />
       </span>
@@ -327,7 +327,7 @@ function Code({ email, codeRef, onBack, onVerified, suggest }: { email: string; 
               className="ring-focus absolute left-0 top-0 flex h-8 items-center gap-2 rounded-full bg-surface-2 pl-2 pr-3 text-footnote text-ink"
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, transition: { duration: 0.12 } }}
+              exit={{ opacity: 0, transition: { duration: dur.exit, ease: ease.out } }} transition={spring.snappy}
             >
               <span className="flex size-5 items-center justify-center rounded-[6px] bg-[#3b82f6] text-white">
                 <Mail size={11} />
@@ -471,7 +471,7 @@ function Redacted({ text, open, at, className }: { text: string; open: boolean; 
   const delay = { transitionDelay: open ? `${120 + at * 90}ms` : '0ms' }
   return (
     <span className={`grid ${className}`}>
-      <span aria-hidden={!open} className={`col-start-1 row-start-1 truncate transition-[opacity,filter] duration-500 ${open ? '' : 'opacity-0 blur-[3px]'}`} style={delay}>
+      <span aria-hidden={!open} className={`col-start-1 row-start-1 truncate transition-opacity duration-500 ${open ? '' : 'opacity-0'}`} style={delay}>
         {text}
       </span>
       <span aria-hidden className={`col-start-1 row-start-1 flex items-center transition-opacity duration-500 ${open ? 'opacity-0' : ''}`} style={delay}>
@@ -493,7 +493,7 @@ function MailToast({ onOpen }: { onOpen: () => void }) {
       className="absolute right-3 top-3 z-20 flex w-[min(320px,calc(100%-24px))] items-start gap-3 rounded-[12px] bg-surface p-3 text-left shadow-modal"
       initial={{ opacity: 0, y: -24, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -16, scale: 0.98, transition: { duration: 0.2, ease: ease.exit } }}
+      exit={{ opacity: 0, y: -16, scale: 0.98, transition: { duration: 0.2, ease: ease.out } }}
       transition={spring.soft}
     >
       <span className="flex size-9 shrink-0 items-center justify-center rounded-[7px] bg-[#3b82f6] text-white">
@@ -519,14 +519,14 @@ function OAuthSheet({ going, onAuthorize, onCancel }: { going: boolean; onAuthor
   const org = `${slug(product)}-labs`
   return (
     <>
-      <motion.div className="absolute inset-0 z-30 bg-black/25" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onCancel} />
+      <motion.div className="absolute inset-0 z-30 bg-black/25" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onCancel} transition={{ duration: dur.enter, ease: ease.out }} />
       <motion.div
         role="dialog"
         aria-label={`Authorize ${product} on GitHub`}
         className="absolute left-1/2 top-1/2 z-40 w-[340px] max-w-[calc(100%-32px)] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[14px] bg-surface shadow-modal"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.15 } }}
+        exit={{ opacity: 0, scale: 0.98, transition: { duration: dur.exit, ease: ease.out } }}
         transition={spring.soft}
       >
         <div className="flex h-9 items-center justify-center gap-2 bg-[light-dark(#f6f8fa,#161b22)] text-footnote text-ink-2 shadow-[inset_0_-1px_0_var(--line)]">

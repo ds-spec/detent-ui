@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Check, Copy } from '../../icons'
-import { ease, spring } from '../../lib/motion'
+import { ease, spring, dur } from '../../lib/motion'
 
 type Tone = 'plain' | 'muted' | 'ok' | 'accent' | 'error'
 
@@ -156,7 +156,7 @@ export function Terminal({
                   <span className={l.done ? 'text-ink' : 'text-ink-2'}>{l.text}</span>
                   <AnimatePresence>
                     {l.done && (
-                      <motion.span className="text-ink-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+                      <motion.span className="text-ink-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2, ease: ease.out }}>
                         {l.took}ms
                       </motion.span>
                     )}
@@ -227,7 +227,7 @@ export function CopyCommand({ command, prompt = '$' }: { command: string; prompt
               style={{ background: 'color-mix(in oklch, var(--accent) 28%, transparent)' }}
               initial={{ scaleX: 0, opacity: 1 }}
               animate={{ scaleX: 1, opacity: 1, transition: { duration: 0.26, ease: ease.out } }}
-              exit={{ opacity: 0, transition: { duration: 0.4 } }}
+              exit={{ opacity: 0, transition: { duration: dur.exit, ease: ease.out } }}
             />
           )}
         </AnimatePresence>

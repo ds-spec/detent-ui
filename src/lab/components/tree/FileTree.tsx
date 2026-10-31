@@ -5,7 +5,7 @@ import type { KeyboardEvent, ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { ChevronDown, Code, FilePage, Folder, FolderOpen } from '../../icons'
 import { useStack } from '../../lib/hooks'
-import { ease } from '../../lib/motion'
+import { ease, dur } from '../../lib/motion'
 
 export type TreeNode = { name: string; children?: TreeNode[]; icon?: ReactNode }
 
@@ -193,9 +193,9 @@ export function FileTree({
               animate={{
                 height: ROW,
                 opacity: 1,
-                transition: { ...fold, delay: reduce ? 0 : Math.min(order, 7) * 0.025, opacity: { duration: 0.2, delay: reduce ? 0 : Math.min(order, 7) * 0.025 + 0.04 } },
+                transition: { ...fold, delay: reduce ? 0 : Math.min(order, 7) * 0.025, opacity: { duration: 0.2, delay: reduce ? 0 : Math.min(order, 7) * 0.025 + 0.04, ease: ease.out } },
               }}
-              exit={{ height: 0, opacity: 0, transition: { ...fold, opacity: { duration: 0.1 } } }}
+              exit={{ height: 0, opacity: 0, transition: { ...fold, opacity: { duration: dur.exit, ease: ease.out } } }}
               className="overflow-hidden"
             >
               <div
@@ -213,7 +213,7 @@ export function FileTree({
                       style={{ background: 'color-mix(in oklch, var(--accent) 20%, transparent)' }}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: [0, 1, 0], transition: { duration: 1.5, times: [0, 0.15, 1], ease: ease.out, delay: 0.1 } }}
-                      exit={{ opacity: 0 }}
+                      exit={{ opacity: 0 }} transition={{ duration: dur.enter, ease: ease.out }}
                     />
                   )}
                 </AnimatePresence>
@@ -241,7 +241,7 @@ export function FileTree({
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      transition={{ duration: 0.16 }}
+                      transition={{ duration: 0.16, ease: ease.out }}
                     >
                       {iconFor(row, isOpen)}
                     </motion.span>
@@ -253,7 +253,7 @@ export function FileTree({
                 </span>
                 {row.folder && (
                   <motion.span
-                    className="flex text-ink-3 opacity-0 transition-opacity duration-150 group-hover/row:opacity-100"
+                    className="flex text-ink-3 opacity-0 transition-opacity duration-150 group-hover/row:opacity-100 pointer-coarse:opacity-100"
                     style={{ opacity: row.depth === 0 ? 1 : undefined }}
                     initial={false}
                     animate={{ rotate: isOpen ? 0 : -90 }}

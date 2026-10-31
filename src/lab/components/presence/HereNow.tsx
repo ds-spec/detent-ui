@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
-import { ease, spring } from '../../lib/motion'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { ease, spring, dur } from '../../lib/motion'
 import { Orb } from '../../ui/Orb'
 import { RollingText } from '../../ui/RollingText'
 
@@ -114,10 +114,10 @@ export function HereNow({
               aria-pressed={following === p.id}
               className="ring-focus absolute top-0 rounded-full pointer-coarse:before:absolute pointer-coarse:before:-inset-1 pointer-coarse:before:content-['']"
               style={{ width: SIZE, height: SIZE, zIndex: shown.length - i }}
-              initial={{ opacity: 0, scale: 0.5, right: k * step + 12 }}
+              initial={{ opacity: 0, scale: 0.8, right: k * step + 12 }}
               animate={{ opacity: 1, scale: 1, right: k * step }}
-              exit={{ opacity: 0, scale: 0.4, transition: { duration: 0.18, ease: ease.exit } }}
-              transition={{ right: spring.smooth, scale: spring.snappy, opacity: { duration: 0.2 } }}
+              exit={{ opacity: 0, scale: 0.8, transition: { duration: dur.exit, ease: ease.out } }}
+              transition={{ right: spring.smooth, scale: spring.snappy, opacity: { duration: 0.2, ease: ease.out } }}
             >
               <Face p={p} followed={following === p.id} />
               <AnimatePresence>
@@ -126,7 +126,7 @@ export function HereNow({
                     className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 flex h-7 -translate-x-1/2 items-center whitespace-nowrap rounded-full bg-ink px-3 text-footnote text-surface shadow-float"
                     initial={{ opacity: 0, y: -3 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, transition: { duration: 0.08 } }}
+                    exit={{ opacity: 0, transition: { duration: dur.exit, ease: ease.out } }}
                     transition={{ duration: 0.14, ease: ease.out }}
                   >
                     <span className="font-medium">{p.name}</span>
@@ -143,6 +143,7 @@ export function HereNow({
 }
 
 function Face({ p, followed }: { p: Person; followed: boolean }) {
+  const reduce = useReducedMotion()
   return (
     <span className="relative block size-full">
       {/* A ring of the page between faces; following adds one of their colour. Idle people lose their colour rather than their shape. */}
@@ -153,17 +154,17 @@ function Face({ p, followed }: { p: Person; followed: boolean }) {
         {p.typing && (
           <motion.span
             className="absolute -right-2 -top-2 flex h-4 items-center gap-[3px] rounded-full bg-surface px-1.5 shadow-raised"
-            initial={{ opacity: 0, scale: 0.4 }}
+            initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.4 }}
+            exit={{ opacity: 0, scale: 0.8 }}
             transition={spring.snappy}
           >
             {[0, 1, 2].map((d) => (
               <motion.span
                 key={d}
                 className="size-[3px] rounded-full bg-ink-2"
-                animate={{ opacity: [0.3, 1, 0.3] }}
-                transition={{ duration: 1, repeat: Infinity, delay: d * 0.16, ease: 'easeInOut' }}
+                animate={reduce ? { opacity: 0.65 } : { opacity: [0.3, 1, 0.3] }}
+                transition={reduce ? { duration: 0 } : { duration: 1, repeat: Infinity, delay: d * 0.16, ease: ease.inOut }}
               />
             ))}
           </motion.span>
@@ -180,8 +181,8 @@ export function Cursor({ p, x, y, quiet }: { p: Person; x: number; y: number; qu
       className="pointer-events-none absolute left-0 top-0 z-10"
       initial={{ x, y, opacity: 0 }}
       animate={{ x, y, opacity: 1 }}
-      exit={{ opacity: 0, scale: 0.6, transition: { duration: 0.15 } }}
-      transition={{ x: { type: 'spring', stiffness: 120, damping: 20 }, y: { type: 'spring', stiffness: 120, damping: 20 }, opacity: { duration: 0.2 } }}
+      exit={{ opacity: 0, scale: 0.6, transition: { duration: dur.exit, ease: ease.out } }}
+      transition={{ x: { type: 'spring', stiffness: 120, damping: 20 }, y: { type: 'spring', stiffness: 120, damping: 20 }, opacity: { duration: 0.2, ease: ease.out } }}
     >
       <svg width="16" height="18" viewBox="0 0 16 18" className="drop-shadow-[0_1px_1px_rgb(0_0_0/0.25)]">
         <path d="M1.5 1.5v13.2l3.6-3.4 2.4 5.2 2.4-1.1-2.3-5.1h5z" fill={tone(p.hue)} stroke="white" strokeWidth="1.3" strokeLinejoin="round" />
@@ -191,7 +192,7 @@ export function Cursor({ p, x, y, quiet }: { p: Person; x: number; y: number; qu
         style={{ background: label(p.hue) }}
         initial={false}
         animate={{ opacity: quiet ? 0 : 1, scale: quiet ? 0.8 : 1 }}
-        transition={{ duration: 0.2 }}
+        transition={{ duration: 0.2, ease: ease.out }}
       >
         {p.name.split(' ')[0]}
       </motion.span>

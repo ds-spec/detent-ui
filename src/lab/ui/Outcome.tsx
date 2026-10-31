@@ -1,6 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion } from 'motion/react'
+import { ease } from '@/lab/lib/motion'
 
 /*
  * Outcomes: the moment something consequential lands (a code verified, a request approved, a run
@@ -19,7 +20,7 @@ export function Bloom({ k, color = 'var(--ok)', radius, spread = 12, delay = 0 }
 export function DrawnCheck({ size = 13, delay = 0.12, strokeWidth = 3 }: { size?: number; delay?: number; strokeWidth?: number }) {
   return (
     <svg aria-hidden width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-      <motion.path d="M5 12.5l4.5 4.5L19 7.5" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.32, ease: [0.4, 0, 0.2, 1], delay }} />
+      <motion.path d="M5 12.5l4.5 4.5L19 7.5" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.32, ease: ease.out, delay }} />
     </svg>
   )
 }
@@ -39,7 +40,7 @@ export function Sweep({ k, color = 'var(--ok)', delay = 0, axis = 'x' }: { k: st
             initial={across ? { x: '-110%' } : { y: '-110%' }}
             animate={across ? { x: '230%' } : { y: '230%' }}
             exit={{ opacity: 0 }}
-            transition={{ duration: across ? 0.85 : 0.9, ease: [0.4, 0, 0.2, 1], delay }}
+            transition={{ duration: across ? 0.85 : 0.9, ease: ease.inOut, delay }}
           />
         )}
       </AnimatePresence>

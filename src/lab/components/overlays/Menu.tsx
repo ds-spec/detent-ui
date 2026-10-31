@@ -5,7 +5,7 @@ import type { KeyboardEvent, ReactNode, Ref } from 'react'
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from 'motion/react'
 import { Check, ChevronRight } from '../../icons'
 import { tap } from '../../lib/feel'
-import { ease, spring } from '../../lib/motion'
+import { ease, spring, dur } from '../../lib/motion'
 import { frameOf, inFrame, originOf, place, useHost } from '../../lib/layer'
 import type { Side } from '../../lib/layer'
 
@@ -45,6 +45,7 @@ export function MenuPanel({
   items,
   label,
   via: startVia,
+  instant = startVia === 'keys',
   quiet,
   onClose,
   onBack,
@@ -59,6 +60,8 @@ export function MenuPanel({
   label: string
   /** How the menu was opened: by pointer, or by keys (then the first item starts highlighted). */
   via: 'pointer' | 'keys'
+  /** Opens with no animation: what a key or a right click starts is there at once. Keys by default. */
+  instant?: boolean
   /** Opened by a demo: never takes focus. */
   quiet: boolean
   /** Close the whole menu; `chose` when an item was picked. */
@@ -131,7 +134,7 @@ export function MenuPanel({
       return
     }
     // Flash the row once, then close and act.
-    if (!reduce) await flash.start({ opacity: [1, 0.25, 1], transition: { duration: 0.16, times: [0, 0.5, 1] } })
+    if (!reduce) await flash.start({ opacity: [1, 0.25, 1], transition: { duration: 0.16, times: [0, 0.5, 1], ease: ease.out } })
     onClose(true)
     if (it.kind === undefined || it.kind === 'item') it.onSelect?.()
   }
@@ -234,9 +237,9 @@ export function MenuPanel({
         }}
         className="absolute left-0 top-0 min-w-[224px] rounded-menu bg-surface p-1 shadow-modal outline-none"
         style={{ x: at?.x ?? 0, y: at?.y ?? 0, visibility: at ? 'visible' : 'hidden', transformOrigin: originOf(side, arrow), pointerEvents: 'auto' }}
-        initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
-        animate={at ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.96 }}
-        exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.12, ease: ease.exit } }}
+        initial={instant ? false : reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
+        animate={at || instant ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.96 }}
+        exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.12, ease: ease.out } }}
         transition={{ duration: 0.18, ease: ease.out }}
       >
         <div className="relative">
@@ -281,7 +284,7 @@ export function MenuPanel({
                   <span className="flex size-4 shrink-0 items-center justify-center">
                     <AnimatePresence initial={false}>
                       {it.checked && (
-                        <motion.span initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.6, transition: { duration: 0.1 } }} transition={spring.snappy}>
+                        <motion.span initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.6, transition: { duration: dur.exit, ease: ease.out } }} transition={spring.snappy}>
                           <Check size={15} />
                         </motion.span>
                       )}

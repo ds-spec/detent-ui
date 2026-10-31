@@ -156,7 +156,7 @@ export function DockDemo() {
         <div className="mx-auto w-[480px] max-w-full pt-12">
           <div className="h-[230px] overflow-hidden rounded-[6px]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/media/search/dunes.jpg" alt="" className="size-full object-cover" />
+            <img src="/media/search/dunes.webp" alt="" className="size-full object-cover" />
           </div>
           <p className="mt-3 flex justify-between text-[11px] uppercase tracking-[0.14em] text-ink-3">
             <span>Plate 3 · Erg Chebbi, Morocco</span>

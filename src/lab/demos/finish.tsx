@@ -23,7 +23,7 @@ function Light({ children }: { children: React.ReactNode }) {
 }
 
 export function PhotoBarDemo() {
-  return <PhotoBar src="/media/search/aerial-shore.jpg" alt="Waves meeting a pale beach, from the air" className="size-full min-h-[560px] !rounded-none lg:min-w-[860px]" />
+  return <PhotoBar src="/media/search/aerial-shore.webp" alt="Waves meeting a pale beach, from the air" className="size-full !rounded-none" />
 }
 
 const Pill = ({ children }: { children: React.ReactNode }) => <span className="inline-flex h-7 max-w-full items-center gap-1.5 truncate rounded-[8px] bg-white/70 px-2 font-mono text-[11.5px]">{children}</span>
@@ -79,7 +79,7 @@ const NOTE = [
 
 export function ReadAlongDemo() {
   return (
-    <div className="flex size-full min-h-[560px] items-center justify-center bg-cover lg:min-w-[620px] bg-center p-5" style={{ backgroundImage: 'url(/media/search/dunes.jpg)' }}>
+    <div className="flex size-full min-h-[560px] items-center justify-center bg-cover lg:min-w-[620px] bg-center p-5" style={{ backgroundImage: 'url(/media/search/dunes.webp)' }}>
       <ReadAlong lines={NOTE} length={137} start={31} from="Priya, on the pricing page" />
     </div>
   )
@@ -99,7 +99,7 @@ export function SecretDemo() {
 
 export function HaloDemo() {
   return (
-    <HaloBands className="size-full min-h-[560px] !rounded-none lg:min-w-[860px]">
+    <HaloBands className="size-full !rounded-none">
       <div className="flex h-full min-h-[560px] flex-col items-center justify-center px-6 text-center">
         <h2 className="text-[clamp(38px,5vw,60px)] font-normal leading-[1.03] tracking-[-0.05em] text-ink">
           Things that

@@ -5,7 +5,7 @@ import type { ReactNode, Ref } from 'react'
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'motion/react'
 import { ArrowUp, Bubble, Check, ChevronRight, Code, Fork, Ship } from '@/lab/icons'
 import { tap } from '@/lab/lib/feel'
-import { spring } from '@/lab/lib/motion'
+import { spring, ease, dur } from '@/lab/lib/motion'
 
 /*
  * What happened, newest first. Events are grouped by day under headers that stay put while you
@@ -145,7 +145,7 @@ export function Timeline({ events: initial, now: start, height = 440, ref }: { e
               className="ring-focus absolute left-1/2 top-2 z-20 flex h-8 -translate-x-1/2 items-center gap-1.5 rounded-full bg-ink pl-2.5 pr-3 text-caption font-medium text-surface shadow-float"
               initial={{ opacity: 0, y: -8, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, transition: { duration: 0.12 } }}
+              exit={{ opacity: 0, y: -8, transition: { duration: dur.exit, ease: ease.out } }}
               transition={spring.snappy}
             >
               <ArrowUp size={13} />
@@ -156,7 +156,7 @@ export function Timeline({ events: initial, now: start, height = 440, ref }: { e
         <motion.div layoutScroll ref={box} className="relative overflow-y-auto overscroll-contain pr-1" style={{ height }}>
           <AnimatePresence initial={false} mode="popLayout">
           {days.map((d) => (
-            <motion.section key={d.label} aria-label={d.label} layout="position" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.12 } }} transition={reduce ? { duration: 0 } : { layout: spring.smooth, opacity: { duration: 0.2 } }}>
+            <motion.section key={d.label} aria-label={d.label} layout="position" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: dur.exit, ease: ease.out } }} transition={reduce ? { duration: 0 } : { layout: spring.smooth, opacity: { duration: 0.2, ease: ease.out } }}>
               <p className="sticky top-0 z-10 bg-[linear-gradient(var(--surface)_70%,transparent)] pb-2 pt-1 text-caption font-medium text-ink-3">{d.label}</p>
               <ol className="relative">
                 <span aria-hidden className="absolute bottom-3 left-[13px] top-3 w-px bg-[var(--line-strong)]" />
@@ -170,8 +170,8 @@ export function Timeline({ events: initial, now: start, height = 440, ref }: { e
                         layout="position"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        exit={{ opacity: 0, transition: { duration: 0.12 } }}
-                        transition={reduce ? { duration: 0 } : { layout: spring.smooth, opacity: { duration: 0.2 } }}
+                        exit={{ opacity: 0, transition: { duration: dur.exit, ease: ease.out } }}
+                        transition={reduce ? { duration: 0 } : { layout: spring.smooth, opacity: { duration: 0.2, ease: ease.out } }}
                       >
                         {it.kind === 'one' ? (
                           <Row e={it.e} now={now} fresh={fresh.includes(it.e.id)} />
@@ -232,7 +232,7 @@ function Row({ e, now, fresh }: { e: Event; now: number; fresh: boolean }) {
   const name = <span className="font-medium text-ink">{e.who.name}</span>
   return (
     <div className="relative flex gap-3 py-2">
-      {fresh && <motion.span aria-hidden className="absolute inset-y-0 -left-2 -right-1 rounded-[10px] bg-[color-mix(in_oklch,var(--accent)_8%,transparent)]" initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: 2.4, ease: 'easeOut' }} />}
+      {fresh && <motion.span aria-hidden className="absolute inset-y-0 -left-2 -right-1 rounded-[10px] bg-[color-mix(in_oklch,var(--accent)_8%,transparent)]" initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: 2.4, ease: ease.out }} />}
       {e.kind === 'comment' ? (
         <Avatar p={e.who} />
       ) : e.kind === 'review' ? (
@@ -301,7 +301,7 @@ function Run({ events, now, open, onToggle }: { events: Event[]; now: number; op
       </button>
       <AnimatePresence initial={false}>
         {open && (
-          <motion.ul key="run" className="pl-[38px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.1 } }} transition={reduce ? { duration: 0 } : { duration: 0.2 }}>
+          <motion.ul key="run" className="pl-[38px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: dur.exit, ease: ease.out } }} transition={reduce ? { duration: 0 } : { duration: 0.2, ease: ease.out }}>
             {events.map((e) => (
               <li key={e.id} className="flex items-baseline gap-2 py-1 text-footnote text-ink-2">
                 {e.kind === 'commit' ? (

@@ -3,7 +3,7 @@
 import { Fragment, useId, useState } from 'react'
 import type { ReactNode } from 'react'
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'motion/react'
-import { ease, spring } from '@/lab/lib/motion'
+import { ease, spring, dur } from '@/lab/lib/motion'
 import { RollingText } from '@/lab/ui/RollingText'
 
 export type Driver = {
@@ -134,7 +134,7 @@ export function MetricExplainer({
                   className={`ring-focus relative h-8 shrink-0 rounded-full px-3 text-footnote transition-colors duration-150 pointer-coarse:h-9 @max-[400px]:px-2 ${on ? 'text-ink' : 'text-ink-3 hover:text-ink-2'}`}
                 >
                   {on && <motion.span layoutId="metric-tab" className="absolute inset-0 rounded-full bg-surface-2" transition={spring.snappy} />}
-                  <span className="relative">{x.name}</span>
+                  <span className="relative z-[1]">{x.name}</span>
                 </button>
               )
             })}
@@ -189,7 +189,7 @@ export function MetricExplainer({
       {/* Why it moved: the reading arrives word by word, in a space held for three lines. */}
       <div className="mt-6 grid min-h-[120px] @min-[520px]:h-[72px] @min-[520px]:min-h-0 @min-[520px]:overflow-hidden">
         <AnimatePresence mode="wait" initial={false}>
-          <motion.p key={m.id} className="col-start-1 row-start-1 text-[15px] leading-6 text-ink [text-wrap:wrap] @min-[520px]:line-clamp-3" exit={{ opacity: 0, transition: { duration: 0.12 } }}>
+          <motion.p key={m.id} className="col-start-1 row-start-1 text-[15px] leading-6 text-ink [text-wrap:wrap] @min-[520px]:line-clamp-3" exit={{ opacity: 0, transition: { duration: dur.exit, ease: ease.out } }}>
             {parts.map((part, k) => {
               const words = part.text.split(/(\s+)/).map((x, i) =>
                 /^\s+$/.test(x) || !x ? (
@@ -226,7 +226,7 @@ export function MetricExplainer({
           the old ones fade out first, so two sets of rows never draw over each other. */}
       <div className="mt-4 grid @min-[520px]:h-[196px]">
         <AnimatePresence mode="wait" initial={false}>
-          <motion.ul key={m.id} className="col-start-1 row-start-1" exit={{ opacity: 0, transition: { duration: 0.12 } }}>
+          <motion.ul key={m.id} className="col-start-1 row-start-1" exit={{ opacity: 0, transition: { duration: dur.exit, ease: ease.out } }}>
             {drivers.map((d, i) => (
               <motion.li
                 key={d.name}
@@ -235,7 +235,7 @@ export function MetricExplainer({
                 {...pointers(d.name)}
                 className="ring-focus grid cursor-default grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-0.5 rounded-[2px] py-2.5 shadow-[inset_0_1px_0_var(--line)] outline-none @min-[520px]:h-[49px] @min-[520px]:grid-cols-[minmax(96px,128px)_minmax(0,1fr)_auto] @min-[520px]:gap-4 @min-[520px]:py-0"
                 initial={reduce ? false : { opacity: 0, y: 4 }}
-                animate={{ opacity: lit && lit !== d.name ? 0.45 : 1, y: 0, transition: { ...spring.smooth, delay: reduce || lit ? 0 : 0.06 + i * 0.04, opacity: { duration: 0.2 } } }}
+                animate={{ opacity: lit && lit !== d.name ? 0.45 : 1, y: 0, transition: { ...spring.smooth, delay: reduce || lit ? 0 : 0.06 + i * 0.04, opacity: { duration: 0.2, ease: ease.out } } }}
               >
                 <span className="truncate text-callout text-ink">{d.name}</span>
                 <span className="col-span-2 row-start-2 text-footnote text-ink-3 @min-[520px]:col-span-1 @min-[520px]:row-start-auto @min-[520px]:truncate">{d.note}</span>

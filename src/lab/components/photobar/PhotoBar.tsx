@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import type { KeyboardEvent, PointerEvent } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { tap } from '../../lib/feel'
+import { ease } from '../../lib/motion'
 
 export type PhotoLook = { name: string; /** Any CSS filter. */ filter: string }
 
@@ -73,8 +74,8 @@ export function PhotoBar({
 
   return (
     <div className={`relative overflow-hidden rounded-[28px] bg-black ${className}`}>
-      <img src={src} alt={alt} draggable={false} className="absolute inset-0 size-full select-none object-cover" />
-      <img aria-hidden alt="" src={src} draggable={false} className="absolute inset-0 size-full select-none object-cover" style={{ filter: looks[look].filter, opacity: held ? 0 : strength / 100, transition: reduce ? undefined : 'opacity 160ms' }} />
+      <img loading="lazy" decoding="async" src={src} alt={alt} draggable={false} className="absolute inset-0 size-full select-none object-cover" />
+      <img aria-hidden alt="" loading="lazy" decoding="async" src={src} draggable={false} className="absolute inset-0 size-full select-none object-cover" style={{ filter: looks[look].filter, opacity: held ? 0 : strength / 100, transition: reduce ? undefined : 'opacity 160ms' }} />
       <button
         type="button"
         aria-label="Hold to see the original"
@@ -91,7 +92,7 @@ export function PhotoBar({
         onContextMenu={(e) => e.preventDefault()}
         className="absolute inset-0 cursor-pointer touch-none outline-none"
       />
-      <motion.p aria-live="polite" className="pointer-events-none absolute left-1/2 top-5 -translate-x-1/2 rounded-full bg-black/45 px-3.5 py-1.5 text-[13px] text-white backdrop-blur-md" initial={false} animate={{ opacity: held ? 1 : 0, y: held ? 0 : -6 }} transition={{ duration: 0.14 }}>
+      <motion.p aria-live="polite" className="pointer-events-none absolute left-1/2 top-5 -translate-x-1/2 rounded-full bg-black/45 px-3.5 py-1.5 text-[13px] text-white backdrop-blur-md" initial={false} animate={{ opacity: held ? 1 : 0, y: held ? 0 : -6 }} transition={{ duration: 0.14, ease: ease.out }}>
         Original
       </motion.p>
 
@@ -100,7 +101,7 @@ export function PhotoBar({
           {looks.map((l, i) => (
             <button key={l.name} type="button" role="radio" aria-checked={i === look} onClick={() => pick(i)} className="ring-focus group/look rounded-[13px] text-center">
               <span className="relative block aspect-square overflow-hidden rounded-[13px]">
-                <img src={src} alt="" draggable={false} className="size-full scale-125 object-cover transition-transform duration-200 group-hover/look:scale-[1.34]" style={{ filter: l.filter }} />
+                <img loading="lazy" decoding="async" src={src} alt="" draggable={false} className="size-full scale-125 object-cover transition-transform duration-200 group-hover/look:scale-[1.34]" style={{ filter: l.filter }} />
                 {i === look ? <span aria-hidden className="absolute inset-0 rounded-[13px] shadow-[inset_0_0_0_2.5px_#fff,inset_0_0_0_3.5px_rgb(0_0_0/0.3)]" /> : null}
               </span>
               <span className={`mt-1 block truncate text-[12px] transition-colors duration-150 ${i === look ? 'text-ink' : 'text-ink-3'}`}>{l.name}</span>

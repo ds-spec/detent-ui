@@ -163,7 +163,7 @@ export function Dialog({
                   className="relative overflow-hidden rounded-card bg-surface shadow-modal outline-none"
                   initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
                   animate={{ opacity: 1, scale: covered ? 0.94 : 1, y: covered ? -14 : 0, height: height ?? 'auto' }}
-                  exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.97, transition: { duration: 0.14, ease: ease.exit } }}
+                  exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.97, transition: { duration: 0.14, ease: ease.out } }}
                   transition={{ duration: 0.22, ease: ease.out, y: spring.smooth, height: spring.smooth, scale: covered ? spring.smooth : { duration: 0.22, ease: ease.out } }}
                 >
                   <div ref={inner} className="p-6">

@@ -190,7 +190,7 @@ function Card({ spec, shown, content, onEnter, onLeave, onEscape }: { spec: Spec
               style={{ x, y, visibility, transformOrigin: origin, pointerEvents: 'auto' }}
               initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1, height: height ?? 'auto', width }}
-              exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.14, ease: ease.exit } }}
+              exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.14, ease: ease.out } }}
               transition={{ ...spring.smooth, opacity: { duration: 0.18 } }}
             >
               <div ref={inner} style={{ width }}>

@@ -6,6 +6,7 @@ import { SERIES } from '../components/charts/parts'
 import { spring } from '@/lab/lib/motion'
 import { RollingText } from '@/lab/ui/RollingText'
 import { hover, pressed } from '@/lab/lib/hand'
+import { useAway } from './loop'
 
 /*
  * What the chart demos share: one account's usage, seeded so it's the same on every visit, a small
@@ -118,6 +119,9 @@ export function useScript(play: (clock: Clock) => Promise<void>) {
   const held = useRef(false)
   const touched = useRef(false)
   const script = useRef(play)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const box = useRef<any>(null)
+  useAway(held, box)
   useEffect(() => {
     let live = true
     const tick = (ms: number) => new Promise<void>((r, x) => setTimeout(() => (live && !touched.current ? r() : x(new Error('stopped'))), ms))
@@ -133,6 +137,7 @@ export function useScript(play: (clock: Clock) => Promise<void>) {
     }
   }, [])
   return {
+    ref: box,
     ...hover(held),
     ...pressed(() => (touched.current = true)),
     onKeyDownCapture: () => (touched.current = true),

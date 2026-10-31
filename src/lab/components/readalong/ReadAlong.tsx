@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PointerEvent } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { tap } from '../../lib/feel'
+import { spring } from '../../lib/motion'
 
 export type ReadAlongLine = { /** Seconds into the note. */ at: number; text: string }
 
@@ -77,7 +78,7 @@ export function ReadAlong({
       {from ? <p className="text-[13px] text-ink-3">{from}</p> : null}
       <div className="relative mt-3 h-[118px] overflow-hidden">
         <AnimatePresence initial={false} mode="popLayout">
-          <motion.p key={n} className="absolute inset-x-0 top-0 text-[27px] leading-[1.26] tracking-[-0.03em]" initial={reduce ? false : { y: 118 }} animate={{ y: 0 }} exit={reduce ? undefined : { y: -118 }} transition={{ type: 'spring', stiffness: 340, damping: 34 }}>
+          <motion.p key={n} className="absolute inset-x-0 top-0 text-[27px] leading-[1.26] tracking-[-0.03em]" initial={reduce ? false : { y: 118 }} animate={{ y: 0 }} exit={reduce ? undefined : { y: -118 }} transition={spring.move}>
             {words.map((w, i) => (
               <span key={i} className={`transition-colors duration-200 ${i < said ? 'text-ink' : 'text-ink-3 opacity-50'}`}>
                 {w}{' '}
@@ -122,7 +123,7 @@ export function ReadAlong({
             setWanted(!playing)
           }}
           aria-label={playing ? 'Pause' : 'Play'}
-          className="ring-focus grid size-10 place-items-center rounded-full bg-ink text-surface transition-transform duration-150 active:scale-[0.92]"
+          className="ring-focus grid size-10 place-items-center rounded-full bg-ink text-surface transition-transform duration-150 active:scale-[0.97]"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
             {playing ? (

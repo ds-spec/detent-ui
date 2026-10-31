@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import { ChartCard, GoalNumerals, compact } from '../components/charts/GoalNumerals'
 import type { Goal, GoalsHandle } from '../components/charts/GoalNumerals'
-import { Big, Segmented, sum, useScript } from './chart-kit'
+import { Segmented, useScript } from './chart-kit'
 
 type Month = 'oct' | 'sep'
 
@@ -44,10 +44,14 @@ const MONTHS: Record<Month, { name: string; days: number; today: number; goals: 
   },
 }
 
+/** The day before Haiku went over October's allowance. */
+const CROSS = MONTHS.oct.goals[1].series.findIndex((v) => v >= MONTHS.oct.goals[1].goal) - 1
+
 /**
- * A month's allowance by model. The numbers fill, then the ruler runs from the first of the month to
- * today and every number counts up dot by dot, Haiku turning amber the day it went over. Then
- * September, where it's Opus that went over. Hovering pauses; touching hands it over.
+ * A month's allowance by model, led by a sentence that says who's over. The bars fill, then the
+ * scrubber walks from the first of the month to today and every bar climbs with it, Haiku pressing into
+ * its allowance, holding, and breaking through amber. Then September, where it's Opus that went over. Hovering pauses; touching
+ * hands it over.
  */
 export function RingsDemo() {
   const [key, setKey] = useState<Month>('oct')
@@ -56,7 +60,10 @@ export function RingsDemo() {
   const m = MONTHS[key]
   const d = day ?? m.today
   const at = (g: Goal) => g.series[Math.min(d, g.series.length - 1)]
-  const used = Math.round((sum(m.goals.map(at)) / sum(m.goals.map((g) => g.goal))) * 100)
+  // The sentence waits for the bar: it says "over" when one breaks through, not the day it's due to.
+  const [broke, setBroke] = useState<string[] | null>(null)
+  const over = (broke ? m.goals.filter((g) => broke.includes(g.id)) : m.goals.filter((g) => at(g) > g.goal)).map((g) => g.label)
+  const said = over.length ? `${over.join(' and ')} ${over.length > 1 ? 'are' : 'is'} over.` : 'Everything’s within its allowance.'
 
   const script = useScript(async ({ beat }) => {
     await beat(2600)
@@ -66,20 +73,24 @@ export function RingsDemo() {
     }
     goals.current?.point(null)
     await beat(600)
-    // Run the month from the first to today.
-    for (let i = 0; i <= MONTHS.oct.today; i += 1) {
-      goals.current?.scrub(i)
-      await beat(90)
-    }
+    // Back to the first of the month, then a hand's walk up to the wall, into it, and through.
+    goals.current?.sweep(0, 900)
+    await beat(1300)
+    goals.current?.sweep(CROSS, 2200)
+    await beat(2200)
+    goals.current?.sweep(CROSS + 2, 1300)
+    await beat(1500)
+    goals.current?.sweep(MONTHS.oct.today, 1000)
     await beat(1100)
-    goals.current?.scrub(null)
     await beat(1800)
+    setBroke(null)
     setKey('sep')
     await beat(2800)
     goals.current?.point('opus')
     await beat(1200)
     goals.current?.point(null)
     await beat(500)
+    setBroke(null)
     setKey('oct')
     await beat(2000)
   })
@@ -88,7 +99,7 @@ export function RingsDemo() {
     <div className="w-[420px] max-w-full" {...script}>
       <ChartCard
         title="Allowance this month"
-        headline={<Big>{`${used}%`}</Big>}
+        headline={<p className="text-[20px] leading-[26px] tracking-[-0.02em] text-ink">{said}</p>}
         actions={
           <Segmented
             small
@@ -100,6 +111,7 @@ export function RingsDemo() {
             ]}
             onChange={(k) => {
               setDay(null)
+              setBroke(null)
               setKey(k)
             }}
           />
@@ -107,7 +119,7 @@ export function RingsDemo() {
         table={{ head: ['Model', 'Used', 'Allowance', 'Share'], rows: m.goals.map((g) => [g.label, compact(at(g)), compact(g.goal), `${Math.round((at(g) / g.goal) * 100)}%`]) }}
       >
         <div className="pt-1">
-          <GoalNumerals key={key} ref={goals} goals={m.goals} days={m.days} today={m.today} dayLabel={(i) => `${m.name} ${i + 1}`} onDayChange={setDay} />
+          <GoalNumerals key={key} ref={goals} goals={m.goals} days={m.days} today={m.today} dayLabel={(i) => `${m.name} ${i + 1}`} onDayChange={setDay} onOver={setBroke} />
         </div>
       </ChartCard>
     </div>

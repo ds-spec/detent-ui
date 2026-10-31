@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { motion } from 'motion/react'
+import { ease } from '@/lab/lib/motion'
 
 /**
  * A soft plate that follows the pointer through a list, sliding from row to row rather than each
@@ -33,7 +34,7 @@ export function Hover({ children, className = '', radius = 7, as: Tag = 'div', l
         style={{ borderRadius: radius }}
         initial={false}
         animate={at ? { x: at.x, y: at.y, width: at.w, height: at.h, opacity: 1 } : { opacity: 0 }}
-        transition={instant ? { duration: 0, opacity: { duration: 0.12 } } : { type: 'spring', stiffness: 620, damping: 46, opacity: { duration: 0.12 } }}
+        transition={instant ? { duration: 0, opacity: { duration: 0.12, ease: ease.out } } : { type: 'spring', stiffness: 620, damping: 46, opacity: { duration: 0.12, ease: ease.out } }}
       />
       {children}
     </Tag>

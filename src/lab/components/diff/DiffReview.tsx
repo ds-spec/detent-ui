@@ -5,7 +5,7 @@ import type { KeyboardEvent, ReactNode, Ref } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { ArrowUpRight, Check, Close } from '@/lab/icons'
 import { stackTop, useSize, useStack } from '@/lab/lib/hooks'
-import { ease, spring } from '@/lab/lib/motion'
+import { ease, spring, dur, press } from '@/lab/lib/motion'
 import { Button } from '@/lab/ui/Button'
 import { Kbd } from '@/lab/ui/Kbd'
 import { Morph } from '@/lab/ui/Morph'
@@ -206,7 +206,7 @@ export function DiffReview({
             )}
             {/* Where the change ends, so the file doesn't just stop. */}
             {ready && (
-              <motion.p key="end" className="flex h-8 items-center justify-center gap-2 text-caption text-ink-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.2 }}>
+              <motion.p key="end" className="flex h-8 items-center justify-center gap-2 text-caption text-ink-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.2, ease: ease.out }}>
                 <span className="h-px w-6 bg-[var(--line)]" />
                 No other changes in {file.split('/').pop()}
                 <span className="h-px w-6 bg-[var(--line)]" />
@@ -379,7 +379,7 @@ function HunkView({
       style={{ boxShadow: focused ? '0 0 0 1.5px var(--accent)' : '0 0 0 1px var(--line)' }}
       initial={{ opacity: 0, height: HEAD }}
       animate={{ opacity: 1, height: HEAD + height * RH }}
-      transition={{ height: spring.smooth, opacity: { duration: 0.2 } }}
+      transition={{ height: spring.smooth, opacity: { duration: 0.2, ease: ease.out } }}
     >
       <div className="relative z-10 flex items-center gap-2 pl-3 pr-1.5 shadow-[inset_0_-1px_0_var(--line)]" style={{ height: HEAD, background: 'color-mix(in oklch, var(--ink) 2.5%, var(--surface))' }}>
         {/* Where it is: the function it's in, then the lines, in words rather than @@ marks. */}
@@ -408,12 +408,12 @@ function HunkView({
               className="absolute top-0 h-5 w-1/2"
               style={{ left: f.side === 'right' ? '50%' : 0, y: f.y * RH, background: 'color-mix(in oklch, var(--ink) 3%, transparent)' }}
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1, transition: { duration: 0.25, delay: 0.15 } }}
-              exit={{ opacity: 0, transition: { duration: 0.1 } }}
+              animate={{ opacity: 1, transition: { duration: 0.25, delay: 0.15, ease: ease.out } }}
+              exit={{ opacity: 0, transition: { duration: dur.exit, ease: ease.out } }}
             />
           ))}
         </AnimatePresence>
-        <motion.span aria-hidden className="absolute inset-y-0 left-1/2 z-[2] w-px bg-line" initial={false} animate={{ opacity: split ? 1 : 0 }} transition={{ duration: 0.2 }} />
+        <motion.span aria-hidden className="absolute inset-y-0 left-1/2 z-[2] w-px bg-line" initial={false} animate={{ opacity: split ? 1 : 0 }} transition={{ duration: 0.2, ease: ease.out }} />
         </div>
       </div>
     </motion.section>
@@ -437,13 +437,13 @@ function RowView({ r, split, body }: { r: Row; split: boolean; body: number }) {
       style={{ background: TINT[r.tone], zIndex: r.gone ? 0 : 1, pointerEvents: r.gone ? 'none' : undefined }}
       initial={{ opacity: 0, ...at }}
       animate={{ opacity: r.gone ? 0 : 1, ...at }}
-      transition={{ default: spring.smooth, opacity: { duration: r.gone ? 0.14 : 0.3 } }}
+      transition={{ default: spring.smooth, opacity: { duration: r.gone ? 0.14 : 0.3, ease: ease.out } }}
     >
       <motion.div className="absolute inset-y-0 left-0 overflow-hidden" initial={false} animate={{ width: full && split ? '50%' : '100%' }} transition={spring.smooth}>
         <Seg num={full && split && r.l.k === 'ctx' ? r.l.o : num} tone={r.tone} text={r.l.text} hl={r.hl} />
       </motion.div>
       {full && (
-        <motion.div className="absolute inset-y-0 left-1/2 w-1/2 overflow-hidden" initial={false} animate={{ opacity: split ? 1 : 0 }} transition={{ duration: 0.2, delay: split ? 0.12 : 0 }}>
+        <motion.div className="absolute inset-y-0 left-1/2 w-1/2 overflow-hidden" initial={false} animate={{ opacity: split ? 1 : 0 }} transition={{ duration: 0.2, delay: split ? 0.12 : 0, ease: ease.out }}>
           <Seg num={num} tone={r.tone} text={r.l.text} />
         </motion.div>
       )}
@@ -595,7 +595,7 @@ function Small({ onClick, hint, focused, strong, children }: { onClick: () => vo
   return (
     <motion.button
       type="button"
-      whileTap={{ scale: 0.96 }}
+      whileTap={press}
       onPointerDown={(e) => e.stopPropagation()}
       onClick={onClick}
       className={`ring-focus relative flex h-6 items-center gap-1 rounded-[7px] pl-1.5 pr-1 text-caption font-medium pointer-coarse:pr-1.5 @max-[420px]:pr-1.5 [@media(pointer:coarse)]:after:absolute [@media(pointer:coarse)]:after:-inset-x-1 [@media(pointer:coarse)]:after:-inset-y-2 [@media(pointer:coarse)]:after:content-[''] transition-[background-color,color,box-shadow] duration-150 ${
