@@ -22,7 +22,6 @@ const CHIPS: Record<Tier, string[]> = {
 }
 const tierOf = (s: number): Tier => (s <= 2 ? 'low' : s === 3 ? 'mid' : 'high')
 
-const PILL_W = 272
 const PILL_H = 44
 
 /**
@@ -111,7 +110,7 @@ export function FeedbackPulse({
 
   const views = {
     idle: (
-      <div className="flex items-center justify-between pl-5 pr-2.5" style={{ width: PILL_W, height: PILL_H }} onPointerLeave={() => setHover(0)}>
+      <div className="flex w-[272px] items-center justify-between pl-5 pr-2.5 pointer-coarse:w-[328px]" style={{ height: PILL_H }} onPointerLeave={() => setHover(0)}>
         <Swap k={hover ? `h${hover}` : 'q'} className="w-[132px] text-callout">
           {hover ? <span className="text-ink">{labels[hover - 1]}</span> : <span className="text-ink-2">{question}</span>}
         </Swap>
@@ -119,9 +118,9 @@ export function FeedbackPulse({
       </div>
     ),
     open: (
-      <div className="w-[372px] p-[18px]">
+      <div className="w-[372px] max-w-full p-[18px]">
         <div className="flex h-7 items-center justify-between">
-          <Swap k={`s${score}`} className="w-[190px] text-headline">
+          <Swap k={`s${score}`} className="w-[190px] text-headline pointer-coarse:w-[166px]">
             {labels[Math.max(0, score - 1)]}
           </Swap>
           <Meter value={hover || score} labels={labels} onHover={setHover} onPick={rate} />
@@ -130,7 +129,7 @@ export function FeedbackPulse({
           {ASK[tier]}
         </Swap>
         {/* Fixed-height chip area: switching tiers never changes the card's size. */}
-        <div className="relative mt-2.5 h-[76px]">
+        <div className="relative mt-2.5 h-[76px] pointer-coarse:h-[80px]">
           <AnimatePresence initial={false}>
             <motion.div
               key={tier}
@@ -164,7 +163,7 @@ export function FeedbackPulse({
       </div>
     ),
     sent: (
-      <div className="flex items-center justify-between pl-3 pr-2.5" style={{ width: PILL_W, height: PILL_H }}>
+      <div className="flex w-[272px] items-center justify-between pl-3 pr-2.5 pointer-coarse:w-[328px]" style={{ height: PILL_H }}>
         <span className="flex items-center gap-2.5 text-callout">
           <motion.span
             initial={{ scale: 0.4 }}
@@ -182,7 +181,7 @@ export function FeedbackPulse({
   }
 
   return (
-    <div ref={root} className="relative" style={{ width: PILL_W, height: PILL_H }}>
+    <div ref={root} className="relative w-[272px] pointer-coarse:w-[328px]" style={{ height: PILL_H }}>
       {/* Hung from the pill's bottom-centre by translate, so the card grows up and out without its top-left ever moving. */}
       <div className="absolute left-1/2 top-full z-10 -translate-x-1/2 -translate-y-full">
         <Morph
@@ -206,7 +205,7 @@ function ReasonChip({ label, on, onToggle }: { label: string; on: boolean; onTog
       whileTap={press}
       aria-pressed={on}
       onClick={onToggle}
-      className={`ring-focus relative flex h-8 items-center rounded-full px-3.5 text-footnote font-medium transition-colors duration-200 ${
+      className={`ring-focus relative flex h-8 items-center rounded-full px-3.5 pointer-coarse:h-9 text-footnote font-medium transition-colors duration-200 ${
         on ? 'bg-ink text-surface' : 'bg-surface-2 text-ink hover:bg-[color-mix(in_oklch,var(--surface-2)_82%,var(--ink)_6%)]'
       }`}
     >
@@ -271,7 +270,7 @@ function Meter({ value, labels, onHover, onPick, quiet }: { value: number; label
             onFocus={() => onHover?.(n)}
             onBlur={() => onHover?.(0)}
             onClick={() => onPick?.(n)}
-            className="ring-focus flex size-[24px] items-center justify-center rounded-full"
+            className="ring-focus flex size-[24px] items-center justify-center rounded-full pointer-coarse:size-8"
           >
             {dot}
           </button>

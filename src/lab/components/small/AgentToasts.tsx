@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Check, Close } from '../../icons'
@@ -48,13 +48,22 @@ export function AgentToasts({
   const [hover, setOpen] = useState(false)
   const reduce = useReducedMotion()
   const open = hover || expanded
+  const root = useRef<HTMLDivElement>(null)
+  // A finger can't leave: the stack stays open until a tap lands somewhere else.
+  useEffect(() => {
+    if (!hover) return
+    const away = (e: PointerEvent) => e.pointerType === 'touch' && !root.current?.contains(e.target as Node) && setOpen(false)
+    document.addEventListener('pointerdown', away)
+    return () => document.removeEventListener('pointerdown', away)
+  }, [hover])
   const shown = events.slice(-max)
   return (
     <div
+      ref={root}
       className="relative w-[360px] max-w-full"
       style={{ height: max * (H + GAP) }}
       onPointerEnter={() => setOpen(true)}
-      onPointerLeave={() => setOpen(false)}
+      onPointerLeave={(e) => e.pointerType !== 'touch' && setOpen(false)}
       onFocus={() => setOpen(true)}
       onBlur={() => setOpen(false)}
       role="log"
@@ -137,7 +146,7 @@ export function AgentToasts({
                   {e.action && ok && (
                     <motion.button
                       type="button"
-                      className="sink ring-focus h-8 shrink-0 rounded-full bg-ink px-3.5 text-footnote font-medium text-surface transition-opacity hover:opacity-90"
+                      className="sink ring-focus h-8 pointer-coarse:h-9 shrink-0 rounded-full bg-ink px-3.5 text-footnote font-medium text-surface transition-opacity hover:opacity-90"
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1, transition: { delay: 0.2 } }}
                       exit={{ opacity: 0 }}
@@ -150,7 +159,7 @@ export function AgentToasts({
                 </AnimatePresence>
               </motion.span>
               {onDismiss && (
-                <button type="button" aria-label={`Dismiss ${e.title}`} onPointerDown={tap} onClick={() => onDismiss(e.id)} className="ring-focus flex size-7 shrink-0 items-center justify-center rounded-full text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink">
+                <button type="button" aria-label={`Dismiss ${e.title}`} onPointerDown={tap} onClick={() => onDismiss(e.id)} className="ring-focus flex size-7 pointer-coarse:size-9 shrink-0 items-center justify-center rounded-full text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink">
                   <Close size={12} />
                 </button>
               )}

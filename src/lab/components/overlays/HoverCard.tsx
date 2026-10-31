@@ -114,6 +114,7 @@ export function HoverCardGroup({ children, skipDelay = 400 }: {
 function Card({ spec, shown, content, onEnter, onLeave, onEscape }: { spec: Spec | null; shown: boolean; content: ReactNode; onEnter: () => void; onLeave: () => void; onEscape: () => void }) {
   const [height, setHeight] = useState<number | null>(null)
   const inner = useRef<HTMLDivElement>(null)
+  const card = useRef<HTMLDivElement>(null)
   // Where the card sits, written straight from measuring: moving it never re-renders it.
   const x = useMotionValue(0)
   const y = useMotionValue(0)
@@ -156,9 +157,17 @@ function Card({ spec, shown, content, onEnter, onLeave, onEscape }: { spec: Spec
   useEffect(() => {
     if (!shown) return
     const key = (e: KeyboardEvent) => e.key === 'Escape' && onEscape()
+    const away = (e: PointerEvent) => {
+      const t = e.target as Node
+      if (e.pointerType === 'touch' && !card.current?.contains(t) && !spec?.anchor.contains(t)) onEscape()
+    }
     document.addEventListener('keydown', key)
-    return () => document.removeEventListener('keydown', key)
-  }, [shown, onEscape])
+    document.addEventListener('pointerdown', away)
+    return () => {
+      document.removeEventListener('keydown', key)
+      document.removeEventListener('pointerdown', away)
+    }
+  }, [shown, onEscape, spec])
 
   return (
     <Layer>
@@ -172,10 +181,11 @@ function Card({ spec, shown, content, onEnter, onLeave, onEscape }: { spec: Spec
           {shown && spec && (
             <motion.div
               key="card"
+              ref={card}
               role="dialog"
               aria-label={spec.label}
               onPointerEnter={onEnter}
-              onPointerLeave={onLeave}
+              onPointerLeave={(e) => e.pointerType !== 'touch' && onLeave()}
               className="absolute left-0 top-0 overflow-hidden rounded-card bg-surface shadow-modal"
               style={{ x, y, visibility, transformOrigin: origin, pointerEvents: 'auto' }}
               initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
@@ -250,6 +260,7 @@ function Trigger({ trigger, children, load, side = 'bottom', align = 'start', wi
   const group = useContext(GroupContext)!
   const id = useId()
   const anchor = useRef<HTMLSpanElement>(null)
+  const touched = useRef(false)
   const spec = (): Spec => ({ id, anchor: anchor.current!, content: children, load, side, align, width, closeDelay, label })
   useImperativeHandle(ref, () => ({ open: () => group.show(spec()), close: () => group.hide() }))
   return (
@@ -257,7 +268,15 @@ function Trigger({ trigger, children, load, side = 'bottom', align = 'start', wi
       ref={anchor}
       className="inline-flex"
       onPointerEnter={(e) => e.pointerType !== 'touch' && group.enter(spec(), openDelay)}
-      onPointerLeave={group.leave}
+      onPointerLeave={(e) => e.pointerType !== 'touch' && group.leave()}
+      onClick={(e) => {
+        if (!touched.current) return
+        touched.current = false
+        if (group.active === id) return
+        e.preventDefault()
+        group.show(spec())
+      }}
+      onPointerDown={(e) => void (touched.current = e.pointerType === 'touch')}
       onFocus={(e) => e.target.matches(':focus-visible') && group.show(spec())}
       onBlur={group.hide}
     >

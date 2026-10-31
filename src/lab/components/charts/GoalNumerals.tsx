@@ -65,8 +65,23 @@ export function GoalNumerals({
   const pace = (d + 1) / days
   const scrubbing = day !== null
 
+  // A finger can't leave: what it touched stays shown until a tap lands somewhere else.
+  const root = useRef<HTMLDivElement>(null)
+  const touched = at !== null || day !== null
+  useEffect(() => {
+    if (!touched) return
+    const away = (e: globalThis.PointerEvent) => {
+      if (e.pointerType !== 'touch' || root.current?.contains(e.target as Node)) return
+      setAt(null)
+      setDay(null)
+    }
+    document.addEventListener('pointerdown', away)
+    return () => document.removeEventListener('pointerdown', away)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [touched])
+
   return (
-    <div onPointerLeave={() => setAt(null)}>
+    <div ref={root} onPointerLeave={(e) => e.pointerType !== 'touch' && setAt(null)}>
       <ul className="divide-y divide-line">
         {goals.map((g) => {
           const f = g.format ?? compact
@@ -169,12 +184,12 @@ function DayRuler({ goals, days, today, day, label, onDay, reduce }: { goals: Go
           read(e)
         }}
         onPointerUp={() => (held.current = false)}
-        onPointerLeave={() => !held.current && onDay(null)}
-        onLostPointerCapture={() => {
+        onPointerLeave={(e) => e.pointerType !== 'touch' && !held.current && onDay(null)}
+        onLostPointerCapture={(e) => {
           held.current = false
-          onDay(null)
+          if (e.pointerType !== 'touch') onDay(null)
         }}
-        className="ring-focus relative flex h-7 flex-1 cursor-ew-resize touch-none items-end justify-between rounded-[4px]"
+        className="ring-focus relative flex h-7 pointer-coarse:h-9 flex-1 cursor-ew-resize touch-pan-y items-end justify-between rounded-[4px]"
       >
         {Array.from({ length: days }, (_, i) => {
           const future = i > today

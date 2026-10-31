@@ -9,7 +9,7 @@ import { ArrowRight, Check, Copy, Expand, Moon, Refresh, Sun } from '@/lab/icons
 import { useTheme } from '@/lab/lib/hooks'
 import { tap } from '@/lab/lib/feel'
 import { TemplateBody } from '@pro'
-import { template } from '@/catalog/templates'
+import { TEMPLATES, template } from '@/catalog/templates'
 import { START } from '@/catalog/template-start'
 import type { Step } from '@/catalog/template-start'
 import { Code } from '../browser/Code'
@@ -19,6 +19,7 @@ import { Desk } from '../blocks/BlockViewer'
 import { ProTag } from '../blocks/ProTag'
 import { Rail } from '../exhibit/Rail'
 import { DownloadStarter } from './Download'
+import { Pager } from '../shell/Pager'
 import { Shell, Trail } from '../shell/Shell'
 import { TEMPLATE_RAIL } from './rail'
 
@@ -42,6 +43,9 @@ export function TemplateViewer({ id }: { id: string }) {
   const app = t.form === 'app'
   const router = useRouter()
   const reduce = useReducedMotion()
+  const place = TEMPLATES.findIndex((x) => x.id === id)
+  const prev = TEMPLATES[(place - 1 + TEMPLATES.length) % TEMPLATES.length]
+  const next = TEMPLATES[(place + 1) % TEMPLATES.length]
   const [mode, setMode] = useState<'preview' | 'code'>('preview')
   const [run, setRun] = useState(0)
   const [present, setPresent] = useState(false)
@@ -86,7 +90,7 @@ export function TemplateViewer({ id }: { id: string }) {
 
   return (
     <Shell list={<Rail label="Templates" groups={TEMPLATE_RAIL} current={t.id} onPick={(to) => router.push(`/templates/${to}`)} />} bar={<Trail steps={['Templates', t.name]} />}>
-    <main className="mx-auto max-w-[1280px] px-4 pb-16 sm:px-8">
+    <main className="mx-auto max-w-[1280px] px-4 pb-24 sm:px-8 lg:pb-16">
       <header className="pt-8 sm:pt-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-footnote text-ink-3">
@@ -212,6 +216,7 @@ export function TemplateViewer({ id }: { id: string }) {
           </ol>
         </section>
       )}
+      {TEMPLATES.length > 1 && !present && <Pager prev={{ name: prev.name, href: `/templates/${prev.id}` }} next={{ name: next.name, href: `/templates/${next.id}` }} />}
     </main>
     </Shell>
   )

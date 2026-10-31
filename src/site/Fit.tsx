@@ -17,14 +17,18 @@ import { MotionConfig } from 'motion/react'
 /** How long a demo's size must hold still before it's shown, and the most it waits. */
 const SETTLE = 110
 const SETTLE_MAX = 420
+/** Below this stage width a demo is laid out at the stage's width, with this much air. */
+const PHONE = 640
+const PHONE_PAD = 16
 
-export function Fit({ children, pad = 28, max = 1, min = 0.2 }: { children: ReactNode; pad?: number; max?: number; min?: number }) {
+export function Fit({ children, pad = 28, max = 1, min = 0.2, onPhone }: { children: ReactNode; pad?: number; max?: number; min?: number; /** Says how tall the demo is on a phone, where it takes the stage's width instead of being scaled. */ onPhone?: (height: number | null) => void }) {
   const outer = useRef<HTMLDivElement>(null)
   const inner = useRef<HTMLDivElement>(null)
   const [zoom, setZoom] = useState(1)
   // Hidden until measured, so a demo never paints one frame at full size and then jumps to fit.
   const [ready, setReady] = useState(false)
   const [crop, setCrop] = useState<{ x: boolean; y: boolean }>({ x: false, y: false })
+  const [phone, setPhone] = useState<number | null>(null)
   const zoomRef = useRef(1)
   const firstSeen = useRef(0)
   const reveal = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -41,6 +45,21 @@ export function Fit({ children, pad = 28, max = 1, min = 0.2 }: { children: Reac
       const ownScale = box.width / (o.offsetWidth || box.width || 1)
       // Nothing to measure yet (not laid out, or the demo is still loading): try again on the next resize.
       if (!o.offsetWidth || !o.offsetHeight || !r.width || !r.height) return
+      // On a phone the demo gets the stage's width and sets its height, so it lays itself out instead of shrinking.
+      const room = onPhone && o.offsetWidth < PHONE ? o.offsetWidth - PHONE_PAD * 2 : null
+      setPhone(room)
+      if (room) {
+        if (zoomRef.current !== 1) {
+          zoomRef.current = 1
+          setZoom(1)
+        }
+        onPhone?.(i.offsetHeight + PHONE_PAD * 2)
+        setCrop((c) => (c.x || c.y ? { x: false, y: false } : c))
+        if (!firstSeen.current) firstSeen.current = performance.now()
+        if (reveal.current) clearTimeout(reveal.current)
+        reveal.current = setTimeout(() => setReady(true), SETTLE)
+        return
+      }
       const w = r.width / ownScale / zoomRef.current
       const h = r.height / ownScale / zoomRef.current
       const fits = Math.min(max, (o.offsetWidth - pad * 2) / w, (o.offsetHeight - pad * 2) / h)
@@ -66,7 +85,7 @@ export function Fit({ children, pad = 28, max = 1, min = 0.2 }: { children: Reac
       ro.disconnect()
       if (reveal.current) clearTimeout(reveal.current)
     }
-  }, [pad, max, min])
+  }, [pad, max, min, onPhone])
 
   // When it can't all fit, show the start of it and let the overflowing edges fade away.
   const fade = [crop.x && 'linear-gradient(to right, #000 calc(100% - 56px), transparent)', crop.y && 'linear-gradient(to bottom, #000 calc(100% - 56px), transparent)'].filter(Boolean).join(', ')
@@ -76,7 +95,7 @@ export function Fit({ children, pad = 28, max = 1, min = 0.2 }: { children: Reac
       className={`absolute inset-0 flex overflow-hidden ${crop.x ? 'justify-start' : 'justify-center'} ${crop.y ? 'items-start' : 'items-center'}`}
       style={{ padding: crop.x || crop.y ? pad : undefined, maskImage: fade || undefined, maskComposite: crop.x && crop.y ? 'intersect' : undefined }}
     >
-      <div ref={inner} data-fit className="w-max shrink-0 transition-opacity duration-200 ease-out" style={{ zoom, opacity: ready ? 1 : 0, visibility: ready ? 'visible' : 'hidden' }}>
+      <div ref={inner} data-fit className={`${phone ? '' : 'w-max'} shrink-0 transition-opacity duration-200 ease-out`} style={{ width: phone ?? undefined, zoom, opacity: ready ? 1 : 0, visibility: ready ? 'visible' : 'hidden' }}>
         <MotionConfig transformPagePoint={unzoom}>{children}</MotionConfig>
       </div>
     </div>

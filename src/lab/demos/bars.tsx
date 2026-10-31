@@ -40,7 +40,7 @@ export function BarsDemo() {
   })
 
   return (
-    <div className="w-[480px]" {...script}>
+    <div className="w-[480px] max-w-full" {...script}>
       <ChartCard
         title="Deploys by weekday"
         headline={

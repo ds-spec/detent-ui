@@ -40,7 +40,7 @@ export function WaffleDemo() {
   })
 
   return (
-    <div className="w-[520px]" {...script}>
+    <div className="w-[520px] max-w-full" {...script}>
       <ChartCard
         title="Spend by model"
         headline={<Big>{dollars(sum(SPEND[range]))}</Big>}

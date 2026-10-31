@@ -28,7 +28,6 @@ export type MenuItem =
 /** For demos and tests: point at, open or choose an item by its path, without touching focus. */
 export type MenuControl = { point(path: number[]): void; choose(path: number[]): void }
 
-const ITEM = 32
 const usable = (it: MenuItem) => (it.kind === undefined || it.kind === 'item' || it.kind === 'check' || it.kind === 'sub') && !('disabled' in it && it.disabled)
 const labelOf = (it: MenuItem) => ('label' in it ? it.label : '')
 
@@ -276,8 +275,7 @@ export function MenuPanel({
                   tap()
                   choose(i, 'pointer')
                 }}
-                className={`relative flex h-8 cursor-default select-none items-center gap-2.5 rounded-[10px] px-2.5 text-callout transition-colors duration-100 ${it.disabled ? 'text-ink-3/70' : isDanger ? 'text-danger' : on ? 'text-ink' : 'text-ink-2'}`}
-                style={{ height: ITEM }}
+                className={`relative flex h-8 pointer-coarse:h-10 cursor-default select-none items-center gap-2.5 rounded-[10px] px-2.5 text-callout transition-colors duration-100 ${it.disabled ? 'text-ink-3/70' : isDanger ? 'text-danger' : on ? 'text-ink' : 'text-ink-2'}`}
               >
                 {it.kind === 'check' ? (
                   <span className="flex size-4 shrink-0 items-center justify-center">

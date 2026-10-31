@@ -12,6 +12,7 @@ mkdirSync(dir, { recursive: true })
 writeFileSync(path.join(dir, 'og-font.json'), JSON.stringify({ data: readFileSync(path.join(root, 'src/site/fonts/geist-og.ttf')).toString('base64') }))
 
 const jiti = createJiti(import.meta.url, { alias: { '@/': path.join(root, 'src/') } })
+const { EXAMPLES } = await jiti.import('../src/catalog/examples.ts')
 const { AI_FILES } = await jiti.import('../src/site/ai/snippets.ts')
 const { FILES } = await jiti.import('../src/catalog/source.ts')
 const { buildSource } = await jiti.import('../src/catalog/source-build.ts')
@@ -45,4 +46,7 @@ for (const [name, item] of Object.entries(items)) put(`items/${name}.json`, item
 put('theme.json', await registryTheme())
 put('index.json', await registryIndex())
 put('ai-files.json', aiFiles)
+for (const [id, code] of Object.entries(EXAMPLES)) {
+  put(`examples/${id}.json`, { code, html: await codeToHtml(code, { lang: 'tsx', themes: { light: 'github-light', dark: 'github-dark-default' }, defaultColor: false }) })
+}
 console.log(`Site data: ${Object.keys(source).length} sources, ${Object.keys(items).length} free items.`)

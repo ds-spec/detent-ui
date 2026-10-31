@@ -26,7 +26,7 @@ export function GaugeDemo() {
   })
 
   return (
-    <div className="w-[360px]" {...script}>
+    <div className="w-[360px] max-w-full" {...script}>
       <ChartCard
         title="Latency"
         actions={<Segmented small label="Range" value={range} options={RANGES.map(([r]) => [r, r])} onChange={setRange} />}

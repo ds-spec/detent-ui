@@ -94,7 +94,7 @@ export function ToasterDemo() {
   }, [])
 
   return (
-    <div className="w-[720px]" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={(e) => !e.altKey && (touched.current = true)}>
+    <div className="w-[720px] max-w-full" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={(e) => !e.altKey && (touched.current = true)}>
       <div className="flex flex-wrap justify-center gap-1.5">
         {TRIGGERS.map((t) => (
           <button key={t.label} type="button" onClick={t.run} className="ring-focus h-8 rounded-full bg-surface px-3.5 text-footnote font-medium text-ink shadow-raised transition-shadow hover:shadow-[var(--elev-raised-hover)]">

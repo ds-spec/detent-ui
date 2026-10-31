@@ -150,10 +150,10 @@ export function DockDemo() {
     }
   })
   return (
-    <div className="h-[600px] w-[760px] overflow-hidden rounded-[40px] bg-[color-mix(in_oklch,var(--ink)_3%,var(--surface))]" {...handlers}>
+    <div className="h-[600px] w-[760px] max-w-full overflow-hidden rounded-[40px] bg-[color-mix(in_oklch,var(--ink)_3%,var(--surface))]" {...handlers}>
       <MorphingDock ref={dock} tools={tools} recede={b.get('recede', true)} onChange={b.on('onChange')}>
         {/* A photo essay, the kind of page a dock should stay out of the way of. */}
-        <div className="mx-auto w-[480px] pt-12">
+        <div className="mx-auto w-[480px] max-w-full pt-12">
           <div className="h-[230px] overflow-hidden rounded-[6px]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/media/search/dunes.jpg" alt="" className="size-full object-cover" />

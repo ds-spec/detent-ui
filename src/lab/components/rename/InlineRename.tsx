@@ -60,6 +60,9 @@ export function InlineRename({
   const timer = useRef(0)
   const shake = useAnimationControls()
   const reduce = useReducedMotion()
+  const touched = useRef(false)
+  const [coarse, setCoarse] = useState(false)
+  useEffect(() => setCoarse(window.matchMedia('(pointer: coarse)').matches), [])
 
   useEffect(() => {
     if (!editing && status === 'idle') setShown(value)
@@ -205,10 +208,12 @@ export function InlineRename({
             <motion.button
               key={shown}
               type="button"
-              aria-label={`${label}: ${shown}. ${activate === 'click' ? 'Click' : 'Double-click'} to rename`}
-              onClick={activate === 'click' ? () => begin() : undefined}
+              aria-label={`${label}: ${shown}. ${coarse ? 'Tap' : activate === 'click' ? 'Click' : 'Double-click'} to rename`}
+              onPointerDown={(e) => void (touched.current = e.pointerType === 'touch')}
+              onClick={() => (activate === 'click' || touched.current) && begin()}
               onDoubleClick={activate === 'double-click' ? () => begin() : undefined}
               onKeyDown={(e) => {
+                touched.current = false
                 if (e.key === 'Enter' || e.key === 'F2') {
                   e.preventDefault()
                   begin()
@@ -254,7 +259,7 @@ export function InlineRename({
           ) : (
             !editing && (
               <motion.span key="pencil" className="flex text-ink-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <span className="flex opacity-0 transition-opacity duration-150 group-hover/rename:opacity-100">
+                <span className="flex opacity-0 transition-opacity duration-150 group-hover/rename:opacity-100 pointer-coarse:opacity-100">
                   <Pencil size={14} />
                 </span>
               </motion.span>

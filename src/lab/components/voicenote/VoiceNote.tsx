@@ -138,7 +138,7 @@ export function VoiceNote({
   const played = t / duration
   const spoken = words.findLastIndex((w) => w.at <= t + 0.05)
   return (
-    <div className="w-[384px] rounded-[22px] bg-surface p-3 shadow-raised">
+    <div className="w-[384px] max-w-full rounded-[22px] bg-surface p-3 shadow-raised">
       <div className="flex items-center gap-3">
         <motion.button
           type="button"
@@ -179,7 +179,7 @@ export function VoiceNote({
           onPointerMove={(e) => scrubbing.current && scrubTo(e)}
           onPointerUp={() => (scrubbing.current = false)}
           onPointerCancel={() => (scrubbing.current = false)}
-          className="ring-focus grid h-9 min-w-0 flex-1 cursor-pointer touch-none content-center items-center justify-between gap-y-[1.5px] rounded-[6px] outline-none"
+          className="ring-focus grid h-9 min-w-0 flex-1 cursor-pointer touch-pan-y content-center items-center justify-between gap-y-[1.5px] rounded-[6px] outline-none"
           style={{ gridTemplateColumns: `repeat(${COLS}, 3px)`, gridTemplateRows: `repeat(${ROWS}, 3px)`, gridAutoFlow: 'column' }}
         >
           {peaks.flatMap((p, c) => {
@@ -200,10 +200,10 @@ export function VoiceNote({
       </div>
 
       <div className="mt-2 flex items-center gap-1 pl-[52px]">
-        <motion.button type="button" whileTap={press} onPointerDown={tap} onClick={cycle} aria-label={`Speed ${rate}×`} className="ring-focus flex h-6 items-center rounded-full bg-surface-2 px-2 text-caption font-medium text-ink transition-colors hover:bg-surface-3">
+        <motion.button type="button" whileTap={press} onPointerDown={tap} onClick={cycle} aria-label={`Speed ${rate}×`} className="ring-focus relative flex h-6 items-center rounded-full bg-surface-2 px-2 pointer-coarse:before:absolute pointer-coarse:before:-inset-x-1 pointer-coarse:before:-inset-y-1.5 pointer-coarse:before:content-[''] text-caption font-medium text-ink transition-colors hover:bg-surface-3">
           <RollingText text={`${rate}×`} />
         </motion.button>
-        <button type="button" onClick={() => setReading((o) => !o)} aria-expanded={reading} className="ring-focus flex h-6 items-center gap-1 rounded-full px-2 text-caption font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink">
+        <button type="button" onClick={() => setReading((o) => !o)} aria-expanded={reading} className="ring-focus relative flex h-6 items-center gap-1 rounded-full px-2 pointer-coarse:before:absolute pointer-coarse:before:-inset-x-1 pointer-coarse:before:-inset-y-1.5 pointer-coarse:before:content-[''] text-caption font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink">
           Transcript
           <motion.span className="flex" animate={{ rotate: reading ? 180 : 0 }} transition={spring.snappy}>
             <ChevronDown size={12} />

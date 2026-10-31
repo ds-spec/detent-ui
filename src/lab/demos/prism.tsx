@@ -7,7 +7,7 @@ import { Prism } from '../components/prism/Prism'
 export function PrismDemo() {
   const b = useBench()
   return (
-    <div className="flex w-[860px] flex-col items-center px-10 py-20 text-center">
+    <div className="flex w-[860px] max-w-full flex-col items-center px-10 py-20 text-center">
       <span className="flex h-7 items-center gap-2 rounded-full bg-surface-2 px-3 text-footnote text-ink-2">
         <span className="size-1.5 rounded-full bg-accent" />
         Calm 2.0 is here

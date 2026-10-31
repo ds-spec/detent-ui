@@ -110,7 +110,7 @@ export function ContextMenu({
         onPointerUp={cancel}
         onPointerCancel={cancel}
         onKeyDown={keys}
-        className={`ring-focus [-webkit-touch-callout:none] ${className}`}
+        className={`ring-focus pointer-coarse:select-none [-webkit-touch-callout:none] ${className}`}
       >
         {children}
       </div>

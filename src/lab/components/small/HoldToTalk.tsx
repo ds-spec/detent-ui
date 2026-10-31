@@ -146,7 +146,7 @@ export function HoldToTalk({
   const knob = Math.max(-cancelAt - 28, dx)
 
   return (
-    <div className="flex w-[380px] max-w-full flex-col">
+    <div className="flex w-[380px] max-w-full flex-col max-[420px]:overflow-x-clip">
       {/* Notes land here, two at most, the older one stepping back. */}
       <div className="flex h-[124px] flex-col items-end justify-end gap-2 pb-3">
         <AnimatePresence initial={false} mode="popLayout">

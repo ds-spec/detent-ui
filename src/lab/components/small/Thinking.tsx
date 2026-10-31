@@ -210,7 +210,7 @@ export function Thinking({ steps, done, expanded = false }: {
   const took = (i: number) => time.took[i] ?? 0
 
   return (
-    <div className="relative w-[320px]">
+    <div className="relative w-[320px] max-w-full">
       <button
         type="button"
         data-invite

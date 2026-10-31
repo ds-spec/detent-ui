@@ -48,7 +48,7 @@ export function ToggleButton({
       type="button"
       aria-pressed={pressed}
       onPointerDown={tap}
-      onPointerEnter={() => setOver(true)}
+      onPointerEnter={(e) => e.pointerType !== 'touch' && setOver(true)}
       onPointerLeave={() => {
         setOver(false)
         setFresh(false)

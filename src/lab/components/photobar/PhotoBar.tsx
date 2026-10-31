@@ -121,7 +121,7 @@ export function PhotoBar({
           }}
           onPointerMove={(e) => e.buttons && read(e)}
           onKeyDown={keys}
-          className="ring-focus relative mt-1.5 flex h-9 cursor-ew-resize touch-none select-none items-center justify-between overflow-hidden rounded-[11px] bg-[var(--line)] px-3 text-[13px]"
+          className="ring-focus relative mt-1.5 flex h-9 cursor-ew-resize touch-pan-y select-none items-center justify-between overflow-hidden rounded-[11px] bg-[var(--line)] px-3 text-[13px]"
         >
           <span aria-hidden className="absolute inset-y-0 left-0 bg-surface/80" style={{ width: `${strength}%` }} />
           <span className="relative text-ink-2">Strength</span>

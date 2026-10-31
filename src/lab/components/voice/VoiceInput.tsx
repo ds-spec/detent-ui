@@ -250,7 +250,7 @@ export function VoiceInput({
                     type="button"
                     onClick={onCancel}
                     aria-label="Discard"
-                    className="ring-focus flex size-7 shrink-0 items-center justify-center rounded-full text-ink-3 transition-colors duration-150 hover:bg-surface-3 hover:text-ink"
+                    className="ring-focus flex size-7 pointer-coarse:size-9 shrink-0 items-center justify-center rounded-full text-ink-3 transition-colors duration-150 hover:bg-surface-3 hover:text-ink"
                   >
                     <Close size={13} />
                   </button>

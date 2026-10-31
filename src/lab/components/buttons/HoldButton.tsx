@@ -98,6 +98,8 @@ export function HoldButton({
     <button
       type="button"
       aria-label={typeof children === 'string' ? children : undefined}
+      onContextMenu={(e) => e.preventDefault()}
+      style={{ touchAction: 'none', WebkitTouchCallout: 'none', userSelect: 'none' }}
       onPointerDown={(e) => {
         if (e.button !== 0) return
         ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)

@@ -51,7 +51,7 @@ export default function Licence() {
           body: (
             <>
               <P>The {free} free components are licensed under the MIT License. Use them in anything, change them however you like, and share what you make. Keep the notice below with them.</P>
-              <pre className="mt-5 overflow-x-auto rounded-[14px] bg-surface-2 p-5 font-mono text-[12px] leading-[1.6] text-ink-2">{MIT}</pre>
+              <pre className="mt-5 whitespace-pre-wrap break-words rounded-[14px] bg-surface-2 p-5 font-mono text-[12px] leading-[1.6] text-ink-2 sm:whitespace-pre sm:overflow-x-auto">{MIT}</pre>
             </>
           ),
         },

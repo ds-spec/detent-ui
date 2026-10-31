@@ -13,8 +13,8 @@ import { keyLabel } from '../../ui/Kbd'
  * moment before it shows, so passing over a button doesn't flash anything. Once one is up, the
  * rest show at once, and it's the same bubble that travels: it glides from button to button,
  * stretching to fit each label, with the new words sliding in from the side you moved toward.
- * Pressing a button or Escape puts it away. Keyboard focus shows it straight away; touch never
- * does, because a finger can't hover.
+ * Pressing a button or Escape puts it away. Keyboard focus shows it straight away; on touch a
+ * tap shows it, and a tap anywhere else puts it away.
  */
 
 type Tip = { id: string; label: string; shortcut?: string[]; side: Side; el: HTMLElement }
@@ -110,8 +110,15 @@ export function TooltipGroup({
   useEffect(() => {
     if (!shown) return
     const key = (e: KeyboardEvent) => e.key === 'Escape' && hide()
+    const away = (e: PointerEvent) => {
+      if (e.pointerType === 'touch' && !live.current.tip?.el.contains(e.target as Node)) hide()
+    }
     document.addEventListener('keydown', key)
-    return () => document.removeEventListener('keydown', key)
+    document.addEventListener('pointerdown', away)
+    return () => {
+      document.removeEventListener('keydown', key)
+      document.removeEventListener('pointerdown', away)
+    }
   }, [shown])
 
   useImperativeHandle(ref, () => ({
@@ -192,7 +199,7 @@ function Label({ tip }: { tip: Tip }) {
     <>
       {tip.label}
       {tip.shortcut && (
-        <span className="ml-0.5 flex gap-0.5">
+        <span className="ml-0.5 flex gap-0.5 pointer-coarse:hidden">
           {tip.shortcut.map((k) => (
             <kbd key={k} className="inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-[5px] bg-[color-mix(in_oklch,var(--surface)_16%,transparent)] px-1 font-sans text-[11px] font-medium leading-none text-[color-mix(in_oklch,var(--surface)_78%,transparent)]">
               {keyLabel(k)}
@@ -226,6 +233,7 @@ export function Tooltip({
   const group = useContext(GroupContext)
   const el = useRef<HTMLSpanElement>(null)
   const pressed = useRef(false)
+  const tap = useRef<'off' | 'open' | 'shown'>('off')
   const id = useId()
   const get = useRef<() => Tip | null>(() => null)
   useLayoutEffect(() => {
@@ -250,13 +258,19 @@ export function Tooltip({
         const t = get.current()
         if (e.pointerType !== 'touch' && t && !pressed.current) group.enter(t)
       }}
-      onPointerLeave={() => {
+      onPointerLeave={(e) => {
         pressed.current = false
-        group.leave()
+        if (e.pointerType !== 'touch') group.leave()
       }}
-      onPointerDown={() => {
+      onPointerDown={(e) => {
         pressed.current = true
+        tap.current = e.pointerType !== 'touch' ? 'off' : group.shown === id ? 'shown' : 'open'
         group.hide()
+      }}
+      onClick={() => {
+        const t = get.current()
+        if (t && tap.current === 'open') group.focus(t)
+        tap.current = 'off'
       }}
       onFocus={(e) => {
         const t = get.current()

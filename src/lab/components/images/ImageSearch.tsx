@@ -176,6 +176,17 @@ export function ImageSearch({
   const shown = order.slice(0, SLOTS)
   const tiles = shown.map((id, i) => ({ ...slots[i], id }))
 
+  // A finger can't leave: the image it touched stays read until a tap lands somewhere else.
+  const fresh = useRef(false)
+  useEffect(() => {
+    if (!aim) return
+    const away = (e: PointerEvent) => {
+      if (e.pointerType === 'touch' && !box.current?.contains(e.target as Node)) setAim(null)
+    }
+    document.addEventListener('pointerdown', away)
+    return () => document.removeEventListener('pointerdown', away)
+  }, [aim])
+
   const type = (q: string) => {
     setQuery(q)
     if (!q.trim()) setAim(null)
@@ -205,7 +216,7 @@ export function ImageSearch({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={like.src} alt="" className="size-6 rounded-[6px] object-cover" />
               <span className="text-footnote text-ink-2">Like this</span>
-              <button type="button" aria-label="Stop finding images like this one" onClick={() => setLikeId(null)} className="ring-focus grid size-5 place-items-center rounded-full text-ink-3 transition-colors hover:bg-surface-3 hover:text-ink">
+              <button type="button" aria-label="Stop finding images like this one" onClick={() => setLikeId(null)} className="ring-focus relative grid size-5 place-items-center rounded-full text-ink-3 transition-colors before:absolute before:-inset-2.5 before:content-[''] hover:bg-surface-3 hover:text-ink pointer-fine:before:hidden">
                 <Close size={11} />
               </button>
             </motion.span>
@@ -258,11 +269,15 @@ export function ImageSearch({
                     exit={{ opacity: 0, scale: 0.94, transition: { duration: 0.18 } }}
                     transition={reduce ? { duration: 0 } : { ...SPRING, delay: i * 0.02 }}
                     onPointerEnter={() => setAim(t.id)}
-                    onPointerLeave={() => setAim(null)}
+                    onPointerLeave={(e) => e.pointerType !== 'touch' && setAim(null)}
+                    onPointerDownCapture={(e) => void (fresh.current = e.pointerType === 'touch' && aim !== t.id)}
                   >
                     <button
                       type="button"
-                      onClick={() => onOpen?.(img)}
+                      onClick={() => {
+                        if (fresh.current) fresh.current = false
+                        else onOpen?.(img)
+                      }}
                       onFocus={() => setAim(t.id)}
                       onBlur={() => setAim(null)}
                       aria-label={img.alt}
@@ -293,7 +308,7 @@ export function ImageSearch({
                       type="button"
                       onClick={() => setLikeId(t.id)}
                       onFocus={() => setAim(t.id)}
-                      className={`ring-focus absolute right-2 top-2 flex h-7 items-center gap-1.5 rounded-full bg-[rgb(255_255_255/0.88)] pl-2 pr-2.5 text-caption font-medium text-[#18181b] shadow-[0_2px_8px_rgb(0_0_0/0.18)] backdrop-blur-md transition-[opacity,transform] duration-200 focus-visible:opacity-100 ${pointed && likeId !== t.id && t.w > 110 ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-1 opacity-0'}`}
+                      className={`ring-focus absolute right-2 top-2 flex h-7 pointer-coarse:h-9 items-center gap-1.5 rounded-full bg-[rgb(255_255_255/0.88)] pl-2 pr-2.5 text-caption font-medium text-[#18181b] shadow-[0_2px_8px_rgb(0_0_0/0.18)] backdrop-blur-md transition-[opacity,transform] duration-200 focus-visible:opacity-100 ${pointed && likeId !== t.id && t.w > 110 ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-1 opacity-0'}`}
                     >
                       <Spark size={11} />
                       Similar
@@ -320,7 +335,7 @@ export function ImageSearch({
           )}
         </span>
         {onSeeAll && (
-          <button type="button" onClick={onSeeAll} className="ring-focus ml-auto rounded-[6px] px-1.5 py-0.5 text-ink-2 transition-colors hover:text-ink">
+          <button type="button" onClick={onSeeAll} className="ring-focus ml-auto rounded-[6px] px-1.5 py-0.5 pointer-coarse:min-h-9 text-ink-2 transition-colors hover:text-ink">
             See all
           </button>
         )}

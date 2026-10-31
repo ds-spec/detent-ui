@@ -526,7 +526,7 @@ function Ramp({ level }: { level: number }) {
 /** One of the row's keys: a square with a hairline edge. */
 function Key({ label, onClick, children }: { label: string; onClick: () => void; children: ReactNode }) {
   return (
-    <motion.button type="button" whileTap={press} aria-label={label} title={label} onClick={onClick} className="ring-focus flex size-8 shrink-0 items-center justify-center rounded-[10px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)] transition-colors duration-150 hover:bg-surface-2 hover:text-ink dark:hover:bg-surface-3">
+    <motion.button type="button" whileTap={press} aria-label={label} title={label} onClick={onClick} className="ring-focus flex size-8 pointer-coarse:size-9 shrink-0 items-center justify-center rounded-[10px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)] transition-colors duration-150 hover:bg-surface-2 hover:text-ink dark:hover:bg-surface-3">
       {children}
     </motion.button>
   )
@@ -556,7 +556,7 @@ function File({ file, index, onRemove }: { file: Attachment; index: number; onRe
         type="button"
         aria-label={`Remove ${file.name}`}
         onClick={onRemove}
-        className="absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full bg-ink text-surface opacity-0 shadow-[0_0_0_2px_var(--surface)] outline-none transition-opacity duration-150 focus-visible:opacity-100 group-hover/file:opacity-100"
+        className="absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full bg-ink text-surface opacity-0 shadow-[0_0_0_2px_var(--surface)] outline-none transition-opacity duration-150 before:absolute before:-inset-3 before:content-[''] focus-visible:opacity-100 group-hover/file:opacity-100 pointer-coarse:opacity-100"
       >
         <Close size={9} strokeWidth={2.8} />
       </button>

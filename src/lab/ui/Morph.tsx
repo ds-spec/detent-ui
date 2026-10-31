@@ -117,7 +117,7 @@ export function Morph({
       </motion.div>
 
       {/* Probes: every view rendered invisibly so its natural size is known before it's needed. */}
-      <div aria-hidden className="pointer-events-none invisible absolute left-0 top-0 -z-50" {...{ inert: true }}>
+      <div aria-hidden className="pointer-events-none invisible absolute left-0 top-0 -z-50 size-0 overflow-clip" {...{ inert: true }}>
         {Object.entries(views).map(([k, v]) => (
           <div
             key={k}

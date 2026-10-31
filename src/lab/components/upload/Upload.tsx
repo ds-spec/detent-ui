@@ -212,7 +212,7 @@ export function Upload({
                         exit={{ scale: 0.4, opacity: 0 }}
                         aria-label={`Cancel ${i.name}`}
                         onClick={() => remove(i.id)}
-                        className="ring-focus absolute flex size-7 items-center justify-center rounded-full text-ink-3 transition-colors duration-150 hover:bg-surface-2 hover:text-ink"
+                        className="ring-focus absolute flex size-7 pointer-coarse:before:absolute pointer-coarse:before:-inset-1 pointer-coarse:before:content-[''] items-center justify-center rounded-full text-ink-3 transition-colors duration-150 hover:bg-surface-2 hover:text-ink"
                       >
                         <Close size={15} />
                       </motion.button>

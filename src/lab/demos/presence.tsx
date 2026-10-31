@@ -123,7 +123,7 @@ export function PresenceDemo() {
           setFollowing(null)
         }
       }}
-      className="flex h-[420px] w-[440px] flex-col overflow-hidden rounded-[24px] bg-surface shadow-float"
+      className="flex h-[420px] w-[440px] max-w-full flex-col overflow-hidden rounded-[24px] bg-surface shadow-float"
     >
       <header className="flex h-16 shrink-0 items-center gap-3 pl-5 pr-3 shadow-[inset_0_-1px_0_var(--line)]">
         <div className="min-w-0 flex-1">

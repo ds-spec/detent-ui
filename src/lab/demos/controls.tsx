@@ -160,7 +160,7 @@ export function InboxDemo() {
   }
 
   return (
-    <div className="flex h-[560px] w-[380px] flex-col items-center">
+    <div className="flex h-[560px] w-[380px] max-w-full flex-col items-center">
       <Inbox
         items={items}
         align={b.get('align', 'center')}
@@ -237,7 +237,7 @@ export function StepperDemo() {
   }, [])
 
   return (
-    <div className="w-[360px] rounded-[22px] bg-surface p-2 shadow-float" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="w-[360px] max-w-full rounded-[22px] bg-surface p-2 shadow-float" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
       <Row name="Seats" note="$12 per seat a month">
         <Stepper ref={a} label={b.get('label', 'Seats')} value={seats} onChange={b.on('onChange', setSeats)} min={b.get('min', 1)} max={b.get('max', 50)} step={b.get('step', 1)} />
       </Row>

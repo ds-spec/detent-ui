@@ -78,7 +78,7 @@ export function CommandDemo() {
   }, [])
 
   return (
-    <div className="w-[460px]" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="w-[460px] max-w-full" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
       <CommandMenu ref={menu} inline open onOpenChange={b.on('onOpenChange')} commands={commands} listHeight={288} placeholder={b.get('placeholder', 'Search projects, people and actions…')} />
       {/* The status line rolls through its slot, so the old and new lines never overlap. */}
       <div className="relative mt-4 h-6 overflow-hidden text-center text-footnote">

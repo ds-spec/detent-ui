@@ -137,7 +137,7 @@ export function ContextRing({
   }
 
   return (
-    <div ref={root} className="relative flex w-fit items-center gap-1.5" onPointerEnter={() => setOpen(true)} onPointerLeave={() => setOpen(false)}>
+    <div ref={root} className="relative flex w-fit items-center gap-1.5" onPointerEnter={(e) => e.pointerType !== 'touch' && setOpen(true)} onPointerLeave={(e) => e.pointerType !== 'touch' && setOpen(false)}>
       <AnimatePresence>
         {open && (
           <motion.div
@@ -255,7 +255,7 @@ export function ContextRing({
             key="suggest"
             type="button"
             onClick={compact}
-            className="ring-focus h-7 rounded-full px-2.5 text-footnote font-medium text-[var(--warn-ink)] transition-colors hover:bg-[color-mix(in_oklch,var(--warn)_14%,transparent)]"
+            className="ring-focus h-7 pointer-coarse:h-9 rounded-full px-2.5 text-footnote font-medium text-[var(--warn-ink)] transition-colors hover:bg-[color-mix(in_oklch,var(--warn)_14%,transparent)]"
             initial={{ opacity: 0, x: -4 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -4, transition: { duration: 0.14 } }}

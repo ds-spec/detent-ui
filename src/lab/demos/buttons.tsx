@@ -95,7 +95,7 @@ export function ButtonsDemo() {
 
   const size = b.get('size', 'md')
   return (
-    <div className="grid w-[620px] grid-cols-2 gap-3" {...handlers}>
+    <div className="grid w-[620px] max-w-full grid-cols-2 gap-3" {...handlers}>
       <Cell label="Variants" wide>
         <div className="flex items-center gap-2.5">
           <Button variant="primary" size={size}>

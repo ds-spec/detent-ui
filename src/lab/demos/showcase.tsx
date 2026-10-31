@@ -67,7 +67,7 @@ export function TagsDemo() {
   }, [])
   return (
     <div
-      className="w-[460px] rounded-[24px] bg-surface px-6 pb-5 pt-6 shadow-float"
+      className="w-[460px] max-w-full rounded-[24px] bg-surface px-6 pb-5 pt-6 shadow-float"
       onPointerEnter={() => (held.current = true)}
       onPointerLeave={() => (held.current = false)}
       onPointerDownCapture={() => (touched.current = true)}
@@ -190,7 +190,7 @@ export function FeedbackDemo() {
   }, [])
 
   return (
-    <div className="relative h-[420px] w-[420px]" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="relative h-[420px] w-[420px] max-w-full max-sm:overflow-x-clip" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
       {/* The end of a docs page, so the widget has something to be about. */}
       <div className="absolute inset-x-0 top-6 px-1" style={{ maskImage: 'linear-gradient(to bottom, #000 55%, transparent 92%)' }}>
         <p className="text-footnote text-ink-3">Docs / Billing</p>

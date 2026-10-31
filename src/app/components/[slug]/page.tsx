@@ -3,8 +3,10 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { apiOf } from '@/catalog/api-of'
 import { ENTRIES, entry } from '@/catalog/meta'
+import { Example } from '@/site/bench/Example'
 import { PropsPanel } from '@/site/bench/Panel'
 import { isProComponent } from '@/catalog/pro'
+import { asset } from '@/lib/asset'
 import { JsonLd, crumbs, page, short } from '@/site/seo'
 
 export function generateStaticParams() {
@@ -33,11 +35,12 @@ async function Props({ params }: { params: PageProps<'/components/[slug]'>['para
   const { slug } = await params
   const e = entry(slug)
   if (!e) notFound()
-  const api = await apiOf(slug)
+  const [api, example] = await Promise.all([apiOf(slug), asset<{ code: string; html: string }>(`examples/${slug}.json`)])
   return (
     <>
       <JsonLd data={crumbs([[e.name, `/components/${e.id}`]])} />
       {api?.props.length ? <PropsPanel id={slug} api={api} /> : null}
+      {example ? <Example {...example} /> : null}
     </>
   )
 }

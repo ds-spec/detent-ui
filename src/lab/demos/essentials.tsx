@@ -64,7 +64,7 @@ export function TabsDemo() {
 
   // Fixed-height frame with the card pinned to the top, so the tab bar never moves under the cursor.
   return (
-    <div className="flex h-[300px] w-[380px] items-start" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="flex h-[300px] w-[380px] max-w-full items-start" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
       <DirectionTabs
         ref={tabs}
         id="demo-tabs"

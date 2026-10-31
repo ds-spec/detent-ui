@@ -345,7 +345,7 @@ function Row({
 
         {/* One fixed slot: the unread dot, swapped for an action on hover or focus. */}
         <span className="absolute right-2 top-2.5 size-6">
-          <span className="absolute inset-0 flex items-center justify-center transition-opacity duration-150 group-hover/row:opacity-0 group-focus-within/row:opacity-0">
+          <span className="absolute inset-0 flex items-center justify-center transition-opacity duration-150 group-hover/row:opacity-0 group-focus-within/row:opacity-0 pointer-coarse:opacity-0">
             <AnimatePresence custom={sweepDelay}>
               {n.unread && (
                 <motion.span
@@ -367,7 +367,7 @@ function Row({
               if (n.unread) onRead(n.id)
               else onDismiss(n.id)
             }}
-            className="absolute inset-0 flex items-center justify-center rounded-full bg-surface text-ink-2 opacity-0 outline-none transition-[opacity,color] duration-150 hover:text-ink focus-visible:opacity-100 group-hover/row:opacity-100"
+            className="absolute inset-0 flex items-center justify-center rounded-full bg-surface text-ink-2 opacity-0 outline-none transition-[opacity,color] duration-150 before:absolute before:-inset-2.5 before:content-[''] hover:text-ink focus-visible:opacity-100 group-hover/row:opacity-100 pointer-coarse:opacity-100"
             style={{ boxShadow: 'var(--elev-raised)' }}
           >
             {n.unread ? <Check size={13} strokeWidth={2.6} /> : <Close size={12} strokeWidth={2.6} />}

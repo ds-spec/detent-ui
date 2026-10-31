@@ -391,7 +391,7 @@ export function Signature({
         {/* Three inks, as dots. */}
         <div role="radiogroup" aria-label="Ink" className="flex items-center">
           {INKS.map((i) => (
-            <button key={i.id} type="button" role="radio" aria-checked={inkId === i.id} aria-label={i.label} onPointerDown={tap} onClick={() => setInk(i.id)} className="ring-focus flex size-6 items-center justify-center rounded-full">
+            <button key={i.id} type="button" role="radio" aria-checked={inkId === i.id} aria-label={i.label} onPointerDown={tap} onClick={() => setInk(i.id)} className="ring-focus relative flex size-6 items-center justify-center rounded-full pointer-coarse:before:absolute pointer-coarse:before:-inset-1.5 pointer-coarse:before:content-['']">
               <span className={`size-3 rounded-full transition-shadow duration-200 ${inkId === i.id ? 'shadow-[0_0_0_2px_var(--surface),0_0_0_3.25px_currentColor]' : ''}`} style={{ background: i.css, color: i.css }} />
             </button>
           ))}
@@ -405,16 +405,16 @@ export function Signature({
             <motion.div key="sealed" className="flex items-center gap-2 text-footnote" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: ease.out } }} exit={{ opacity: 0, y: -10, transition: { duration: 0.12, ease: ease.exit } }}>
               <span className="text-ink">Signed and sealed</span>
               <span className="tnum text-ink-3">{sealed.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
-              <motion.button type="button" whileTap={press} onPointerDown={tap} onClick={clear} className="ring-focus ml-2 h-8 rounded-full px-3 font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink">
+              <motion.button type="button" whileTap={press} onPointerDown={tap} onClick={clear} className="ring-focus ml-2 h-8 pointer-coarse:h-9 rounded-full px-3 font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink">
                 Start over
               </motion.button>
             </motion.div>
           ) : (
             <motion.div key="actions" className="flex items-center gap-1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: ease.out } }} exit={{ opacity: 0, y: -10, transition: { duration: 0.12, ease: ease.exit } }}>
-              <motion.button type="button" whileTap={press} onPointerDown={tap} onClick={clear} disabled={!value} className="ring-focus h-8 rounded-full px-3 text-footnote font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink disabled:opacity-40">
+              <motion.button type="button" whileTap={press} onPointerDown={tap} onClick={clear} disabled={!value} className="ring-focus h-8 pointer-coarse:h-9 rounded-full px-3 text-footnote font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink disabled:opacity-40">
                 Clear
               </motion.button>
-              <motion.button type="button" whileTap={press} onPointerDown={tap} onClick={sign} disabled={!value.trim()} className="ring-focus flex h-8 items-center gap-2 rounded-full bg-ink pl-3.5 pr-1.5 text-footnote font-medium text-surface transition-opacity hover:opacity-90 disabled:opacity-40">
+              <motion.button type="button" whileTap={press} onPointerDown={tap} onClick={sign} disabled={!value.trim()} className="ring-focus flex h-8 pointer-coarse:h-9 items-center gap-2 rounded-full bg-ink pl-3.5 pr-1.5 pointer-coarse:pr-3.5 text-footnote font-medium text-surface transition-opacity hover:opacity-90 disabled:opacity-40">
                 Sign and seal
                 <Kbd onInk>↵</Kbd>
               </motion.button>

@@ -69,7 +69,7 @@ export function TimelineDemo() {
     }
   }, [])
   return (
-    <div className="w-[560px] rounded-card bg-surface p-6 shadow-raised" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="w-[560px] max-w-full rounded-card bg-surface p-6 shadow-raised" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
       <p className="text-caption text-ink-3">ACM-142</p>
       <p className="mt-0.5 text-title text-ink">Apply discount codes before tax</p>
       <div className="mt-4">

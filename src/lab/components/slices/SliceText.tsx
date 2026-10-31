@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
+import type { PointerEvent } from 'react'
 import { motion, useInView, useReducedMotion } from 'motion/react'
 
 const OUT = [0.16, 1, 0.3, 1] as const
@@ -38,6 +39,24 @@ export function SliceText({
   const reduce = useReducedMotion()
   const mid = (strips - 1) / 2
 
+  // Too wide for what holds it: the type steps down to fit, and goes back to its own size when there's room.
+  useLayoutEffect(() => {
+    const el = box.current
+    const host = el?.parentElement
+    if (!el || !host) return
+    const fit = () => {
+      el.style.fontSize = ''
+      const pad = getComputedStyle(host)
+      const room = host.clientWidth - parseFloat(pad.paddingLeft) - parseFloat(pad.paddingRight)
+      const own = el.offsetWidth
+      if (room > 0 && own > room) el.style.fontSize = `${(parseFloat(getComputedStyle(el).fontSize) * room) / own}px`
+    }
+    fit()
+    const ro = new ResizeObserver(fit)
+    ro.observe(host)
+    return () => ro.disconnect()
+  }, [text])
+
   useEffect(() => {
     if (!interactive || reduce) return
     const now = Array.from({ length: strips }, () => 0)
@@ -60,15 +79,18 @@ export function SliceText({
     return () => cancelAnimationFrame(raf)
   }, [strips, reach, interactive, reduce])
 
+  const aimAt = (e: PointerEvent<HTMLSpanElement>) => {
+    const r = box.current!.getBoundingClientRect()
+    aim.current = (e.clientY - r.top) / r.height
+  }
+
   return (
     <span
       ref={box}
       role="img"
       aria-label={text}
-      onPointerMove={(e) => {
-        const r = box.current!.getBoundingClientRect()
-        aim.current = (e.clientY - r.top) / r.height
-      }}
+      onPointerDown={aimAt}
+      onPointerMove={aimAt}
       onPointerLeave={() => {
         aim.current = null
       }}

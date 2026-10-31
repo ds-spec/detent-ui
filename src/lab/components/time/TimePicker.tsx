@@ -329,8 +329,8 @@ export function TimePicker({
   const now = new Date().getHours() * 60 + new Date().getMinutes()
 
   return (
-    <div className="inline-flex flex-col">
-      <div className="flex items-center gap-2">
+    <div className="inline-flex max-w-full flex-col">
+      <div className="flex flex-wrap items-center gap-2">
         {field('start')}
         {range && (
           <>
@@ -355,7 +355,7 @@ export function TimePicker({
         )}
       </div>
       {zones.length > 0 && (
-        <p className="mt-7 flex h-4 flex-wrap items-center gap-x-3 text-caption text-ink-3">
+        <p className="mt-7 flex min-h-4 flex-wrap items-center gap-x-3 text-caption text-ink-3">
           {zones.map((z) => {
             const [zone, name] = z.split('|')
             return (

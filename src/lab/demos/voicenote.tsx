@@ -39,7 +39,7 @@ export function VoiceNoteDemo() {
     }
   })
   return (
-    <div className="flex w-[430px] flex-col gap-3" {...handlers}>
+    <div className="flex w-[430px] max-w-full flex-col gap-3" {...handlers}>
       <p className="ml-auto w-fit max-w-[280px] rounded-[20px] rounded-br-[6px] bg-[light-dark(var(--ink),var(--surface-3))] px-3.5 py-2.5 text-body leading-5 text-[light-dark(var(--surface),var(--ink))]">Did the refund go through?</p>
       <div className="flex items-end gap-2">
         <span className="mb-1 flex">

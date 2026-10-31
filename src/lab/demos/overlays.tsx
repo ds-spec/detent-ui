@@ -68,7 +68,7 @@ function useScript(script: (beat: Beat) => Promise<void>) {
 function Window({ title, children, hands, wide = false, size }: { title: string; children: ReactNode; hands: ReturnType<typeof useScript>; wide?: boolean; /** Tailwind size classes, when neither default fits. */ size?: string }) {
   return (
     <div {...hands}>
-      <LayerHost className={`${size ?? (wide ? 'h-[400px] w-[580px]' : 'h-[360px] w-[520px]')} max-w-full rounded-[20px] bg-surface shadow-[0_0_0_1px_var(--line),0_1px_2px_rgb(0_0_0/0.04),0_12px_32px_-16px_rgb(0_0_0/0.14)]`}>
+      <LayerHost className={`${size ?? (wide ? 'h-[400px] w-[580px] max-w-full' : 'h-[360px] w-[520px] max-w-full')} max-w-full rounded-[20px] bg-surface shadow-[0_0_0_1px_var(--line),0_1px_2px_rgb(0_0_0/0.04),0_12px_32px_-16px_rgb(0_0_0/0.14)]`}>
         <div className="flex h-10 items-center gap-1.5 border-b border-line px-3.5">
           {[0, 1, 2].map((i) => (
             <span key={i} className="size-[10px] rounded-full bg-[color-mix(in_oklch,var(--ink)_12%,transparent)]" />
@@ -159,7 +159,7 @@ export function DialogDemo() {
   }
   const count = emails.length + (draft.includes('@') ? 1 : 0)
   return (
-    <Window title="Acme · Team" hands={hands} size="h-[440px] w-[600px]">
+    <Window title="Acme · Team" hands={hands} size="h-[440px] w-[600px] max-w-full">
       <div className="flex h-full flex-col p-5">
         <div className="flex items-center justify-between">
           <div>

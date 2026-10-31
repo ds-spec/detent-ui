@@ -142,6 +142,14 @@ function Stack({ toasts, position, expand, hotkey, onDismiss, onUpdate }: { toas
   // Fanned out, each sits beyond the newer ones by their real heights.
   const offsets = toasts.map((_, i) => toasts.slice(0, i).reduce((a, t) => a + (heights[t.id] ?? 64) + GAP, 0))
 
+  // A finger can't leave: the stack stays fanned out until a tap lands somewhere else.
+  useEffect(() => {
+    if (!hover) return
+    const away = (e: PointerEvent) => e.pointerType === 'touch' && !list.current?.contains(e.target as Node) && setHover(false)
+    document.addEventListener('pointerdown', away)
+    return () => document.removeEventListener('pointerdown', away)
+  }, [hover])
+
   useEffect(() => {
     if (!hotkey) return
     const on = (e: KeyboardEvent) => {
@@ -176,7 +184,7 @@ function Stack({ toasts, position, expand, hotkey, onDismiss, onUpdate }: { toas
           className={`ring-focus pointer-events-auto absolute w-[min(372px,calc(100%-32px))] rounded-[18px] ${bottom ? 'bottom-4' : 'top-4'} ${h === 'left' ? 'left-4' : h === 'right' ? 'right-4' : 'inset-x-0 mx-auto'}`}
           style={{ height: open ? (offsets[offsets.length - 1] ?? 0) + (heights[toasts[toasts.length - 1]?.id] ?? 64) : front }}
           onPointerEnter={() => setHover(true)}
-          onPointerLeave={() => setHover(false)}
+          onPointerLeave={(e) => e.pointerType !== 'touch' && setHover(false)}
           onFocus={() => setFocused(true)}
           onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setFocused(false)}
           onKeyDown={keys}
@@ -302,7 +310,7 @@ function Item({ t, i, open, paused, bottom, side, y, frontHeight, onHeight, onDi
           {t.replies && (
             <div className="mt-2.5 flex flex-wrap gap-1.5">
               {t.replies.map((r) => (
-                <button key={r} type="button" onClick={() => reply(r)} className="ring-focus h-7 rounded-full bg-[color-mix(in_oklch,var(--ink)_6%,transparent)] px-3 text-caption font-medium text-ink transition-colors hover:bg-[color-mix(in_oklch,var(--ink)_10%,transparent)]">
+                <button key={r} type="button" onClick={() => reply(r)} className="ring-focus h-7 pointer-coarse:h-9 rounded-full bg-[color-mix(in_oklch,var(--ink)_6%,transparent)] px-3 text-caption font-medium text-ink transition-colors hover:bg-[color-mix(in_oklch,var(--ink)_10%,transparent)]">
                   {r}
                 </button>
               ))}
@@ -316,13 +324,13 @@ function Item({ t, i, open, paused, bottom, side, y, frontHeight, onHeight, onDi
               ;(t.undo ?? t.action!.onClick)()
               onDismiss()
             }}
-            className={`ring-focus mt-0.5 flex h-7 shrink-0 items-center gap-1.5 rounded-full bg-ink pl-3 text-caption font-medium text-surface transition-opacity ${t.undo ? 'pr-1.5' : 'pr-3'} ${back ? 'opacity-0' : ''}`}
+            className={`ring-focus mt-0.5 flex h-7 pointer-coarse:h-9 shrink-0 items-center gap-1.5 rounded-full bg-ink pl-3 text-caption font-medium text-surface transition-opacity ${t.undo ? 'pr-1.5' : 'pr-3'} ${back ? 'opacity-0' : ''}`}
           >
             {t.undo ? 'Undo' : t.action!.label}
             {t.undo && <Countdown left={left} />}
           </button>
         )}
-        <button type="button" aria-label="Dismiss" onClick={onDismiss} className={`ring-focus mt-0.5 grid size-7 shrink-0 place-items-center rounded-full text-ink-3 transition-[opacity,color,background-color] hover:bg-[color-mix(in_oklch,var(--ink)_6%,transparent)] hover:text-ink ${back ? 'opacity-0' : ''}`}>
+        <button type="button" aria-label="Dismiss" onClick={onDismiss} className={`ring-focus mt-0.5 grid size-7 pointer-coarse:size-9 shrink-0 place-items-center rounded-full text-ink-3 transition-[opacity,color,background-color] hover:bg-[color-mix(in_oklch,var(--ink)_6%,transparent)] hover:text-ink ${back ? 'opacity-0' : ''}`}>
           <Close size={12} strokeWidth={2.4} />
         </button>
         {timed && !back && <motion.span aria-hidden className="absolute inset-x-0 bottom-0 h-[2px] origin-left" style={{ scaleX: left, background: `color-mix(in oklch, ${tone ?? 'var(--ink)'} ${tone ? 55 : 20}%, transparent)` }} />}

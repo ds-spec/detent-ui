@@ -72,7 +72,7 @@ export function ImagesDemo() {
     }
   })
   return (
-    <div className="w-[780px]" {...handlers}>
+    <div className="w-[780px] max-w-full" {...handlers}>
       <ImageSearch ref={box} images={PHOTOS} placeholder={b.get('placeholder', 'Describe what you’re looking for')} onOpen={b.on('onOpen')} onQuery={b.on('onQuery')} onSeeAll={b.on('onSeeAll')} />
     </div>
   )

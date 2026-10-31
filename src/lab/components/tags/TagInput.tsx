@@ -68,6 +68,7 @@ export function TagInput({ label = 'Topics', initial = [], suggestions = [], max
   const [driven, setDriven] = useState(false)
   const input = useRef<HTMLInputElement>(null)
   const field = useRef<HTMLDivElement>(null)
+  const touched = useRef(false)
   const hint = useRef<HTMLParagraphElement>(null)
   const listId = useId()
 
@@ -290,8 +291,10 @@ export function TagInput({ label = 'Topics', initial = [], suggestions = [], max
                     }}
                     onPointerDown={(e) => {
                       e.preventDefault()
-                      add(m)
+                      touched.current = e.pointerType === 'touch'
+                      if (!touched.current) add(m)
                     }}
+                    onClick={() => touched.current && add(m)}
                     className="absolute inset-x-1 top-1 flex h-9 cursor-pointer items-center gap-2.5 rounded-[10px] px-3 text-callout"
                   >
                     {create ? (
@@ -353,7 +356,7 @@ function Tag({ label, armed, nudge, onRemove }: { label: string; armed: boolean;
           aria-label={`Remove ${label}`}
           onPointerDown={(e) => e.preventDefault()}
           onClick={onRemove}
-          className={`flex size-6 items-center justify-center rounded-[7px] transition-[opacity,background-color] duration-150 hover:bg-[color-mix(in_oklch,currentColor_12%,transparent)] ${armed ? 'opacity-100' : 'opacity-60 group-hover/tag:opacity-100'}`}
+          className={`relative flex size-6 items-center justify-center rounded-[7px] before:absolute before:-inset-2 before:content-[''] transition-[opacity,background-color] duration-150 hover:bg-[color-mix(in_oklch,currentColor_12%,transparent)] ${armed ? 'opacity-100' : 'opacity-60 group-hover/tag:opacity-100'}`}
         >
           <Close size={12} strokeWidth={2.4} />
         </button>

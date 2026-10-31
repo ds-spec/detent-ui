@@ -171,8 +171,8 @@ export function MorphingDock({
                   aria-label={t.label}
                   aria-expanded={on}
                   onClick={() => set(on ? null : t.id)}
-                  onPointerEnter={() => setHover(t.id)}
-                  onPointerLeave={() => setHover(null)}
+                  onPointerEnter={(e) => e.pointerType !== 'touch' && setHover(t.id)}
+                  onPointerLeave={(e) => e.pointerType !== 'touch' && setHover(null)}
                   onFocus={() => setHover(t.id)}
                   onBlur={() => setHover(null)}
                   className={`ring-focus relative grid h-10 w-11 place-items-center rounded-full transition-colors duration-150 ${on ? 'text-ink' : 'text-ink-3 hover:text-ink'}`}

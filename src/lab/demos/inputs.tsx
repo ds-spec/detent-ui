@@ -54,7 +54,7 @@ export function CodeDemo() {
   }, [])
 
   return (
-    <div className="w-[360px]" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="w-[360px] max-w-full" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
       <span className="flex size-11 items-center justify-center rounded-[14px] bg-surface text-ink-2 shadow-raised">
         <Mail size={19} />
       </span>
@@ -189,7 +189,7 @@ export function PromptDemo() {
 
   return (
     <div
-      className="flex h-[500px] w-[540px] flex-col overflow-hidden rounded-[28px] bg-card shadow-border"
+      className="flex h-[500px] w-[540px] max-w-full flex-col overflow-hidden rounded-[28px] bg-card shadow-border"
       onPointerEnter={() => (held.current = true)}
       onPointerLeave={() => (held.current = false)}
       onPointerDownCapture={() => (touched.current = true)}

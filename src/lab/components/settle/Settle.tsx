@@ -397,7 +397,7 @@ export function Settle({
   const ends = [stops.find((s) => s.amount === min), stops.find((s) => s.amount === max)]
 
   return (
-    <div className="w-[380px] select-none rounded-[28px] bg-surface p-6 shadow-raised">
+    <div className="w-[380px] max-w-full select-none rounded-[28px] bg-surface p-6 shadow-raised">
       <div className="flex items-center gap-3">
         <CardFace />
         <div className="min-w-0">

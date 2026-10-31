@@ -10,11 +10,11 @@ export type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
 export type Size = 'sm' | 'md' | 'lg'
 
 const SIZE: Record<Size, string> = {
-  sm: 'h-8 gap-1.5 rounded-[9px] px-3 text-footnote',
+  sm: 'h-8 pointer-coarse:h-9 gap-1.5 rounded-[9px] px-3 text-footnote',
   md: 'h-9 gap-2 rounded-control px-3.5 text-callout',
   lg: 'h-11 gap-2 rounded-row px-5 text-body',
 }
-const ICON: Record<Size, string> = { sm: 'size-8 rounded-[9px]', md: 'size-9 rounded-control', lg: 'size-11 rounded-row' }
+const ICON: Record<Size, string> = { sm: 'size-8 pointer-coarse:size-9 rounded-[9px]', md: 'size-9 rounded-control', lg: 'size-11 rounded-row' }
 
 const VARIANT: Record<Variant, string> = {
   primary: 'bg-ink text-surface shadow-[inset_0_1px_0_rgb(255_255_255/0.14),0_1px_2px_rgb(0_0_0/0.16)] hover:bg-[color-mix(in_oklch,var(--ink),var(--surface)_14%)]',

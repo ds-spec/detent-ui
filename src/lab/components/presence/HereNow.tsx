@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { ease, spring } from '../../lib/motion'
 import { Orb } from '../../ui/Orb'
@@ -47,6 +47,21 @@ export function HereNow({
   const [hover, setHover] = useState(false)
   const [tip, setTip] = useState<string | null>(null)
   const open = hover || !!forced
+  const root = useRef<HTMLDivElement>(null)
+  const wasOpen = useRef(true)
+
+  // A finger can't leave: the stack stays fanned out until a tap lands somewhere else.
+  useEffect(() => {
+    if (!hover) return
+    const away = (e: PointerEvent) => {
+      if (e.pointerType === 'touch' && !root.current?.contains(e.target as Node)) {
+        setHover(false)
+        setTip(null)
+      }
+    }
+    document.addEventListener('pointerdown', away)
+    return () => document.removeEventListener('pointerdown', away)
+  }, [hover])
   const shown = people.slice(0, max)
   const extra = people.length - shown.length
   const step = open ? OPEN : CLOSED
@@ -55,10 +70,12 @@ export function HereNow({
 
   return (
     <div
+      ref={root}
       className="relative shrink-0"
       style={{ width, height: SIZE }}
       onPointerEnter={() => setHover(true)}
-      onPointerLeave={() => {
+      onPointerLeave={(e) => {
+        if (e.pointerType === 'touch') return
         setHover(false)
         setTip(null)
       }}
@@ -84,13 +101,18 @@ export function HereNow({
             <motion.button
               key={p.id}
               type="button"
-              onClick={() => onFollow(following === p.id ? null : p.id)}
+              onPointerDown={(e) => void (wasOpen.current = e.pointerType !== 'touch' || open)}
+              onClick={() => {
+                setTip(p.id)
+                if (wasOpen.current) onFollow(following === p.id ? null : p.id)
+                wasOpen.current = true
+              }}
               onPointerEnter={() => setTip(p.id)}
               onFocus={() => setTip(p.id)}
               onBlur={() => setTip(null)}
               aria-label={`${following === p.id ? 'Stop following' : 'Follow'} ${p.name}`}
               aria-pressed={following === p.id}
-              className="ring-focus absolute top-0 rounded-full"
+              className="ring-focus absolute top-0 rounded-full pointer-coarse:before:absolute pointer-coarse:before:-inset-1 pointer-coarse:before:content-['']"
               style={{ width: SIZE, height: SIZE, zIndex: shown.length - i }}
               initial={{ opacity: 0, scale: 0.5, right: k * step + 12 }}
               animate={{ opacity: 1, scale: 1, right: k * step }}

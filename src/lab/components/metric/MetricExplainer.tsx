@@ -115,8 +115,9 @@ export function MetricExplainer({
   let w = 0
 
   return (
-    <div className="rounded-[22px] bg-surface p-7 shadow-[var(--card-edge)]" style={{ width, maxWidth: '100%' }}>
-      <div className="flex items-center justify-between gap-4">
+    <div className="@container" style={{ width, maxWidth: '100%' }}>
+    <div className="rounded-[22px] bg-surface p-5 shadow-[var(--card-edge)] @min-[520px]:p-7">
+      <div className="flex flex-col gap-2 @min-[520px]:flex-row @min-[520px]:items-center @min-[520px]:justify-between @min-[520px]:gap-4">
         <LayoutGroup id={group}>
           <div role="tablist" aria-label="Metric" className="-ml-1 flex min-w-0 gap-0.5 overflow-x-auto [scrollbar-width:none]">
             {metrics.map((x) => {
@@ -143,10 +144,10 @@ export function MetricExplainer({
       {/* The number, and the change in words. */}
       <div className="mt-7">
         {/* Without the driver pointed at, the number rolls to what it would have been, and goes quiet. */}
-        <p className={`tnum flex text-[52px] font-normal leading-none tracking-[-0.045em] transition-colors duration-300 ${without ? 'text-quiet' : 'text-ink'}`}>
+        <p className={`tnum flex text-[40px] @min-[520px]:text-[52px] font-normal leading-none tracking-[-0.045em] transition-colors duration-300 ${without ? 'text-quiet' : 'text-ink'}`}>
           <RollingText text={format(without ? m.value - without.amount : m.value)} proportional />
         </p>
-        <p className="mt-2.5 h-5 truncate text-callout text-ink-3">
+        <p className="mt-2.5 min-h-5 text-callout text-ink-3 @min-[520px]:h-5 @min-[520px]:truncate">
           {without ? (
             <>
               <span className="text-ink">without {without.name}</span> · {signed(-without.amount, format)}, the rest of the change stays
@@ -163,9 +164,9 @@ export function MetricExplainer({
       </div>
 
       {/* Why it moved: the reading arrives word by word, in a space held for three lines. */}
-      <div className="mt-6 h-[72px] overflow-hidden">
+      <div className="mt-6 min-h-[120px] @min-[520px]:h-[72px] @min-[520px]:min-h-0 @min-[520px]:overflow-hidden">
         <AnimatePresence mode="wait" initial={false}>
-          <motion.p key={m.id} className="line-clamp-3 text-[15px] leading-6 text-ink" exit={{ opacity: 0, transition: { duration: 0.12 } }}>
+          <motion.p key={m.id} className="text-[15px] leading-6 text-ink @min-[520px]:line-clamp-3" exit={{ opacity: 0, transition: { duration: 0.12 } }}>
             {parts.map((part, k) => {
               const words = part.text.split(/(\s+)/).map((x, i) =>
                 /^\s+$/.test(x) || !x ? (
@@ -195,7 +196,7 @@ export function MetricExplainer({
 
       {/* What moved it, biggest first, in rows of fixed height. A new metric's drivers swap in as one list:
           the old ones fade out first, so two sets of rows never draw over each other. */}
-      <div className="mt-4 h-[196px]">
+      <div className="mt-4 @min-[520px]:h-[196px]">
         <AnimatePresence mode="wait" initial={false}>
           <motion.ul key={m.id} exit={{ opacity: 0, transition: { duration: 0.12 } }}>
             {drivers.map((d, i) => (
@@ -204,12 +205,12 @@ export function MetricExplainer({
                 tabIndex={0}
                 aria-label={`${d.name}, ${signed(d.amount, format)}. Show the number without it.`}
                 {...pointers(d.name)}
-                className="ring-focus grid h-[49px] cursor-default grid-cols-[minmax(96px,128px)_minmax(0,1fr)_auto] items-center gap-4 rounded-[2px] shadow-[inset_0_1px_0_var(--line)] outline-none"
+                className="ring-focus grid cursor-default grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-0.5 rounded-[2px] py-2.5 shadow-[inset_0_1px_0_var(--line)] outline-none @min-[520px]:h-[49px] @min-[520px]:grid-cols-[minmax(96px,128px)_minmax(0,1fr)_auto] @min-[520px]:gap-4 @min-[520px]:py-0"
                 initial={reduce ? false : { opacity: 0, y: 4 }}
                 animate={{ opacity: lit && lit !== d.name ? 0.45 : 1, y: 0, transition: { ...spring.smooth, delay: reduce || lit ? 0 : 0.06 + i * 0.04, opacity: { duration: 0.2 } } }}
               >
                 <span className="truncate text-callout text-ink">{d.name}</span>
-                <span className="truncate text-footnote text-ink-3">{d.note}</span>
+                <span className="col-span-2 row-start-2 text-footnote text-ink-3 @min-[520px]:col-span-1 @min-[520px]:row-start-auto @min-[520px]:truncate">{d.note}</span>
                 <span className={`tnum text-right text-callout ${withIt(d) || lit === d.name ? 'text-ink' : 'text-ink-3'}`}>{signed(d.amount, format)}</span>
               </motion.li>
             ))}
@@ -217,10 +218,11 @@ export function MetricExplainer({
         </AnimatePresence>
       </div>
 
-      <div className="mt-3 flex h-5 items-center justify-between gap-4">
-        <p className="min-w-0 truncate text-footnote text-ink-3">{m.basis}</p>
+      <div className="mt-3 flex min-h-5 flex-col gap-2 @min-[520px]:h-5 @min-[520px]:flex-row @min-[520px]:items-center @min-[520px]:justify-between @min-[520px]:gap-4">
+        <p className="min-w-0 text-footnote text-ink-3 @min-[520px]:truncate">{m.basis}</p>
         {footer && <div className="flex shrink-0 gap-4 text-footnote">{footer}</div>}
       </div>
+    </div>
     </div>
   )
 }

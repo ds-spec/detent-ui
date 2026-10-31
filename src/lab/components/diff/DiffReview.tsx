@@ -218,7 +218,7 @@ export function DiffReview({
 
       <footer className="flex h-14 shrink-0 items-center gap-3 pl-4 pr-3 shadow-[inset_0_1px_0_var(--line)]">
         {/* One segment a hunk: green kept, red turned down, grey still to look at, blue where you are. */}
-        <span className="flex shrink-0 items-center gap-[3px]" aria-hidden>
+        <span className="flex shrink-0 items-center gap-[3px] @max-[420px]:hidden" aria-hidden>
           {hunks.map((h, i) => {
             const v = verdict(h)
             const here = ready && focus === i && !applied
@@ -369,6 +369,7 @@ function HunkView({
   }, [h])
   const { rows, fills, height } = place(numbered.slice(0, shown), verdict, split, h.id)
   const nc = h.lines.filter(([k]) => k !== 'del').length
+  const widest = h.lines.reduce((m, [, t]) => Math.max(m, t.length), 0)
 
   return (
     <motion.section
@@ -395,7 +396,8 @@ function HunkView({
         <Verdicts verdict={verdict} writing={writing} canDecide={canDecide} focused={focused} onDecide={onDecide} />
       </div>
 
-      <div className="relative" style={{ height: height * RH }}>
+      <div className="relative overflow-x-auto [scrollbar-width:none]" style={{ height: height * RH }}>
+        <div className="relative h-full font-mono text-caption" style={{ minWidth: split ? undefined : `calc(${widest}ch + 4.5rem)` }}>
         {rows.map((r) => (
           <RowView key={r.l.i} r={r} split={split} body={body} />
         ))}
@@ -412,6 +414,7 @@ function HunkView({
           ))}
         </AnimatePresence>
         <motion.span aria-hidden className="absolute inset-y-0 left-1/2 z-[2] w-px bg-line" initial={false} animate={{ opacity: split ? 1 : 0 }} transition={{ duration: 0.2 }} />
+        </div>
       </div>
     </motion.section>
   )
@@ -559,7 +562,7 @@ function Verdicts({ verdict, writing, canDecide, focused, onDecide }: { verdict:
         )}
         {(state === 'accepted' || state === 'rejected') && (
           <motion.span key={state} className="flex items-center gap-1" {...fade}>
-            <button type="button" onPointerDown={(e) => e.stopPropagation()} onClick={() => onDecide('pending')} className="ring-focus h-6 rounded-[7px] px-1.5 text-caption text-ink-3 transition-colors duration-150 hover:bg-surface-2 hover:text-ink">
+            <button type="button" onPointerDown={(e) => e.stopPropagation()} onClick={() => onDecide('pending')} className="ring-focus relative h-6 rounded-[7px] px-1.5 text-caption text-ink-3 transition-colors duration-150 hover:bg-surface-2 hover:text-ink [@media(pointer:coarse)]:after:absolute [@media(pointer:coarse)]:after:-inset-x-1 [@media(pointer:coarse)]:after:-inset-y-2 [@media(pointer:coarse)]:after:content-['']">
               Undo
             </button>
             <Mark ok={state === 'accepted'} />
@@ -594,7 +597,7 @@ function Small({ onClick, hint, focused, strong, children }: { onClick: () => vo
       whileTap={{ scale: 0.96 }}
       onPointerDown={(e) => e.stopPropagation()}
       onClick={onClick}
-      className={`ring-focus flex h-6 items-center gap-1 rounded-[7px] pl-1.5 pr-1 text-caption font-medium transition-[background-color,color,box-shadow] duration-150 ${
+      className={`ring-focus relative flex h-6 items-center gap-1 rounded-[7px] pl-1.5 pr-1 text-caption font-medium [@media(pointer:coarse)]:after:absolute [@media(pointer:coarse)]:after:-inset-x-1 [@media(pointer:coarse)]:after:-inset-y-2 [@media(pointer:coarse)]:after:content-[''] transition-[background-color,color,box-shadow] duration-150 ${
         strong && focused ? 'bg-ink text-surface hover:opacity-90' : strong ? 'bg-surface text-ink shadow-[0_0_0_1px_var(--line-strong)] hover:bg-surface-2' : 'text-ink-2 hover:bg-surface-2 hover:text-ink'
       }`}
     >

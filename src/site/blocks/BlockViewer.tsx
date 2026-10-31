@@ -22,6 +22,7 @@ import { PropRows, PropsSection } from '../PropsTable'
 import { isProBlock } from '@/catalog/pro'
 import { FreeTag, ProTag } from './ProTag'
 import { Rail } from '../exhibit/Rail'
+import { Pager } from '../shell/Pager'
 import { Shell, Trail } from '../shell/Shell'
 import type { RailGroup } from '../exhibit/Rail'
 import { Backdrop, Window } from './Studio'
@@ -84,7 +85,7 @@ export function BlockViewer({ id }: { id: string }) {
 
   return (
     <Shell list={<Rail label="Blocks" groups={RAIL} current={b.id} onPick={(to) => router.push(`/blocks/${to}`)} />} bar={<Trail steps={['Blocks', `${KINDS[b.kind]}s`, b.name]} />}>
-    <main className="mx-auto max-w-[1280px] px-4 pb-16 sm:px-8">
+    <main className="mx-auto max-w-[1280px] px-4 pb-24 sm:px-8 lg:pb-16">
       <header className="pt-8 sm:pt-10">
         <div className="flex flex-wrap items-center gap-2.5">
           <span className="text-[13px] text-ink-2">{KINDS[b.kind]}</span>
@@ -134,6 +135,7 @@ export function BlockViewer({ id }: { id: string }) {
         <Neighbour b={prev} dir="prev" />
         <Neighbour b={next} dir="next" />
       </nav>
+      {!present && <Pager prev={{ name: prev.name, href: `/blocks/${prev.id}` }} next={{ name: next.name, href: `/blocks/${next.id}` }} />}
     </main>
     </Shell>
   )

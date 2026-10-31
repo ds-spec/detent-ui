@@ -55,7 +55,7 @@ export function TimeDemo() {
     }
   }, [])
   return (
-    <div className="w-[560px]" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="w-[560px] max-w-full" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
       <LayerHost className="h-[420px] rounded-card bg-surface shadow-raised">
         <div className="p-7">
           <p className="text-caption text-ink-3">New event</p>

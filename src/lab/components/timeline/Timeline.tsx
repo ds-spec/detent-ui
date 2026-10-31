@@ -122,7 +122,7 @@ export function Timeline({ events: initial, now: start, height = 440, ref }: { e
     <div className="w-full">
       <div role="radiogroup" aria-label="Show" className="-mx-1 flex gap-1 overflow-x-auto px-1 [scrollbar-width:none]">
         {(['all', 'talk', 'changes'] as Filter[]).map((f) => (
-          <button key={f} type="button" role="radio" aria-checked={filter === f} onClick={() => (tap(), setFilter(f))} className="ring-focus relative flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 text-footnote">
+          <button key={f} type="button" role="radio" aria-checked={filter === f} onClick={() => (tap(), setFilter(f))} className="ring-focus relative flex h-8 pointer-coarse:h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 text-footnote">
             {filter === f && <motion.span layoutId={plate} className="absolute inset-0 rounded-full bg-surface-2" transition={reduce ? { duration: 0 } : spring.move} />}
             <span className={`relative ${filter === f ? 'font-medium text-ink' : 'text-ink-3 hover:text-ink-2'}`}>{f === 'all' ? 'Everything' : f === 'talk' ? 'Conversation' : 'Changes'}</span>
             <span className="relative min-w-[2ch] text-caption tabular-nums text-ink-3">{counts[f]}</span>

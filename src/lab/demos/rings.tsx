@@ -85,7 +85,7 @@ export function RingsDemo() {
   })
 
   return (
-    <div className="w-[420px]" {...script}>
+    <div className="w-[420px] max-w-full" {...script}>
       <ChartCard
         title="Allowance this month"
         headline={<Big>{`${used}%`}</Big>}

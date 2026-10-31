@@ -117,7 +117,7 @@ export function Stepper({
         onPointerLeave={release}
         onPointerCancel={release}
         onContextMenu={(e) => e.preventDefault()}
-        className={`sink flex size-8 shrink-0 touch-none select-none items-center justify-center rounded-full outline-none transition-[color,background-color,box-shadow] duration-150 hover:bg-plate hover:shadow-raised ${pressing === dir ? 'bg-plate shadow-raised' : ''} ${atLimit ? 'text-ink-3/60' : 'text-ink-2 hover:text-ink'}`}
+        className={`sink flex size-8 pointer-coarse:size-9 shrink-0 touch-none select-none items-center justify-center rounded-full outline-none transition-[color,background-color,box-shadow] duration-150 hover:bg-plate hover:shadow-raised ${pressing === dir ? 'bg-plate shadow-raised' : ''} ${atLimit ? 'text-ink-3/60' : 'text-ink-2 hover:text-ink'}`}
       >
         {dir > 0 ? <Plus size={15} strokeWidth={2.4} /> : <Minus size={15} strokeWidth={2.4} />}
       </motion.button>
@@ -166,7 +166,7 @@ export function Stepper({
         onPointerUp={() => setScrub(null)}
         onPointerCancel={() => setScrub(null)}
         title="Drag sideways to change"
-        className={`ring-focus relative flex h-8 cursor-ew-resize touch-none select-none items-center justify-center rounded-full text-callout font-semibold text-ink transition-colors duration-150 ${scrub ? 'bg-plate' : ''}`}
+        className={`ring-focus relative flex h-8 pointer-coarse:h-9 cursor-ew-resize touch-pan-y select-none items-center justify-center rounded-full text-callout font-semibold text-ink transition-colors duration-150 ${scrub ? 'bg-plate' : ''}`}
         style={{ width: `calc(${digits} * ${DIGIT} + 20px)` }}
       >
         <motion.span animate={nudge} className="flex">

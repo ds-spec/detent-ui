@@ -205,7 +205,7 @@ export function UndoList({
                     aria-label={`Delete ${it.name}`}
                     onClick={() => remove(it.id)}
                     whileTap={press}
-                    className="flex size-8 shrink-0 items-center justify-center rounded-full text-ink-3 opacity-0 transition-[color,background-color,opacity] duration-150 hover:bg-[color-mix(in_oklch,var(--danger)_11%,transparent)] hover:text-danger group-hover/row:opacity-100 group-focus-visible/row:opacity-100 group-data-[pointed]/row:opacity-100"
+                    className="flex size-8 pointer-coarse:size-9 shrink-0 items-center justify-center rounded-full text-ink-3 opacity-0 pointer-coarse:opacity-100 transition-[color,background-color,opacity] duration-150 hover:bg-[color-mix(in_oklch,var(--danger)_11%,transparent)] hover:text-danger group-hover/row:opacity-100 group-focus-visible/row:opacity-100 group-data-[pointed]/row:opacity-100"
                   >
                     <Bin size={16} />
                   </motion.button>
@@ -254,7 +254,7 @@ export function UndoList({
           ) : (
             <motion.div
               key="hint"
-              className="absolute inset-0 flex items-center justify-center gap-1.5 text-footnote text-ink-3"
+              className="absolute inset-0 flex items-center justify-center gap-1.5 text-footnote text-ink-3 pointer-coarse:hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1, transition: { delay: 0.12, duration: 0.24 } }}
               exit={{ opacity: 0, transition: { duration: 0.1 } }}

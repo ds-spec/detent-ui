@@ -15,6 +15,7 @@ import { Kbd } from '@/lab/ui/Kbd'
 import { Code } from '../browser/Code'
 import { InspectLayer } from '../browser/Inspect'
 import { Fit } from '../Fit'
+import { Pager } from '../shell/Pager'
 import { Mini } from '../Mini'
 import { Footer } from '../Footer'
 import { Header } from '../Header'
@@ -106,6 +107,8 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
   const [index, setIndex] = useState(false)
   const page = useTheme()
   const stage = useRef<HTMLElement>(null)
+  // How tall the demo is on a phone, where it sets the stage's height.
+  const [demoHeight, setDemoHeight] = useState<number | null>(null)
   // The view and the stage's theme belong to one component; moving on starts the next fresh.
   const [view, setView] = useState({ id, mode: 'preview' as 'preview' | 'code', theme: null as 'light' | 'dark' | null })
   const mode = view.id === id ? view.mode : 'preview'
@@ -199,7 +202,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
 
   return (
     <Shell list={<Rail label="Components" groups={RAIL} current={id} onPick={go} preview={peek} />} bar={<Trail steps={['Components', family.name, e.name]} />}>
-    <main className="mx-auto max-w-[1280px] px-4 sm:px-8">
+    <main className="mx-auto max-w-[1280px] px-4 pb-20 sm:px-8 lg:pb-0">
       <div className="pb-6 sm:pb-8">
       {/* The title: which family, where you are in the forty, and what this one is. */}
       <header className="flex flex-col gap-6 pt-8 sm:pt-10 2xl:flex-row 2xl:items-end 2xl:justify-between">
@@ -221,8 +224,8 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
                 {e.name}
               </Glide>
             </span>
-            <span className="relative block h-[1.08em] overflow-hidden text-quiet">
-              <Glide k={e.id} dir={dir} delay={0.05}>
+            <span className="relative block overflow-hidden text-quiet lg:h-[1.08em]">
+              <Glide k={e.id} dir={dir} delay={0.05} wrap>
                 {e.short ?? first(e.line)}
               </Glide>
             </span>
@@ -241,7 +244,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
       {present && <motion.div className="fixed inset-0 z-[45] bg-bg" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setPresent(false)} />}
       <BenchProvider key={id}>
       <div className="mt-4 grid gap-3">
-      <div className="relative flex h-[var(--stage-phone)] flex-col lg:h-[var(--stage)] " style={{ ['--stage' as string]: `max(clamp(540px, calc(100dvh - 290px), 760px), ${need}px)`, ['--stage-phone' as string]: phone }}>
+      <div className="relative flex h-[var(--stage-phone)] flex-col lg:h-[var(--stage)] " style={{ ['--stage' as string]: `max(clamp(540px, calc(100dvh - 290px), 760px), ${need}px)`, ['--stage-phone' as string]: demoHeight ? `${demoHeight + 48 + 64}px` : phone }}>
         <motion.section
           ref={stage}
           layout
@@ -276,7 +279,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
                     <Demo />
                   </div>
                 ) : (
-                  <Fit pad={STAGE_PAD} max={e.zoom ?? 1.25} min={0.62}>
+                  <Fit pad={STAGE_PAD} max={e.zoom ?? 1.25} min={0.62} onPhone={setDemoHeight}>
                     <Demo />
                   </Fit>
                 )}
@@ -345,6 +348,8 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
         </section>
       )}
 
+      {!present && <Pager prev={{ name: prev.name, href: prev.id }} next={{ name: next.name, href: next.id }} onPick={go} />}
+
       <Index
         open={index}
         current={id}
@@ -393,12 +398,12 @@ function CopyPrompt({ name, line, command, page }: { name: string; line: string;
  * The title travels with the component: the old one leaves the way you're going and the new one
  * arrives from the other side, quickly, inside its own clipped line so the two never overlap.
  */
-function Glide({ k, dir = 1, delay = 0, children }: { k: string; dir?: number; delay?: number; children: ReactNode }) {
+function Glide({ k, dir = 1, delay = 0, wrap = false, children }: { k: string; dir?: number; delay?: number; wrap?: boolean; children: ReactNode }) {
   return (
     <AnimatePresence mode="popLayout" initial={false} custom={dir}>
       <motion.span
         key={k}
-        className="block truncate"
+        className={wrap ? 'block lg:truncate' : 'block truncate'}
         custom={dir}
         variants={{
           in: (d: number) => ({ x: d * 56, opacity: 0 }),

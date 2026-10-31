@@ -129,7 +129,7 @@ export function ContextDemo() {
   })
   const lines = SAID.slice(folded, shown)
   return (
-    <div className="flex w-[360px] flex-col" {...handlers}>
+    <div className="flex w-[360px] max-w-full flex-col" {...handlers}>
       {/* The chat: it hangs from the composer, and compacting folds its start into one summary. */}
       <div className="relative h-[260px] overflow-hidden">
         <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-10 bg-gradient-to-b from-bg to-transparent" />
@@ -232,7 +232,7 @@ export function RunDemo() {
   const live = state === 'running' || state === 'stopped'
   return (
     // The button where it lives: on an agent's task, whose steps light up in step with it.
-    <div className="w-[440px] rounded-[24px] bg-surface p-6 shadow-float" {...handlers}>
+    <div className="w-[440px] max-w-full rounded-[24px] bg-surface p-6 shadow-float" {...handlers}>
       <p className="text-caption text-ink-3">Agent task · acme/storefront</p>
       <p className="mt-1 text-title text-ink">Move checkout to the new pricing API</p>
       <ol className="mt-5 flex flex-col gap-2.5">
@@ -359,7 +359,7 @@ export function ToastsDemo() {
   })
   const draft = events.find((e) => e.id === 'draft')?.status
   return (
-    <div className="relative h-[420px] w-[640px] overflow-hidden rounded-[24px] bg-surface shadow-float" {...handlers}>
+    <div className="relative h-[420px] w-[640px] max-w-full overflow-hidden rounded-[24px] bg-surface shadow-float" {...handlers}>
       <div className="flex h-12 items-center justify-between px-5 shadow-[inset_0_-1px_0_var(--line)]">
         <span className="text-footnote font-medium text-ink">Open tickets</span>
         <span className="tnum text-caption text-ink-3">{draft === 'done' ? 3 : 4} waiting</span>
@@ -437,7 +437,7 @@ function ThinkingRun({ onDone }: { onDone: () => void }) {
     onDone()
   })
   return (
-    <div className="flex h-[300px] w-[320px] flex-col" {...handlers}>
+    <div className="flex h-[300px] w-[320px] max-w-full flex-col" {...handlers}>
       <p className="mb-4 ml-auto w-fit max-w-[260px] rounded-[20px] rounded-br-[8px] bg-[light-dark(var(--ink),var(--surface-2))] px-4 py-3 text-body leading-5 text-[light-dark(var(--surface),var(--ink))] shadow-[inset_0_0_0_1px_light-dark(transparent,var(--line))]">Did the refund policy change?</p>
       <Thinking steps={steps} done={done} expanded={b.get('expanded', false) || open} />
     </div>
@@ -476,7 +476,7 @@ export function TypingDemo() {
   })
   const typing = lines.some((l) => l.typing)
   return (
-    <div className="w-[404px] rounded-[28px] bg-surface p-4 pt-3 shadow-float" {...handlers}>
+    <div className="w-[404px] max-w-full rounded-[28px] bg-surface p-4 pt-3 shadow-float" {...handlers}>
       <div className="flex h-11 items-center gap-2.5 px-1">
         <DetentMark size={30} round />
         <div className="min-w-0">
@@ -521,7 +521,7 @@ export function ChipsDemo() {
     }
   })
   return (
-    <div className="w-[460px] rounded-[26px] bg-card p-5 shadow-[inset_0_0_0_1px_light-dark(transparent,var(--line-strong))]" {...handlers}>
+    <div className="w-[460px] max-w-full rounded-[26px] bg-card p-5 shadow-[inset_0_0_0_1px_light-dark(transparent,var(--line-strong))]" {...handlers}>
       <div className="flex items-center justify-between px-1">
         <span className="text-footnote font-medium text-ink"># launch-planning</span>
         <span className="text-caption text-ink-3">48 new messages</span>
@@ -571,7 +571,7 @@ export function RetryDemo() {
     }
   })
   return (
-    <div className="w-[460px] rounded-[24px] bg-card p-5 shadow-[inset_0_0_0_1px_light-dark(transparent,var(--line-strong))]" {...handlers}>
+    <div className="w-[460px] max-w-full rounded-[24px] bg-card p-5 shadow-[inset_0_0_0_1px_light-dark(transparent,var(--line-strong))]" {...handlers}>
       <p className="ml-auto w-fit rounded-[16px] rounded-br-[6px] bg-surface px-3.5 py-2 text-footnote text-ink" style={{ boxShadow: 'var(--elev-raised)' }}>
         What changed in the refund policy?
       </p>
@@ -647,7 +647,7 @@ export function FilesDemo() {
   })
   const busy = files.some((f) => f.status !== 'done')
   return (
-    <div className="w-[440px] rounded-[24px] bg-surface p-3 shadow-float" {...handlers}>
+    <div className="w-[440px] max-w-full rounded-[24px] bg-surface p-3 shadow-float" {...handlers}>
       <FileChips files={files} onRemove={b.on('onRemove', (id: string) => setFiles((f) => f.filter((x) => x.id !== id)))} onRetry={b.on('onRetry', retry)} empty={b.get('empty', 'Attach files, or drop them here')} />
       <p className="px-1.5 pb-1 pt-3.5 text-body text-ink-3">Compare these with last quarter’s launch…</p>
       <div className="mt-2 flex items-center justify-between">

@@ -112,7 +112,7 @@ export function SelectDemo() {
   }, [])
 
   return (
-    <div className="w-[360px] rounded-[22px] bg-surface p-5 shadow-float" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="w-[360px] max-w-full rounded-[22px] bg-surface p-5 shadow-float" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
       <p className="tnum text-footnote text-ink-3">NW-142</p>
       <h3 className="mt-1 text-headline text-ink">Tighten the onboarding empty states</h3>
       <div className="mt-5 grid grid-cols-[84px_1fr] items-center gap-y-2.5">
@@ -202,7 +202,7 @@ export function RenameDemo() {
   }, [])
 
   return (
-    <div className="w-[400px]" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="w-[400px] max-w-full" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
       <p className="text-footnote text-ink-3">Northwind / Docs</p>
       <h2 className="mt-1.5 text-large text-ink">
         <InlineRename ref={head} label={b.get('label', 'Title')} value={title} activate={b.get('activate', 'click')} onRename={b.on('onRename', (v: string) => save().then(() => setTitle(v)))} />

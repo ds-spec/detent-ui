@@ -230,12 +230,12 @@ export function CommandMenu({
       </div>
 
       <div className="flex h-10 items-center gap-4 px-4 text-caption text-ink-3" style={{ boxShadow: 'inset 0 1px 0 var(--line)' }}>
-        <span className="flex items-center gap-1.5">
+        <span className="flex items-center gap-1.5 pointer-coarse:hidden">
           <Kbd>↑</Kbd>
           <Kbd>↓</Kbd>
           Move
         </span>
-        <span className="flex items-center gap-1.5">
+        <span className="flex items-center gap-1.5 pointer-coarse:hidden">
           <Kbd>↵</Kbd>
           Open
         </span>
