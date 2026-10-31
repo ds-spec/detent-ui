@@ -176,7 +176,7 @@ export function SignIn({ autoplay = true, accent, product = 'Detent', providers 
 
   return (
     <Names.Provider value={names}>
-      <div className={`pro-app @container relative flex h-full w-full overflow-hidden bg-surface text-ink ${className}`} style={accentVars(accent)} onPointerDownCapture={director.onPointerDownCapture} onKeyDownCapture={director.onKeyDownCapture}>
+      <div className={`pro-app @container relative flex h-full w-full overflow-hidden bg-surface text-ink ${className}`} style={accentVars(accent)} onPointerDownCapture={director.onPointerDownCapture} onPointerUpCapture={director.onPointerUpCapture} onKeyDownCapture={director.onKeyDownCapture}>
         <div className="relative min-w-0 flex-1">
           {/* The mark sits in the corner as far in as the panel on the right: its top on the panel's top edge. */}
           <div className="absolute left-5 top-5 flex items-center gap-2 @4xl:left-3 @4xl:top-3">

@@ -10,6 +10,7 @@ import type { StepperHandle } from '../components/stepper/Stepper'
 import { Ship } from '../icons'
 import { press } from '../lib/motion'
 import { useBench } from './bench'
+import { hover, pressed } from '@/lab/lib/hand'
 
 /* ───────────────────────────── Inbox ───────────────────────────── */
 
@@ -237,7 +238,7 @@ export function StepperDemo() {
   }, [])
 
   return (
-    <div className="w-[360px] max-w-full rounded-[22px] bg-surface p-2 shadow-float" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="w-[360px] max-w-full rounded-[22px] bg-surface p-2 shadow-float" {...hover(held)} {...pressed(() => (touched.current = true))} onKeyDownCapture={() => (touched.current = true)}>
       <Row name="Seats" note="$12 per seat a month">
         <Stepper ref={a} label={b.get('label', 'Seats')} value={seats} onChange={b.on('onChange', setSeats)} min={b.get('min', 1)} max={b.get('max', 50)} step={b.get('step', 1)} />
       </Row>

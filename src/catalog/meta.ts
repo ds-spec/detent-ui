@@ -1332,28 +1332,6 @@ const ALL: Entry[] = [
     ],
   },
 
-  {
-    id: 'time',
-    name: 'Typed time range',
-    short: 'Times you can type',
-    category: 'inputs',
-    feel: ['type'],
-    line: 'A time you can say: type “3p” or “1530” and it reads it as you go. As a range, every end time tells you how long the meeting would be.',
-    tags: ['New', 'Keyboard'],
-    details: [
-      'Type the way you’d say it: “3p”, “9:45a”, “1530”, “noon”. The field reads every key and says what it understood before you commit. A bare “3” means the afternoon, as people mean it.',
-      'Or open the list and point. It opens on the current time, and the time it’s on now is marked.',
-      'As a range, the end list counts from the start: each time says how long the meeting would be. Move the start and the end comes along, so the length holds.',
-      'An end is always read as after its start: type “10” after a 10 AM start and you get the evening.',
-      'The small clock in the field turns its hands to the time, the short way round.',
-      'The same moment can be shown in other time zones beneath, for whoever’s on the other end of the call.',
-    ],
-    keys: [
-      ['↑ ↓', 'Step the time, ⇧ for an hour'],
-      ['↵', 'Take it'],
-      ['Esc', 'Put it back'],
-    ],
-  },
 
   {
     id: 'combobox',

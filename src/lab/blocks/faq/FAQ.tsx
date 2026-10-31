@@ -123,7 +123,7 @@ export function FAQ({
   )
 
   return (
-    <div className={`pro-app @container h-full w-full overflow-y-auto overflow-x-hidden bg-surface text-ink [scrollbar-width:thin] ${className}`} style={accentVars(accent)} onPointerDownCapture={director.onPointerDownCapture} onKeyDownCapture={director.onKeyDownCapture}>
+    <div className={`pro-app @container h-full w-full overflow-y-auto overflow-x-hidden bg-surface text-ink [scrollbar-width:thin] ${className}`} style={accentVars(accent)} onPointerDownCapture={director.onPointerDownCapture} onPointerUpCapture={director.onPointerUpCapture} onKeyDownCapture={director.onKeyDownCapture}>
       <section className="mx-auto grid max-w-[1120px] gap-10 px-5 py-14 @3xl:px-8 @3xl:py-20 @4xl:grid-cols-[minmax(0,360px)_minmax(0,1fr)] @4xl:gap-16">
         <div className="@4xl:sticky @4xl:top-12 @4xl:self-start">
           <p className="text-footnote font-medium text-[var(--accent-ink)]">{eyebrow}</p>

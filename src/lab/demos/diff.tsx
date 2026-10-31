@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { DiffReview } from '../components/diff/DiffReview'
 import type { DiffHandle, Hunk } from '../components/diff/DiffReview'
 import { useBench } from './bench'
+import { hover } from '@/lab/lib/hand'
 
 const HUNKS: Hunk[] = [
   {
@@ -104,7 +105,7 @@ function Session({ onDone }: { onDone: () => void }) {
   }, [onDone])
 
   return (
-    <div onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDown={() => (touched.current = true)} onKeyDown={() => (touched.current = true)}>
+    <div {...hover(held)} onPointerDown={() => (touched.current = true)} onKeyDown={() => (touched.current = true)}>
       <DiffReview ref={diff} title={b.get('title', 'Apply the Q3 refund rules')} file={b.get('file', 'src/billing/refunds.ts')} hunks={HUNKS} shown={shown} onApply={b.on('onApply')} />
     </div>
   )

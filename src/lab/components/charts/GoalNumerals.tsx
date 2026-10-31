@@ -115,7 +115,7 @@ export function GoalNumerals({
               >
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-callout text-ink">{g.label}</span>
-                  <span className="tnum mt-0.5 block truncate text-footnote text-ink-3 @max-[380px]:whitespace-normal">
+                  <span className="tnum mt-0.5 block truncate text-footnote text-ink-3 @max-[380px]:min-h-[2lh] @max-[380px]:whitespace-normal">
                     {f(v)} of {f(g.goal)}
                     {over ? <Note className="text-warn-ink">{pct - 100}% over</Note> : ahead ? <Note className="text-ink-2">ahead of pace</Note> : even ? <Note>on pace</Note> : null}
                   </span>

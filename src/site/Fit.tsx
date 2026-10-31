@@ -22,6 +22,7 @@ const PHONE = 640
 /** Below this a component's stage does the same: the rail leaves it too narrow to scale. */
 const LAPTOP = 1280
 const PHONE_PAD = 10
+const PHONE_AIR = 6
 const CARD_PAD = 8
 const CARD_MIN = 0.5
 
@@ -52,7 +53,8 @@ export function Fit({ children, pad = 28, max = 1, min = 0.2, onPhone, stage = f
       if (!o.offsetWidth || !o.offsetHeight || !r.width || !r.height) return
       // On a phone the demo gets the stage's width and sets its height, so it lays itself out instead of shrinking.
       const vw = window.innerWidth
-      const room = onPhone && vw < (stage ? LAPTOP : PHONE) ? o.offsetWidth - PHONE_PAD * 2 : null
+      const air = vw < PHONE ? PHONE_AIR : PHONE_PAD
+      const room = onPhone && vw < (stage ? LAPTOP : PHONE) ? o.offsetWidth - air * 2 : null
       // A card can't grow, so on a phone its demo is laid out at the card's width, then scaled to its height: never cropped.
       const card = !onPhone && vw < PHONE
       if (card) {
@@ -74,7 +76,7 @@ export function Fit({ children, pad = 28, max = 1, min = 0.2, onPhone, stage = f
           zoomRef.current = 1
           setZoom(1)
         }
-        if (room) onPhone?.(i.offsetHeight + PHONE_PAD * 2)
+        if (room) onPhone?.(i.offsetHeight + air * 2)
         setCrop((c) => (c.x || c.y ? { x: false, y: false } : c))
         if (!firstSeen.current) firstSeen.current = performance.now()
         if (reveal.current) clearTimeout(reveal.current)
@@ -113,8 +115,8 @@ export function Fit({ children, pad = 28, max = 1, min = 0.2, onPhone, stage = f
   return (
     <div
       ref={outer}
-      className={`absolute inset-0 flex overflow-hidden ${crop.x ? 'justify-start' : 'justify-center'} ${crop.y ? 'items-start' : 'items-center'}`}
-      style={{ padding: crop.x || crop.y ? pad : undefined, maskImage: fade || undefined, maskComposite: crop.x && crop.y ? 'intersect' : undefined }}
+      className={`absolute inset-0 flex overflow-hidden ${crop.x ? 'justify-start' : 'justify-center'} ${crop.y || (stage && phone) ? 'items-start' : 'items-center'}`}
+      style={{ padding: crop.x || crop.y ? pad : stage && phone ? `${window.innerWidth < PHONE ? PHONE_AIR : PHONE_PAD}px 0 0` : undefined, maskImage: fade || undefined, maskComposite: crop.x && crop.y ? 'intersect' : undefined }}
     >
       <div ref={inner} data-fit className="w-max shrink-0 transition-opacity duration-200 ease-out" style={{ maxWidth: phone ?? undefined, zoom, opacity: ready ? 1 : 0, visibility: ready ? 'visible' : 'hidden' }}>
         <MotionConfig transformPagePoint={unzoom}>{children}</MotionConfig>

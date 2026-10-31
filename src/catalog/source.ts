@@ -44,7 +44,6 @@ export const FILES: Record<string, string[]> = {
   cropper: ['../pro/components/cropper/ImageCropper.tsx'],
   tour: ['../pro/components/tour/ProductTour.tsx', 'lib/layer.tsx'],
   composer: ['components/composer/RichComposer.tsx'],
-  time: ['components/time/TimePicker.tsx', 'lib/layer.tsx'],
   combobox: ['../pro/components/combobox/Combobox.tsx', 'lib/layer.tsx'],
   trend: ['../pro/components/outlook/OutlookChart.tsx', 'components/charts/parts.tsx', 'lib/hooks.ts'],
   bars: ['components/charts/BarChart.tsx', 'components/charts/parts.tsx', 'components/charts/ChartCard.tsx'],

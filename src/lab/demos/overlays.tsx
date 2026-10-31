@@ -26,6 +26,7 @@ import { Kbd } from '../ui/Kbd'
 import { Orb } from '../ui/Orb'
 import { Switch } from '../ui/Switch'
 import { useBench } from './bench'
+import { hover, pressed } from '@/lab/lib/hand'
 
 /*
  * The overlays, each in a small app window that keeps them inside it. Every demo plays its
@@ -57,9 +58,8 @@ function useScript(script: (beat: Beat) => Promise<void>) {
     }
   }, [])
   return {
-    onPointerEnter: () => (held.current = true),
-    onPointerLeave: () => (held.current = false),
-    onPointerDownCapture: () => (touched.current = true),
+    ...hover(held),
+    ...pressed(() => (touched.current = true)),
     onKeyDownCapture: () => (touched.current = true),
   }
 }

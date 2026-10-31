@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { pressed } from '@/lab/lib/hand'
 
 export const STOP = Symbol('stop')
 export type Wait = (ms: number) => Promise<void>
@@ -13,8 +14,8 @@ export type Wait = (ms: number) => Promise<void>
 export const InPlay = createContext(true)
 
 /**
- * Plays a block's script on a loop until someone touches the block, then hands it over for
- * good. Each pass gets a `wait` that rejects once the script should stop, so a script reads as
+ * Plays a block's script on a loop until someone takes the block, then hands it over for
+ * good. Scrolling past it on a phone doesn't count. Each pass gets a `wait` that rejects once the script should stop, so a script reads as
  * a plain sequence of steps. A whole screen doesn't pause on hover: a pointer resting on it is
  * the normal case. Spread the returned handlers on the block's root.
  */
@@ -56,7 +57,7 @@ export function useDirector(script: (wait: Wait, pass: number) => Promise<void>,
     if (!touched.current) onTakeOver?.()
     touched.current = true
   }
-  return { onPointerDownCapture: takeOver, onKeyDownCapture: takeOver, touched }
+  return { ...pressed(takeOver), onKeyDownCapture: takeOver, touched }
 }
 
 /** A sleep that stops when its run is superseded or the block unmounts. */

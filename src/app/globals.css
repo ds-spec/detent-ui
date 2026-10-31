@@ -416,6 +416,38 @@ body {
   color: var(--ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* On a touch screen: no delay waiting for a double tap, and a field under 16px would make iOS zoom the page when it's focused. */
+@media (pointer: coarse) {
+  a, button, input, select, textarea, label, [role='button'] {
+    touch-action: manipulation;
+  }
+  input:not([type='checkbox'], [type='radio'], [type='range']), select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Pro apps on a touch screen: a control shorter than 36px keeps its look but is tappable out to 36px, by a hit area that reaches past it. */
+@media (pointer: coarse) {
+  .pro-app :where(button, [role='button'], [role='switch'], [role='tab'], [role='radio'], [role='menuitem'], [role='option'], summary, a.ring-focus):not(.absolute, .fixed, .sticky, [data-hit='off']) {
+    position: relative;
+  }
+  .pro-app :where(button, [role='button'], [role='switch'], [role='tab'], [role='radio'], [role='menuitem'], [role='option'], summary, a.ring-focus):not([data-hit='off'])::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 36px);
+    height: max(100%, 36px);
+    transform: translate(-50%, -50%);
+  }
+  .pro-app :is([class*='text-[10px]'], [class*='text-[10.5px]']) {
+    font-size: 11px;
+  }
 }
 
 .tnum {

@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { Waitlist } from '../components/site/Waitlist'
 import type { WaitlistHandle } from '../components/site/Waitlist'
 import { useBench } from './bench'
+import { hover, pressed } from '@/lab/lib/hand'
 
 /* ───────────────────────────── Waitlist ───────────────────────────── */
 
@@ -46,7 +47,7 @@ export function WaitlistDemo() {
     }
   }, [])
   return (
-    <div className="flex flex-col items-center text-center" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="flex flex-col items-center text-center" {...hover(held)} {...pressed(() => (touched.current = true))} onKeyDownCapture={() => (touched.current = true)}>
       <span className="text-footnote text-ink-3">Early access</span>
       <h2 className="mt-2 text-large text-ink">Be first in line.</h2>
       <p className="mb-7 mt-2 text-body text-ink-3">We’re letting new teams in every week.</p>

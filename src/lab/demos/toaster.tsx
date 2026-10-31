@@ -7,6 +7,7 @@ import type { ToastPosition } from '../components/toast/Toaster'
 import { LayerHost } from '../lib/layer'
 import { spring } from '../lib/motion'
 import { Kbd } from '../ui/Kbd'
+import { hover, pressed } from '@/lab/lib/hand'
 
 // Its own toaster, so the page's toasts and the demo's never mix.
 const { toast, Toaster } = createToaster()
@@ -94,7 +95,7 @@ export function ToasterDemo() {
   }, [])
 
   return (
-    <div className="w-[720px] max-w-full" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={(e) => !e.altKey && (touched.current = true)}>
+    <div className="w-[720px] max-w-full" {...hover(held)} {...pressed(() => (touched.current = true))} onKeyDownCapture={(e) => !e.altKey && (touched.current = true)}>
       <div className="flex flex-wrap justify-center gap-1.5">
         {TRIGGERS.map((t) => (
           <button key={t.label} type="button" onClick={t.run} className="ring-focus h-8 rounded-full bg-surface px-3.5 text-footnote font-medium text-ink shadow-raised transition-shadow hover:shadow-[var(--elev-raised-hover)]">

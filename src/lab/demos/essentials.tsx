@@ -5,6 +5,7 @@ import { DirectionTabs } from '../components/DirectionTabs'
 import type { TabsHandle } from '../components/DirectionTabs'
 import { Switch } from '../ui/Switch'
 import { useBench } from './bench'
+import { hover, pressed } from '@/lab/lib/hand'
 
 /** A number with a quiet line of its last two weeks under it. */
 function Stat({ label, value, delta, points }: { label: string; value: string; delta: string; points: number[] }) {
@@ -64,7 +65,7 @@ export function TabsDemo() {
 
   // Fixed-height frame with the card pinned to the top, so the tab bar never moves under the cursor.
   return (
-    <div className="flex h-[300px] w-[380px] max-w-full items-start" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="flex h-[300px] w-[380px] max-w-full items-start" {...hover(held)} {...pressed(() => (touched.current = true))} onKeyDownCapture={() => (touched.current = true)}>
       <DirectionTabs
         ref={tabs}
         id="demo-tabs"

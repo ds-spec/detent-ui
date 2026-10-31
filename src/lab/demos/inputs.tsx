@@ -6,9 +6,10 @@ import { CodeInput } from '../components/code/CodeInput'
 import type { CodeHandle } from '../components/code/CodeInput'
 import { PromptBox, PromptStarters } from '../components/prompt/PromptBox'
 import type { Attachment, Message, PromptHandle, Starter } from '../components/prompt/PromptBox'
-import { Mail, Orbit } from '../icons'
+import { Mail } from '../icons'
 import { ease, press } from '../lib/motion'
 import { useBench } from './bench'
+import { hover, pressed } from '@/lab/lib/hand'
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
@@ -54,7 +55,7 @@ export function CodeDemo() {
   }, [])
 
   return (
-    <div className="w-[360px] max-w-full" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="w-[360px] max-w-full" {...hover(held)} {...pressed(() => (touched.current = true))} onKeyDownCapture={() => (touched.current = true)}>
       <span className="flex size-11 items-center justify-center rounded-[14px] bg-surface text-ink-2 shadow-raised">
         <Mail size={19} />
       </span>
@@ -190,9 +191,8 @@ export function PromptDemo() {
   return (
     <div
       className="flex h-[500px] w-[540px] max-w-full flex-col overflow-hidden rounded-[28px] bg-card shadow-border"
-      onPointerEnter={() => (held.current = true)}
-      onPointerLeave={() => (held.current = false)}
-      onPointerDownCapture={() => (touched.current = true)}
+      {...hover(held)}
+      {...pressed(() => (touched.current = true))}
       onKeyDownCapture={() => (touched.current = true)}
     >
       {/* The host: a chat that names itself once there's something to name it after. */}
@@ -235,11 +235,8 @@ export function PromptDemo() {
                   {turn.q}
                 </motion.div>
               )}
-              {/* The reply: who's answering, thinking while it works, then the answer a word at a time. */}
+              {/* The reply: thinking while it works, then the answer a word at a time. */}
               <div className="mt-4 flex min-h-[88px] gap-3">
-                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-surface text-[var(--accent)]" style={{ boxShadow: 'var(--elev-raised)' }}>
-                  <Orbit size={14} />
-                </span>
                 <div className="relative min-w-0 flex-1 pt-1 text-callout leading-[22px]">
                   <AnimatePresence mode="popLayout" initial={false}>
                     <motion.div

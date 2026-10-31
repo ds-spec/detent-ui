@@ -282,11 +282,7 @@ export function PromptBox({
                 <AnimatePresence initial={false} mode="popLayout">
                   {busy ? (
                     <motion.span key="busy" className="flex min-w-0 items-center gap-2" initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.1 } }} transition={{ duration: 0.2, ease: ease.out }}>
-                      <span className="relative flex size-1.5 shrink-0">
-                        {!reduce && <span className="absolute inset-0 animate-ping rounded-full bg-accent opacity-50" />}
-                        <span className="relative size-1.5 rounded-full bg-accent" />
-                      </span>
-                      <span className="truncate text-ink-2">{status}</span>
+                      <span className="ai-text ai-quiet truncate">{status}</span>
                       <Elapsed />
                     </motion.span>
                   ) : label ? (

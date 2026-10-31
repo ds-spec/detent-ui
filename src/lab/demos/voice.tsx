@@ -5,6 +5,7 @@ import { useAnimationFrame, useMotionValue } from 'motion/react'
 import { VoiceInput } from '../components/voice/VoiceInput'
 import type { VoiceHandle, VoiceState } from '../components/voice/VoiceInput'
 import { useBench } from './bench'
+import { hover, pressed } from '@/lab/lib/hand'
 
 const TAKE = ['Draft a note for the support team', 'about the new forty-five day window,', 'and keep it short.']
 const THROWN = ['Actually, make it', 'a little more']
@@ -174,9 +175,8 @@ export function VoiceDemo() {
 
   return (
     <div
-      onPointerEnter={() => (held.current = true)}
-      onPointerLeave={() => (held.current = false)}
-      onPointerDownCapture={() => (touched.current = true)}
+      {...hover(held)}
+      {...pressed(() => (touched.current = true))}
       onKeyDownCapture={() => (touched.current = true)}
     >
       <VoiceInput ref={voice} state={state} level={level} text={text} interim={interim} onTextChange={b.on('onTextChange', setText)} onStart={b.on('onStart', start)} onStop={b.on('onStop', finish)} onCancel={b.on('onCancel', discard)} onSend={b.on('onSend', () => setText(''))} placeholder={b.get('placeholder', 'Message Copilot, or tap the mic')} />

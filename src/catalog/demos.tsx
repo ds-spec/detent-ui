@@ -28,7 +28,6 @@ const FREE: Record<string, ComponentType> = {
   diff: dynamic(() => import('@/lab/demos/diff').then((m) => m.DiffDemo), { ssr: false }),
   images: dynamic(() => import('@/lab/demos/images').then((m) => m.ImagesDemo), { ssr: false }),
   dock: dynamic(() => import('@/lab/demos/dock').then((m) => m.DockDemo), { ssr: false }),
-  time: dynamic(() => import('@/lab/demos/time').then((m) => m.TimeDemo), { ssr: false }),
   composer: dynamic(() => import('@/lab/demos/composer').then((m) => m.ComposerDemo), { ssr: false }),
   voice: dynamic(() => import('@/lab/demos/voice').then((m) => m.VoiceDemo), { ssr: false }),
   select: dynamic(() => import('@/lab/demos/menus').then((m) => m.SelectDemo), { ssr: false }),

@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { RichComposer, Runs } from '../components/composer/RichComposer'
 import type { ComposerHandle, Mark, Person, Run } from '../components/composer/RichComposer'
 import { spring } from '@/lab/lib/motion'
+import { hover, pressed } from '@/lab/lib/hand'
 
 const PEOPLE: Person[] = [
   { id: 'maya', name: 'Maya Chen', role: 'Payments', hue: 150 },
@@ -67,7 +68,7 @@ export function ComposerDemo() {
     }
   }, [])
   return (
-    <div className="w-[560px] max-w-full" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="w-[560px] max-w-full" {...hover(held)} {...pressed(() => (touched.current = true))} onKeyDownCapture={() => (touched.current = true)}>
       <ul className="flex flex-col gap-4 pb-5">
         <AnimatePresence initial={false}>
           {notes.map((n) => (

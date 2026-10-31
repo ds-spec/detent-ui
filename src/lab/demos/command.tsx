@@ -7,6 +7,7 @@ import type { Command, CommandHandle } from '../components/command/CommandMenu'
 import { Calendar, Check, Code, Folder, Mail, Plus } from '../icons'
 import { Kbd } from '../ui/Kbd'
 import { useBench } from './bench'
+import { hover, pressed } from '@/lab/lib/hand'
 
 const PEOPLE = ['Maya Chen', 'Jonas Weber', 'Aiko Tanaka', 'Sam Ortiz']
 const PROJECTS = ['northwind-web', 'support-bot', 'billing-api', 'design-system']
@@ -78,7 +79,7 @@ export function CommandDemo() {
   }, [])
 
   return (
-    <div className="w-[460px] max-w-full" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="w-[460px] max-w-full" {...hover(held)} {...pressed(() => (touched.current = true))} onKeyDownCapture={() => (touched.current = true)}>
       <CommandMenu ref={menu} inline open onOpenChange={b.on('onOpenChange')} commands={commands} listHeight={288} placeholder={b.get('placeholder', 'Search projects, people and actions…')} />
       {/* The status line rolls through its slot, so the old and new lines never overlap. */}
       <div className="relative mt-4 h-6 overflow-hidden text-center text-footnote">

@@ -11,6 +11,7 @@ import { Upload } from '../components/upload/Upload'
 import type { UploadHandle } from '../components/upload/Upload'
 import type { PulseHandle } from '../components/FeedbackPulse'
 import { useBench } from './bench'
+import { hover, pressed } from '@/lab/lib/hand'
 
 /* ───────────────────────────── Tag input ───────────────────────────── */
 
@@ -68,9 +69,8 @@ export function TagsDemo() {
   return (
     <div
       className="w-[460px] max-w-full rounded-[24px] bg-surface px-6 pb-5 pt-6 shadow-float"
-      onPointerEnter={() => (held.current = true)}
-      onPointerLeave={() => (held.current = false)}
-      onPointerDownCapture={() => (touched.current = true)}
+      {...hover(held)}
+      {...pressed(() => (touched.current = true))}
       onKeyDownCapture={() => (touched.current = true)}
     >
       <p className="text-caption text-ink-3">Publish to the journal</p>
@@ -143,7 +143,7 @@ export function UndoDemo() {
   }, [])
 
   return (
-    <div onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div {...hover(held)} {...pressed(() => (touched.current = true))} onKeyDownCapture={() => (touched.current = true)}>
       <UndoList ref={list} initial={FILES} title={b.get('title', 'Recent files')} seconds={b.get('seconds', 5)} onDelete={b.on('onDelete')} onUndo={b.on('onUndo')} />
     </div>
   )
@@ -190,7 +190,7 @@ export function FeedbackDemo() {
   }, [])
 
   return (
-    <div className="@container relative h-[420px] w-[420px] max-w-full max-sm:overflow-x-clip" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="@container relative h-[420px] w-[420px] max-w-full max-sm:overflow-x-clip" {...hover(held)} {...pressed(() => (touched.current = true))} onKeyDownCapture={() => (touched.current = true)}>
       {/* The end of a docs page, so the widget has something to be about. */}
       <div className="absolute inset-x-0 top-6 px-1" style={{ maskImage: 'linear-gradient(to bottom, #000 55%, transparent 92%)' }}>
         <p className="text-footnote text-ink-3">Docs / Billing</p>
@@ -239,7 +239,7 @@ export function UploadDemo() {
     }
   }, [])
   return (
-    <div onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div {...hover(held)} {...pressed(() => (touched.current = true))} onKeyDownCapture={() => (touched.current = true)}>
       <Upload ref={up} accept={b.get('accept', 'PNG, JPG, PDF or MP4')} onFiles={b.on('onFiles')} />
     </div>
   )

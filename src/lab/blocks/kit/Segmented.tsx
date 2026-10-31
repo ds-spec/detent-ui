@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import { motion } from 'motion/react'
 import { spring } from '@/lab/lib/motion'
 import { tap } from '@/lab/lib/feel'
+import type { pressed } from '@/lab/lib/hand'
 
 /** A row of choices on one plate that glides to the chosen one. Arrow keys move along it. */
 export function Segmented({ label, options, at, onPick, handlers }: {
@@ -13,7 +14,7 @@ export function Segmented({ label, options, at, onPick, handlers }: {
   at: number
   onPick: (i: number) => void
   /** The director's handlers, so using the control hands it over. */
-  handlers?: { onPointerDownCapture: () => void; onKeyDownCapture: () => void }
+  handlers?: Pick<ReturnType<typeof pressed>, 'onPointerDownCapture' | 'onPointerUpCapture'> & { onKeyDownCapture: () => void }
 }) {
   const plate = useId()
   const refs = useRef<(HTMLButtonElement | null)[]>([])

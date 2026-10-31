@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { DetentMark } from '@/lab/ui/DetentMark'
 import { Timeline } from '../components/timeline/Timeline'
 import type { Event, Person, TimelineHandle } from '../components/timeline/Timeline'
+import { hover, pressed } from '@/lab/lib/hand'
 
 const MAYA: Person = { name: 'Maya Chen', hue: 150 }
 const JONAS: Person = { name: 'Jonas Weber', hue: 250 }
@@ -69,7 +70,7 @@ export function TimelineDemo() {
     }
   }, [])
   return (
-    <div className="w-[560px] max-w-full rounded-card bg-surface p-6 shadow-raised" onPointerEnter={() => (held.current = true)} onPointerLeave={() => (held.current = false)} onPointerDownCapture={() => (touched.current = true)} onKeyDownCapture={() => (touched.current = true)}>
+    <div className="w-[560px] max-w-full rounded-card bg-surface p-6 shadow-raised" {...hover(held)} {...pressed(() => (touched.current = true))} onKeyDownCapture={() => (touched.current = true)}>
       <p className="text-caption text-ink-3">ACM-142</p>
       <p className="mt-0.5 text-title text-ink">Apply discount codes before tax</p>
       <div className="mt-4">

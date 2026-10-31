@@ -125,7 +125,7 @@ export function BlockViewer({ id }: { id: string }) {
             </Tool>
           </span>
         </div>
-        <Desk title={b.window} chrome={b.chrome} run={run} mode={mode} theme={stageTheme} present={present} onExit={() => setPresent(false)} view={<Live id={b.id} />} code={<Code id={b.id} />} />
+        <Desk grow={b.kind === 'section'} title={b.window} chrome={b.chrome} run={run} mode={mode} theme={stageTheme} present={present} onExit={() => setPresent(false)} view={<Live id={b.id} />} code={<Code id={b.id} />} />
       </div>
 
       <Props b={b} />
@@ -368,8 +368,29 @@ const Live = memo(function Live({ id }: { id: string }) {
  * width to the desk's. Blocks and templates both sit on it. `view` is what runs in the window and
  * `code` what the Code tab shows.
  */
-export function Desk({ title, chrome, run, mode, theme, present, onExit, view, code }: { title: string; chrome?: 'app' | 'titled' | 'browser'; run: number; mode: 'preview' | 'code'; theme: 'light' | 'dark' | null; present: boolean; onExit: () => void; view: ReactNode; code: ReactNode }) {
+export function Desk({ title, chrome, run, mode, theme, present, onExit, view, code, grow = false }: { /** A page section, not a screen: below a laptop the window grows to hold it, so nothing scrolls inside a scroll. */ grow?: boolean; title: string; chrome?: 'app' | 'titled' | 'browser'; run: number; mode: 'preview' | 'code'; theme: 'light' | 'dark' | null; present: boolean; onExit: () => void; view: ReactNode; code: ReactNode }) {
   const track = useRef<HTMLDivElement>(null)
+  const [tall, setTall] = useState<number | null>(null)
+  useEffect(() => {
+    const box = track.current
+    if (!grow || !box || present) return
+    setTall(null)
+    const measure = () => {
+      const app = box.querySelector('.pro-app')
+      if (window.innerWidth >= 1280) return setTall(null)
+      if (app) setTall((was) => Math.max(was ?? 0, app.scrollHeight + box.clientHeight - app.clientHeight))
+    }
+    measure()
+    // The block loads a moment after the page does, and its first content a moment after that.
+    const poll = setInterval(measure, 300)
+    const stop = setTimeout(() => clearInterval(poll), 4000)
+    window.addEventListener('resize', measure)
+    return () => {
+      clearInterval(poll)
+      clearTimeout(stop)
+      window.removeEventListener('resize', measure)
+    }
+  }, [grow, present, title])
   const [max, setMax] = useState(0)
   // null follows the desk: the frame is as wide as there's room for.
   const [w, setW] = useState<number | null>(null)
@@ -461,10 +482,10 @@ export function Desk({ title, chrome, run, mode, theme, present, onExit, view, c
   return (
     <>
       {/* The desk: the block's own backdrop, a ruler, and the block in a window you can resize. */}
-      <div data-desk data-theme={theme ?? undefined} className="relative mt-6 rounded-[32px] px-3 pb-3 pt-3 text-ink sm:px-8 sm:pb-8 sm:pt-0">
+      <div data-desk data-theme={theme ?? undefined} className="relative mt-6 rounded-[32px] px-1.5 pb-1.5 pt-1.5 text-ink max-sm:-mx-3 sm:px-8 sm:pb-8 sm:pt-0">
         <Backdrop />
         <Ruler max={max} width={width} stops={stops} here={here} onPick={to} />
-        <div ref={track} className="relative h-[clamp(560px,calc(100dvh-320px),840px)] max-sm:h-[max(560px,calc(100dvh-150px))]">
+        <div ref={track} className="relative h-[clamp(560px,calc(100dvh-320px),840px)] max-sm:h-[max(560px,calc(100dvh-150px))]" style={{ height: tall ?? undefined }}>
           {max > 0 && (
             <Window title={title} chrome={chrome} width={width} compact={width < 520}>
               <div key={run} className={`h-full transition-opacity duration-300 ${mode === 'code' ? 'pointer-events-none opacity-0' : ''}`}>

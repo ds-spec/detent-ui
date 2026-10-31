@@ -127,7 +127,7 @@ export function Testimonials({
             </div>
 
             {/* Who's next. The ring fills while the quote is up, and stops once someone picks. */}
-            <div role="radiogroup" aria-label="Customer" className="flex gap-1.5" onPointerDownCapture={director.onPointerDownCapture} onKeyDownCapture={director.onKeyDownCapture}>
+            <div role="radiogroup" aria-label="Customer" className="flex gap-1.5" onPointerDownCapture={director.onPointerDownCapture} onPointerUpCapture={director.onPointerUpCapture} onKeyDownCapture={director.onKeyDownCapture}>
               {stories.map((s, i) => (
                 <button
                   key={s.id}
@@ -148,7 +148,7 @@ export function Testimonials({
                   onClick={() => (tap(), i !== at && show(i))}
                   className="ring-focus relative grid size-10 place-items-center rounded-full"
                 >
-                  <svg aria-hidden width="40" height="40" viewBox="0 0 40 40" className="absolute inset-0 -rotate-90">
+                  <svg aria-hidden viewBox="0 0 40 40" className="absolute inset-0 size-full -rotate-90">
                     <circle cx="20" cy="20" r="18.75" fill="none" stroke="var(--line-strong)" strokeWidth="1.5" className={`transition-opacity ${i === at ? '' : 'opacity-0'}`} />
                     {i === at && <motion.circle key={handed ? 'held' : run} cx="20" cy="20" r="18.75" fill="none" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" initial={{ pathLength: handed ? 1 : 0 }} animate={{ pathLength: 1 }} transition={{ duration: handed ? 0 : DWELL / 1000, ease: 'linear' }} />}
                   </svg>

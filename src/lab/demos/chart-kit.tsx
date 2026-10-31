@@ -5,6 +5,7 @@ import { motion } from 'motion/react'
 import { SERIES } from '../components/charts/parts'
 import { spring } from '@/lab/lib/motion'
 import { RollingText } from '@/lab/ui/RollingText'
+import { hover, pressed } from '@/lab/lib/hand'
 
 /*
  * What the chart demos share: one account's usage, seeded so it's the same on every visit, a small
@@ -132,9 +133,8 @@ export function useScript(play: (clock: Clock) => Promise<void>) {
     }
   }, [])
   return {
-    onPointerEnter: () => (held.current = true),
-    onPointerLeave: () => (held.current = false),
-    onPointerDownCapture: () => (touched.current = true),
+    ...hover(held),
+    ...pressed(() => (touched.current = true)),
     onKeyDownCapture: () => (touched.current = true),
   }
 }

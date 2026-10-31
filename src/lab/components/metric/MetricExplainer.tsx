@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useState } from 'react'
+import { Fragment, useId, useState } from 'react'
 import type { ReactNode } from 'react'
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'motion/react'
 import { ease, spring } from '@/lab/lib/motion'
@@ -36,6 +36,8 @@ export type Metric = {
   basis?: string
 }
 
+/** The four drivers shown, biggest first. */
+const topDrivers = (m: Metric) => [...m.drivers].sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount)).slice(0, 4)
 const plain = (n: number) => Math.round(n).toLocaleString('en-US')
 const signed = (n: number, format: (n: number) => string) => `${n < 0 ? '−' : '+'}${format(Math.abs(n))}`
 
@@ -92,7 +94,7 @@ export function MetricExplainer({
   const diff = m.value - m.previous
   const up = diff >= 0
   const pct = m.previous ? Math.abs(diff / m.previous) * 100 : 0
-  const drivers = [...m.drivers].sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount)).slice(0, 4)
+  const drivers = topDrivers(m)
   // What carried the change in its direction reads in ink; what pulled the other way, quietly.
   const withIt = (d: Driver) => (d.amount >= 0) === up
   const lit = (aim?.metric === m.id ? aim.name : null) ?? highlight
@@ -147,26 +149,47 @@ export function MetricExplainer({
         <p className={`tnum flex text-[40px] @min-[520px]:text-[52px] font-normal leading-none tracking-[-0.045em] transition-colors duration-300 ${without ? 'text-quiet' : 'text-ink'}`}>
           <RollingText text={format(without ? m.value - without.amount : m.value)} proportional />
         </p>
-        <p className="mt-2.5 min-h-5 text-callout text-ink-3 @min-[520px]:h-5 @min-[520px]:truncate">
-          {without ? (
-            <>
-              <span className="text-ink">without {without.name}</span> · {signed(-without.amount, format)}, the rest of the change stays
-            </>
-          ) : (
-            <>
-              <span className="text-ink">
-                {up ? 'up' : 'down'} {format(Math.abs(diff))}
-              </span>{' '}
-              on {m.vs}, {pct.toFixed(1)}% {up ? 'more' : 'less'}
-            </>
-          )}
-        </p>
+        {/* On a narrow card the line can wrap; unseen copies of every state hold the tallest so the card never resizes. */}
+        <div className="mt-2.5 grid min-h-5 text-callout text-ink-3 @min-[520px]:h-5">
+          <p className="col-start-1 row-start-1 @min-[520px]:truncate">
+            {without ? (
+              <>
+                <span className="text-ink">without {without.name}</span> · {signed(-without.amount, format)}, the rest of the change stays
+              </>
+            ) : (
+              <>
+                <span className="text-ink">
+                  {up ? 'up' : 'down'} {format(Math.abs(diff))}
+                </span>{' '}
+                on {m.vs}, {pct.toFixed(1)}% {up ? 'more' : 'less'}
+              </>
+            )}
+          </p>
+          {metrics.map((x) => {
+            const f = x.format ?? plain
+            const d = x.value - x.previous
+            const pc = x.previous ? Math.abs(d / x.previous) * 100 : 0
+            const top = topDrivers(x)[0]
+            return (
+              <Fragment key={x.id}>
+                <span aria-hidden className="invisible col-start-1 row-start-1 @min-[520px]:hidden">
+                  {d >= 0 ? 'up' : 'down'} {f(Math.abs(d))} on {x.vs}, {pc.toFixed(1)}% {d >= 0 ? 'more' : 'less'}
+                </span>
+                {top && (
+                  <span aria-hidden className="invisible col-start-1 row-start-1 @min-[520px]:hidden">
+                    without {top.name} · {signed(-top.amount, f)}, the rest of the change stays
+                  </span>
+                )}
+              </Fragment>
+            )
+          })}
+        </div>
       </div>
 
       {/* Why it moved: the reading arrives word by word, in a space held for three lines. */}
-      <div className="mt-6 min-h-[120px] @min-[520px]:h-[72px] @min-[520px]:min-h-0 @min-[520px]:overflow-hidden">
+      <div className="mt-6 grid min-h-[120px] @min-[520px]:h-[72px] @min-[520px]:min-h-0 @min-[520px]:overflow-hidden">
         <AnimatePresence mode="wait" initial={false}>
-          <motion.p key={m.id} className="text-[15px] leading-6 text-ink @min-[520px]:line-clamp-3" exit={{ opacity: 0, transition: { duration: 0.12 } }}>
+          <motion.p key={m.id} className="col-start-1 row-start-1 text-[15px] leading-6 text-ink [text-wrap:wrap] @min-[520px]:line-clamp-3" exit={{ opacity: 0, transition: { duration: 0.12 } }}>
             {parts.map((part, k) => {
               const words = part.text.split(/(\s+)/).map((x, i) =>
                 /^\s+$/.test(x) || !x ? (
@@ -192,13 +215,18 @@ export function MetricExplainer({
             })}
           </motion.p>
         </AnimatePresence>
+        {metrics.map((x) => (
+          <p key={x.id} aria-hidden className="invisible col-start-1 row-start-1 text-[15px] leading-6 [text-wrap:wrap] @min-[520px]:hidden">
+            {x.reason}
+          </p>
+        ))}
       </div>
 
       {/* What moved it, biggest first, in rows of fixed height. A new metric's drivers swap in as one list:
           the old ones fade out first, so two sets of rows never draw over each other. */}
-      <div className="mt-4 @min-[520px]:h-[196px]">
+      <div className="mt-4 grid @min-[520px]:h-[196px]">
         <AnimatePresence mode="wait" initial={false}>
-          <motion.ul key={m.id} exit={{ opacity: 0, transition: { duration: 0.12 } }}>
+          <motion.ul key={m.id} className="col-start-1 row-start-1" exit={{ opacity: 0, transition: { duration: 0.12 } }}>
             {drivers.map((d, i) => (
               <motion.li
                 key={d.name}
@@ -216,10 +244,28 @@ export function MetricExplainer({
             ))}
           </motion.ul>
         </AnimatePresence>
+        {metrics.map((x) => (
+          <ul key={x.id} aria-hidden className="invisible col-start-1 row-start-1 @min-[520px]:hidden">
+            {topDrivers(x).map((d) => (
+              <li key={d.name} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-0.5 py-2.5">
+                <span className="truncate text-callout">{d.name}</span>
+                <span className="col-span-2 row-start-2 text-footnote">{d.note}</span>
+                <span className="tnum text-right text-callout">{signed(d.amount, x.format ?? plain)}</span>
+              </li>
+            ))}
+          </ul>
+        ))}
       </div>
 
       <div className="mt-3 flex min-h-5 flex-col gap-2 @min-[520px]:h-5 @min-[520px]:flex-row @min-[520px]:items-center @min-[520px]:justify-between @min-[520px]:gap-4">
-        <p className="min-w-0 text-footnote text-ink-3 @min-[520px]:truncate">{m.basis}</p>
+        <div className="grid min-w-0">
+          <p className="col-start-1 row-start-1 min-w-0 text-footnote text-ink-3 @min-[520px]:truncate">{m.basis}</p>
+          {metrics.map((x) => (
+            <p key={x.id} aria-hidden className="invisible col-start-1 row-start-1 text-footnote @min-[520px]:hidden">
+              {x.basis}
+            </p>
+          ))}
+        </div>
         {footer && <div className="flex shrink-0 gap-4 text-footnote">{footer}</div>}
       </div>
     </div>

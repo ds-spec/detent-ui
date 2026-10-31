@@ -7,6 +7,7 @@ import type { Person } from '../components/presence/HereNow'
 import { ease } from '../lib/motion'
 import { Button } from '../ui/Button'
 import { useBench } from './bench'
+import { hover, pressed } from '@/lab/lib/hand'
 
 const P: Record<string, Person> = {
   maya: { id: 'maya', name: 'Maya Chen', hue: 25, status: 'active' },
@@ -113,9 +114,8 @@ export function PresenceDemo() {
 
   return (
     <div
-      onPointerEnter={() => (held.current = true)}
-      onPointerLeave={() => (held.current = false)}
-      onPointerDownCapture={() => (touched.current = true)}
+      {...hover(held)}
+      {...pressed(() => (touched.current = true))}
       onKeyDownCapture={() => (touched.current = true)}
       onKeyDown={(e) => {
         if (e.key === 'Escape' && following) {

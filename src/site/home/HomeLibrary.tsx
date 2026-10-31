@@ -21,7 +21,7 @@ import type { LibItem } from './library'
 /** The eight, row by row: each pair is wide then narrow, or narrow then wide. Four free, four Pro. */
 const ROWS: [string, string][] = [
   ['answer', 'approval'],
-  ['signature', 'filter'],
+  ['images', 'filter'],
   ['toasts', 'presence'],
   ['trace', 'scaffold'],
 ]
@@ -48,7 +48,7 @@ export function HomeLibrary({ lib }: { lib: LibItem[] }) {
     <section id="library" className="scroll-mt-20 px-2.5 sm:px-5">
       <style>{CSS}</style>
       <div className="relative overflow-hidden rounded-[26px] sm:rounded-[36px]" style={{ background: 'var(--paper)', boxShadow: 'var(--leaf-edge)' }}>
-        <div className="relative mx-auto max-w-[1440px] px-3 pb-6 pt-20 sm:px-8 sm:pb-8 sm:pt-28">
+        <div className="relative mx-auto max-w-[1440px] px-1 pb-6 pt-20 sm:px-8 sm:pb-8 sm:pt-28">
           <div className="flex flex-col items-center px-2 text-center">
             <h2 className="text-[clamp(38px,4.2vw,62px)] font-normal leading-[1.02] tracking-[-0.055em] text-ink">
               These aren’t screenshots.

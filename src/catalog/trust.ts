@@ -105,7 +105,6 @@ export const RELEASES: Release[] = [
     title: 'The most asked-for pieces',
     line: 'The components people install a library for, each built to the same bar as the rest.',
     items: [
-      { label: 'Typed time range', href: '/components/time' },
       { label: 'Live code block', href: '/components/codeblock', pro: true },
       { label: 'Ticket history', href: '/components/history' },
       { label: 'Toasts' },

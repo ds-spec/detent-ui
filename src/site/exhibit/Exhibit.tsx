@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useId, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { flushSync } from 'react-dom'
 import { usePathname, useRouter } from 'next/navigation'
@@ -107,8 +107,14 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
   const [index, setIndex] = useState(false)
   const page = useTheme()
   const stage = useRef<HTMLElement>(null)
-  // How tall the demo is on a phone, where it sets the stage's height.
-  const [demoHeight, setDemoHeight] = useState<number | null>(null)
+  // How tall the demo gets on a phone, where it sets the stage's height. It only grows, so a demo
+  // that opens and closes as it plays never moves the page under it.
+  const [tall, setTall] = useState<{ id: string; height: number } | null>(null)
+  const demoHeight = tall?.id === id ? tall.height : null
+  const onDemoHeight = useCallback(
+    (height: number | null) => setTall((was) => (height === null ? null : was?.id === id && was.height >= height ? was : { id, height })),
+    [id],
+  )
   // The view and the stage's theme belong to one component; moving on starts the next fresh.
   const [view, setView] = useState({ id, mode: 'preview' as 'preview' | 'code', theme: null as 'light' | 'dark' | null })
   const mode = view.id === id ? view.mode : 'preview'
@@ -244,7 +250,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
       {present && <motion.div className="fixed inset-0 z-[45] bg-bg" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setPresent(false)} />}
       <BenchProvider key={id}>
       <div className="mt-4 grid gap-3">
-      <div className="relative flex h-[var(--stage-phone)] flex-col lg:h-[var(--stage)] " style={{ ['--stage' as string]: demoHeight ? `max(540px, ${demoHeight + 48 + 64}px)` : `max(clamp(540px, calc(100dvh - 290px), 760px), ${need}px)`, ['--stage-phone' as string]: demoHeight ? `${demoHeight + 48 + 64}px` : phone }}>
+      <div className="relative flex h-[var(--stage-phone)] flex-col max-sm:-mx-3 lg:h-[var(--stage)]" style={{ ['--stage' as string]: demoHeight ? `max(540px, ${demoHeight + 48 + 64}px)` : `max(clamp(540px, calc(100dvh - 290px), 760px), ${need}px)`, ['--stage-phone' as string]: demoHeight ? `${demoHeight + 48 + 64}px` : phone }}>
         <motion.section
           ref={stage}
           layout
@@ -279,7 +285,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
                     <Demo />
                   </div>
                 ) : (
-                  <Fit pad={STAGE_PAD} max={e.zoom ?? 1.25} min={0.62} onPhone={setDemoHeight} stage>
+                  <Fit pad={STAGE_PAD} max={e.zoom ?? 1.25} min={0.62} onPhone={onDemoHeight} stage>
                     <Demo />
                   </Fit>
                 )}

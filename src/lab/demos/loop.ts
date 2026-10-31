@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { hover, pressed } from '@/lab/lib/hand'
 
 /**
  * Drives a self-playing demo. `beat` waits out its time, and keeps waiting while someone
@@ -24,9 +25,8 @@ export function useLoop(play: (beat: (ms: number) => Promise<void>) => Promise<v
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps)
   return {
-    onPointerEnter: () => (held.current = true),
-    onPointerLeave: () => (held.current = false),
-    onPointerDownCapture: () => (touched.current = true),
+    ...hover(held),
+    ...pressed(() => (touched.current = true)),
     onKeyDownCapture: () => (touched.current = true),
   }
 }

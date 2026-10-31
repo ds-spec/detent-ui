@@ -2,7 +2,7 @@
 
 import { Fragment, useEffect, useId, useImperativeHandle, useRef, useState } from 'react'
 import type { ReactNode, Ref } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'motion/react'
 import { ArrowUp, Bubble, Check, ChevronRight, Code, Fork, Ship } from '@/lab/icons'
 import { tap } from '@/lab/lib/feel'
 import { spring } from '@/lab/lib/motion'
@@ -119,6 +119,7 @@ export function Timeline({ events: initial, now: start, height = 440, ref }: { e
   const counts = { all: events.length, talk: events.filter((e) => TALK.has(e.kind)).length, changes: events.filter((e) => !TALK.has(e.kind)).length }
 
   return (
+    <LayoutGroup id={plate}>
     <div className="@container w-full">
       <div role="radiogroup" aria-label="Show" className="-mx-1 flex gap-1 overflow-x-auto px-1 [scrollbar-width:none]">
         {(['all', 'talk', 'changes'] as Filter[]).map((f) => (
@@ -152,23 +153,25 @@ export function Timeline({ events: initial, now: start, height = 440, ref }: { e
             </motion.button>
           )}
         </AnimatePresence>
-        <div ref={box} className="relative overflow-y-auto overscroll-contain pr-1" style={{ height }}>
+        <motion.div layoutScroll ref={box} className="relative overflow-y-auto overscroll-contain pr-1" style={{ height }}>
+          <AnimatePresence initial={false} mode="popLayout">
           {days.map((d) => (
-            <section key={d.label} aria-label={d.label}>
+            <motion.section key={d.label} aria-label={d.label} layout="position" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.12 } }} transition={reduce ? { duration: 0 } : { layout: spring.smooth, opacity: { duration: 0.2 } }}>
               <p className="sticky top-0 z-10 bg-[linear-gradient(var(--surface)_70%,transparent)] pb-2 pt-1 text-caption font-medium text-ink-3">{d.label}</p>
               <ol className="relative">
                 <span aria-hidden className="absolute bottom-3 left-[13px] top-3 w-px bg-[var(--line-strong)]" />
-                <AnimatePresence initial={false}>
+                <AnimatePresence initial={false} mode="popLayout">
                   {d.items.map((it) => {
                     const id = it.kind === 'one' ? it.e.id : it.id
                     return (
                       <motion.li
                         key={id}
-                        className="relative overflow-hidden"
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={reduce ? { duration: 0 } : { height: spring.smooth, opacity: { duration: 0.2 } }}
+                        className="relative"
+                        layout="position"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0, transition: { duration: 0.12 } }}
+                        transition={reduce ? { duration: 0 } : { layout: spring.smooth, opacity: { duration: 0.2 } }}
                       >
                         {it.kind === 'one' ? (
                           <Row e={it.e} now={now} fresh={fresh.includes(it.e.id)} />
@@ -180,12 +183,14 @@ export function Timeline({ events: initial, now: start, height = 440, ref }: { e
                   })}
                 </AnimatePresence>
               </ol>
-            </section>
+            </motion.section>
           ))}
+          </AnimatePresence>
           {!kept.length && <p className="pt-10 text-center text-footnote text-ink-3">Nothing here yet.</p>}
-        </div>
+        </motion.div>
       </div>
     </div>
+    </LayoutGroup>
   )
 }
 
@@ -296,7 +301,7 @@ function Run({ events, now, open, onToggle }: { events: Event[]; now: number; op
       </button>
       <AnimatePresence initial={false}>
         {open && (
-          <motion.ul key="run" className="overflow-hidden pl-[38px]" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={reduce ? { duration: 0 } : spring.smooth}>
+          <motion.ul key="run" className="pl-[38px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.1 } }} transition={reduce ? { duration: 0 } : { duration: 0.2 }}>
             {events.map((e) => (
               <li key={e.id} className="flex items-baseline gap-2 py-1 text-footnote text-ink-2">
                 {e.kind === 'commit' ? (
