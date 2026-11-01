@@ -4,24 +4,20 @@
  * shares a screen or comes next in the same job.
  */
 export const BESIDE: Record<string, string> = {
-  scaffold: 'trace', // It builds the project; the waterfall says what it did and where the time went.
-  images: 'reveal', // Finding an image, and making one.
-  diff: 'approval', // Reading the change, then letting the agent go ahead.
-  prompt: 'answer', // What you ask, and what comes back.
+  diff: 'activity', // Reading the change, and what each agent is doing next.
+  prompt: 'activity', // What you ask, and the agents working on it.
   upload: 'extract', // A file comes in, and gets read.
   history: 'activity', // What happened, and which agent needs a person next.
-  signature: 'extract', // Check what the AI read in the contract, then sign it.
-  presence: 'kanban', // Who's here, on the board everyone's looking at.
-  hold: 'rewrite', // Dictate it, then tidy the phrase in place.
-  rings: 'chart', // Big numbers up top, the trend under them.
+  rings: 'bridge', // Big numbers up top, and what moved them.
   metric: 'lens', // Why the number moved, and whether that day was really unusual.
   dock: 'flow', // The toolbar over a canvas.
-  voicenote: 'answer', // A spoken reply and a written one, in the same thread.
-  photobar: 'carousel', // A finished photo, and a run of them.
-  checklist: 'tour', // The list says what to do; the tour shows where.
-  readalong: 'video', // Read along with a note, or watch with chapters and captions.
-  secret: 'region', // Both live on a project's settings page: its keys and where it runs.
-  halo: 'carousel', // Light behind a section, and what sits in it.
-  slices: 'video', // The headline, and the film under it.
-  threads: 'video', // The hero, and the film under it.
+  voicenote: 'activity', // A spoken update, from one of the agents at work.
+  readalong: 'print', // A note read aloud, and the word that opens the page.
+  halo: 'threads', // Light behind a section, and the hero that sits in it.
+  slices: 'print', // Two ways to open a page.
+  rewrite: 'extract', // What the AI changed in the text, and what it read from a file, both for a person to check.
+  models: 'usage', // Choosing the model, and how much of the month it leaves.
+  chart: 'forecast', // The month behind you, and the cash ahead.
+  trend: 'askchart', // A range you can trust, and a question to ask of it.
+  carousel: 'region', // A run of places, and the wheel that picks one.
 }

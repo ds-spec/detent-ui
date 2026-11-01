@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
       { source: '/components/cropper', destination: '/components', permanent: true },
       { source: '/blocks/feature-story', destination: '/blocks', permanent: true },
       { source: '/blocks/prompt-playground', destination: '/blocks', permanent: true },
-      ...['feedback', 'codeblock', 'donut', 'photobar', 'chips', 'retry', 'typing', 'bars', 'waffle', 'run', 'context', 'thread', 'toolcall', 'docchat', 'time', 'versions', 'thinking', 'toasts', 'tags', 'rename', 'waitlist', 'files', 'tree', 'composer', 'meter', 'inbox', 'voice', 'undo'].map((id) => ({ source: `/components/${id}`, destination: '/components', permanent: true })),
+      ...['feedback', 'codeblock', 'donut', 'photobar', 'hold', 'kanban', 'answer', 'scaffold', 'ask', 'images', 'signature', 'video', 'presence', 'checklist', 'secret', 'reveal', 'approval', 'chips', 'retry', 'typing', 'bars', 'waffle', 'run', 'context', 'thread', 'toolcall', 'docchat', 'time', 'versions', 'thinking', 'toasts', 'tags', 'rename', 'waitlist', 'files', 'tree', 'composer', 'meter', 'inbox', 'voice', 'undo'].map((id) => ({ source: `/components/${id}`, destination: '/components', permanent: true })),
     ]
   },
   cacheComponents: true,

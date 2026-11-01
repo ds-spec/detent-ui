@@ -57,7 +57,6 @@ const FREE: Record<string, ComponentType> = {
   secret: lazy('secret', () => import('@/lab/demos/finish').then((m) => m.SecretDemo)),
   halo: lazy('halo', () => import('@/lab/demos/finish').then((m) => m.HaloDemo)),
   slices: lazy('slices', () => import('@/lab/demos/finish').then((m) => m.SlicesDemo)),
-  threads: lazy('threads', () => import('@/lab/demos/finish').then((m) => m.ThreadsDemo)),
   versions: lazy('versions', () => import('@/lab/demos/small').then((m) => m.VersionsDemo)),
   context: lazy('context', () => import('@/lab/demos/small').then((m) => m.ContextDemo)),
   run: lazy('run', () => import('@/lab/demos/small').then((m) => m.RunDemo)),
@@ -68,6 +67,11 @@ const FREE: Record<string, ComponentType> = {
   files: lazy('files', () => import('@/lab/demos/small').then((m) => m.FilesDemo)),
   toasts: lazy('toasts', () => import('@/lab/demos/small').then((m) => m.ToastsDemo)),
   retry: lazy('retry', () => import('@/lab/demos/small').then((m) => m.RetryDemo)),
+  rewrite: lazy('rewrite', () => import('@/lab/demos/rewrite').then((m) => m.RewriteDemo)),
+  models: lazy('models', () => import('@/lab/demos/models').then((m) => m.ModelsDemo)),
+  chart: lazy('chart', () => import('@/lab/demos/chart').then((m) => m.ChartDemo)),
+  trend: lazy('trend', () => import('@/lab/demos/trend').then((m) => m.TrendDemo)),
+  carousel: lazy('carousel', () => import('@/lab/demos/carousel').then((m) => m.CarouselDemo)),
 }
 
 /** Starts downloading a demo before anything renders it, so it's there the moment it's asked for. */

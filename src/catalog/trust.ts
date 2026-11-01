@@ -62,7 +62,7 @@ export const RELEASES: Release[] = [
     title: 'A section for the landing page',
     line: 'Integrations, where your stack drifts under a lens of glass and connects where you press it.',
     items: [
-      { label: 'Integrations', href: '/blocks/integrations', pro: true },
+      { label: 'Integrations', href: '/blocks/integrations' },
     ],
   },
   {
@@ -71,7 +71,7 @@ export const RELEASES: Release[] = [
     title: 'The free components, rebuilt to the Pro bar',
     line: 'Two new ones: a signature that a pencil writes as you type your name, and a voice note you can read along with. And thinking dots that play each step, and a voice meter made of dots.',
     items: [
-      { label: 'Signature', href: '/components/signature' },
+      { label: 'Signature' },
       { label: 'Voice note', href: '/components/voicenote' },
       { label: 'Thinking indicator' },
       { label: 'Voice input' },
@@ -116,7 +116,7 @@ export const RELEASES: Release[] = [
     line: 'Every free component installs with one command from a public registry, bringing its files and the Detent theme without touching yours. A Team plan joins Pro.',
     items: [
       { label: 'Public registry', href: '/components/prompt' },
-      { label: 'Agent kit', href: '/components/scaffold' },
+      { label: 'Agent kit', href: '/components/prompt' },
       { label: 'Team plan', href: '/pro#pricing' },
     ],
   },
@@ -136,7 +136,7 @@ export const RELEASES: Release[] = [
     title: 'Agents, and whole screens',
     line: 'The components an AI product is made of, and the blocks they make together.',
     items: [
-      { label: 'Streaming answer', href: '/components/answer', pro: true },
+      { label: 'Streaming answer', pro: true },
       { label: 'Run trace', href: '/components/trace', pro: true },
       { label: 'Approval tray', href: '/components/approval', pro: true },
       { label: 'Prompt box', href: '/components/prompt' },

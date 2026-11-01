@@ -33,6 +33,7 @@ export const KNOBS: Record<string, Record<string, Knob>> = {
   plan: { goal: { value: 'Ship the Q3 refund rules' } },
   chart: { title: { value: 'Revenue' } },
   lens: { title: { value: 'Sign-ups, last 90 days' } },
+  print: { text: { value: 'Yours.' }, line: { value: 'One word, printed in light.' }, family: { value: 'spectral', options: ['spectral', 'ember', 'ice', 'paper'] } },
   voice: { placeholder: { value: 'Message Copilot, or tap the mic' } },
   select: { label: { value: 'Status' }, placeholder: { value: 'Unassigned' } },
   rename: { label: { value: 'Title' }, activate: { value: 'click', options: ['click', 'double-click'] } },

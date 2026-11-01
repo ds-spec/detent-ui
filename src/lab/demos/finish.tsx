@@ -7,19 +7,12 @@ import { PhotoBar } from '../components/photobar/PhotoBar'
 import { ReadAlong } from '../components/readalong/ReadAlong'
 import { SecretField } from '../components/secret/SecretField'
 import { SliceText } from '../components/slices/SliceText'
-import { ThreadHero } from '../components/threads/ThreadHero'
-import { GRAIN } from '../lib/grain'
 
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
-/** Soft printed light for a piece to sit on. */
+/** A plain ground for a piece to sit on: nothing behind it. */
 function Light({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="relative flex size-full min-h-[560px] items-center lg:min-w-[620px] justify-center overflow-hidden p-5" style={{ background: 'radial-gradient(70% 80% at 15% 10%, #ffc08f, transparent 62%), radial-gradient(70% 90% at 90% 20%, #a9c6ff, transparent 62%), radial-gradient(80% 80% at 60% 100%, #f4a0c3, transparent 62%), #efe4d6' }}>
-      <span aria-hidden className="absolute inset-0 opacity-[0.28] mix-blend-overlay" style={{ backgroundImage: GRAIN }} />
-      <div className="relative w-full [&>*]:mx-auto">{children}</div>
-    </div>
-  )
+  return <div className="flex size-full items-center justify-center p-5 lg:min-w-[620px] [&>*]:mx-auto">{children}</div>
 }
 
 export function PhotoBarDemo() {
@@ -79,7 +72,7 @@ const NOTE = [
 
 export function ReadAlongDemo() {
   return (
-    <div className="flex size-full min-h-[560px] items-center justify-center bg-cover lg:min-w-[620px] bg-center p-5" style={{ backgroundImage: 'url(/media/search/dunes.webp)' }}>
+    <div className="flex size-full items-center justify-center p-5 lg:min-w-[620px]">
       <ReadAlong lines={NOTE} length={137} start={31} from="Priya, on the pricing page" />
     </div>
   )
@@ -100,7 +93,7 @@ export function SecretDemo() {
 export function HaloDemo() {
   return (
     <HaloBands className="size-full !rounded-none">
-      <div className="flex h-full min-h-[560px] flex-col items-center justify-center px-6 text-center">
+      <div className="flex h-full flex-col items-center justify-center px-6 text-center">
         <h2 className="text-[clamp(38px,5vw,60px)] font-normal leading-[1.03] tracking-[-0.05em] text-ink">
           Things that
           <span className="block text-ink-3">click into place.</span>
@@ -116,17 +109,8 @@ export function HaloDemo() {
 
 export function SlicesDemo() {
   return (
-    <div className="flex size-full min-h-[560px] items-center justify-center overflow-hidden bg-black px-6 lg:min-w-[860px]">
+    <div className="flex size-full items-center justify-center overflow-hidden bg-black px-6 lg:min-w-[860px]">
       <SliceText text="Cut to fit." fill="linear-gradient(180deg, #ffffff 18%, #d9dbe2 52%, #8c8f99 88%)" className="text-[clamp(64px,11vw,150px)] font-semibold tracking-[-0.05em]" />
-    </div>
-  )
-}
-
-
-export function ThreadsDemo() {
-  return (
-    <div className="size-full" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", var(--font-sans)' }}>
-      <ThreadHero title="Everything, finally connected." sub="Your tools, your team and your data, pulled together in one place." action="Get started" sentLabel="You’re in" />
     </div>
   )
 }

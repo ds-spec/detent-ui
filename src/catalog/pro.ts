@@ -19,10 +19,7 @@ const PRO_CODE = [
   'activity',
   'trace',
   'approval',
-  'rewrite',
   'filter',
-  'chart',
-  'models',
   'usage',
   'dates',
   'extract',
@@ -32,13 +29,13 @@ const PRO_CODE = [
   'video',
   'tour',
   'combobox',
-  'trend',
   'lens',
   'codeblock',
   'sidebar',
-  'carousel',
   'region',
   'reveal',
+  'threads',
+  'print',
 ]
 
 /** The Pro components in the catalog. Unlisted ones stay Pro, so their source stays locked. */
@@ -47,7 +44,7 @@ export const PRO_COMPONENTS = PRO_CODE.filter((id) => !UNLISTED.has(id))
 export const isProComponent = (id: string) => PRO_CODE.includes(id)
 
 /** The blocks anyone can install: sections every library gives away, so the free tier has whole screens to try. The rest are what the licence buys. */
-export const FREE_BLOCKS: string[] = ['faq', 'testimonials', 'sign-in']
+export const FREE_BLOCKS: string[] = ['faq', 'testimonials', 'sign-in', 'cta', 'integrations']
 
 export const isProBlock = (id: string) => (BLOCK_IDS as readonly string[]).includes(id) && !FREE_BLOCKS.includes(id)
 

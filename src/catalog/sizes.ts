@@ -20,8 +20,8 @@ export const SIZE: Record<string, [number, number]> = {
   trace: [602, 560],
   diff: [720, 600],
   rewrite: [560, 314],
-  approval: [380, 600],
-  prompt: [540, 500],
+  approval: [380, 344],
+  prompt: [640, 500],
   tree: [300, 420],
   activity: [760, 414],
   plan: [420, 520],
@@ -69,6 +69,7 @@ export const SIZE: Record<string, [number, number]> = {
   // Bleeds on a laptop, so only its height counts there; the width sets its taller shape on a phone.
   region: [460, 620],
   reveal: [520, 740],
+  print: [860, 560],
   threads: [980, 620],
   confirm: [580, 400],
   dialog: [600, 440],

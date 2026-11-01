@@ -18,12 +18,12 @@ export const FILES: Record<string, string[]> = {
   trace: ['../pro/components/trace/RunTrace.tsx'],
   diff: ['components/diff/DiffReview.tsx'],
   approval: ['../pro/components/approval/ApprovalTray.tsx'],
-  prompt: ['components/prompt/PromptBox.tsx'],
+  prompt: ['components/prompt/PromptBox.tsx', 'lib/detent.ts'],
   tree: ['components/tree/FileTree.tsx'],
   activity: ['../pro/components/activity/AgentActivity.tsx', 'ui/Orb.tsx'],
-  models: ['../pro/components/models/ModelPicker.tsx', 'lib/detent.ts'],
+  models: ['components/models/ModelPicker.tsx', 'lib/detent.ts'],
   filter: ['../pro/components/filter/AskFilter.tsx'],
-  chart: ['../pro/components/baseline/BaselineChart.tsx', 'components/charts/parts.tsx', 'lib/detent.ts', 'lib/hooks.ts'],
+  chart: ['components/baseline/BaselineChart.tsx', 'components/charts/parts.tsx', 'ui/ink.tsx', 'lib/detent.ts', 'lib/hooks.ts'],
   usage: ['../pro/components/usage/UsageLimit.tsx'],
   dates: ['../pro/components/dates/PeriodPicker.tsx', '../pro/components/dates/parse.ts'],
   voice: ['components/voice/VoiceInput.tsx'],
@@ -31,7 +31,7 @@ export const FILES: Record<string, string[]> = {
   rename: ['components/rename/InlineRename.tsx'],
   code: ['components/code/CodeInput.tsx'],
   stepper: ['components/stepper/Stepper.tsx'],
-  rewrite: ['../pro/components/rewrite/Rewrite.tsx'],
+  rewrite: ['components/rewrite/Rewrite.tsx'],
   tags: ['components/tags/TagInput.tsx'],
   upload: ['components/upload/Upload.tsx'],
   inbox: ['components/inbox/Inbox.tsx'],
@@ -44,7 +44,7 @@ export const FILES: Record<string, string[]> = {
   tour: ['../pro/components/tour/ProductTour.tsx', 'lib/layer.tsx'],
   composer: ['components/composer/RichComposer.tsx'],
   combobox: ['../pro/components/combobox/Combobox.tsx', 'lib/layer.tsx'],
-  trend: ['../pro/components/outlook/OutlookChart.tsx', 'components/charts/parts.tsx', 'lib/detent.ts', 'lib/hooks.ts'],
+  trend: ['components/outlook/OutlookChart.tsx', 'components/charts/parts.tsx', 'ui/ink.tsx', 'lib/detent.ts', 'lib/hooks.ts'],
   bars: ['components/charts/BarChart.tsx', 'components/charts/parts.tsx', 'components/charts/ChartCard.tsx'],
   rings: ['components/charts/GoalNumerals.tsx', 'lib/detent.ts', 'ui/RollingText.tsx', 'components/charts/parts.tsx', 'components/charts/ChartCard.tsx'],
   waffle: ['components/charts/Waffle.tsx', 'components/charts/parts.tsx', 'components/charts/ChartCard.tsx'],
@@ -54,7 +54,7 @@ export const FILES: Record<string, string[]> = {
   lens: ['../pro/components/lens/LensChart.tsx', 'lib/detent.ts'],
   sidebar: ['../pro/components/sidebar/AppSidebar.tsx', 'components/overlays/Tooltip.tsx', 'lib/layer.tsx'],
   history: ['components/timeline/Timeline.tsx'],
-  carousel: ['../pro/components/carousel/Carousel.tsx', 'lib/detent.ts'],
+  carousel: ['components/carousel/Carousel.tsx', 'lib/detent.ts'],
   toaster: ['components/toast/Toaster.tsx', 'lib/layer.tsx', 'ui/RollingText.tsx'],
   signature: ['components/signature/Signature.tsx'],
   video: ['../pro/components/video/VideoPlayer.tsx', 'components/overlays/DropdownMenu.tsx', 'components/overlays/Menu.tsx', 'components/overlays/Tooltip.tsx', 'lib/layer.tsx'],
@@ -76,9 +76,10 @@ export const FILES: Record<string, string[]> = {
   secret: ['components/secret/SecretField.tsx'],
   halo: ['components/halo/HaloBands.tsx', 'lib/grain.ts'],
   slices: ['components/slices/SliceText.tsx'],
-  threads: ['components/threads/ThreadHero.tsx'],
+  threads: ['../pro/components/threads/ThreadHero.tsx'],
   region: ['../pro/components/region/RegionWheel.tsx', '../pro/components/region/land.ts', 'ui/RollingText.tsx', 'lib/detent.ts'],
   reveal: ['../pro/components/reveal/ImageReveal.tsx'],
+  print: ['../pro/components/print/PrintWord.tsx', '../pro/components/print/print.ts', 'lib/detent.ts'],
   versions: ['components/small/Versions.tsx'],
   context: ['components/small/ContextRing.tsx'],
   run: ['components/small/RunButton.tsx'],
@@ -100,7 +101,8 @@ export const FILES: Record<string, string[]> = {
   'code-review': ['../pro/blocks/review/CodeReview.tsx', 'blocks/kit/props.tsx', 'ui/DetentMark.tsx'],
   testimonials: ['blocks/testimonials/Testimonials.tsx', 'blocks/testimonials/content.ts', 'blocks/kit/props.tsx'],
   faq: ['blocks/faq/FAQ.tsx', 'blocks/faq/content.ts', 'blocks/kit/Segmented.tsx', '../lab/lib/hooks.ts', 'blocks/kit/props.tsx'],
-  cta: ['../pro/blocks/cta/CTA.tsx', '../lab/ui/Count.tsx', 'blocks/kit/props.tsx', 'ui/DetentMark.tsx'],
+  cta: ['blocks/cta/CTA.tsx', 'ui/Count.tsx', 'blocks/kit/props.tsx', 'ui/DetentMark.tsx'],
+  integrations: ['blocks/integrations/Integrations.tsx', 'blocks/integrations/content.ts', 'ui/Count.tsx', 'blocks/kit/props.tsx'],
   calendar: ['../pro/blocks/calendar/Calendar.tsx', '../pro/blocks/calendar/content.ts', 'blocks/kit/props.tsx', 'ui/DetentMark.tsx'],
   'data-table': ['../pro/blocks/table/ConversationTable.tsx', '../pro/blocks/table/content.ts', '../pro/blocks/analytics/Sidebar.tsx', 'blocks/kit/Segmented.tsx', '../pro/ui/Stream.tsx', 'blocks/kit/props.tsx', 'ui/DetentMark.tsx'],
   analytics: ['../pro/blocks/analytics/Analytics.tsx', '../pro/blocks/analytics/Sidebar.tsx', '../pro/blocks/analytics/content.ts', 'blocks/kit/Segmented.tsx', '../lab/lib/hooks.ts', '../lab/ui/Count.tsx', 'blocks/kit/props.tsx', 'ui/DetentMark.tsx'],
@@ -267,7 +269,7 @@ export type SourceFile = { name: string; lines: number; code: string; html: stri
 /** How much of a Pro file the public site shows: the imports and the opening comment. */
 export const TEASER = 18
 
-/** Pro source: a Pro component, any block (their files live in src/pro), any template. */
+/** Pro source: a Pro component, any block whose files live in src/pro, any template. */
 export const locked = (id: string) => process.env.DETENT_UNLOCK !== '1' && (isProComponent(id) || id.startsWith('template-') || !!FILES[id]?.[0]?.startsWith('../pro/'))
 
 /** A component's files as highlighted at build time. Pro files are a teaser or only named. */

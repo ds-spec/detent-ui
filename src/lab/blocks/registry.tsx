@@ -8,4 +8,6 @@ export const FREE_BLOCK_VIEWS: Record<string, ComponentType<{ autoplay?: boolean
   'sign-in': dynamic(() => import('./signin/SignIn').then((m) => m.SignIn), { ssr: false }),
   testimonials: dynamic(() => import('./testimonials/Testimonials').then((m) => m.Testimonials), { ssr: false }),
   faq: dynamic(() => import('./faq/FAQ').then((m) => m.FAQ), { ssr: false }),
+  cta: dynamic(() => import('./cta/CTA').then((m) => m.CTA), { ssr: false }),
+  integrations: dynamic(() => import('./integrations/Integrations').then((m) => m.Integrations), { ssr: false }),
 }

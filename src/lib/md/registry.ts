@@ -41,7 +41,7 @@ function renderHome(): string {
     '',
     `## Components (${ENTRIES.length} total, ${FREE_COUNT} free)`,
     '',
-    `${NAME} ships ${ENTRIES.length} React components for AI products: chat interfaces, agent scaffolds, streaming answers, data tables, charts, and inputs. ${FREE_COUNT} are free under MIT. The rest are Pro.`,
+    `${NAME} ships ${ENTRIES.length} premium React components: agents, data, inputs and marketing. ${FREE_COUNT} are free under MIT. The rest are Pro.`,
     '',
     `Install the free agent kit to get started:`,
     '',
@@ -59,7 +59,7 @@ function renderHome(): string {
     `## Key sections`,
     '',
     itemList([
-      { label: 'Components', href: abs('/components'), desc: `${ENTRIES.length} React components for AI products` },
+      { label: 'Components', href: abs('/components'), desc: `${ENTRIES.length} premium React components` },
       { label: 'Pro', href: abs('/pro'), desc: `${PRO_COMPONENTS.length} Pro components, ${PRO_BLOCK_COUNT} blocks and ${TEMPLATES.length} templates` },
       { label: 'Blocks', href: abs('/blocks'), desc: 'Whole screens built from Detent components' },
       { label: 'Templates', href: abs('/templates'), desc: 'Landing pages and full apps' },
@@ -114,7 +114,7 @@ function renderPro(): string {
 
   return envelope({
     title: `${NAME} Pro`,
-    summary: `${PRO_COMPONENTS.length} React components, ${PRO_BLOCK_COUNT} whole screens and ${TEMPLATES.length} templates for AI products. One payment, every update for life.`,
+    summary: `${PRO_COMPONENTS.length} React components, ${PRO_BLOCK_COUNT} whole screens and ${TEMPLATES.length} templates. One payment, every update for life.`,
     path: '/pro',
     body,
     related: [
@@ -143,7 +143,7 @@ function renderComponents(): string {
 
   return envelope({
     title: `${NAME} component library`,
-    summary: `${ENTRIES.length} React components for AI products: chat, agents, data, inputs and more. ${FREE_COUNT} free under MIT.`,
+    summary: `${ENTRIES.length} premium React components: agents, data, inputs and more. ${FREE_COUNT} free under MIT.`,
     path: '/components',
     body,
     related: [{ label: 'Blocks', href: abs('/blocks') }, { label: 'Templates', href: abs('/templates') }],
@@ -183,7 +183,7 @@ function renderTemplates(): string {
 
   return envelope({
     title: `${NAME} Templates`,
-    summary: `${TEMPLATES.length} landing pages and full-app templates for AI products. Pro licence required.`,
+    summary: `${TEMPLATES.length} landing pages and full-app templates. Pro licence required.`,
     path: '/templates',
     body,
     related: [{ label: 'Pro', href: abs('/pro') }, { label: 'Blocks', href: abs('/blocks') }],
@@ -455,7 +455,7 @@ function renderTemplate(slug: string): string | null {
  * All static pages are registered here.
  */
 const STATIC_ROUTES: Record<string, { render: () => string | null; desc: string; isStatic: boolean }> = {
-  '/':            { render: renderHome,       desc: `${NAME} — the UI kit for AI products`,              isStatic: true },
+  '/':            { render: renderHome,       desc: `${NAME} — premium React components`,              isStatic: true },
   '/pro':         { render: renderPro,        desc: `Pro components, blocks and templates`,              isStatic: true },
   '/components':  { render: renderComponents, desc: `All ${ENTRIES.length} components, by category`,    isStatic: true },
   '/blocks':      { render: renderBlocks,     desc: `All ${BLOCKS.length} whole-screen blocks`,         isStatic: true },
