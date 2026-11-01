@@ -2,7 +2,7 @@ import { TOTAL_DAYS } from '@/catalog/effort'
 import { PLANS } from '@/catalog/pro'
 import { CONTENT_TYPE, OG, pageImage } from '@/site/og'
 
-export const alt = 'Detent Pro: advanced React components, whole screens and templates for AI products.'
+export const alt = 'Detent Pro: premium React components, whole screens and templates.'
 export const size = OG
 export const contentType = CONTENT_TYPE
 

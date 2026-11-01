@@ -13,9 +13,9 @@ import { JsonLd, page, proGraph } from '@/site/seo'
 import { SitePage } from '@/site/sheets'
 
 export const metadata: Metadata = page({
-  title: 'Detent Pro — components, screens and templates for AI apps',
+  title: 'Detent Pro — premium components, screens and templates',
   absolute: true,
-  description: `${PRO_COMPONENTS.length} React components, ${PRO_BLOCKS.length} whole screens and ${TEMPLATES.length} templates for AI products: about ${TOTAL_DAYS} days of work, installed as source you own. One payment, for life.`,
+  description: `${PRO_COMPONENTS.length} React components, ${PRO_BLOCKS.length} whole screens and ${TEMPLATES.length} templates: about ${TOTAL_DAYS} days of work, installed as source you own. One payment, for life.`,
   path: '/pro',
 })
 

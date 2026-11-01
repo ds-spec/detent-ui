@@ -4,7 +4,7 @@ import { DESCRIPTION, NAME } from '@/site/seo'
 /** For a home-screen shortcut and anything else that reads the app's name and colours. */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${NAME} — React components for AI products`,
+    name: `${NAME} — premium React components`,
     short_name: NAME,
     description: DESCRIPTION,
     start_url: '/',

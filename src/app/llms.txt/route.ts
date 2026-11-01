@@ -28,7 +28,7 @@ export function GET() {
     '## Core pages',
     `- [Home](${SITE}/index.md): ${NAME} — ${TAGLINE}`,
     `- [Pro](${SITE}/pro.md): Pro components, whole-screen blocks, and production templates with lifetime updates`,
-    `- [Components](${SITE}/components.md): All ${ENTRIES.length} React components designed for AI products`,
+    `- [Components](${SITE}/components.md): All ${ENTRIES.length} premium React components`,
     `- [Blocks](${SITE}/blocks.md): Production-ready screens built from Detent components`,
     `- [Templates](${SITE}/templates.md): Full landing pages and applications ready to clone`,
     '',

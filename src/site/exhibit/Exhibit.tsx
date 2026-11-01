@@ -48,7 +48,7 @@ const glide = { type: 'spring', stiffness: 360, damping: 40 } as const
 /** Air around a demo on the stage. */
 const STAGE_PAD = 48
 /** Demos that bleed to the stage's edges and hold their own height: nothing scales them, so a phone's stage is as tall as they are. */
-const HOLDS_HEIGHT = new Set(['checklist', 'readalong', 'secret', 'halo', 'slices'])
+const HOLDS_HEIGHT = new Set(['checklist', 'readalong', 'secret', 'halo', 'slices', 'print'])
 
 
 const first = (s: string) => s.split(/(?<=\.)\s/)[0]

@@ -14,7 +14,7 @@ import type { Tone } from '../home/lights'
 
 const PIECES: { id: string; name: string; line: string; tone: Tone; bleed?: boolean; className: string }[] = [
   { id: 'region', name: 'Region wheel', line: 'Flick the drum and the Earth turns with it, in today’s real sunlight.', tone: 'blue', bleed: true, className: 'h-[580px] sm:h-[640px] lg:col-span-12 lg:h-[700px]' },
-  { id: 'reveal', name: 'Image reveal', line: 'An image arrives the way a lens finds focus.', tone: 'rose', className: 'h-[640px] lg:col-span-7 lg:h-[680px]' },
+  { id: 'print', name: 'Print word', line: 'One word, printed in light.', tone: 'rose', bleed: true, className: 'h-[640px] lg:col-span-7 lg:h-[680px]' },
   { id: 'lens', name: 'Lens chart', line: 'Drag across it to ask if a day was really unusual.', tone: 'amber', className: 'h-[520px] lg:col-span-5 lg:h-[680px]' },
 ]
 

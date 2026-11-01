@@ -2,7 +2,7 @@ import { CATEGORIES, ENTRIES, entry } from '@/catalog/meta'
 import { isProComponent } from '@/catalog/pro'
 import { CONTENT_TYPE, OG, pageImage } from '@/site/og'
 
-export const alt = 'A Detent React component for AI products'
+export const alt = 'A premium Detent React component'
 export const size = OG
 export const contentType = CONTENT_TYPE
 

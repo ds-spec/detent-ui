@@ -20,7 +20,7 @@ import { Backdrop, Window } from './Studio'
  * them in its own window, at the size the window gives it. Nothing changes until you scroll or
  * press a name; the scroll has detents, so each name settles on the line. Press it again, or its
  * Open, to go to its page; what's running is named above the window, so the way in is always in
- * view. All but three blocks are Pro. Below 1024px each name carries its block underneath it instead.
+ * view. All but five blocks are Pro. Below 1024px each name carries its block underneath it instead.
  */
 
 const GROUPS = BLOCK_GROUPS

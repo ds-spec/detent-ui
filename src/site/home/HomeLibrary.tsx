@@ -18,12 +18,12 @@ import type { LibItem } from './library'
  * of them.
  */
 
-/** The eight, row by row: each pair is wide then narrow, or narrow then wide. Four free, four Pro. */
+/** The eight, row by row: each pair is wide then narrow, or narrow then wide.  */
 const ROWS: [string, string][] = [
-  ['region', 'approval'],
-  ['images', 'answer'],
-  ['halo', 'upload'],
-  ['trace', 'scaffold'],
+  ['region', 'activity'],
+  ['upload', 'print'],
+  ['halo', 'readalong'],
+  ['lens', 'threads'],
 ]
 
 /**
@@ -56,7 +56,7 @@ export function HomeLibrary({ lib }: { lib: LibItem[] }) {
               <span className="text-quiet">Go on, use one.</span>
             </h2>
             <p className="mt-5 max-w-[480px] text-balance text-[16px] leading-[1.6] text-ink-3">
-              Eight from the library, live on this page: half free under MIT, half from Pro. <span className="text-ink">All {lib.length}</span> are a click away.
+              Eight from the library, live on this page. <span className="text-ink">All {lib.length}</span> are a click away.
             </p>
           </div>
 

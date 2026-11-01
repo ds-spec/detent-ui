@@ -7,7 +7,7 @@ import { LinkShell } from '@/site/shell/Shell'
 
 export const metadata: Metadata = page({
   title: 'Changelog',
-  description: 'Everything that’s shipped in Detent, newest first: new React components, blocks and templates for AI products.',
+  description: 'Everything that’s shipped in Detent, newest first: new React components, blocks and templates.',
   path: '/changelog',
   image: '/opengraph-image',
 })

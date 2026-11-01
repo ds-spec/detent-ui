@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { BLOCKS } from '@/catalog/blocks'
 import { asset } from '@/lib/asset'
 import { entry } from '@/catalog/meta'
-import { PLANS } from '@/catalog/pro'
+import { PLANS, isProComponent } from '@/catalog/pro'
 import { Files } from '@/site/ai/Files'
 import { Live } from '@/site/ai/Live'
 import type { RailGroup } from '@/site/exhibit/Rail'
@@ -19,8 +19,8 @@ export const metadata: Metadata = page({
 
 const [pro] = PLANS
 
-/** The list down the side: this page's sections, then the Pro parts the chat is made of. */
-const PARTS = ['answer', 'trace', 'approval']
+/** The list down the side: this page's sections, then the parts the chat is made of. */
+const PARTS = ['trace', 'activity', 'models']
 const RAIL: RailGroup[] = [
   {
     id: 'guide',
@@ -37,7 +37,7 @@ const RAIL: RailGroup[] = [
     name: 'Built from',
     items: [
       { id: 'agent-chat', name: BLOCKS.find((b) => b.id === 'agent-chat')?.name ?? 'Agent chat', pro: true },
-      ...PARTS.map((id) => ({ id, name: entry(id)?.name ?? id, pro: true })),
+      ...PARTS.map((id) => ({ id, name: entry(id)?.name ?? id, pro: isProComponent(id) })),
     ],
   },
 ]

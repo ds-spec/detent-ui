@@ -64,7 +64,7 @@ export function HomeHero({ lib }: { lib: LibItem[] }) {
               <span className="sr-only">.</span>
             </h1>
             <p className="rise mt-6 max-w-[540px] text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
-              Premium React components, with AI as their strongest suit. <span className="text-ink">{lib.length} components</span> for boards, charts, media, agents and everything around them. Every state worked out, styled by your{'\u00a0'}theme.
+              Premium React components. <span className="text-ink">{lib.length} components</span> for boards, charts, media, agents and everything around them. Every state worked out, styled by your{'\u00a0'}theme.
             </p>
             <div className="rise mt-8 flex items-center gap-2.5" style={{ animationDelay: '200ms' }}>
               <Link href={FIRST_COMPONENT} className="ring-focus group/go flex h-11 items-center whitespace-nowrap gap-1.5 rounded-full bg-ink pl-5 pr-4 text-[14px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.97] max-[359px]:pl-4 max-[359px]:pr-3">

@@ -12,7 +12,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<'/blocks/[slug]'>): Promise<Metadata> {
   const { slug } = await params
   const b = block(slug)
-  return b ? page({ title: `${b.name} — React block for AI products`, description: short(`${b.line} ${isProBlock(b.id) ? 'A Detent Pro block.' : 'Free under MIT.'}`), path: `/blocks/${b.id}` }) : {}
+  return b ? page({ title: `${b.name} — premium React block`, description: short(`${b.line} ${isProBlock(b.id) ? 'A Detent Pro block.' : 'Free under MIT.'}`), path: `/blocks/${b.id}` }) : {}
 }
 
 export default function BlockPage({ params }: PageProps<'/blocks/[slug]'>) {

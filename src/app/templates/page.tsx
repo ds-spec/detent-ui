@@ -6,7 +6,7 @@ import { JsonLd, list, page } from '@/site/seo'
 import { Band, BandHead, card } from '@/site/sheets'
 
 export const metadata: Metadata = page({
-  title: 'Templates — apps for AI products, AI built in',
+  title: 'Templates — whole apps, ready to run',
   description: `${TEMPLATES.length} app templates with the AI built in: an agent workspace, a SaaS dashboard and a CRM, built in React from Detent components and the AI SDK: light and dark, any width, no layout shift.`,
   path: '/templates',
 })

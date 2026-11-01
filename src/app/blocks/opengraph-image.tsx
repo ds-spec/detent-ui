@@ -1,7 +1,7 @@
 import { BLOCKS } from '@/catalog/blocks'
 import { CONTENT_TYPE, OG, pageImage } from '@/site/og'
 
-export const alt = 'Detent blocks: whole screens for AI products, already working.'
+export const alt = 'Detent blocks: whole screens, already working.'
 export const size = OG
 export const contentType = CONTENT_TYPE
 
