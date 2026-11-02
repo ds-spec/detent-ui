@@ -1,18 +1,10 @@
-'use client'
-
-import { useEffect, useState } from 'react'
-import { usePathname } from 'next/navigation'
-
-/** Prototype flag: ?side=new tries the new components page, and it stays on for this tab until ?side=old. */
+/**
+ * The new design is the site's design now: the sidebar, docs-style props, device previews and the
+ * button set. This was the prototype switch (?side=new); it stays as a constant so the older
+ * branches it guarded can be removed one by one.
+ */
 export function useSideNew() {
-  const path = usePathname()
-  const [on, setOn] = useState(false)
-  useEffect(() => {
-    const q = new URLSearchParams(location.search).get('side')
-    if (q) sessionStorage.setItem('side', q)
-    setOn(sessionStorage.getItem('side') === 'new')
-  }, [path])
-  return on
+  return true
 }
 
 /**
