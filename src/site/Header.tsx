@@ -70,11 +70,9 @@ export function Header() {
           aria-hidden
           className={side ? `pointer-events-none absolute left-1/2 top-[20px] -z-10 h-[54px] w-full max-w-[980px] rounded-[16px] will-change-[opacity,transform]` : "pointer-events-none absolute left-1/2 top-[20px] -z-10 h-[54px] w-full max-w-[980px] rounded-full will-change-[opacity,transform]"}
           style={{
-            // The links' own graphite, so gathering the bar keeps the colour it had at rest.
-            background: 'color-mix(in oklch, var(--nav) 94%, transparent)',
-            boxShadow: 'var(--leaf-edge), 0 14px 34px -16px rgb(0 0 0 / 0.24)',
-            backdropFilter: 'blur(14px) saturate(1.2)',
-            WebkitBackdropFilter: 'blur(14px) saturate(1.2)',
+            // The links' own graphite and hairline, solid, so gathering the bar keeps exactly the look it had at rest.
+            background: 'var(--nav)',
+            boxShadow: 'inset 0 0 0 1px var(--line), 0 14px 34px -16px rgb(0 0 0 / 0.24)',
             opacity: stuck ? 1 : 0,
             transform: `translateX(-50%) scale(${stuck ? 1 : 0.985})`,
             transition: `opacity ${MOVE}ms ${UI}, transform ${MOVE}ms ${UI}`,
