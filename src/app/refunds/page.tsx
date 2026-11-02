@@ -48,7 +48,7 @@ export default function Refunds() {
         {
           id: 'upgrades',
           title: 'Upgrades',
-          body: <P>Moving from Pro to Pro + Templates, or to Team, you pay only the difference, and the {REFUND_DAYS} days start again for the upgrade.</P>,
+          body: <P>Moving from Pro to Pro + Templates, you pay only the difference, and the {REFUND_DAYS} days start again for the upgrade.</P>,
         },
       ]}
     />

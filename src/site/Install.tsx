@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'motion/react'
-import { daysFor } from '@/catalog/days'
 import LINES from '@/catalog/lines.json'
 import { installCommand } from '@/catalog/site'
 import { CopyCommand } from './parts'
@@ -13,11 +12,11 @@ const strong = `${link} font-medium text-ink-2`
 
 /**
  * The install command for one thing and, under it, what installing it means. Free things say they
- * bring their files and the theme. Pro things say what they're worth, in real lines and days, and
+ * bring their files and the theme. Pro things say how much is there, in real lines, and
  * name the plan that has them; just after copying, the line says it runs with a key. All of it
  * sits in one fixed height, so a free page and a Pro page sit the same.
  */
-export function Install({ id, free, copied = 0 }: { id: string; free: boolean; /** Goes up when something else on the page has just copied the command, like Copy prompt. */ copied?: number }) {
+export function Install({ id, free, bare = false }: { id: string; free: boolean; /** Just the command, for a page that says the rest elsewhere. */ bare?: boolean }) {
   const template = id.startsWith('template-')
   const [noted, setNoted] = useState(false)
   const timer = useRef(0)
@@ -26,17 +25,11 @@ export function Install({ id, free, copied = 0 }: { id: string; free: boolean; /
     clearTimeout(timer.current)
     timer.current = window.setTimeout(() => setNoted(false), 1600)
   }
-  const said = useRef(copied)
-  useEffect(() => {
-    if (said.current === copied) return
-    said.current = copied
-    note()
-  }, [copied])
   useEffect(() => () => clearTimeout(timer.current), [])
 
   const lines = (LINES as Record<string, number>)[id]
-  const days = daysFor(template ? id.slice('template-'.length) : id)
   const plan = template ? 'Pro + Templates' : 'Pro'
+  if (bare) return <CopyCommand fill command={installCommand(id, free)} onCopy={free ? undefined : note} />
   return (
     <div className="w-full">
       <CopyCommand fill command={installCommand(id, free)} onCopy={free ? undefined : note} />
@@ -61,7 +54,6 @@ export function Install({ id, free, copied = 0 }: { id: string; free: boolean; /
             ) : (
               <>
                 {lines ? <span className={template ? 'max-sm:hidden' : ''}>{lines.toLocaleString('en-US')} lines ·</span> : null}
-                <span className={template ? 'sm:lowercase' : lines ? 'lowercase' : ''}>About {days} days{template ? <span className="max-sm:hidden"> to build</span> : ' to build'}</span> ·
                 <Link href="/pro" className={strong}>
                   {template ? `Comes with ${plan}` : 'Get Pro'}
                 </Link>

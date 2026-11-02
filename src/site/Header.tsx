@@ -4,16 +4,17 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { FIRST_BLOCK, FIRST_COMPONENT } from '@/catalog/site'
+import { AI_SDK, FIRST_BLOCK, FIRST_COMPONENT } from '@/catalog/site'
 import { ArrowRight, Search } from '@/lab/icons'
 import { Mark, ThemeButton } from './parts'
+import { BTN, useSideNew } from './shell/side'
 import { useSite } from './Providers'
 
 const NAV = [
   { href: FIRST_COMPONENT, section: '/components', label: 'Components' },
   { href: FIRST_BLOCK, section: '/blocks', label: 'Blocks' },
   { href: '/templates', section: '/templates', label: 'Templates' },
-  { href: '/ai-sdk', section: '/ai-sdk', label: 'AI SDK' },
+  ...(AI_SDK ? [{ href: '/ai-sdk', section: '/ai-sdk', label: 'AI SDK' }] : []),
   { href: '/pro', section: '/pro', label: 'Pricing' },
 ]
 
@@ -37,6 +38,7 @@ const INSET = `max(0px, (min(1440px, 100vw - 40px) - ${PILL}px) / 2)`
  * top doesn't lay anything out.
  */
 export function Header() {
+  const side = useSideNew()
   const [stuck, setStuck] = useState(false)
   const [menu, setMenu] = useState(false)
   const path = usePathname()
@@ -66,9 +68,10 @@ export function Header() {
         {/* The floating pill: always there, and only ever faded and settled. */}
         <span
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-[20px] -z-10 h-[54px] w-full max-w-[980px] rounded-full will-change-[opacity,transform]"
+          className={side ? `pointer-events-none absolute left-1/2 top-[20px] -z-10 h-[54px] w-full max-w-[980px] rounded-[16px] will-change-[opacity,transform]` : "pointer-events-none absolute left-1/2 top-[20px] -z-10 h-[54px] w-full max-w-[980px] rounded-full will-change-[opacity,transform]"}
           style={{
-            background: 'color-mix(in oklch, var(--leaf) 90%, transparent)',
+            // The links' own graphite, so gathering the bar keeps the colour it had at rest.
+            background: 'color-mix(in oklch, var(--nav) 94%, transparent)',
             boxShadow: 'var(--leaf-edge), 0 14px 34px -16px rgb(0 0 0 / 0.24)',
             backdropFilter: 'blur(14px) saturate(1.2)',
             WebkitBackdropFilter: 'blur(14px) saturate(1.2)',
@@ -77,7 +80,7 @@ export function Header() {
             transition: `opacity ${MOVE}ms ${UI}, transform ${MOVE}ms ${UI}`,
           }}
         />
-        <div className="w-fit" style={step(stuck, `calc(${INSET} - 6px)`)}>
+        <div className="pointer-events-none w-fit [&>*]:pointer-events-auto" style={step(stuck, `calc(${INSET} - 6px)`)}>
           <Link href="/" className="ring-focus -mx-1.5 flex w-fit items-center gap-2.5 rounded-[8px] px-1.5 py-1">
             <Mark />
             <span className="text-[15px] font-medium tracking-[-0.02em] text-ink">Detent</span>
@@ -88,24 +91,25 @@ export function Header() {
           <Links stuck={stuck} path={path} />
         </div>
 
-        <div className="flex items-center justify-end gap-1.5" style={step(stuck, `calc(${INSET} * -1 + 2px)`)}>
+        {/* Only its buttons take the pointer: gathered, this column slides left across the links, and its empty box would otherwise sit on top of them. */}
+        <div className="pointer-events-none flex items-center justify-end gap-1.5 [&>*]:pointer-events-auto" style={step(stuck, `calc(${INSET} * -1 + 2px)`)}>
           <button
             type="button"
             onClick={openSearch}
             data-search
             aria-label="Search components (⌘K)"
             title="Search  ⌘K"
-            className="ring-focus grid size-9 place-items-center rounded-full text-ink-2 transition-[background-color,box-shadow,color,transform] duration-200 hover:text-ink active:scale-[0.97]"
-            style={{ transitionTimingFunction: UI, background: stuck ? 'transparent' : 'color-mix(in oklch, var(--leaf) 75%, transparent)', boxShadow: stuck ? 'none' : 'inset 0 0 0 1px var(--line)' }}
+            className={side ? `ring-focus grid size-8 place-items-center rounded-[8px] text-ink-3 transition-colors duration-150 hover:bg-[var(--shell-hover)] hover:text-ink active:scale-[0.97]` : "ring-focus grid size-9 place-items-center rounded-full text-ink-2 transition-[background-color,box-shadow,color,transform] duration-200 hover:text-ink active:scale-[0.97]"}
+            style={side ? { transitionTimingFunction: UI } : { transitionTimingFunction: UI, background: stuck ? 'transparent' : 'var(--nav)', boxShadow: stuck ? 'none' : 'inset 0 0 0 1px var(--line)' }}
           >
             <Search size={15} />
           </button>
           <ThemeButton />
-          <Link href={FIRST_COMPONENT} className="ring-focus group/go hidden h-9 items-center gap-1.5 rounded-full bg-ink pl-4 pr-3.5 text-[13px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97] sm:flex">
+          <Link href={FIRST_COMPONENT} className={side ? `ring-focus group/go hidden h-9 items-center gap-1.5 rounded-[9px] ${BTN.accent} pl-4 pr-3.5 text-[13px] font-medium transition-[opacity,transform] duration-150 active:scale-[0.97] sm:flex` : "ring-focus group/go hidden h-9 items-center gap-1.5 rounded-full bg-ink pl-4 pr-3.5 text-[13px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97] sm:flex"}>
             Get started
             <ArrowRight size={13} className="transition-transform duration-150 group-hover/go:translate-x-0.5" />
           </Link>
-          <button type="button" aria-label={menu ? 'Close menu' : 'Menu'} aria-expanded={menu} onClick={() => setMenu((m) => !m)} className="ring-focus grid size-9 place-items-center rounded-full text-ink-2 transition-transform duration-150 hover:bg-[var(--line)] active:scale-[0.97] lg:hidden">
+          <button type="button" aria-label={menu ? 'Close menu' : 'Menu'} aria-expanded={menu} onClick={() => setMenu((m) => !m)} className={side ? `ring-focus grid size-9 place-items-center rounded-[9px] text-ink-2 transition-transform duration-150 hover:bg-[var(--line)] active:scale-[0.97] lg:hidden` : "ring-focus grid size-9 place-items-center rounded-full text-ink-2 transition-transform duration-150 hover:bg-[var(--line)] active:scale-[0.97] lg:hidden"}>
             <span aria-hidden className="relative block h-3 w-4">
               <motion.span className="absolute left-0 top-0 h-[1.5px] w-4 rounded-full bg-current" initial={false} animate={menu ? { y: 5.25, rotate: 45 } : { y: 0, rotate: 0 }} transition={{ type: 'spring', stiffness: 520, damping: 34 }} />
               <motion.span className="absolute bottom-0 left-0 h-[1.5px] w-4 rounded-full bg-current" initial={false} animate={menu ? { y: -5.25, rotate: -45 } : { y: 0, rotate: 0 }} transition={{ type: 'spring', stiffness: 520, damping: 34 }} />
@@ -123,6 +127,7 @@ const step = (stuck: boolean, x: string) => ({ transform: stuck ? `translate(${x
 
 /** The links in a small pill of their own, with a plate that rests under the current page and slides to the one you point at. */
 function Links({ stuck, path }: { stuck: boolean; path: string }) {
+  const side = useSideNew()
   const box = useRef<HTMLElement>(null)
   const links = useRef<(HTMLAnchorElement | null)[]>([])
   const [hot, setHot] = useState<number | null>(null)
@@ -142,14 +147,14 @@ function Links({ stuck, path }: { stuck: boolean; path: string }) {
     <nav
       ref={box}
       aria-label="Main"
-      className="relative hidden h-10 items-center rounded-full p-1 transition-[background-color,box-shadow] duration-200 lg:flex"
-      style={{ transitionTimingFunction: UI, background: stuck ? 'transparent' : 'color-mix(in oklch, var(--leaf) 55%, transparent)', boxShadow: stuck ? 'none' : 'inset 0 0 0 1px var(--line)' }}
+      className={side ? `relative hidden h-10 items-center rounded-[12px] p-1 transition-[background-color,box-shadow] duration-200 lg:flex` : "relative hidden h-10 items-center rounded-full p-1 transition-[background-color,box-shadow] duration-200 lg:flex"}
+      style={{ transitionTimingFunction: UI, background: stuck ? 'transparent' : 'var(--nav)', boxShadow: stuck ? 'none' : 'inset 0 0 0 1px var(--line)' }}
       onPointerLeave={() => setHot(null)}
     >
       <motion.span
         aria-hidden
-        className="pointer-events-none absolute left-0 top-1 h-8 rounded-full"
-        style={{ background: stuck ? 'var(--line)' : 'var(--surface)', boxShadow: stuck ? 'none' : 'var(--elev-raised)' }}
+        className={side ? `pointer-events-none absolute left-0 top-1 h-8 rounded-[9px]` : "pointer-events-none absolute left-0 top-1 h-8 rounded-full"}
+        style={{ background: 'var(--surface)', boxShadow: 'var(--elev-raised)' }}
         initial={false}
         animate={spot ? { x: spot.x, width: spot.w, opacity: 1 } : { opacity: 0 }}
         transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 520, damping: 40, opacity: { duration: 0.15 } }}
@@ -165,7 +170,7 @@ function Links({ stuck, path }: { stuck: boolean; path: string }) {
           onPointerEnter={() => setHot(i)}
           onFocus={() => setHot(i)}
           onBlur={() => setHot(null)}
-          className={`ring-focus relative flex h-8 items-center whitespace-nowrap rounded-full px-3.5 text-[13.5px] transition-[color,transform] duration-200 active:scale-[0.97] ${at === i ? 'text-ink' : 'text-ink-2'}`}
+          className={side ? `ring-focus relative flex h-8 items-center whitespace-nowrap rounded-[9px] px-3.5 text-[13.5px] transition-[color,transform] duration-200 active:scale-[0.97] ${at === i ? 'text-ink' : 'text-ink-2'}` : `ring-focus relative flex h-8 items-center whitespace-nowrap rounded-full px-3.5 text-[13.5px] transition-[color,transform] duration-200 active:scale-[0.97] ${at === i ? 'text-ink' : 'text-ink-2'}`}
         >
           {n.label}
         </Link>
@@ -176,6 +181,7 @@ function Links({ stuck, path }: { stuck: boolean; path: string }) {
 
 /** Below a laptop: the links drop as a sheet from under the bar. */
 function Menu({ path, onClose }: { path: string; onClose: () => void }) {
+  const side = useSideNew()
   const reduce = useReducedMotion()
   // These links never get pointed at or scrolled past first, so they're fetched as soon as they show.
   const router = useRouter()
@@ -195,7 +201,7 @@ function Menu({ path, onClose }: { path: string; onClose: () => void }) {
           {n.label}
         </Link>
       ))}
-      <Link href={FIRST_COMPONENT} onClick={onClose} className="ring-focus mt-1 flex h-11 items-center justify-center gap-1.5 rounded-full bg-ink text-[14px] font-medium text-surface transition-transform duration-150 active:scale-[0.97] sm:hidden">
+      <Link href={FIRST_COMPONENT} onClick={onClose} className={side ? `ring-focus mt-1 flex h-11 items-center justify-center gap-1.5 rounded-[11px] ${BTN.accent} text-[14px] font-medium transition-transform duration-150 active:scale-[0.97] sm:hidden` : "ring-focus mt-1 flex h-11 items-center justify-center gap-1.5 rounded-full bg-ink text-[14px] font-medium text-surface transition-transform duration-150 active:scale-[0.97] sm:hidden"}>
         Get started
         <ArrowRight size={13} />
       </Link>

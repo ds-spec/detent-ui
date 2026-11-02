@@ -4,19 +4,19 @@ import type { Plan } from '@/catalog/pro'
 import { REFUND_DAYS } from '@/catalog/trust'
 
 /**
- * The plans, side by side: Pro and Team are plain cards; Pro + Templates, the one with everything,
- * is the same card inverted. Each says who it's for, its one price, the way in, and what's in it.
+ * The plans, side by side: Pro is a plain card; Pro + Templates, the one with everything, is the
+ * same card inverted. Each says who it's for, its one price, the way in, and what's in it.
  * Underneath, the promises every plan shares, said once.
  */
 export function Plans({ compact = false }: { compact?: boolean }) {
   return (
     <div>
-      <div className="mx-auto grid max-w-[1180px] gap-3 md:grid-cols-3">
+      <div className="mx-auto grid max-w-[860px] gap-3 md:grid-cols-2">
         {PLANS.map((p) => (
           <PlanCard key={p.id} plan={p} compact={compact} />
         ))}
       </div>
-      <ul className="mx-auto mt-3 grid max-w-[1180px] gap-x-6 gap-y-3 rounded-[22px] px-6 py-5 text-[13.5px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)] sm:grid-cols-2 lg:grid-cols-4">
+      <ul className="mx-auto mt-3 grid max-w-[860px] gap-x-6 gap-y-3 rounded-[22px] px-6 py-5 text-[13.5px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)] sm:grid-cols-2 lg:grid-cols-4">
         {(
           [
             [<Check key="c" size={14} />, 'One payment, never a subscription'],

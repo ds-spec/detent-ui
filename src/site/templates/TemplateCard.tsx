@@ -13,7 +13,7 @@ import { useNear } from '../near'
 import type { Tone } from '../home/lights'
 
 /** Each template stands on its own light. */
-const TONE: Record<string, Tone> = { detent: 'blue', tandem: 'violet', rapport: 'amber' }
+const TONE: Record<string, Tone> = { detent: 'blue' }
 
 /**
  * A template on the gallery, running live in a browser window. A whole site doesn't fit in a
@@ -70,7 +70,6 @@ export function TemplateCard({ t }: { t: Template }) {
             {app ? 'App' : 'Landing page'} · {t.kind}
           </p>
           <h2 className="mt-1.5 text-[24px] leading-7 tracking-[-0.025em] text-ink">{t.name}</h2>
-          <p className="mt-1 line-clamp-2 max-w-[680px] text-callout text-ink-3">{t.line}</p>
           <p className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-footnote text-ink-3">
             <span>
               {t.parts.length} {app ? 'parts' : 'sections'}

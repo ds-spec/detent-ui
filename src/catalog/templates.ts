@@ -116,79 +116,21 @@ const ALL: Template[] = [
       'Its sessions, turns, sources and models are plain data, ready to be swapped for your own and for what your model streams back.',
     ],
   },
-  {
-    id: 'tandem',
-    form: 'app',
-    name: 'Tandem',
-    kind: 'SaaS dashboard, AI built in',
-    suits: 'a subscription business, with the AI built in',
-    window: 'tandem.app',
-    line: 'The dashboard for a subscription business, with the AI built in: one ruler runs every number through the month, Ask Tandem answers from the data on the AI SDK, agents work in the background and ask before they move money.',
-    parts: [
-      { anchor: 'overview', name: 'Overview', line: 'Drag the ruler and the whole page shows that day; events catch it with a click. Ask about the day you’re on and the answer is about that day; an event in it moves the ruler there.', uses: ['Timeline ruler', 'Dot month', 'Ask Tandem'] },
-      { anchor: 'revenue', name: 'Revenue', line: 'Five numbers with a year in ticks, the month’s movement as a waterfall with its driver lit, revenue by plan, and retention as a field of dots.', uses: ['Waterfall', 'Cohort dots'] },
-      { anchor: 'customers', name: 'Customers', line: 'Found as you type, filtered by plan and state, sorted by what matters; seats as a ruler, health as five dots.', uses: ['Data table', 'Tick bars'] },
-      { anchor: 'customer', name: 'A customer', line: 'Their numbers, twelve weeks of use in dots, what happened and who’s who, and Tandem’s read on what to do next.', uses: ['Activity timeline'] },
-      { anchor: 'invoices', name: 'Invoices', line: 'Failed payments first, with a retry that settles the row as paid and rolls the totals.', uses: ['Retry', 'Rolling numbers'] },
-      { anchor: 'assistant', name: 'Ask Tandem', line: 'On the AI SDK: it reads the dashboard’s data through tools, streams its answer, draws what it found under it, and charges a card only with your yes.', uses: ['Approval tray', 'AI SDK adapter'] },
-      { anchor: 'agents', name: 'Agents', line: 'Dunning, churn watch and a Monday report, working in the background: each run as a live waterfall, every request for a yes in one tray, counted in the sidebar from any page.', uses: ['Run waterfall', 'Approval tray', 'Streaming answer'] },
-      { anchor: 'settings', name: 'Settings', line: 'One page you scroll: the workspace, the team, the AI’s spend against a monthly limit, its model, and what agents may do without asking, which the route obeys.', uses: ['Usage limit', 'Model & effort'] },
-      { anchor: 'signin', name: 'Sign in', line: 'Google, GitHub or a link by email, beside the product’s own ink hills.', uses: ['Ink landscape'] },
-    ],
-    details: [
-      'One accent, blue, for where you are and the one thing that matters on each chart. Everything else is ink and grey, in light and in true black.',
-      'Data is drawn, not plotted: months in dots, goals and seats as rulers of ticks, forecasts hatched, one bar lit with its value called out.',
-      'Every number is “as of” a day you choose on the ruler, so you can stand on the day something shipped and see what followed.',
-      'Ask Tandem is a real AI SDK route with tools over the dashboard’s data. It ships with a scripted model so it runs without a key; swap in yours and the same tools answer for real.',
-      'It can act, not just answer: retrying a failed payment waits for a yes, and once it’s charged the invoice is paid on the Invoices page too.',
-      'Nothing jumps: rows are placed, answers hold their space before their words land, and every panel morphs rather than pops.',
-    ],
-  },
-  {
-    id: 'rapport',
-    form: 'app',
-    name: 'Rapport',
-    kind: 'CRM, AI built in',
-    suits: 'a sales team, with the AI doing the busywork',
-    window: 'rapport.app',
-    line: 'A whole CRM where the AI does the busywork: it opens on what needs you, drafts the replies in your inbox, keeps the tasks, carries deals across a board under the quota, reports on the quarter, and asks before it changes anything.',
-    parts: [
-      { anchor: 'today', name: 'Today', line: 'Rapport’s morning brief: a call turned into the fields it changes, each with the words that say so; a quiet deal with the follow-up drafted; a request with the files ready. Beside it, what’s due today and the week’s meetings.', uses: ['Streaming answer', 'Approval tray'] },
-      { anchor: 'inbox', name: 'Inbox', line: 'The team’s email, every thread beside its deal. Where one needs a reply, Rapport has drafted it from the deal and what was said; edit it or send it as it is, and the deal warms up everywhere.', uses: ['Drafted reply', 'Undo toast'] },
-      { anchor: 'tasks', name: 'Tasks', line: 'Yours or everyone’s, late first, then today, then coming up. Add one to any deal for today, tomorrow or next week; tick it off and undo it from the toast.', uses: ['Undo toast'] },
-      { anchor: 'board', name: 'Pipeline', line: 'A column per stage under the quota as a ruler of ticks; pick a deal up and carry it, or press Space and use the keys. The same deals as a list, sorted and filtered, with the stage changed in place.', uses: ['Tick ruler', 'Drag and drop', 'Data table'] },
-      { anchor: 'quarter', name: 'The quarter', line: 'Every open deal as a dot on the quarter, sized by its value; slide one along and its close date, the likely line and the gap re-step as you go.', uses: ['Timeline ruler', 'Tip'] },
-      { anchor: 'deal', name: 'A deal', line: 'Where it stands in Rapport’s words. Change the value, close date, owner or next step where they sit, log a note or a call, add tasks, and press the stage ruler to move it.', uses: ['Activity timeline', 'Inline rename'] },
-      { anchor: 'companies', name: 'Companies', line: 'Customers and prospects, found as you type. Each account opens on what it pays, what’s open, every deal it’s had and everything that happened.', uses: ['Data table', 'Activity timeline'] },
-      { anchor: 'people', name: 'People', line: 'Everyone on the other side of a deal, with who decides and who needs convincing. Each opens on every word between you, and a button that has Rapport write to them.', uses: ['Data table'] },
-      { anchor: 'reports', name: 'Reports', line: 'The quarter as a manager reads it: closed against the pace the quota needs, the team against their numbers, stage to stage, days in each, and why deals were lost.', uses: ['Tick bars', 'Tip'] },
-      { anchor: 'settings', name: 'Settings', line: 'How likely each stage is to close, with the forecast moving as you set it; the team’s quotas; what Rapport may do without asking; and the tools it reads from.', uses: ['Settings', 'Rolling numbers'] },
-      { anchor: 'search', name: 'Search', line: '⌘K from anywhere: deals, companies, people and pages as you type, or hand the question to Rapport.', uses: ['Search'] },
-      { anchor: 'ask', name: 'Ask Rapport', line: 'On the AI SDK, with tools over the CRM: it reads the pipeline, adds tasks, and moves a deal or emails a customer only with your yes, unless Settings say it needn’t ask.', uses: ['Streaming answer', 'Approval tray', 'AI SDK adapter'] },
-    ],
-    details: [
-      'The same story as Tandem, from the sales side: Tandem’s growing customers are Rapport’s October wins.',
-      'Every change is an edit, by you or by Rapport with a yes, so the board, the quarter, the deal and the forecast always agree, and anything can be undone.',
-      'The quota is one ruler of ticks everywhere it appears: closed in ink, negotiation in the accent, proposal in a wash of it.',
-      'Ask Rapport is a real AI SDK route whose every request carries the session’s edits and Settings, so it answers from the deals as they stand and asks only where you’ve said it should. It ships with a scripted model; swap in yours.',
-      'Records open on top of each other, a deal to its company to a person, and Back walks you out the way you came.',
-      'Warmth is five dots that go out one by one as a deal goes quiet, the same mark on every card, row and deal page.',
-    ],
-  },
 ]
 
 /**
- * Set aside for now: the two landing-page templates. Their code stays (Tandem's sign-in paints
- * with Kiln's landscape); they're just not listed, so the templates on offer are all apps.
+ * Set aside for now: the two landing-page templates. Their code stays; they're just not listed.
  */
 export const PARKED = ['lumen', 'kiln']
 
 /** The templates on offer. */
 export const TEMPLATES: Template[] = ALL.filter((t) => !PARKED.includes(t.id))
+/** How many, said in words: "1 template", or "3 templates". */
+export const TEMPLATE_COUNT = `${TEMPLATES.length} template${TEMPLATES.length === 1 ? '' : 's'}`
 
 /** Templates on the way, named on the gallery. */
 export const SOON: { name: string; kind: string; line: string }[] = [
-  { name: 'Voice assistant', kind: 'Voice AI', line: 'For a voice-first product: a living orb, captions that hold their place, and a call you can try.' },
+  { name: 'Voice assistant', kind: 'Voice', line: 'For a voice-first product: captions that hold their place, and a call you can try.' },
 ]
 
 export const template = (id: string) => TEMPLATES.find((t) => t.id === id)

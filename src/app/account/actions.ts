@@ -3,12 +3,11 @@
 import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { addSeat, createKey, MAX_KEYS, removeKey, removeSeat } from '@/lib/account/keys'
+import { createKey, MAX_KEYS, removeKey } from '@/lib/account/keys'
 import { currentEmail, endSession, linkEmail, normalEmail, sendLink, spendLink } from '@/lib/account/session'
 
 export type LinkState = { sent?: string; error?: string; email?: string }
 export type KeyState = { secret?: string; error?: string }
-export type SeatState = { error?: string }
 
 export async function askForLink(_: LinkState, form: FormData): Promise<LinkState> {
   const email = normalEmail(form.get('email'))
@@ -44,22 +43,6 @@ export async function deleteKey(form: FormData) {
   const email = await currentEmail()
   if (!email) redirect('/account')
   await removeKey(email, String(form.get('id')))
-  revalidatePath('/account')
-}
-
-export async function inviteSeat(_: SeatState, form: FormData): Promise<SeatState> {
-  const email = await currentEmail()
-  if (!email) redirect('/account')
-  const error = await addSeat(email, form.get('email'))
-  if (error) return { error }
-  revalidatePath('/account')
-  return {}
-}
-
-export async function dropSeat(form: FormData) {
-  const email = await currentEmail()
-  if (!email) redirect('/account')
-  await removeSeat(email, String(form.get('email')))
   revalidatePath('/account')
 }
 

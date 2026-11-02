@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { block } from '@/catalog/blocks'
-import { TOTAL_DAYS } from '@/catalog/effort'
 import { PRO_BLOCK_COUNT, PRO_COMPONENTS } from '@/catalog/pro'
 import { Live } from '@/site/ai/Live'
+import { AI_SDK } from '@/catalog/site'
 import { Footer } from '@/site/Footer'
 import { Header } from '@/site/Header'
 import { HomeHero } from '@/site/home/HomeHero'
@@ -17,7 +17,7 @@ import { DESCRIPTION, JsonLd, NAME, page, siteGraph } from '@/site/seo'
 /** The Pro screen that runs above the plans. */
 const SHOWN = block('support-inbox')!
 
-export const metadata: Metadata = page({ title: `${NAME} — premium React components, AI included`, absolute: true, description: DESCRIPTION, path: '/' })
+export const metadata: Metadata = page({ title: `${NAME} — premium React components`, absolute: true, description: DESCRIPTION, path: '/' })
 
 /*
  * The home page: sheets laid on a soft ground. The first holds the sentence and the four lights,
@@ -35,6 +35,8 @@ export default function Home() {
         <div style={{ height: BRIDGE }} />
         <HomeLibrary lib={lib} />
 
+        {AI_SDK && (
+          <>
         {/* The proof: a real AI SDK conversation, drawn by Detent, and three plain facts. */}
         <section id="ai-sdk" aria-labelledby="ai-sdk-title" className="mt-3 scroll-mt-20 px-2.5 sm:px-5">
           <div className="rounded-[26px] sm:rounded-[36px]" style={{ background: 'var(--leaf)', boxShadow: 'var(--leaf-edge)' }}>
@@ -55,7 +57,7 @@ export default function Home() {
                   [
                     ['One hook, the whole chat', 'useDetentChat turns what useChat returns into the streaming answer, the run waterfall and the approval card, each timed as its parts arrive.', '/ai-sdk', 'See how it fits'],
                     ['Your theme, not ours', 'Install with the shadcn CLI and Detent reads your tokens. Your primary becomes its accent, and .dark makes it dark. No second design system.', '/system', 'See the tokens'],
-                    ['Or start from a whole app', 'Tandem and Rapport answer from their own data, run agents in the background, and ask before they act. Rename one and ship.', '/templates', 'See the templates'],
+                    ['Or start from a whole app', 'The Detent workspace is a whole chat app: sessions, automations and agents that ask before they act. Rename it and ship.', '/templates', 'See the template'],
                   ] as const
                 ).map(([t, d, href, go]) => (
                   <li key={t}>
@@ -75,6 +77,8 @@ export default function Home() {
             </div>
           </div>
         </section>
+          </>
+        )}
 
         {/* Pro, at the end of the tour: what it adds and what it costs, in one place. */}
         <section id="pro" className="mt-3 scroll-mt-20 px-2.5 sm:px-5">
@@ -87,11 +91,11 @@ export default function Home() {
                   <span className="text-quiet">already built.</span>
                 </h2>
                 <p className="mt-5 max-w-[520px] text-[16px] leading-[1.6] text-ink-3">
-                  {PRO_COMPONENTS.length} advanced components, {PRO_BLOCK_COUNT} full screens and apps with the AI built in, from run waterfalls to evals to a whole CRM. About {TOTAL_DAYS} days of work, yours as source for one payment.
+                  {PRO_COMPONENTS.length} components and {PRO_BLOCK_COUNT} full screens you’d otherwise build yourself. Pay once, and the code is yours.
                 </p>
               </div>
               <div className="mt-12 sm:mt-16">
-                <Running id={SHOWN.id} name={SHOWN.name} line={SHOWN.short} title={SHOWN.window} count={PRO_BLOCK_COUNT} />
+                <Running id={SHOWN.id} name={SHOWN.name} title={SHOWN.window} count={PRO_BLOCK_COUNT} />
               </div>
               <div className="mt-3">
                 <Plans compact />

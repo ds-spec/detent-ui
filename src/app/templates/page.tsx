@@ -7,7 +7,7 @@ import { Band, BandHead, card } from '@/site/sheets'
 
 export const metadata: Metadata = page({
   title: 'Templates — whole apps, ready to run',
-  description: `${TEMPLATES.length} app templates with the AI built in: an agent workspace, a SaaS dashboard and a CRM, built in React from Detent components and the AI SDK: light and dark, any width, no layout shift.`,
+  description: 'A whole app to start from, built in React from Detent components. More templates are on the way.',
   path: '/templates',
 })
 
@@ -20,7 +20,7 @@ export default function TemplatesPage() {
           tag={<ProTag />}
           title="Skip the blank repo."
           quiet="Start from an app that works."
-          line="Complete apps with the AI wired in: chat, agents, approvals, reports. Every screen live, in light and dark, at any width. Rename it, point it at your model, ship it."
+          line="A complete app with the AI wired in: chat, agents, approvals. Every screen live, in light and dark, at any width. Rename it, point it at your model, ship it."
         />
         <JsonLd
           data={list(
@@ -37,7 +37,7 @@ export default function TemplatesPage() {
 
       {SOON.length > 0 && (
         <Band tone="quiet" label="In the works">
-          <BandHead title="In the works." quiet="One for every kind of AI product." />
+          <BandHead title="In the works." quiet="More apps to start from." />
           <ul className="mt-12 grid gap-3 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
             {SOON.map((s) => (
               <li key={s.name} className={card}>

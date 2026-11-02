@@ -10,7 +10,7 @@
 
 import { ENTRIES, entry } from '@/catalog/meta'
 import { BLOCKS } from '@/catalog/blocks'
-import { TEMPLATES } from '@/catalog/templates'
+import { TEMPLATES, TEMPLATE_COUNT } from '@/catalog/templates'
 import { RELEASES, CONTACT } from '@/catalog/trust'
 import { FREE_BLOCKS, PLANS, PRO_COMPONENTS, PRO_BLOCK_COUNT, SITE } from '@/catalog/pro'
 import { NAME, DESCRIPTION, TAGLINE, FREE_COUNT } from '@/site/seo'
@@ -60,10 +60,9 @@ function renderHome(): string {
     '',
     itemList([
       { label: 'Components', href: abs('/components'), desc: `${ENTRIES.length} premium React components` },
-      { label: 'Pro', href: abs('/pro'), desc: `${PRO_COMPONENTS.length} Pro components, ${PRO_BLOCK_COUNT} blocks and ${TEMPLATES.length} templates` },
+      { label: 'Pro', href: abs('/pro'), desc: `${PRO_COMPONENTS.length} Pro components, ${PRO_BLOCK_COUNT} blocks and ${TEMPLATE_COUNT}` },
       { label: 'Blocks', href: abs('/blocks'), desc: 'Whole screens built from Detent components' },
       { label: 'Templates', href: abs('/templates'), desc: 'Landing pages and full apps' },
-      { label: 'AI SDK guide', href: abs('/ai-sdk'), desc: 'How Detent integrates with the Vercel AI SDK' },
       { label: 'Changelog', href: abs('/changelog'), desc: 'Every update, newest first' },
     ]),
   ].join('\n')
@@ -85,7 +84,7 @@ function renderPro(): string {
   const body = [
     `## What's in Pro`,
     '',
-    `Pro gives you ${PRO_COMPONENTS.length} advanced React components, ${PRO_BLOCK_COUNT} whole-screen blocks, and ${TEMPLATES.length} templates. One payment, every update for life, unlimited projects.`,
+    `Pro gives you ${PRO_COMPONENTS.length} advanced React components, ${PRO_BLOCK_COUNT} whole-screen blocks, and ${TEMPLATE_COUNT}. One payment, every update for life, unlimited projects.`,
     '',
     `## Plans`,
     '',
@@ -98,7 +97,6 @@ function renderPro(): string {
     '',
     `**Is it a subscription?** No. You pay once and keep everything, including every update that ships after you buy.`,
     '',
-    `**Does it work with the AI SDK?** Yes. \`useDetentChat\` wraps \`useChat\` and returns the props for the streaming answer, run waterfall, and approval card.`,
     '',
     `**Will it match my design?** Installed with shadcn, Detent reads your theme: your primary becomes its accent, and \`.dark\` turns it dark.`,
     '',
@@ -114,7 +112,7 @@ function renderPro(): string {
 
   return envelope({
     title: `${NAME} Pro`,
-    summary: `${PRO_COMPONENTS.length} React components, ${PRO_BLOCK_COUNT} whole screens and ${TEMPLATES.length} templates. One payment, every update for life.`,
+    summary: `${PRO_COMPONENTS.length} React components, ${PRO_BLOCK_COUNT} whole screens and ${TEMPLATE_COUNT}. One payment, every update for life.`,
     path: '/pro',
     body,
     related: [
@@ -183,7 +181,7 @@ function renderTemplates(): string {
 
   return envelope({
     title: `${NAME} Templates`,
-    summary: `${TEMPLATES.length} landing pages and full-app templates. Pro licence required.`,
+    summary: `${TEMPLATE_COUNT}, with Pro + Templates.`,
     path: '/templates',
     body,
     related: [{ label: 'Pro', href: abs('/pro') }, { label: 'Blocks', href: abs('/blocks') }],
@@ -459,8 +457,7 @@ const STATIC_ROUTES: Record<string, { render: () => string | null; desc: string;
   '/pro':         { render: renderPro,        desc: `Pro components, blocks and templates`,              isStatic: true },
   '/components':  { render: renderComponents, desc: `All ${ENTRIES.length} components, by category`,    isStatic: true },
   '/blocks':      { render: renderBlocks,     desc: `All ${BLOCKS.length} whole-screen blocks`,         isStatic: true },
-  '/templates':   { render: renderTemplates,  desc: `All ${TEMPLATES.length} templates`,                isStatic: true },
-  '/ai-sdk':      { render: renderAiSdk,      desc: 'How Detent integrates with the Vercel AI SDK',    isStatic: true },
+  '/templates':   { render: renderTemplates,  desc: `Every template`,                isStatic: true },
   '/system':      { render: renderSystem,     desc: 'Design tokens, typography and theme',             isStatic: true },
   '/changelog':   { render: renderChangelog,  desc: 'Every update, newest first',                      isStatic: false },
   '/licence':     { render: renderLicence,    desc: 'Licence terms and key conditions',                isStatic: true },
@@ -511,7 +508,7 @@ export function listMarkdownRoutes(): MarkdownRoute[] {
   const routes: MarkdownRoute[] = []
 
   // Static pages — in content priority order
-  const staticOrder = ['/', '/pro', '/components', '/blocks', '/templates', '/ai-sdk', '/system', '/changelog', '/licence', '/terms', '/refunds']
+  const staticOrder = ['/', '/pro', '/components', '/blocks', '/templates', '/system', '/changelog', '/licence', '/terms', '/refunds']
   for (const path of staticOrder) {
     const r = STATIC_ROUTES[path]
     if (r) routes.push({ path, desc: r.desc, inFull: true, isStatic: r.isStatic })

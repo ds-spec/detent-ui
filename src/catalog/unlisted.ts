@@ -15,6 +15,10 @@
  * Later that day chart, trend, carousel and model & effort came back, redesigned.
  */
 export const UNLISTED = new Set([
+  // 2026-11-02: the owner's cut. Read-along doubled Voice note.
+  'tour', 'readalong', 'dock',
+  // 2026-11-02: hidden while its shader is redone.
+  'dotlight',
   // 2026-10-31, later: the UI audit found these two can't reach the bar.
   'feedback', 'codeblock', 'donut', 'photobar', 'hold', 'kanban', 'answer',
   // 2026-11-01: the owner's cut from the board of 45.

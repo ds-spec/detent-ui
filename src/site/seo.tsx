@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { ENTRIES } from '@/catalog/meta'
 import { PLANS, PRO_COMPONENTS, SITE } from '@/catalog/pro'
 import { BLOCKS } from '@/catalog/blocks'
-import { TEMPLATES } from '@/catalog/templates'
+import { TEMPLATE_COUNT } from '@/catalog/templates'
 
 /**
  * What search engines and link previews read: each page's title, the sentence under it in a
@@ -11,11 +11,11 @@ import { TEMPLATES } from '@/catalog/templates'
  */
 
 export const NAME = 'Detent'
-export const TAGLINE = 'Interfaces that click into place'
+export const TAGLINE = 'Most apps look the same. Yours won’t.'
 export const FREE_COUNT = ENTRIES.length - PRO_COMPONENTS.length
 
 /** What Detent is, in one sentence: the default description, and the one structured data uses. */
-export const DESCRIPTION = `Premium React components, full screens and whole apps: ${ENTRIES.length} components for boards, charts, media, agents and approvals. AI SDK ready, styled by your shadcn theme. ${FREE_COUNT} are free.`
+export const DESCRIPTION = `Well-made React components for your product. Installed with shadcn, styled by your theme, yours to change. ${FREE_COUNT} of ${ENTRIES.length} are free.`
 
 export const url = (path = '/') => `${SITE}${path === '/' ? '' : path}`
 
@@ -84,7 +84,7 @@ export const proGraph = (faq: [string, string][]) => ({
     {
       '@type': 'Product',
       name: `${NAME} Pro`,
-      description: `${PRO_COMPONENTS.length} advanced React components, ${BLOCKS.length} whole screens and ${TEMPLATES.length} templates, installed as source you own.`,
+      description: `${PRO_COMPONENTS.length} advanced React components, ${BLOCKS.length} whole screens and ${TEMPLATE_COUNT}, installed as source you own.`,
       brand: { '@type': 'Brand', name: NAME },
       url: url('/pro'),
       image: url('/pro/opengraph-image'),

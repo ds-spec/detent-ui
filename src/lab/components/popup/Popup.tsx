@@ -1,0 +1,350 @@
+'use client'
+
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import type { KeyboardEvent, PointerEvent } from 'react'
+import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react'
+import { clamp, feedback, lerp, notched } from '../../lib/detent'
+import { Layer, fill, frameOf, inFrame, useDismiss, useHost, useReposition } from '../../lib/layer'
+
+/*
+ * A popup that opens around what you pressed. The pill never goes away: its label stays exactly under
+ * your finger and the menu unfolds above and below it, so the thing you're holding is already the
+ * current choice. Keep holding and slide, let go to choose: one gesture, not two taps.
+ *
+ * The black plate is a second copy of the list clipped to a moving window, so the text turns white at
+ * the plate's edge, part of a letter at a time. Choosing slides the new row up under the finger and
+ * closes around it, so the pill becomes the row you picked with nothing swapped.
+ */
+
+const ROW = 36
+const PAD = 6
+const LEFT = 14
+const RIGHT = 34
+const OPEN = { type: 'spring', bounce: 0, duration: 0.3 } as const
+const SHUT = { type: 'spring', bounce: 0, duration: 0.24 } as const
+const FOLLOW = { type: 'spring', stiffness: 900, damping: 60 } as const
+const LOST = 48
+const NOW = { duration: 0 } as const
+const EDGE = 'drop-shadow(0 0 .5px var(--edge)) drop-shadow(0 1px 1px rgb(0 0 0 / .05))'
+const INK = '[--edge:rgb(0_0_0/.3)] [[data-theme=dark]_&]:[--edge:rgb(255_255_255/.3)]'
+
+const rubber = (d: number) => 18 * (1 - 1 / (1 + d / 60))
+
+function Check() {
+  return (
+    <svg viewBox="0 0 14 14" aria-hidden className="absolute right-3.5 size-3.5 self-center" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2.5 7.5 5.6 10.5 11.5 3.5" />
+    </svg>
+  )
+}
+
+function Updown() {
+  return (
+    <svg viewBox="0 0 10 14" aria-hidden className="h-3.5 w-2.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 5 5 2l3 3M2 9l3 3 3-3" />
+    </svg>
+  )
+}
+
+export type PopupProps = {
+  /** The choices. Made for short lists: everything shows at once, with no scrolling. */
+  options: string[]
+  /** The chosen option, for a controlled popup. */
+  value?: string
+  defaultValue?: string
+  onChange?: (value: string) => void
+  /** What it chooses, for screen readers. */
+  label?: string
+  /** Set to submit the value with a form. */
+  name?: string
+  /** Corner radius of the closed pill, for one sitting inside something round. */
+  radius?: number
+  /** Type for the pill and the menu, for one sitting beside other text. */
+  textClass?: string
+  className?: string
+}
+
+/** A popup you press, slide and let go. It opens around the current choice, so the label never leaves your finger. */
+export function Popup({ options, value: controlled, defaultValue, onChange, label, name, radius = 10, textClass = 'text-[14px] font-medium', className = '' }: PopupProps) {
+  const reduce = !!useReducedMotion()
+  const id = useId()
+  const { contained, frame } = useHost()
+  const [inner, setInner] = useState(() => Math.max(0, options.indexOf(defaultValue ?? '')))
+  const value = controlled === undefined ? inner : Math.max(0, options.indexOf(controlled))
+  const start = value
+  const [shown, setShown] = useState(false)
+  const [active, setActive] = useState(start)
+  const [spot, setSpot] = useState({ x: 0, y: 0 })
+  const [width, setWidth] = useState(0)
+
+  const pill = useRef<HTMLButtonElement>(null)
+  const sheet = useRef<HTMLDivElement>(null)
+  const probes = useRef<(HTMLSpanElement | null)[]>([])
+  const nudge = useRef({ x: 0, y: 0 })
+  const live = useRef({ mode: 'shut' as 'shut' | 'press' | 'tap', y0: 0, u0: 0, left: false, lost: false, active: start, value: start })
+
+  const open = useMotionValue(0)
+  const anchor = useMotionValue(start)
+  const plate = useMotionValue(start * ROW)
+  const pull = useMotionValue(0)
+  const pillW = useMotionValue(0)
+  const on = useMotionValue(1)
+  const height = PAD * 2 + ROW * options.length
+  const widthRef = useRef(0)
+
+  const y = useTransform([open, anchor, pull], ([o, a, p]: number[]) => -(PAD + ROW * a) + nudge.current.y * o + p)
+  const x = useTransform(open, (o) => nudge.current.x * o)
+  const clip = useTransform([open, anchor, pillW], ([o, a, w]: number[]) => {
+    const top = (PAD + ROW * a) * (1 - o)
+    const bottom = (height - PAD - ROW * (a + 1)) * (1 - o)
+    return `inset(${top}px ${(widthRef.current - w) * (1 - o)}px ${bottom}px 0 round ${lerp(radius, 16, o)}px)`
+  })
+  const window_ = useTransform(plate, (p) => `inset(${PAD + p}px ${PAD}px ${height - PAD - ROW - p}px ${PAD}px round 10px)`)
+  const inverted = useTransform([open, on], ([o, v]: number[]) => clamp((o - 0.3) / 0.5, 0, 1) * v)
+  const shadow = useTransform(open, (o) => `${EDGE} drop-shadow(0 18px 28px rgb(0 0 0 / ${0.2 * o}))`)
+  const updownX = useTransform(pillW, (w) => w - 24)
+  const updownY = useTransform(anchor, (a) => PAD + ROW * a)
+  const updownO = useTransform(open, [0, 0.3], [1, 0])
+
+  const widths = () => probes.current.map((p) => (p?.offsetWidth ?? 0) + LEFT + RIGHT)
+
+  useLayoutEffect(() => {
+    const read = () => {
+      const all = widths()
+      pillW.set(all[live.current.value])
+      widthRef.current = Math.max(...all)
+      setWidth(widthRef.current)
+    }
+    read()
+    void document.fonts?.ready.then(read)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [options.join('\n')])
+
+  useEffect(() => {
+    if (live.current.mode !== 'shut' || live.current.value === value) return
+    live.current.value = value
+    anchor.set(value)
+    pillW.set(widths()[value])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
+
+  const measure = () => {
+    const f = frameOf(frame)
+    const box = inFrame(pill.current!.getBoundingClientRect(), f)
+    return { f, box }
+  }
+
+  const mark = (i: number) => {
+    if (live.current.active === i) return
+    live.current.active = i
+    setActive(i)
+  }
+
+  const show = (instant: boolean) => {
+    const s = live.current
+    const { f, box } = measure()
+    const top = box.y - PAD - ROW * s.value
+    nudge.current = {
+      x: Math.min(0, f.width - 8 - (box.x + widthRef.current)),
+      y: top < 12 ? 12 - top : Math.min(0, f.height - 12 - (top + height)),
+    }
+    setSpot({ x: box.x, y: box.y })
+    s.active = s.value
+    setActive(s.value)
+    plate.set(s.value * ROW)
+    on.set(1)
+    if (sheet.current) sheet.current.style.pointerEvents = ''
+    setShown(true)
+    animate(anchor, s.value, instant || reduce ? NOW : OPEN)
+    animate(pull, 0, NOW)
+    animate(open, 1, instant || reduce ? NOW : OPEN)
+  }
+
+  const hide = (instant = false) => {
+    const s = live.current
+    s.mode = 'shut'
+    // A press while it's closing belongs to the pill underneath, which catches it in flight.
+    if (sheet.current) sheet.current.style.pointerEvents = 'none'
+    animate(pull, 0, SHUT)
+    animate(anchor, s.value, instant || reduce ? NOW : SHUT)
+    animate(pillW, widths()[s.value], instant || reduce ? NOW : SHUT)
+    animate(open, 0, instant || reduce ? NOW : SHUT).then(() => {
+      if (live.current.mode === 'shut') setShown(false)
+    })
+  }
+
+  const commit = (i: number) => {
+    const changed = live.current.value !== i
+    live.current.value = i
+    setInner(i)
+    hide()
+    if (changed) onChange?.(options[i])
+  }
+
+  const down = (e: PointerEvent<HTMLButtonElement>) => {
+    if (e.button !== 0) return
+    const s = live.current
+    feedback.wake(true)
+    if (s.mode !== 'shut') return hide()
+    e.currentTarget.setPointerCapture(e.pointerId)
+    s.mode = 'press'
+    s.y0 = e.clientY
+    s.u0 = s.value * ROW
+    s.left = false
+    s.lost = false
+    show(false)
+  }
+
+  const move = (e: PointerEvent<HTMLButtonElement>) => {
+    const s = live.current
+    if (s.mode !== 'press') return
+    const d = e.clientY - s.y0
+    const box = sheet.current?.getBoundingClientRect()
+    s.lost = !!box && (e.clientX < box.left - LOST || e.clientX > box.right + LOST)
+    on.set(s.lost ? 0 : 1)
+    const hi = ROW * (options.length - 1)
+    const u = s.u0 + d
+    pull.set(u < 0 ? -rubber(-u) : u > hi ? rubber(u - hi) : 0)
+    const near = clamp(u, 0, hi)
+    plate.set(notched(near, options.map((_, i) => i * ROW), ROW / 2, 0.9))
+    const i = Math.round(near / ROW)
+    if (i !== s.active) {
+      s.left = true
+      mark(i)
+      feedback.tick()
+    }
+  }
+
+  const up = () => {
+    const s = live.current
+    if (s.mode !== 'press') return
+    // A click of any length stays open. Only sliding to another row turns the press into a choice.
+    if (s.lost) return hide()
+    if (!s.left) {
+      s.mode = 'tap'
+      pull.set(0)
+      animate(plate, s.active * ROW, FOLLOW)
+      return
+    }
+    commit(s.active)
+  }
+
+  const hover = (i: number) => {
+    if (live.current.mode !== 'tap') return
+    mark(i)
+    animate(plate, i * ROW, reduce ? NOW : FOLLOW)
+  }
+
+  const keys = (e: KeyboardEvent) => {
+    const s = live.current
+    if (s.mode === 'shut') {
+      if (!['ArrowUp', 'ArrowDown', 'Enter', ' '].includes(e.key)) return
+      e.preventDefault()
+      s.mode = 'tap'
+      return show(true)
+    }
+    const last = options.length - 1
+    const go = { ArrowUp: s.active - 1, ArrowDown: s.active + 1, Home: 0, End: last }[e.key]
+    if (go !== undefined) {
+      e.preventDefault()
+      const i = clamp(go, 0, last)
+      mark(i)
+      plate.set(i * ROW)
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      commit(s.active)
+    }
+  }
+
+  useDismiss(shown, [pill, sheet], (why) => hide(why === 'escape'))
+  useReposition(shown, () => {
+    const { box } = measure()
+    setSpot({ x: box.x, y: box.y })
+  })
+
+  const rows = (ghost: boolean) =>
+    options.map((o, i) => (
+      <div
+        key={o}
+        id={ghost ? undefined : `${id}-${i}`}
+        role={ghost ? undefined : 'option'}
+        aria-selected={ghost ? undefined : i === value}
+        onPointerMove={ghost ? undefined : () => hover(i)}
+        onClick={ghost ? undefined : () => live.current.mode === 'tap' && commit(i)}
+        className="relative flex items-center whitespace-nowrap"
+        style={{ height: ROW, paddingLeft: LEFT }}
+      >
+        {o}
+        {i === value && <Check />}
+      </div>
+    ))
+
+  return (
+    <div className={`relative inline-block max-w-full align-middle ${INK} ${className}`} style={{ height: ROW }}>
+      {name && <input type="hidden" name={name} value={options[value]} />}
+      <button
+        ref={pill}
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={shown}
+        aria-label={label}
+        aria-activedescendant={shown ? `${id}-${active}` : undefined}
+        onPointerDown={down}
+        onPointerMove={move}
+        onPointerUp={up}
+        onPointerCancel={() => hide()}
+        // A tap's late click would land on the row that just opened under the finger and shut the menu.
+        onTouchEnd={(e) => e.preventDefault()}
+        onKeyDown={keys}
+        onBlur={() => live.current.mode === 'tap' && hide(true)}
+        className={`ring-focus relative flex touch-none select-none items-center whitespace-nowrap bg-surface text-ink before:absolute before:-inset-y-1 before:inset-x-0 ${textClass} ${shown ? 'opacity-0' : ''}`}
+        // Inline, because a site's own button rules often set touch-action and would turn the slide into a scroll.
+        style={{ height: ROW, paddingLeft: LEFT, paddingRight: 10, filter: EDGE, borderRadius: radius, touchAction: 'none' }}
+      >
+        <span style={{ paddingRight: RIGHT - 10 }}>{options[value]}</span>
+        <span className="absolute right-[9px] text-ink-3">
+          <Updown />
+        </span>
+      </button>
+
+      <div aria-hidden className={`pointer-events-none invisible absolute left-0 top-0 ${textClass}`}>
+        {options.map((o, i) => (
+          <span
+            key={o}
+            ref={(el) => {
+              probes.current[i] = el
+            }}
+            className="absolute whitespace-nowrap"
+          >
+            {o}
+          </span>
+        ))}
+      </div>
+
+      {shown && (
+        <Layer>
+          <motion.div className={`pointer-events-none ${fill(contained).split(' ')[0]} z-50 ${INK}`} style={{ left: spot.x, top: spot.y, x, y, filter: shadow, width, height }}>
+            <motion.div
+              ref={sheet}
+              role="listbox"
+              aria-label={label}
+              // Pressing a row must not take focus from the pill, or it closes before the click lands.
+              onPointerDown={(e) => e.preventDefault()}
+              onMouseDown={(e) => e.preventDefault()}
+              className={`pointer-events-auto relative select-none bg-surface text-ink ${textClass}`}
+              style={{ clipPath: clip, width, height, paddingTop: PAD, paddingBottom: PAD }}
+            >
+              {rows(false)}
+              <motion.div aria-hidden className="pointer-events-none absolute inset-0 bg-ink text-surface" style={{ clipPath: window_, opacity: inverted, paddingTop: PAD }}>
+                {rows(true)}
+              </motion.div>
+              <motion.span aria-hidden className="pointer-events-none absolute left-0 top-0 flex items-center text-ink-3" style={{ x: updownX, y: updownY, opacity: updownO, height: ROW }}>
+                <Updown />
+              </motion.span>
+            </motion.div>
+          </motion.div>
+        </Layer>
+      )}
+    </div>
+  )
+}

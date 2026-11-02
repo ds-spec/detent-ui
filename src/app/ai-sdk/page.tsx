@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { BLOCKS } from '@/catalog/blocks'
 import { asset } from '@/lib/asset'
@@ -7,6 +8,7 @@ import { PLANS, isProComponent } from '@/catalog/pro'
 import { Files } from '@/site/ai/Files'
 import { Live } from '@/site/ai/Live'
 import type { RailGroup } from '@/site/exhibit/Rail'
+import { AI_SDK } from '@/catalog/site'
 import { page } from '@/site/seo'
 import { LinkShell } from '@/site/shell/Shell'
 
@@ -20,7 +22,7 @@ export const metadata: Metadata = page({
 const [pro] = PLANS
 
 /** The list down the side: this page's sections, then the parts the chat is made of. */
-const PARTS = ['trace', 'activity', 'models']
+const PARTS = ['trace', 'models']
 const RAIL: RailGroup[] = [
   {
     id: 'guide',
@@ -65,6 +67,7 @@ const MAP: { parts: string[]; becomes: string; line: string }[] = [
  * message becomes, then the code it takes. The demo is the argument; everything under it says how.
  */
 export default async function AiSdk() {
+  if (!AI_SDK) notFound()
   const shown = (await asset<{ name: string; note: string; code: string; html: string }[]>('ai-files.json')) ?? []
 
   return (

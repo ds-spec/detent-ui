@@ -33,7 +33,6 @@ export function GET() {
     `- [Templates](${SITE}/templates.md): Full landing pages and applications ready to clone`,
     '',
     '## Docs & Guides',
-    `- [AI SDK Integration](${SITE}/ai-sdk.md): Integrating Detent components with the Vercel AI SDK`,
     `- [Design System](${SITE}/system.md): Tokens, typography, layout principles, and styling rules`,
     '',
     '## Kits',

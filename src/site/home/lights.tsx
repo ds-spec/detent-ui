@@ -66,7 +66,7 @@ const EMBLEM_VOICE = (
 
 export const CARDS: Card[] = [
   { id: 'prompt', line: 'Grows as you type, stops mid-answer', paint: field('#b9d0ff', '#4d78ff', '#0d22b0', '#7d8cff', 'linear-gradient(165deg, #3f6dff, #1631cc)'), sheen: '#d9e5ff', dot: '#3f6dff', emblem: EMBLEM_PROMPT },
-  { id: 'activity', line: 'Every agent, and what each one is doing', paint: field('#ffe0b0', '#ff9a3c', '#b84300', '#ffb3a0', 'linear-gradient(165deg, #ff9a3a, #d85a08)'), sheen: '#fff0d8', dot: '#f5821f', emblem: EMBLEM_ACTIVITY },
+  { id: 'models', line: 'Choose the model, and how hard it thinks', paint: field('#ffe0b0', '#ff9a3c', '#b84300', '#ffb3a0', 'linear-gradient(165deg, #ff9a3a, #d85a08)'), sheen: '#fff0d8', dot: '#f5821f', emblem: EMBLEM_ACTIVITY },
   { id: 'voicenote', line: 'A voice reply you can read along with', paint: field('#ddd2ff', '#8466ff', '#3519b8', '#c5a8ff', 'linear-gradient(165deg, #7c5cff, #4426d0)'), sheen: '#efe8ff', dot: '#7c5cff', emblem: EMBLEM_VOICE },
   { id: 'metric', line: 'The number, and why it moved', paint: field('#ffd0de', '#f5568c', '#a3164b', '#ffb0c4', 'linear-gradient(165deg, #f4588d, #c02158)'), sheen: '#ffe6ee', dot: '#ec4f86', emblem: EMBLEM_METRIC },
 ]

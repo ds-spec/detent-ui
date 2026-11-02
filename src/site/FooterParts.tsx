@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useId, useRef, useSyncExternalStore } from 'react'
 import type { ReactNode } from 'react'
-import { animate, motion, useMotionValue } from 'motion/react'
+import { motion } from 'motion/react'
 import { Moon, Sun } from '@/lab/icons'
-import { useSite } from './Providers'
+import { BAYER } from './Dither'
 
 type Choice = 'light' | 'dark' | 'system'
 const dark = () => matchMedia('(prefers-color-scheme: dark)').matches
@@ -74,21 +74,17 @@ export function ThemeSwitch() {
 
 /* ───────────────────────────── The wordmark ───────────────────────────── */
 
-const CLICK = { type: 'spring', stiffness: 900, damping: 21, mass: 0.6 } as const
-const RISE = { type: 'spring', stiffness: 260, damping: 22, mass: 0.9 } as const
-const SEAT = { type: 'spring', stiffness: 520, damping: 24, mass: 0.8 } as const
-
 /*
  * The wordmark's layout, measured from Geist at weight 760 and 300 units, tracked -16. The D is
  * the mark itself, scaled to Geist's cap height (213), so the logo and the word are one object;
- * the letters sit as close to it as they sit to each other. Each letter is placed at its measured
- * origin, and the view box stops 38 units above the baseline, so the word sinks off the page.
+ * the letters sit as close to it as they sit to each other. The view stops 38 units above the
+ * baseline, so the word sinks off the page.
  */
 const CAP = 213
 const S = CAP / 18 // the mark's grid unit, so its D is exactly a capital tall
 const BASE = 213
 const VIEW = { w: 931, h: 175 }
-const LETTERS: [string, number][] = [
+const WORD: [string, number][] = [
   ['e', 200.65],
   ['t', 361.23],
   ['e', 477.9],
@@ -96,182 +92,154 @@ const LETTERS: [string, number][] = [
   ['t', 802.01],
 ]
 const WEIGHT = 760
-const MARK_AT = `translate(${-3.75 * S} ${BASE - 21 * S}) scale(${S})`
+/** One printed pixel, in CSS pixels. */
+const CELL = 3
+/** How strongly the name is printed at rest: barely there. */
+const FAINT = 0.09
+/** The light under the pointer, as a share of the word's width. */
+const LENS = 0.09
 
 /**
- * The foot of every page: the name, monumental, sinking off the bottom edge. The first time it
- * comes into view the letters rise into their places one after another and settle with a little
- * give, and last of all the D's half-disc rises into its seat and clicks, landing in the accent
- * before it cools to ink. While it's on screen a soft glint of light crosses the letters now and then.
- * Point at a letter and it lifts and drops back into place, like a key.
+ * The foot of every page: the name, monumental and faint, printed in fine ordered dither and
+ * sinking off the bottom edge, where it thins to single pixels. The first time it's seen it prints
+ * in from the top. Point at it and a soft light follows the hand, bringing the pixels under it up
+ * toward full ink, like a torch over a page.
  */
 export function Wordmark() {
-  const { tick } = useSite()
-  const box = useRef<SVGSVGElement>(null)
-  const id = 'wm' + useId().replace(/[^a-zA-Z0-9]/g, '')
-  const half = useMotionValue(VIEW.h + 20)
-  const rise = useMotionValue(VIEW.h + 20)
-  const [seen, setSeen] = useState(false)
-  const [live, setLive] = useState(false)
-  const [flash, setFlash] = useState(0)
-
+  const wrap = useRef<HTMLDivElement>(null)
+  const canvas = useRef<HTMLCanvasElement>(null)
   useEffect(() => {
-    const el = box.current
-    if (!el) return
-    const io = new IntersectionObserver(
-      ([e]) => {
-        setLive(e.isIntersecting)
-        if (e.isIntersecting) setSeen(true)
-      },
-      { threshold: 0.35 },
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
+    const box = wrap.current
+    const cv = canvas.current
+    const g = cv?.getContext('2d')
+    if (!box || !cv || !g) return
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches
+    let shape: Uint8ClampedArray = new Uint8ClampedArray()
+    let w = 0
+    let h = 0
+    let dpr = 1
+    // The pointer, eased; the lens grows in while the hand is over the word and fades when it leaves.
+    const at = { x: -1, y: -1, tx: -1, ty: -1, r: 0, tr: 0 }
+    let printed = still ? 1 : 0
+    let seen = false
+    let raf = 0
 
-  // The D's slab rises first; last of all its half-disc rises into its seat and clicks.
-  useEffect(() => {
-    if (!seen) return
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      rise.set(0)
-      half.set(0)
-      return
+    // The word, drawn once at this size into a hidden canvas, so each cell can ask whether it's inside a letter.
+    const shapeUp = () => {
+      w = box.clientWidth
+      h = Math.round((w * VIEW.h) / VIEW.w)
+      dpr = Math.min(2, devicePixelRatio || 1)
+      cv.width = Math.round(w * dpr)
+      cv.height = Math.round(h * dpr)
+      cv.style.height = `${h}px`
+      const k = w / VIEW.w
+      const off = document.createElement('canvas')
+      off.width = w
+      off.height = h
+      const o = off.getContext('2d')!
+      o.scale(k, k)
+      o.save()
+      o.translate(-3.75 * S, BASE - 21 * S)
+      o.scale(S, S)
+      o.beginPath()
+      o.roundRect(3.75, 3, 5.5, 18, 1.1)
+      o.fill(new Path2D('M11.25 3a9 9 0 0 1 0 18z'))
+      o.fill()
+      o.restore()
+      const family = getComputedStyle(document.body).getPropertyValue('--font-geist').trim() || 'sans-serif'
+      o.font = `${WEIGHT} 300px ${family}`
+      ;(o as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = '-16px'
+      for (const [c, x] of WORD) o.fillText(c, x, BASE)
+      shape = o.getImageData(0, 0, w, h).data
     }
-    const up = animate(rise, 0, RISE)
-    const t = setTimeout(() => {
-      animate(half, 0, SEAT)
-      setFlash((f) => f + 1)
-    }, 760)
+
+    const draw = () => {
+      raf = 0
+      const ink = getComputedStyle(box).color
+      at.x += (at.tx - at.x) * 0.2
+      at.y += (at.ty - at.y) * 0.2
+      at.r += (at.tr - at.r) * 0.14
+      if (!still && seen && printed < 1) printed = Math.min(1, printed + 0.022)
+      g.setTransform(dpr, 0, 0, dpr, 0, 0)
+      g.clearRect(0, 0, w, h)
+      g.fillStyle = ink
+      const cols = Math.ceil(w / CELL)
+      const rows = Math.ceil(h / CELL)
+      const R = Math.max(1, w * LENS * at.r)
+      for (let y = 0; y < rows; y++) {
+        const cy = y * CELL + CELL / 2
+        // Whole for most of their height, breaking into dither only where the page cuts them off; while printing in, the top comes first.
+        const sink = Math.min(1, 1.6 - (cy / h) * 1.5)
+        const front = printed * 1.4 - cy / h
+        for (let x = 0; x < cols; x++) {
+          const cx = x * CELL + CELL / 2
+          if (shape[(Math.min(h - 1, cy | 0) * w + Math.min(w - 1, cx | 0)) * 4 + 3] < 128) continue
+          let light = front > 0 ? sink : 0
+          let lit = 0
+          if (at.r > 0.01) {
+            const d = Math.hypot(cx - at.x, cy - at.y) / R
+            lit = Math.max(0, 1 - d * d)
+            light = Math.max(light, lit)
+          }
+          if (light <= BAYER[(y % 8) * 8 + (x % 8)]) continue
+          // Faint, the way a name is pressed into paper; under the light it comes up toward full ink.
+          g.globalAlpha = FAINT + lit * 0.62
+          g.fillRect(x * CELL, y * CELL, CELL, CELL)
+        }
+      }
+      const moving = Math.abs(at.tx - at.x) + Math.abs(at.ty - at.y) > 0.5 || Math.abs(at.tr - at.r) > 0.01 || (seen && printed < 1)
+      if (moving) raf = requestAnimationFrame(draw)
+    }
+    const again = () => void (raf ||= requestAnimationFrame(draw))
+
+    const move = (e: PointerEvent) => {
+      const r = cv.getBoundingClientRect()
+      at.tx = e.clientX - r.left
+      at.ty = e.clientY - r.top
+      if (at.r < 0.01) {
+        at.x = at.tx
+        at.y = at.ty
+      }
+      at.tr = 1
+      again()
+    }
+    const leave = () => {
+      at.tr = 0
+      again()
+    }
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !seen) {
+        seen = true
+        again()
+      }
+    }, { threshold: 0.3 })
+    const ro = new ResizeObserver(() => {
+      shapeUp()
+      again()
+    })
+    // A theme change recolours the print.
+    const mo = new MutationObserver(again)
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class'] })
+    void document.fonts.ready.then(() => {
+      shapeUp()
+      again()
+    })
+    io.observe(cv)
+    ro.observe(box)
+    cv.addEventListener('pointermove', move)
+    cv.addEventListener('pointerleave', leave)
     return () => {
-      up.stop()
-      clearTimeout(t)
+      cancelAnimationFrame(raf)
+      io.disconnect()
+      ro.disconnect()
+      mo.disconnect()
+      cv.removeEventListener('pointermove', move)
+      cv.removeEventListener('pointerleave', leave)
     }
-  }, [seen, half, rise])
-
-  const clickD = () => {
-    if (!seen) return
-    animate(half, -16, { duration: 0.12, ease: [0.3, 0, 0.6, 1] }).then(() => {
-      animate(half, 0, CLICK)
-      setTimeout(tick, 60)
-    })
-  }
-
+  }, [])
   return (
-    <svg ref={box} viewBox={`0 0 ${VIEW.w} ${VIEW.h}`} role="img" aria-label="Detent" className={`block h-auto w-full select-none text-ink ${live ? 'glint-on' : ''}`}>
-      <defs>
-        {/* The word sinks: full ink at the top, softer where the page cuts it off. */}
-        <linearGradient id={`${id}f`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2={VIEW.h}>
-          <stop offset="0" stopColor="#fff" />
-          <stop offset="1" stopColor="#fff" stopOpacity="0.45" />
-        </linearGradient>
-        <mask id={`${id}m`} maskUnits="userSpaceOnUse" x="0" y="-400" width={VIEW.w} height={VIEW.h + 800}>
-          <rect x="0" y="-400" width={VIEW.w} height="400" fill="#fff" />
-          <rect x="0" y="0" width={VIEW.w} height={VIEW.h + 400} fill={`url(#${id}f)`} />
-        </mask>
-        <linearGradient id={`${id}g`} x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0" className="glint-stop glint-edge" />
-          <stop offset="0.3" className="glint-stop glint-half" />
-          <stop offset="0.5" className="glint-stop glint-peak" />
-          <stop offset="0.7" className="glint-stop glint-half" />
-          <stop offset="1" className="glint-stop glint-edge" />
-        </linearGradient>
-        <clipPath id={`${id}c`}>
-          <g transform={MARK_AT}>
-            <rect x="3.75" y="3" width="5.5" height="18" rx="1.1" />
-            <path d="M11.25 3a9 9 0 0 1 0 18z" />
-          </g>
-          {LETTERS.map(([c, x], i) => (
-            <text key={i} x={x} y={BASE} fontSize="300" fontWeight={WEIGHT} letterSpacing="-16" style={{ fontFamily: 'var(--font-geist)' }}>
-              {c}
-            </text>
-          ))}
-        </clipPath>
-      </defs>
-
-      <g fill="currentColor" mask={`url(#${id}m)`}>
-        <motion.g style={{ y: rise }}>
-          <rect transform={MARK_AT} x="3.75" y="3" width="5.5" height="18" rx="1.1" />
-        </motion.g>
-        <motion.g style={{ y: half }} onPointerEnter={clickD}>
-          <g key={flash} transform={MARK_AT} className={flash ? 'seat-flash' : undefined}>
-            <path d="M11.25 3a9 9 0 0 1 0 18z" />
-          </g>
-        </motion.g>
-        {LETTERS.map(([c, x], i) => (
-          <Letter key={i} c={c} x={x} seen={seen} delay={0.08 + i * 0.07} onPress={tick} />
-        ))}
-      </g>
-
-      {/* The glint: a soft band of light crossing the word inside its letters. */}
-      <g clipPath={`url(#${id}c)`} pointerEvents="none">
-        <g transform={`rotate(14 ${VIEW.w / 2} ${VIEW.h / 2})`}>
-          <rect className="glint glint-wide" x="-260" y="-200" width="180" height="600" fill={`url(#${id}g)`} />
-        </g>
-      </g>
-    </svg>
-  )
-}
-
-/** One letter of the wordmark: rises into place when first seen, and lifts and drops back under the pointer. */
-function Letter({ c, x, seen, delay, onPress }: { c: string; x: number; seen: boolean; delay: number; onPress: () => void }) {
-  const y = useMotionValue(VIEW.h + 20)
-  useEffect(() => {
-    if (!seen) return
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return void y.set(0)
-    const run = animate(y, 0, { ...RISE, delay })
-    return () => run.stop()
-  }, [seen, delay, y])
-  const lift = () => {
-    if (!seen) return
-    animate(y, -16, { duration: 0.12, ease: [0.3, 0, 0.6, 1] }).then(() => {
-      animate(y, 0, CLICK)
-      setTimeout(onPress, 60)
-    })
-  }
-  return (
-    <motion.text x={x} y={BASE} fontSize="300" fontWeight={WEIGHT} letterSpacing="-16" style={{ y, fontFamily: 'var(--font-geist)' }} onPointerEnter={lift}>
-      {c}
-    </motion.text>
-  )
-}
-
-/* ───────────────────────────── Layout shift, measured ───────────────────────────── */
-
-type Shift = PerformanceEntry & { value: number; hadRecentInput: boolean }
-let shifted = 0
-let watching = false
-const heard = new Set<() => void>()
-const measurable = () => typeof PerformanceObserver !== 'undefined' && !!PerformanceObserver.supportedEntryTypes?.includes('layout-shift')
-const watchShift = (cb: () => void) => {
-  heard.add(cb)
-  if (!watching && measurable()) {
-    watching = true
-    new PerformanceObserver((list) => {
-      for (const e of list.getEntries() as Shift[]) if (!e.hadRecentInput) shifted += e.value
-      heard.forEach((h) => h())
-    }).observe({ type: 'layout-shift', buffered: true })
-  }
-  return () => void heard.delete(cb)
-}
-
-/**
- * The library's promise, checked live: how far this visit's layout has shifted, measured by the
- * browser's own Layout Instability API. Its slot is held from the first paint and it fades in
- * once there's a number, so the readout never shifts anything itself. Browsers that can't
- * measure it leave the slot empty rather than claim a number.
- */
-export function ShiftReadout() {
-  const v = useSyncExternalStore(
-    watchShift,
-    () => (measurable() ? shifted : -1),
-    () => -1,
-  )
-  const shown = v >= 0
-  return (
-    <span className={`flex items-center gap-2 text-ink-3 transition-opacity duration-250 ${shown ? '' : 'opacity-0'}`} title="Measured live in your browser by the Layout Instability API, since you arrived." aria-hidden={!shown}>
-      <span className={`size-1.5 rounded-full ${v < 0.001 ? 'bg-ok' : 'bg-[var(--warn)]'}`} />
-      <span className="tnum font-mono text-[12px] text-ink-2">{Math.max(0, v).toFixed(3)}</span>
-      layout shift this visit
-    </span>
+    <div ref={wrap} className="text-ink">
+      <canvas ref={canvas} role="img" aria-label="Detent" className="block w-full select-none" style={{ aspectRatio: `${VIEW.w} / ${VIEW.h}` }} />
+    </div>
   )
 }

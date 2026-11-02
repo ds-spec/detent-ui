@@ -5,15 +5,16 @@ import type { ComponentType, ReactNode } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { BLOCKS } from '@/catalog/blocks'
-import { PRO_DAYS, TOTAL_DAYS } from '@/catalog/effort'
 import { PLANS, PRO_BLOCK_COUNT, PRO_COMPONENTS } from '@/catalog/pro'
 import type { Plan } from '@/catalog/pro'
-import { TEMPLATES } from '@/catalog/templates'
+import { TEMPLATES, TEMPLATE_COUNT } from '@/catalog/templates'
 import { REFUND_DAYS } from '@/catalog/trust'
 import { ArrowRight, ArrowUpRight, Check, Code, Refresh, Undo } from '@/lab/icons'
 import { RollingText } from '@/lab/ui/RollingText'
 import { BLOCK_VIEWS, TEMPLATE_VIEWS } from '@pro'
 import { Backdrop, Window } from '../blocks/Studio'
+import { BTN, useSideNew } from '../shell/side'
+import { DitherIcon } from '../Dither'
 import { Fit } from '../Fit'
 
 /*
@@ -26,15 +27,13 @@ import { Fit } from '../Fit'
 const UI = [0.2, 0, 0, 1] as const
 
 type Edition = 'pro' | 'all'
-type Seats = 'one' | 'team'
-type Choice = { edition: Edition; seats: Seats; setEdition: (e: Edition) => void; setSeats: (s: Seats) => void }
+type Choice = { edition: Edition; setEdition: (e: Edition) => void }
 
 const Ctx = createContext<Choice | null>(null)
 
 export function BuyProvider({ children }: { children: ReactNode }) {
   const [edition, setEdition] = useState<Edition>('pro')
-  const [seats, setSeats] = useState<Seats>('one')
-  return <Ctx.Provider value={{ edition, seats, setEdition, setSeats }}>{children}</Ctx.Provider>
+  return <Ctx.Provider value={{ edition, setEdition }}>{children}</Ctx.Provider>
 }
 
 const plan = (id: Plan['id']) => PLANS.find((p) => p.id === id)!
@@ -42,49 +41,12 @@ const plan = (id: Plan['id']) => PLANS.find((p) => p.id === id)!
 export function useChoice() {
   const c = useContext(Ctx)
   if (!c) throw new Error('The parts of the buy panel sit inside BuyProvider')
-  // A team licence always comes with the templates; the solo choice is kept for if they switch back.
-  const edition: Edition = c.seats === 'team' ? 'all' : c.edition
-  const chosen = c.seats === 'team' ? plan('team') : plan(edition)
-  return { ...c, edition, plan: chosen, days: edition === 'all' ? TOTAL_DAYS : PRO_DAYS }
+  return { ...c, plan: plan(c.edition) }
 }
-
-/** The headline: what the chosen plan would take to build, and what it costs. Both roll as the choice changes. */
-export function BuyHead() {
-  const { plan, days } = useChoice()
-  return (
-    <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-      <h1 className="focus-in text-[clamp(40px,4.4vw,62px)] font-normal leading-[1.02] tracking-[-0.055em] text-ink">
-        <span className="sr-only">
-          {days} days of work. Yours for ${plan.price}.
-        </span>
-        {/* The count is digits only, so it's centred on the line; the price starts with $, which gives it a true baseline. */}
-        <span aria-hidden className="flex flex-wrap items-center">
-          <RollingText text={String(days)} proportional />
-          <span>&nbsp;days of work.</span>
-        </span>
-        <span aria-hidden className="block text-quiet">
-          Yours for <RollingText text={`$${plan.price}`} proportional />.
-        </span>
-      </h1>
-      <div className="rise flex flex-wrap gap-2 lg:pb-2" style={{ animationDelay: '160ms' }}>
-        <Link href="/refunds" className={PILL}>
-          <Undo size={13} />
-          {REFUND_DAYS}-day refund, no questions
-        </Link>
-        <Link href="#questions" className={PILL}>
-          Questions
-          <ArrowRight size={12} />
-        </Link>
-      </div>
-    </div>
-  )
-}
-
-const PILL = 'ring-focus inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[13px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)] transition-colors duration-150 hover:bg-surface-2 hover:text-ink'
 
 /*
  * The stage: what you'd be buying, running. Pro shows three of its whole screens in turn; with
- * the templates it shows three of the apps instead. Each is laid out at a desktop size and scaled
+ * the templates it shows the app instead. Each is laid out at a desktop size and scaled
  * to the stage, so it reads like the real thing rather than a phone-width squeeze.
  */
 
@@ -96,11 +58,11 @@ const BLOCK_SHOTS: Shot[] = ['support-inbox', 'task-to-merge', 'evals'].flatMap(
   if (!b || !View) return []
   return [{ id, name: b.name, line: b.short, count: `One of ${PRO_BLOCK_COUNT} blocks`, href: `/blocks/${id}`, title: b.window, chrome: b.chrome === 'browser' ? 'browser' : 'titled', view: () => <View autoplay /> }]
 })
-const TEMPLATE_SHOTS: Shot[] = ['rapport', 'tandem', 'detent'].flatMap((id) => {
+const TEMPLATE_SHOTS: Shot[] = ['detent'].flatMap((id) => {
   const t = TEMPLATES.find((x) => x.id === id)
   const View = TEMPLATE_VIEWS[id]
   if (!t || !View) return []
-  return [{ id, name: t.name, line: t.kind, count: `One of ${TEMPLATES.length} apps`, href: `/templates/${id}`, title: t.window, chrome: 'browser', view: View }]
+  return [{ id, name: t.name, line: t.kind, count: 'The whole app', href: `/templates/${id}`, title: t.window, chrome: 'browser', view: View }]
 })
 
 /** How long each screen stays on the stage before the next. */
@@ -124,6 +86,7 @@ export function WideStage() {
 }
 
 function Shots({ shots, tone, wide = false }: { shots: Shot[]; tone: 'amber' | 'violet'; wide?: boolean }) {
+  const side = useSideNew()
   const reduce = useReducedMotion()
   const [n, setN] = useState(0)
   const [held, setHeld] = useState(false)
@@ -167,7 +130,6 @@ function Shots({ shots, tone, wide = false }: { shots: Shot[]; tone: 'amber' | '
       <div className="mt-3 flex h-9 items-center gap-3 px-1">
         <p className="min-w-0 flex-1 truncate text-[14px] text-ink">
           {s.name}
-          <span className="text-quiet"> — {s.line}</span>
         </p>
         <span className="hidden shrink-0 text-[13px] text-ink-3 sm:inline">{s.count}</span>
         <span className="flex shrink-0">
@@ -177,7 +139,7 @@ function Shots({ shots, tone, wide = false }: { shots: Shot[]; tone: 'amber' | '
             </button>
           ))}
         </span>
-        <Link href={s.href} className="ring-focus group/open flex h-8 shrink-0 items-center gap-1 rounded-full px-3 text-[13px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)] transition-[color,transform] duration-150 hover:text-ink active:scale-[0.97]">
+        <Link href={s.href} className={side ? `ring-focus group/open flex h-8 shrink-0 items-center gap-1 rounded-[9px] px-3 text-[13px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)] transition-[color,transform] duration-150 hover:text-ink active:scale-[0.97]` : "ring-focus group/open flex h-8 shrink-0 items-center gap-1 rounded-full px-3 text-[13px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)] transition-[color,transform] duration-150 hover:text-ink active:scale-[0.97]"}>
           Open
           <ArrowUpRight size={12} className="transition-transform duration-150 group-hover/open:-translate-y-px group-hover/open:translate-x-px" />
         </Link>
@@ -188,18 +150,12 @@ function Shots({ shots, tone, wide = false }: { shots: Shot[]; tone: 'amber' | '
 
 /** The two questions, each answered with a tile, and the summary that adds them up. */
 export function Choose() {
-  const { edition, seats, setEdition, setSeats } = useChoice()
-  const team = seats === 'team'
+  const { edition, setEdition } = useChoice()
   return (
     <div className="flex min-w-0 flex-col gap-6">
       <Question title="Edition." quiet="What you’re building.">
-        <Tile name="edition" on={edition === 'pro'} disabled={team} onPick={() => setEdition('pro')} title="Pro" price={`$${plan('pro').price}`} line={`${PRO_COMPONENTS.length} Pro components and ${PRO_BLOCK_COUNT} whole screens, already working.`} note={team ? 'A team licence comes with the templates.' : undefined} />
-        <Tile name="edition" on={edition === 'all'} onPick={() => setEdition('all')} title="Pro + Templates" price={`$${plan('all').price}`} line={`Everything in Pro, plus ${TEMPLATES.length} apps with the AI built in.`} />
-      </Question>
-      {/* Two short answers side by side; the line under them says what the chosen one means. */}
-      <Question title="Licence." quiet="Who’s building it." row note={team ? 'Up to five people, a key each, and one more for CI.' : 'One person, in as many projects as you like.'}>
-        <Tile name="seats" short on={!team} onPick={() => setSeats('one')} title="Just me" price="Included" />
-        <Tile name="seats" short on={team} onPick={() => setSeats('team')} title="My team" price={`$${plan('team').price}`} />
+        <Tile name="edition" on={edition === 'pro'} onPick={() => setEdition('pro')} title="Pro" price={`$${plan('pro').price}`} line={`${PRO_COMPONENTS.length} Pro components and ${PRO_BLOCK_COUNT} whole screens, already working.`} />
+        <Tile name="edition" on={edition === 'all'} onPick={() => setEdition('all')} title="Pro + Templates" price={`$${plan('all').price}`} line={`Everything in Pro, plus ${TEMPLATE_COUNT}, with every new one.`} />
       </Question>
       <Summary />
     </div>
@@ -246,7 +202,8 @@ const PROMISES = [
 ] as const
 
 function Summary() {
-  const { plan, days } = useChoice()
+  const side = useSideNew()
+  const { plan } = useChoice()
   return (
     <div className="rounded-[22px] bg-surface-2 p-5 sm:p-6">
       <div className="flex items-end justify-between gap-4">
@@ -264,7 +221,7 @@ function Summary() {
           <span className="text-[14px] text-ink-3">once</span>
         </p>
       </div>
-      <a href={plan.href} className="ring-focus group/buy mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-[15px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.98]">
+      <a href={plan.href} className={side ? `ring-focus group/buy mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-[12px] ${BTN.accent} text-[15px] font-medium transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] active:scale-[0.98]` : "ring-focus group/buy mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-[15px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.98]"}>
         {plan.cta}
         <ArrowRight size={15} className="transition-transform duration-150 group-hover/buy:translate-x-0.5" />
       </a>
@@ -276,27 +233,33 @@ function Summary() {
           </li>
         ))}
       </ul>
-      <p className="mt-5 pt-4 text-[12.5px] leading-[1.5] text-ink-3 shadow-[inset_0_1px_0_var(--line)]">
-        Built yourself, about <span className="tnum text-ink-2">{days}</span> working days. Our estimate, piece by piece, is below.
-      </p>
     </div>
   )
 }
 
 /** The way in at the foot of the page: the button is the price, for whatever was chosen above. */
 export function BigBuy() {
+  const side = useSideNew()
   const { plan } = useChoice()
+  const [hot, setHot] = useState(false)
   return (
     <a
       href={plan.href}
-      className="ring-focus group/big flex h-20 w-full max-w-[720px] items-center gap-4 rounded-full bg-ink pl-7 pr-2.5 text-surface transition-transform duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] active:scale-[0.985] sm:h-24 sm:pl-10 sm:pr-3"
+      onPointerEnter={() => setHot(true)}
+      onPointerLeave={() => setHot(false)}
+      onFocus={() => setHot(true)}
+      onBlur={() => setHot(false)}
+      className={side ? `ring-focus group/big flex h-20 w-full max-w-[720px] items-center gap-4 rounded-[18px] ${BTN.accent} pl-7 pr-2.5 transition-transform duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] active:scale-[0.985] sm:h-24 sm:pl-10 sm:pr-3` : "ring-focus group/big flex h-20 w-full max-w-[720px] items-center gap-4 rounded-full bg-ink pl-7 pr-2.5 text-surface transition-transform duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] active:scale-[0.985] sm:h-24 sm:pl-10 sm:pr-3"}
     >
       <span className="min-w-0 flex-1 truncate text-left text-[clamp(20px,2.6vw,30px)] tracking-[-0.03em]">{plan.cta}</span>
       <span className="tnum shrink-0 text-[clamp(20px,2.6vw,30px)] tracking-[-0.03em]">
         <RollingText text={`$${plan.price}`} proportional />
       </span>
-      <span className="grid size-[60px] shrink-0 place-items-center rounded-full bg-surface text-ink transition-transform duration-200 [transition-timing-function:cubic-bezier(0.2,0,0,1)] group-hover/big:translate-x-1 sm:size-[72px]">
-        <ArrowRight size={24} />
+      <span className={side ? `grid size-[60px] shrink-0 place-items-center rounded-[12px] bg-surface text-ink transition-transform duration-200 [transition-timing-function:cubic-bezier(0.2,0,0,1)] sm:size-[72px]` : "grid size-[60px] shrink-0 place-items-center rounded-full bg-surface text-ink transition-transform duration-200 [transition-timing-function:cubic-bezier(0.2,0,0,1)] sm:size-[72px]"}>
+        {/* Pointed at, the arrow doesn't move: it reprints, pixel by pixel, in the accent. */}
+        <DitherIcon color={hot ? 'var(--accent)' : 'var(--ink)'} size={24}>
+          <ArrowRight size={24} />
+        </DitherIcon>
       </span>
     </a>
   )
@@ -308,52 +271,39 @@ export function BigBuy() {
  * questions in one line instead of a column of form.
  */
 export function HeroHead() {
-  const { plan, days } = useChoice()
+  const { plan } = useChoice()
   return (
     <div className="flex flex-col items-center text-center">
       <h1 className="focus-in text-[clamp(40px,5vw,72px)] font-normal leading-[1.02] tracking-[-0.055em] text-ink">
-        <span className="sr-only">
-          Skip {days} days of work. Pay ${plan.price}, once.
-        </span>
-        <span aria-hidden className="flex flex-wrap items-center justify-center gap-x-[0.22em]">
-          Skip
-          <RollingText text={String(days)} proportional />
-          <span>days of work.</span>
+        <span className="sr-only">Make your app feel expensive. Pay ${plan.price}, once.</span>
+        <span aria-hidden className="block">
+          Make your app feel expensive.
         </span>
         <span aria-hidden className="block text-quiet">
           Pay <RollingText text={`$${plan.price}`} proportional />, once.
         </span>
       </h1>
       <p className="rise mt-6 max-w-[520px] text-balance text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
-        The hard parts of an app, finished: every state, both themes, every width. Installed as source you own.
+        Every Pro component and screen, as code in your own project. Pay once, change anything, keep it.
       </p>
     </div>
   )
 }
 
 export function BuyBar() {
-  const { edition, seats, setEdition, setSeats, plan } = useChoice()
-  const team = seats === 'team'
-  const what = edition === 'all' ? `${PRO_COMPONENTS.length} Pro components, ${PRO_BLOCK_COUNT} screens and ${TEMPLATES.length} apps` : `${PRO_COMPONENTS.length} Pro components and ${PRO_BLOCK_COUNT} whole screens`
+  const side = useSideNew()
+  const { edition, setEdition, plan } = useChoice()
+  const what = edition === 'all' ? `${PRO_COMPONENTS.length} Pro components, ${PRO_BLOCK_COUNT} screens and ${TEMPLATE_COUNT}` : `${PRO_COMPONENTS.length} Pro components and ${PRO_BLOCK_COUNT} whole screens`
   return (
     <div className="flex w-full flex-col items-center">
-      <div className="flex w-full max-w-[820px] flex-col gap-3 rounded-[26px] bg-surface p-2 shadow-[var(--card-edge)] sm:flex-row sm:items-center sm:rounded-full sm:gap-2">
+      <div className={side ? `flex w-full max-w-[600px] flex-col gap-3 rounded-[26px] bg-surface p-2 shadow-[var(--card-edge)] sm:flex-row sm:items-center sm:rounded-[18px] sm:gap-2` : "flex w-full max-w-[600px] flex-col gap-3 rounded-[26px] bg-surface p-2 shadow-[var(--card-edge)] sm:flex-row sm:items-center sm:rounded-full sm:gap-2"}>
         <Seg
           label="Edition"
           value={edition}
           onPick={(v) => setEdition(v as Edition)}
           options={[
-            ['pro', 'Pro', team],
+            ['pro', 'Pro', false],
             ['all', 'Pro + Templates', false],
-          ]}
-        />
-        <Seg
-          label="Licence"
-          value={seats}
-          onPick={(v) => setSeats(v as Seats)}
-          options={[
-            ['one', 'Just me', false],
-            ['team', 'Team', false],
           ]}
         />
         <div className="flex items-center gap-3 px-2 pb-1 sm:ml-auto sm:p-0">
@@ -363,7 +313,7 @@ export function BuyBar() {
             </span>
             <span className="text-[13px] text-ink-3">once</span>
           </p>
-          <a href={plan.href} className="ring-focus group/buy flex h-11 shrink-0 items-center gap-2 rounded-full bg-ink pl-5 pr-4 text-[15px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.97]">
+          <a href={plan.href} className={side ? `ring-focus group/buy flex h-11 shrink-0 items-center gap-2 rounded-[11px] ${BTN.accent} pl-5 pr-4 text-[15px] font-medium transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] active:scale-[0.97]` : "ring-focus group/buy flex h-11 shrink-0 items-center gap-2 rounded-full bg-ink pl-5 pr-4 text-[15px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.97]"}>
             {plan.cta}
             <ArrowRight size={15} className="transition-transform duration-150 group-hover/buy:translate-x-0.5" />
           </a>
@@ -382,8 +332,9 @@ export function BuyBar() {
 
 /** Two answers in a track; the chosen one sits on a plate that slides between them. */
 function Seg({ label, value, onPick, options }: { label: string; value: string; onPick: (v: string) => void; options: [string, string, boolean][] }) {
+  const side = useSideNew()
   return (
-    <div role="radiogroup" aria-label={label} className="grid grid-cols-2 rounded-full bg-surface-2 p-1 sm:flex">
+    <div role="radiogroup" aria-label={label} className={`grid grid-cols-2 sm:flex ${side ? `rounded-[12px] p-[3px] ${BTN.track}` : 'rounded-full bg-surface-2 p-1'}`}>
       {options.map(([v, name, disabled]) => {
         const on = v === value
         return (
@@ -394,9 +345,9 @@ function Seg({ label, value, onPick, options }: { label: string; value: string; 
             aria-checked={on}
             disabled={disabled}
             onClick={() => onPick(v)}
-            className={`ring-focus relative h-9 whitespace-nowrap rounded-full px-4 text-[14px] transition-[color,transform] duration-150 enabled:active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 ${on ? 'text-ink' : 'text-ink-3 enabled:hover:text-ink'}`}
+            className={`ring-focus relative h-9 whitespace-nowrap px-4 ${side ? 'rounded-[9px]' : 'rounded-full'} text-[14px] transition-[color,transform] duration-150 enabled:active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 ${on ? 'text-ink' : 'text-ink-3 enabled:hover:text-ink'}`}
           >
-            {on && <motion.span layoutId={`seg-${label}`} className="absolute inset-0 rounded-full bg-surface shadow-[var(--card-edge)]" transition={{ type: 'spring', stiffness: 520, damping: 42 }} />}
+            {on && <motion.span layoutId={`seg-${label}`} className={`absolute inset-0 ${side ? `rounded-[9px] ${BTN.plate}` : 'rounded-full bg-surface shadow-[var(--card-edge)]'}`} transition={{ type: 'spring', stiffness: 520, damping: 42 }} />}
             <span className="relative">{name}</span>
           </button>
         )

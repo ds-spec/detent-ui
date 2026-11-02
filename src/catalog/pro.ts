@@ -16,14 +16,11 @@ const PRO_CODE = [
   'donut',
   'scatter',
   'histogram',
-  'activity',
   'trace',
   'approval',
   'filter',
-  'usage',
   'dates',
   'extract',
-  'flow',
   'kanban',
   'forecast',
   'video',
@@ -33,9 +30,10 @@ const PRO_CODE = [
   'codeblock',
   'sidebar',
   'region',
+  'find',
   'reveal',
   'threads',
-  'print',
+  'dotlight',
 ]
 
 /** The Pro components in the catalog. Unlisted ones stay Pro, so their source stays locked. */
@@ -57,8 +55,8 @@ export const isLockedSource = (slug: string, blocks: string[]) => isProComponent
 export const KITS: Record<string, { name: string; line: string; items: string[] }> = {
   'agent-kit': {
     name: 'Agent kit',
-    line: 'The free components for an agent product: the scaffold it builds in, the prompt box, the diff you review, and the history of what happened.',
-    items: ['scaffold', 'prompt', 'diff', 'history'],
+    line: 'The free components for an agent product: the scaffold it builds in, the prompt box, and the diff you review.',
+    items: ['scaffold', 'prompt', 'diff'],
   },
 }
 
@@ -70,14 +68,13 @@ export { SITE, installCommand } from './site'
 export const CHECKOUT = {
   pro: process.env.NEXT_PUBLIC_CHECKOUT_PRO ?? '#checkout',
   all: process.env.NEXT_PUBLIC_CHECKOUT_ALL ?? '#checkout',
-  team: process.env.NEXT_PUBLIC_CHECKOUT_TEAM ?? '#checkout',
 }
 
 export type Plan = {
-  id: 'pro' | 'all' | 'team'
+  id: 'pro' | 'all'
   name: string
   price: number
-  /** Who it covers, said after the price: one person, or a team of up to five. */
+  /** Who it covers, said after the price. */
   seats: string
   /** Who it's for, in a line. */
   line: string
@@ -92,7 +89,7 @@ export const PLANS: Plan[] = [
   {
     id: 'pro',
     name: 'Pro',
-    price: 149,
+    price: 99,
     seats: 'one person',
     line: 'Everything you build the product with.',
     cta: 'Get Pro',
@@ -102,23 +99,13 @@ export const PLANS: Plan[] = [
   {
     id: 'all',
     name: 'Pro + Templates',
-    price: 249,
+    price: 129,
     seats: 'one person',
-    line: 'For the product and the page that sells it.',
+    line: 'Everything in Pro, and a whole app to start from.',
     cta: 'Get everything',
     href: CHECKOUT.all,
     best: true,
-    features: ['Everything in Pro', 'Every template, pages and apps', 'New templates as they ship', 'Sections and content in plain files', 'Every update, for life', 'Unlimited projects'],
-  },
-  {
-    id: 'team',
-    name: 'Team',
-    price: 599,
-    seats: 'up to five people',
-    line: 'Everything, for everyone building it with you.',
-    cta: 'Get Team',
-    href: CHECKOUT.team,
-    features: ['Everything in Pro + Templates', 'A key for each person, up to five', 'Keys for CI and shared repos', 'Company invoices, with VAT handled', 'Every update, for life', 'Unlimited projects'],
+    features: ['Everything in Pro', 'The Detent app template', 'Every new template as it ships', 'Real routes, data and AI wired in', 'Every update, for life', 'Unlimited projects'],
   },
 ]
 

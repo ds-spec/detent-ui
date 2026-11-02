@@ -27,6 +27,8 @@ import { Shell, Trail } from '../shell/Shell'
 import { useWant } from '../shell/want'
 import type { RailGroup } from '../exhibit/Rail'
 import { Backdrop, Window } from './Studio'
+import { DeviceStage } from './DeviceStage'
+import { useSideNew } from '../shell/side'
 
 /** Widths the frame clicks into as you drag it: the sizes a screen most often meets. */
 const DETENTS = [
@@ -38,7 +40,6 @@ const MIN = 340
 const SNAP = 14
 const settle = { type: 'spring', stiffness: 460, damping: 44 } as const
 
-const first = (s: string) => s.split(/(?<=\.)\s/)[0]
 
 /** A plain click moves in place; a click that means a new tab stays a link. */
 const movesTo = (go: (id: string) => void, id: string) => (e: React.MouseEvent) => {
@@ -89,6 +90,7 @@ function BlockViewer({ b, go }: { b: Block; go: (id: string) => void }) {
   const page = useTheme()
   const [stageTheme, setStageTheme] = useState<'light' | 'dark' | null>(null)
   const shown = stageTheme ?? page
+  const side = useSideNew()
 
   useEffect(() => {
     if (!present) return
@@ -113,6 +115,45 @@ function BlockViewer({ b, go }: { b: Block; go: (id: string) => void }) {
     return () => window.removeEventListener('keydown', on)
   }, [go, prev, next, present])
 
+  if (side)
+    return (
+      <main className="mx-auto max-w-[1280px] px-4 pb-24 sm:px-8 lg:pb-16">
+        {/* One calm line, the same as a component's: what it is, and how to get it. */}
+        <header className="flex flex-col gap-4 pt-7 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+          <div className="min-w-0">
+            <p className="mb-2 flex items-center gap-2 text-[13px] text-ink-3">
+              {KINDS[b.kind]}
+              {isProBlock(b.id) && <ProTag />}
+            </p>
+            <h1 className="text-[clamp(32px,3.8vw,48px)] font-normal leading-[1.08] tracking-[-0.045em] text-ink">{b.name}</h1>
+          </div>
+          <div className="min-w-0 lg:w-[360px]">
+            <Install id={b.id} free={!isProBlock(b.id)} bare />
+          </div>
+        </header>
+        <DeviceStage
+          title={b.window}
+          chrome={b.chrome}
+          mode={mode}
+          setMode={setMode}
+          pro={isProBlock(b.id)}
+          theme={shown}
+          onReplay={() => setRun((r) => r + 1)}
+          onFull={() => window.open(`/full/blocks/${b.id}`, '_blank', 'noopener')}
+          run={run}
+          view={<Live id={b.id} />}
+          code={<Code id={b.id} />}
+        />
+        {present && <Desk title={b.window} chrome={b.chrome} run={run} mode={mode} theme={stageTheme} present onExit={() => setPresent(false)} view={<Live id={b.id} />} code={<Code id={b.id} />} />}
+        <Props b={b} />
+        <nav aria-label="More blocks" className="mt-28 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <Neighbour b={prev} dir="prev" go={go} />
+          <Neighbour b={next} dir="next" go={go} />
+        </nav>
+        {!present && <Pager prev={{ name: prev.name, href: prev.id }} next={{ name: next.name, href: next.id }} onPick={go} />}
+      </main>
+    )
+
   return (
     <main className="mx-auto max-w-[1280px] px-4 pb-24 sm:px-8 lg:pb-16">
       <header className="pt-8 sm:pt-10">
@@ -126,7 +167,6 @@ function BlockViewer({ b, go }: { b: Block; go: (id: string) => void }) {
         <div className="mt-5 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <h1 className="min-w-0 text-[clamp(36px,4vw,56px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink">
             {b.name}
-            <span className="block text-quiet">{b.short}</span>
           </h1>
           <div className="w-full shrink-0 sm:w-[400px] lg:w-[460px]">
             <Install id={b.id} free={!isProBlock(b.id)} />
@@ -296,7 +336,6 @@ function Neighbour({ b, dir, go }: { b: Block; dir: 'prev' | 'next'; go: (id: st
           {back ? 'Previous' : 'Next'} · {KINDS[b.kind]}
         </span>
         <span className="mt-0.5 block truncate text-title text-ink">{b.name}</span>
-        <span className="block truncate text-footnote text-ink-3">{first(b.line)}</span>
       </span>
     </Link>
   )

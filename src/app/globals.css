@@ -203,22 +203,22 @@
 
 [data-theme="dark"] {
   color-scheme: dark;
-  /* Midnight: true black, finished with light.Page and stage are black; a component sits a small
-     step above at #0d0d0d, and what makes it stand is its edge: one crisp ring of white laid over a
-     ring of black, a faint lit top edge like light catching a rim, and a shadow deep enough to
-     read on the stage. Fills step up in plain neutral greys. */
-  --bg: #0b0b0c;
-  --surface: #0d0d0d;
-  --surface-2: #191919;
-  --surface-3: #242424;
+  /* Graphite, from the ⌘K palette: never black, a faintly cool grey in small even steps, so depth
+     comes from tone. Page 1a, then card 23, fill 27, well 30, plate 37. The edge stays one fine
+     ring of white over a ring of the page. Text is the palette's three greys, except that the
+     faintest is lifted to pass AA on these surfaces. */
+  --bg: #1a1a1d;
+  --surface: #232327;
+  --surface-2: #27272c;
+  --surface-3: #303036;
   /* In dark a plate must be lighter than the well it sits in, never darker. */
-  --plate: #2a2a2a;
-  --line: rgb(255 255 255 / 0.1);
-  --line-strong: rgb(255 255 255 / 0.145);
-  --ink: #ededed;
-  --ink-2: #a1a1a1;
-  --ink-3: #8f8f8f;
-  --quiet: #77777c;
+  --plate: #37373d;
+  --line: rgb(255 255 255 / 0.09);
+  --line-strong: rgb(255 255 255 / 0.13);
+  --ink: #f5f5f7;
+  --ink-2: #a1a1a6;
+  --ink-3: #909096;
+  --quiet: #7c7c82;
   --ai-1: #3ec6ff;
   --ai-2: #6a7bff;
   --ai-3: #c46bff;
@@ -252,9 +252,9 @@
   --elev-modal: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 0 0 1px rgb(255 255 255 / 0.145), 0 16px 40px -12px rgb(0 0 0 / 0.9), 0 0 0 1px var(--bg);
   --elev-field: 0 0 0 1px rgb(255 255 255 / 0.32), 0 0 0 4px color-mix(in oklch, var(--accent) 22%, transparent);
   --elev-field-error: 0 0 0 1px color-mix(in oklch, var(--danger) 70%, transparent), 0 0 0 4px color-mix(in oklch, var(--danger) 18%, transparent);
-  --folder-back: #141414;
-  --folder-front: #1f1f1f;
-  --folder-ink: #a1a1a1;
+  --folder-back: #1f1f22;
+  --folder-front: #2a2a2e;
+  --folder-ink: #a1a1a6;
   --sheet: #ececec;
   --sheet-line: #d6d6d6;
 }
@@ -269,6 +269,8 @@
 [data-theme="light"] {
   --ground: #eeede9;
   --leaf: #fdfdfc;
+  /* The navbar's own surfaces: the leaf in light, black in dark. */
+  --nav: var(--leaf);
   --paper: #f6f5f2;
   --mount: #f1f0ed;
   --bezel: #ffffff;
@@ -287,18 +289,19 @@
   --card-lift: 0 0 0 1px rgb(21 22 26 / 0.07), 0 30px 60px -30px rgb(30 30 60 / 0.28);
 }
 [data-theme="dark"] {
-  --ground: #0b0b0c;
-  --leaf: #000000;
-  --paper: #000000;
-  --mount: #141416;
-  --bezel: #1c1c1f;
-  --well: #0d0d0f;
+    --ground: #141416;
+  --leaf: #1a1a1d;
+  --nav: #2e2e31;
+  --paper: #1a1a1d;
+  --mount: #26262a;
+  --bezel: #2a2a2f;
+  --well: #1a1a1d;
   --well-tint: 0%;
   --well-glow: linear-gradient(transparent, transparent);
-  --shell: #000000;
+  --shell: #141416;
   --shell-hover: rgb(255 255 255 / 0.05);
   --shell-on: rgb(255 255 255 / 0.08);
-  --panel: #000000;
+  --panel: #1a1a1e;
   --panel-edge: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 0 0 1px rgb(255 255 255 / 0.09);
   --leaf-edge: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 0 0 1px rgb(255 255 255 / 0.08);
   --card-edge: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 0 0 1px rgb(255 255 255 / 0.1);
@@ -435,7 +438,7 @@ body {
 
 /* On a touch screen: no delay waiting for a double tap, and a field under 16px would make iOS zoom the page when it's focused. */
 @media (pointer: coarse) {
-  a, button, input, select, textarea, label, [role='button'] {
+  :is(a, button, input, select, textarea, label, [role='button']):not([class*='touch-']) {
     touch-action: manipulation;
   }
   input:not([type='checkbox'], [type='radio'], [type='range']), select, textarea {
@@ -460,45 +463,6 @@ body {
   .pro-app :is([class*='text-[10px]'], [class*='text-[10.5px]']) {
     font-size: 11px;
   }
-}
-
-/* Agent activity: light as the status. A stage takes one of these fills by tone, nearest theme winning,
-   and in light its edge is lit from one corner and fades out. */
-.agent-activity,
-[data-theme] [data-theme="light"] .agent-activity {
-  --agent-activity-ask: radial-gradient(120% 130% at 100% 0%, #b9cdff, transparent 62%), radial-gradient(110% 120% at 0% 100%, #e4d3ff, transparent 66%), radial-gradient(70% 80% at 92% 100%, #ffdbe6, transparent 70%), #eef1fc;
-  --agent-activity-fail: radial-gradient(120% 130% at 100% 0%, #ffc4b8, transparent 62%), radial-gradient(110% 120% at 0% 100%, #ffe0b5, transparent 66%), radial-gradient(70% 80% at 92% 100%, #ffd3e0, transparent 70%), #fff1ec;
-  --agent-activity-ok: radial-gradient(120% 130% at 100% 0%, #b6edd6, transparent 62%), radial-gradient(110% 120% at 0% 100%, #c6ebff, transparent 66%), #eaf8f2;
-  --agent-activity-run: radial-gradient(120% 130% at 100% 0%, #e3e8f1, transparent 62%), radial-gradient(110% 120% at 0% 100%, #eeebf3, transparent 66%), #f4f4f5;
-  --agent-activity-calm: radial-gradient(120% 130% at 100% 0%, #eceef1, transparent 62%), #f4f4f5;
-  --agent-activity-edge: linear-gradient(215deg, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.2) 42%, rgb(255 255 255 / 0.5));
-  --accent: inherit;
-  --accent-ink: inherit;
-}
-/* Dark mirrors light rather than inverting it: one neutral graphite plane in every tone, a few percent
-   of white from one corner, a flat 8% hairline, and colour only in the orb and the true-blue accent. */
-[data-theme="dark"] .agent-activity,
-[data-theme] [data-theme="dark"] .agent-activity {
-  --agent-activity-ask: radial-gradient(120% 130% at 100% 0%, rgb(255 255 255 / 0.06), transparent 62%), #1a1a1a;
-  --agent-activity-fail: var(--agent-activity-ask);
-  --agent-activity-ok: var(--agent-activity-ask);
-  --agent-activity-run: radial-gradient(120% 130% at 100% 0%, rgb(255 255 255 / 0.04), transparent 62%), #1a1a1a;
-  --agent-activity-calm: radial-gradient(120% 130% at 100% 0%, rgb(255 255 255 / 0.03), transparent 62%), #1a1a1a;
-  --agent-activity-edge: linear-gradient(rgb(255 255 255 / 0.08), rgb(255 255 255 / 0.08));
-  --accent: var(--primary, #3d7bff);
-  --accent-ink: var(--primary, #6aa1ff);
-}
-.agent-activity-edge {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  pointer-events: none;
-  background: var(--agent-activity-edge);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
 }
 
 .tnum {

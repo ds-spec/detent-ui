@@ -15,15 +15,12 @@ export const DAYS: Record<string, number> = {
   donut: 5,
   scatter: 8,
   histogram: 7,
-  activity: 7,
   trace: 12,
   approval: 8,
   filter: 8,
-  usage: 6,
   dates: 8,
   extract: 9,
   lens: 5,
-  flow: 15,
   kanban: 10,
   forecast: 7,
   video: 8,
@@ -31,8 +28,9 @@ export const DAYS: Record<string, number> = {
   codeblock: 6,
   region: 14,
   threads: 8,
+  find: 9,
   reveal: 10,
-  print: 9,
+  dotlight: 9,
   // Blocks
   'live-features': 8,
   pricing: 6,
@@ -50,8 +48,6 @@ export const DAYS: Record<string, number> = {
   'code-review': 12,
   // Templates
   detent: 24,
-  tandem: 24,
-  rapport: 30,
 }
 
 export const daysFor = (id: string) => DAYS[id] ?? 8

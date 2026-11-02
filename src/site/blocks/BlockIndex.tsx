@@ -25,7 +25,6 @@ import { Backdrop, Window } from './Studio'
 
 const GROUPS = BLOCK_GROUPS
 const ALL = BLOCK_ORDER
-const first = (s: string) => s.split(/(?<=\.)\s/)[0]
 /** At the stage's width an app's own sidebar may fold away, and the unified window's lights would sit on its content: so every window here has a title bar. */
 const bar = (b: Block) => (b.chrome === 'browser' ? 'browser' : 'titled')
 
@@ -169,7 +168,6 @@ function Caption({ b }: { b: Block }) {
               )}
               <span className="text-caption font-normal text-ink-3">{KINDS[b.kind]}</span>
             </p>
-            <p className="mt-0.5 truncate text-footnote text-ink-3">{first(b.line)}</p>
           </motion.div>
         </AnimatePresence>
       </div>

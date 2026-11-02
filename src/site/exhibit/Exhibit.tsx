@@ -9,8 +9,8 @@ import { BESIDE } from '@/catalog/beside'
 import { DEMOS, preloadDemo } from '@/catalog/demos'
 import { CATEGORIES, ENTRIES } from '@/catalog/meta'
 import { SIZE } from '@/catalog/sizes'
-import { SITE, installCommand, isProComponent } from '@/catalog/pro'
-import { Check, Copy, Expand, Moon, Refresh, Sun } from '@/lab/icons'
+import { isProComponent } from '@/catalog/pro'
+import { Code as CodeIcon, Expand, Eye, Moon, Refresh, Sun } from '@/lab/icons'
 import { useTheme } from '@/lab/lib/hooks'
 import { Kbd } from '@/lab/ui/Kbd'
 import { Code, warmSource } from '../browser/Code'
@@ -28,9 +28,9 @@ import { Beside } from './Beside'
 import { Index } from './Index'
 import { Rail } from './Rail'
 import { Shell, Trail, scroller } from '../shell/Shell'
+import { BTN, useSideNew } from '../shell/side'
 import type { RailGroup } from './Rail'
 import { CategoryIcon } from '../icons'
-import { ExitFull } from '../blocks/BlockViewer'
 import { wellOf } from '../wells'
 import type { Tone } from '../home/lights'
 
@@ -48,10 +48,12 @@ const glide = { type: 'spring', stiffness: 360, damping: 40 } as const
 /** Air around a demo on the stage. */
 const STAGE_PAD = 48
 /** Demos that bleed to the stage's edges and hold their own height: nothing scales them, so a phone's stage is as tall as they are. */
-const HOLDS_HEIGHT = new Set(['checklist', 'readalong', 'secret', 'halo', 'slices', 'print'])
+const HOLDS_HEIGHT = new Set(['checklist', 'readalong', 'secret', 'halo', 'slices', 'dotlight'])
 
 
 const first = (s: string) => s.split(/(?<=\.)\s/)[0]
+/** Full screen is its own address, in its own tab, so it can be resized and shared. */
+const open = (id: string) => void window.open(`/full/components/${id}`, '_blank', 'noopener')
 
 /** Every component for the list down the side, family by family. */
 const RAIL: RailGroup[] = CATEGORIES.map((c) => ({
@@ -110,10 +112,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
   const { tick } = useSite()
   const [run, setRun] = useState(0)
   const [inspect, setInspect] = useState(false)
-  const [present, setPresent] = useState(false)
   const [index, setIndex] = useState(false)
-  // Goes up when Copy prompt copies a Pro install, so the line under the command can say what it needs.
-  const [promptCopied, setPromptCopied] = useState(0)
   const page = useTheme()
   const stage = useRef<HTMLElement>(null)
   // How tall the demo gets on a phone, where it sets the stage's height. It only grows, so a demo
@@ -224,11 +223,8 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
       else if (k === 'arrowleft' || k === 'k') to(p.id)
       else if (k === '/') setIndex(true)
       else if (k === 'i') setInspect((v) => !v)
-      else if (k === 'p') setPresent((v) => !v)
-      else if (k === 'escape') {
-        setPresent(false)
-        setInspect(false)
-      }
+      else if (k === 'p') open(id)
+      else if (k === 'escape') setInspect(false)
       else return
       ev.preventDefault()
     }
@@ -236,61 +232,43 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
     return () => window.removeEventListener('keydown', key)
   }, [index])
 
+  const side = useSideNew()
   return (
     <Shell list={<Rail label="Components" groups={RAIL} current={id} onPick={go} preview={peek} />} bar={<Trail steps={['Components', family.name, e.name]} />}>
     <main className="mx-auto max-w-[1280px] px-4 pb-20 sm:px-8 lg:pb-0">
       <div className="pb-6 sm:pb-8">
-      {/* The title: which family, where you are in the forty, and what this one is. */}
-      <header className="flex flex-col gap-6 pt-8 sm:pt-10 xl:flex-row xl:items-end xl:justify-between xl:gap-10">
+      {/* One calm line: what this is, what it costs, and how to get it. */}
+      <header className="flex flex-col gap-4 pt-7 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2.5">
-            <span className="chip inline-flex h-7 items-center gap-1.5 rounded-full px-2.5 text-footnote font-medium transition-[color,background-color,box-shadow] duration-300" style={{ color: `var(--${family.id})`, ['--chip' as string]: `var(--${family.id})` }}>
-              <span className="size-1.5 rounded-full" style={{ background: `var(--${family.id})` }} />
-              {family.name}
-            </span>
-            {isProComponent(e.id) && <ProTag />}
-            <button type="button" onClick={() => setIndex(true)} className="ring-focus tnum flex h-7 items-center gap-2 rounded-full pl-2.5 pr-1.5 text-footnote text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink lg:hidden">
-              All components
-              <Kbd>/</Kbd>
-            </button>
-          </div>
-          <h1 className="mt-5 text-[clamp(36px,4vw,56px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink xl:text-[44px] 2xl:text-[52px]">
-            <span className="relative block h-[1.08em] overflow-hidden">
+          {side && <p className="mb-2 text-[13px] text-ink-3">{family.name}</p>}
+          <h1 className="text-[clamp(32px,3.8vw,48px)] font-normal leading-[1.08] tracking-[-0.045em] text-ink">
+            <span className="relative block h-[1.2em] overflow-hidden">
               <Glide k={e.id} dir={dir}>
                 {e.name}
               </Glide>
             </span>
-            <span className="relative block overflow-hidden text-quiet lg:h-[1.08em] xl:h-[2.16em]">
-              <Glide k={e.id} dir={dir} delay={0.05} wrap>
-                {e.short ?? first(e.line)}
-              </Glide>
-            </span>
           </h1>
         </div>
-        <div className="flex w-full max-w-[460px] shrink-0 flex-col gap-3 xl:w-[380px] 2xl:w-[460px]">
-          {/* Hand it to your agent. */}
-          <div className="flex items-center xl:justify-end">
-            <CopyPrompt name={e.name} line={e.line} command={installCommand(e.id, !pro)} page={`${SITE}/components/${e.id}.md`} pro={pro} onCopy={() => setPromptCopied((n) => n + 1)} />
+        <div className="flex min-w-0 items-center gap-2">
+          <div className="min-w-0 flex-1 lg:w-[300px] lg:flex-none">
+            <Install id={e.id} free={!pro} bare />
           </div>
-          <Install id={e.id} free={!pro} copied={promptCopied} />
         </div>
       </header>
 
       {/* The bench: the component on its stage, its props under it, then the usage. One bench per component, so it starts clean. */}
-      {present && <motion.div className="fixed inset-0 z-[45] bg-bg" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setPresent(false)} />}
       <BenchProvider key={id}>
-      <div className="mt-4 grid gap-3">
-      <div className="relative flex h-[var(--stage-phone)] flex-col max-sm:-mx-3 lg:h-[var(--stage)]" style={{ ['--stage' as string]: demoHeight ? `max(540px, ${demoHeight + 48 + 64}px)` : `max(clamp(540px, calc(100dvh - 290px), 760px), ${need}px)`, ['--stage-phone' as string]: demoHeight ? `${demoHeight + 48 + 64}px` : phone }}>
+      <div className="mt-5 grid gap-3">
+      <div className="relative flex h-[var(--stage-phone)] flex-col rounded-[20px] bg-[var(--mount)] max-sm:-mx-3 lg:h-[var(--stage)]" style={{ ['--stage' as string]: demoHeight ? `max(540px, ${demoHeight + 48 + 64}px)` : `max(clamp(540px, calc(100dvh - 290px), 760px), ${need}px)`, ['--stage-phone' as string]: demoHeight ? `${demoHeight + 48 + 64}px` : phone }}>
         <motion.section
           ref={stage}
           layout
           transition={{ layout: lift }}
           data-theme={stageTheme ?? undefined}
           aria-label={`${e.name}, live`}
-          // Full screen is the component alone, edge to edge on the page's own ground: no well, no frame.
-          className={`overflow-hidden text-ink ${present ? 'fixed inset-0 z-50 bg-bg' : 'absolute inset-x-0 bottom-0 top-12 rounded-[28px] shadow-[inset_0_0_0_1px_var(--line)]'}`}
+          className={`absolute inset-x-[5px] bottom-[5px] overflow-hidden ${side ? 'top-[44px]' : 'top-[56px]'} rounded-[15px] text-ink shadow-[0_0_0_.5px_var(--line)]`}
           // The stage is a well tinted with the family's light, the same as the plates on the walls.
-          style={{ background: present ? undefined : wellOf(FAMILY_TONE[family.id] ?? 'blue') }}
+          style={{ background: wellOf(FAMILY_TONE[family.id] ?? 'blue') }}
         >
           <AnimatePresence mode="popLayout" initial={false} custom={dir}>
             <motion.div
@@ -332,25 +310,25 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
           </AnimatePresence>
 
           <InspectLayer on={inspect && mode === 'preview'} stage={stage} />
-          {present && <ExitFull onExit={() => setPresent(false)} />}
-
         </motion.section>
         {/* Above the stage, quietly: what you're looking at on the left, and two small tools on the right. The rest are keys. */}
-        <div className="absolute inset-x-0 top-0 flex h-12 items-start justify-between">
-          <span className="flex rounded-full bg-surface-2 p-1">
-            <Modes mode={mode} setMode={setMode} pro={pro} onWarm={() => warmSource(e.id)} />
+        <div className={side ? 'absolute inset-x-[5px] top-[5px] flex h-[34px] items-center justify-between pr-0.5' : 'absolute inset-x-[5px] top-[8px] flex h-[36px] items-center justify-between pl-1'}>
+          <span className="flex">
+            {side ? <ModesLine mode={mode} setMode={setMode} pro={pro} onWarm={() => warmSource(e.id)} /> : <Modes mode={mode} setMode={setMode} pro={pro} onWarm={() => warmSource(e.id)} />}
           </span>
           <span className="flex items-center gap-0.5">
-            <Tool label="Replay" onClick={() => setRun((r) => r + 1)}>
+            <Tool small={side} label="Replay" onClick={() => setRun((r) => r + 1)}>
               <motion.span key={run} className="flex" initial={{ rotate: -180 }} animate={{ rotate: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 22 }}>
-                <Refresh size={16} />
+                <Refresh size={side ? 15 : 16} />
               </motion.span>
             </Tool>
-            <Tool label={shown === 'dark' ? 'View in light' : 'View in dark'} onClick={() => setStageTheme(stageTheme ? null : page === 'dark' ? 'light' : 'dark')}>
-              {shown === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            {!side && (
+              <Tool small={side} label={shown === 'dark' ? 'View in light' : 'View in dark'} onClick={() => setStageTheme(stageTheme ? null : page === 'dark' ? 'light' : 'dark')}>
+              {shown === 'dark' ? <Sun size={side ? 15 : 16} /> : <Moon size={side ? 15 : 16} />}
             </Tool>
-            <Tool className="hidden sm:block" label="Full screen" keys="P" onClick={() => setPresent(true)}>
-              <Expand size={16} />
+            )}
+            <Tool small={side} className="hidden sm:block" label="Full screen" keys="P" onClick={() => open(e.id)}>
+              <Expand size={side ? 15 : 16} />
             </Tool>
           </span>
         </div>
@@ -365,14 +343,18 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
 
       {/* The keys it answers to, when it has any. */}
       {e.keys && (
-        <section aria-labelledby="keys" className="mt-12 sm:mt-16">
-          <h2 id="keys" className="px-1 text-[clamp(22px,2vw,28px)] font-normal tracking-[-0.035em] text-ink">
-            Keyboard <span className="text-quiet">it answers to.</span>
-          </h2>
-          <dl className="mt-5 grid gap-x-8 rounded-[22px] bg-surface px-6 py-2 shadow-[var(--card-edge)] sm:grid-cols-2">
+        <section aria-labelledby="keys" className={side ? 'mt-12' : 'mt-12 sm:mt-16'}>
+          {side ? (
+            <h2 id="keys" className="text-[18px] font-medium tracking-[-0.015em] text-ink">Keyboard</h2>
+          ) : (
+            <h2 id="keys" className="px-1 text-[clamp(22px,2vw,28px)] font-normal tracking-[-0.035em] text-ink">
+              Keyboard <span className="text-quiet">it answers to.</span>
+            </h2>
+          )}
+          <dl className={side ? 'mt-4 grid gap-x-10 shadow-[inset_0_1px_0_var(--line)] sm:grid-cols-2' : 'mt-5 grid gap-x-8 rounded-[22px] bg-surface px-6 py-2 shadow-[var(--card-edge)] sm:grid-cols-2'}>
             {e.keys.map(([k, what]) => (
-              <div key={k + what} className="flex items-center justify-between gap-4 py-3 shadow-[inset_0_1px_0_var(--line)] first:shadow-none sm:[&:nth-child(2)]:shadow-none">
-                <dd className="text-callout text-ink-2">{what}</dd>
+              <div key={k + what} className={side ? 'flex items-center justify-between gap-4 py-3.5 shadow-[inset_0_-1px_0_var(--line)]' : 'flex items-center justify-between gap-4 py-3 shadow-[inset_0_1px_0_var(--line)] first:shadow-none sm:[&:nth-child(2)]:shadow-none'}>
+                <dd className={side ? 'text-[14px] text-ink-2' : 'text-callout text-ink-2'}>{what}</dd>
                 <dt className="flex shrink-0 gap-1">
                   {k.split(' ').map((part, j) => (
                     <Kbd key={j}>{part}</Kbd>
@@ -385,9 +367,9 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
       )}
 
       {/* What a free part usually sits beside, from Pro, running. */}
-      {!present && BESIDE[e.id] && <Beside key={`beside-${e.id}`} id={BESIDE[e.id]} />}
+      {BESIDE[e.id] && <Beside key={`beside-${e.id}`} id={BESIDE[e.id]} />}
 
-      {!present && <Pager prev={{ name: prev.name, href: prev.id }} next={{ name: next.name, href: next.id }} onPick={go} />}
+      <Pager prev={{ name: prev.name, href: prev.id }} next={{ name: next.name, href: next.id }} onPick={go} />
 
       <Index
         open={index}
@@ -404,35 +386,6 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
   )
 }
 
-
-/** Hands the component to a coding agent: a prompt with what it is, the command that installs it, and the page that documents it. */
-function CopyPrompt({ name, line, command, page, pro, onCopy }: { name: string; line: string; command: string; page: string; pro: boolean; onCopy: () => void }) {
-  const [done, setDone] = useState(false)
-  const timer = useRef(0)
-  useEffect(() => () => clearTimeout(timer.current), [])
-  const copy = async () => {
-    const text = `Add the ${name} component from Detent to this project. ${line}\n\nInstall it with:\n${command}\n${pro ? '\nThis needs a Detent Pro key.\n' : ''}\nIts props, usage and details are at ${page}. Fit it to the project's theme and use it where it belongs.`
-    try {
-      await navigator.clipboard.writeText(text)
-    } catch {
-      /* Clipboard blocked: nothing to show. */
-    }
-    setDone(true)
-    if (pro) onCopy()
-    clearTimeout(timer.current)
-    timer.current = window.setTimeout(() => setDone(false), 1600)
-  }
-  return (
-    <button type="button" onClick={copy} className="ring-focus flex h-9 items-center gap-2 rounded-full bg-ink pl-3.5 pr-4 text-[13px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]">
-      <AnimatePresence initial={false} mode="popLayout">
-        <motion.span key={done ? 'ok' : 'copy'} className="flex" initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.6 }} transition={{ duration: 0.15 }}>
-          {done ? <Check size={14} strokeWidth={2.6} /> : <Copy size={14} style={{ ['--icon-cutout' as string]: 'var(--ink)' }} />}
-        </motion.span>
-      </AnimatePresence>
-      {done ? 'Copied for your agent' : 'Copy prompt'}
-    </button>
-  )
-}
 
 /**
  * The title travels with the component: the old one leaves the way you're going and the new one
@@ -465,7 +418,7 @@ export function Rule() {
 }
 
 /** A dock button; its name and key show above it while you point at it. */
-export function Tool({ label, keys, on, onClick, children, className = '' }: { label: string; keys?: string; on?: boolean; onClick: () => void; children: ReactNode; className?: string }) {
+export function Tool({ label, keys, on, onClick, children, className = '', small = false }: { label: string; keys?: string; on?: boolean; onClick: () => void; children: ReactNode; className?: string; /** Quiet, square-ish, the sidebar's grey: for the new page. */ small?: boolean }) {
   const [tip, setTip] = useState(false)
   return (
     <span className={`relative ${className}`} onPointerEnter={() => setTip(true)} onPointerLeave={() => setTip(false)}>
@@ -475,7 +428,7 @@ export function Tool({ label, keys, on, onClick, children, className = '' }: { l
         onClick={onClick}
         aria-label={label}
         aria-pressed={on}
-        className={`ring-focus flex size-9 items-center justify-center rounded-full transition-[color,background-color,box-shadow] duration-150 ${on ? 'bg-plate text-ink shadow-raised' : 'text-ink-2 hover:bg-surface-2 hover:text-ink'}`}
+        className={`ring-focus flex items-center justify-center transition-[color,background-color,box-shadow] duration-150 ${small ? 'size-8 rounded-[8px]' : 'size-9 rounded-full'} ${on ? 'bg-plate text-ink shadow-raised' : small ? 'text-ink-3 hover:bg-[var(--shell-hover)] hover:text-ink' : 'text-ink-2 hover:bg-surface-2 hover:text-ink'}`}
       >
         {children}
       </motion.button>
@@ -522,6 +475,34 @@ export function Modes({ mode, setMode, pro = false, onWarm }: { mode: 'preview' 
                 <path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3" />
               </svg>
             )}
+          </span>
+        </button>
+      ))}
+    </span>
+  )
+}
+
+/** Preview or source as one small switch: a sunk track, a raised plate that slides, an icon to each word. */
+export function ModesLine({ mode, setMode, pro = false, onWarm }: { mode: 'preview' | 'code'; setMode: (m: 'preview' | 'code') => void; pro?: boolean; onWarm?: () => void }) {
+  const id = useId()
+  return (
+    <span role="radiogroup" aria-label="Show" className={`flex h-[34px] items-center rounded-[11px] p-[3px] ${BTN.track}`}>
+      {(['preview', 'code'] as const).map((m) => (
+        <button
+          key={m}
+          type="button"
+          role="radio"
+          aria-checked={mode === m}
+          onClick={() => setMode(m)}
+          onPointerEnter={m === 'code' ? onWarm : undefined}
+          onPointerDown={m === 'code' ? onWarm : undefined}
+          className={`ring-focus relative flex h-full items-center gap-1.5 rounded-[8px] px-3 text-[13px] font-medium capitalize transition-[color,transform] duration-150 active:scale-[0.97] ${mode === m ? 'text-ink' : 'text-ink-3 hover:text-ink-2'}`}
+        >
+          {mode === m && <motion.span layoutId={id} className={`absolute inset-0 rounded-[8px] ${BTN.plate}`} transition={{ type: 'spring', stiffness: 520, damping: 40 }} />}
+          <span className="relative flex items-center gap-1.5">
+            {m === 'preview' ? <Eye size={13} /> : <CodeIcon size={13} />}
+            {m}
+            {m === 'code' && pro && <span className="text-[10.5px] font-normal text-ink-3">Pro</span>}
           </span>
         </button>
       ))}

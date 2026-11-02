@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { askForLink, confirmLink, inviteSeat, makeKey, peekLink, type KeyState, type LinkState, type SeatState } from '@/app/account/actions'
+import { askForLink, confirmLink, makeKey, peekLink, type KeyState, type LinkState } from '@/app/account/actions'
 import { Check, Copy } from '@/lab/icons'
 
 const FIELD = 'ring-focus h-10 min-w-0 flex-1 rounded-[10px] bg-surface-2 px-3 text-callout text-ink placeholder:text-ink-3'
@@ -113,21 +113,6 @@ export function NewKey() {
         <input name="name" aria-label="Key name" maxLength={40} autoComplete="off" placeholder="Name it: laptop, CI…" className={FIELD} />
         <button type="submit" disabled={pending} className={BUTTON}>
           {pending ? 'Making…' : 'Generate key'}
-        </button>
-      </form>
-      <Alert text={state.error} />
-    </div>
-  )
-}
-
-export function NewSeat() {
-  const [state, action, pending] = useActionState<SeatState, FormData>(inviteSeat, {})
-  return (
-    <div>
-      <form action={action} className="flex gap-2">
-        <input name="email" type="email" required aria-label="Their email" placeholder="them@company.com" className={FIELD} />
-        <button type="submit" disabled={pending} className={BUTTON}>
-          Add
         </button>
       </form>
       <Alert text={state.error} />

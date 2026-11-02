@@ -1,3 +1,4 @@
+import { AI_SDK } from '@/catalog/site'
 import type { MetadataRoute } from 'next'
 import { ENTRIES } from '@/catalog/meta'
 import { RELEASES } from '@/catalog/trust'
@@ -14,7 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     at('/pro', 0.9),
     at('/blocks', 0.8),
     at('/templates', 0.8),
-    at('/ai-sdk', 0.8),
+    ...(AI_SDK ? [at('/ai-sdk', 0.8)] : []),
     ...ENTRIES.map((e) => at(`/components/${e.id}`, 0.7)),
     ...BLOCKS.map((b) => at(`/blocks/${b.id}`, 0.7)),
     ...TEMPLATES.map((t) => at(`/templates/${t.id}`, 0.7)),

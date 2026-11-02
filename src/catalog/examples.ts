@@ -1,50 +1,5 @@
 /** A whole page for each chart and board: real data, every prop that matters, ready to paste and run. */
 export const EXAMPLES: Record<string, string> = {
-  activity: `"use client"
-
-import { AgentActivity } from "@/components/detent/components/activity/AgentActivity"
-import type { AgentRun } from "@/components/detent/components/activity/AgentActivity"
-import { useState } from "react"
-
-const start: AgentRun[] = [
-  {
-    id: "support",
-    agent: "Support",
-    hue: 262,
-    status: "waiting",
-    line: "Refund $86.40 to Dana Ruiz",
-    thought: "Charged twice on Oct 28. It’s over the $50 it can send alone.",
-    when: "14m",
-    day: "Today",
-  },
-  {
-    id: "dunning",
-    agent: "Dunning",
-    hue: 40,
-    status: "running",
-    line: "Retrying the charges",
-    when: "2m",
-    day: "Today",
-    steps: [
-      { id: "find", title: "Finding failed invoices", status: "done" },
-      { id: "retry", title: "Retrying the charges", status: "running" },
-      { id: "write", title: "Writing to who still owes", status: "pending" },
-    ],
-  },
-  { id: "weekly", agent: "Monday report", hue: 220, status: "done", line: "MRR up 4.2%, sent to #revenue", when: "9:00", day: "Yesterday" },
-]
-
-export default function Page() {
-  const [runs, setRuns] = useState(start)
-  const settle = (id: string) => setRuns((all) => all.map((r) => (r.id === id ? { ...r, status: "done", thought: undefined, when: "now" } : r)))
-
-  return (
-    <main className="flex min-h-screen items-center justify-center p-6">
-      <AgentActivity runs={runs} onApprove={settle} onRetry={settle} />
-    </main>
-  )
-}
-`,
   rings: `"use client"
 
 import { ChartCard, GoalNumerals, compact } from "@/components/detent/components/charts/GoalNumerals"
@@ -395,31 +350,6 @@ export default function Page() {
           onStart={(i) => console.log(i)}
         />
       </div>
-    </main>
-  )
-}
-`,
-  usage: `"use client"
-
-import { UsageLimit } from "@/components/detent/components/usage/UsageLimit"
-
-const daily = [12, 18, 9, 22, 31, 14, 8, 26, 34, 19, 21, 28]
-
-export default function Page() {
-  return (
-    <main className="flex min-h-screen items-center justify-center p-6">
-      <UsageLimit
-        label="API usage"
-        period={{ start: new Date(2026, 9, 1), end: new Date(2026, 9, 31) }}
-        spent={daily.reduce((a, b) => a + b, 0)}
-        daily={daily}
-        breakdown={[
-          { name: "Fast model", amount: 141 },
-          { name: "Deep model", amount: 101 },
-        ]}
-        defaultSettings={{ limit: 500, atLimit: "pause", alerts: [0.5, 0.8] }}
-        onSettingsChange={(settings) => console.log(settings)}
-      />
     </main>
   )
 }

@@ -27,8 +27,6 @@ const VERSIONS: Record<string, string> = {
 
 /** Where each template opens, and what it asks for in .env. */
 const HOME: Record<string, { path: string; ai: string }> = {
-  tandem: { path: '/dashboard', ai: 'Ask Tandem and its agents' },
-  rapport: { path: '/crm', ai: 'Ask Rapport' },
   detent: { path: '/chat', ai: 'the agent' },
 }
 

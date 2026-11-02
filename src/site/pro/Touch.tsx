@@ -9,13 +9,14 @@ import type { Tone } from '../home/lights'
 /*
  * The first thing under the hero: Pro's best work, in the hand. The Pro page's other stages are
  * for watching and comparing; here nothing is inert. Each part only runs while it's near the
- * screen, so three live pieces, two of them WebGL, cost one at a time.
+ * screen, so several live pieces, some of them WebGL, cost one at a time.
  */
 
 const PIECES: { id: string; name: string; line: string; tone: Tone; bleed?: boolean; className: string }[] = [
   { id: 'region', name: 'Region wheel', line: 'Flick the drum and the Earth turns with it, in today’s real sunlight.', tone: 'blue', bleed: true, className: 'h-[580px] sm:h-[640px] lg:col-span-12 lg:h-[700px]' },
-  { id: 'print', name: 'Print word', line: 'One word, printed in light.', tone: 'rose', bleed: true, className: 'h-[640px] lg:col-span-7 lg:h-[680px]' },
-  { id: 'lens', name: 'Lens chart', line: 'Drag across it to ask if a day was really unusual.', tone: 'amber', className: 'h-[520px] lg:col-span-5 lg:h-[680px]' },
+  { id: 'lens', name: 'Lens chart', line: 'Drag across it to ask if a day was really unusual.', tone: 'amber', className: 'h-[520px] lg:col-span-7 lg:h-[600px]' },
+  { id: 'find', name: 'Lit find', line: 'Search lights the sentence, not only the word.', tone: 'blue', className: 'h-[520px] lg:col-span-5 lg:h-[600px]' },
+  { id: 'threads', name: 'Thread hero', line: 'Threads that lead the eye to your button.', tone: 'rose', bleed: true, className: 'h-[560px] lg:col-span-12 lg:h-[640px]' },
 ]
 
 export function Touch() {
@@ -32,7 +33,6 @@ export function Touch() {
             <div className="flex shrink-0 items-center gap-4 px-3 pb-2 pt-4">
               <p className="min-w-0 flex-1 text-[17px] leading-6 tracking-[-0.015em] text-ink">
                 {p.name}
-                <span className="block text-[15px] leading-5 text-quiet">{p.line}</span>
               </p>
               <Link href={`/components/${p.id}`} className="ring-focus group/open flex h-9 shrink-0 items-center gap-1 rounded-full px-3.5 text-[13px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)] transition-[color,transform] duration-150 hover:text-ink active:scale-[0.97]">
                 Open

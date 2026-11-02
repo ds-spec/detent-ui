@@ -160,7 +160,6 @@ export function Ledger() {
                   >
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[14.5px] text-ink">{i.name}</span>
-                      <span className="block truncate text-[12.5px] text-ink-3">{i.line}</span>
                     </span>
                     {/* A tick a day: what it would take to build. */}
                     <span aria-hidden className="hidden h-4 items-end gap-[2px] sm:flex" style={{ width: MOST * 4 }}>

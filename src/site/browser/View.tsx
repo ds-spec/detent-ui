@@ -176,9 +176,6 @@ function Caption({ e }: { e: Entry }) {
               </motion.span>
             </span>
           </h1>
-          <motion.p className="mt-1 max-w-[580px] text-body text-ink-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.12 }}>
-            {e.line}
-          </motion.p>
         </motion.div>
       </AnimatePresence>
       {/* A fixed column, so a longer command never re-wraps the line beside it. */}

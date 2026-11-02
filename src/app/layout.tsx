@@ -11,7 +11,7 @@ const mono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', dis
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
-  title: { default: `${NAME} — premium React components, AI included`, template: `%s · ${NAME}` },
+  title: { default: `${NAME} — premium React components`, template: `%s · ${NAME}` },
   description: DESCRIPTION,
   applicationName: NAME,
   keywords: ['React components', 'AI UI components', 'shadcn', 'Tailwind CSS', 'Next.js', 'chat UI', 'AI chat components', 'agent UI', 'streaming answer', 'model picker', 'component library', 'React templates'],
@@ -38,7 +38,11 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   viewportFit: 'cover',
-  themeColor: '#ffffff',
+  // The browser's own bar matches the page in either theme.
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#141416' },
+  ],
 }
 
 // Runs before first paint, so the page never flashes the wrong theme. Light unless dark was chosen,

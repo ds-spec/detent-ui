@@ -9,6 +9,7 @@ import { Check, Copy } from '@/lab/icons'
 import { Stepper } from '@/lab/components/stepper/Stepper'
 import { Switch } from '@/lab/ui/Switch'
 import { useBenchState } from './state'
+import { BTN, useSideNew } from '../shell/side'
 import type { Call } from './state'
 
 /**
@@ -25,6 +26,8 @@ export function PropsPanel({ id, api }: { id: string; api: Api }) {
   const events = props.filter(isEvent)
   const live = Object.keys(knobs).length > 0
   // The columns, shared by the head and every row so they line up: prop, what it does, default, and a control when the demo has one.
+  const side = useSideNew()
+  if (side) return <PropsDocs api={api} props={props} knobs={knobs} value={value} live={live} bench={bench} events={events} />
   const cols = live ? 'md:grid-cols-[minmax(150px,200px)_minmax(0,1fr)_minmax(110px,160px)_190px]' : 'md:grid-cols-[minmax(150px,200px)_minmax(0,1fr)_minmax(110px,180px)]'
   return (
     <>
@@ -106,11 +109,12 @@ function Row({ p, cols, live, knob, value, set, changed, pulse }: { p: PropDoc; 
 }
 
 function Control({ k, value, set, name }: { k: Knob; value: unknown; set: (v: unknown) => void; name: string }) {
+  const side = useSideNew()
   if ('options' in k)
     return (
-      <span role="radiogroup" aria-label={name} className="flex h-8 items-center rounded-full bg-surface-2 p-0.5">
+      <span role="radiogroup" aria-label={name} className={`flex h-8 items-center ${side ? `rounded-[10px] p-[3px] ${BTN.track}` : 'rounded-full bg-surface-2 p-0.5'}`}>
         {k.options.map((o) => (
-          <button key={String(o)} type="button" role="radio" aria-checked={value === o} onClick={() => set(o)} className={`ring-focus h-7 rounded-full px-2.5 text-caption font-medium transition-colors ${value === o ? 'bg-plate text-ink shadow-raised' : 'text-ink-3 hover:text-ink-2'}`}>
+          <button key={String(o)} type="button" role="radio" aria-checked={value === o} onClick={() => set(o)} className={`ring-focus px-2.5 text-caption font-medium transition-colors ${side ? 'h-full rounded-[7px]' : 'h-7 rounded-full'} ${value === o ? (side ? BTN.plate : 'bg-plate text-ink shadow-raised') : 'text-ink-3 hover:text-ink-2'}`}>
             {String(o)}
           </button>
         ))}
@@ -201,7 +205,7 @@ const attr = (name: string, v: unknown) => (typeof v === 'string' ? `${name}="${
 const literal = (v: unknown) => (typeof v === 'string' ? `'${v}'` : String(v))
 
 /** The usage, written from what's set: every required prop, and any control that's away from the component's own default. Lines you changed are marked. */
-function Usage({ api, props, knobs, value }: { api: Api; props: PropDoc[]; knobs: Record<string, Knob>; value: (p: PropDoc) => unknown }) {
+function Usage({ api, props, knobs, value, flat = false }: { api: Api; props: PropDoc[]; knobs: Record<string, Knob>; value: (p: PropDoc) => unknown; flat?: boolean }) {
   const [copied, setCopied] = useState(false)
   const lines: { text: string; changed?: boolean }[] = []
   for (const p of props) {
@@ -220,12 +224,16 @@ function Usage({ api, props, knobs, value }: { api: Api; props: PropDoc[]; knobs
     setTimeout(() => setCopied(false), 1400)
   }
   return (
-    <section aria-label="Usage" className="overflow-hidden rounded-[26px] bg-surface shadow-[var(--card-edge)]">
-      <div className="flex h-12 items-center justify-between px-6 shadow-[inset_0_-1px_0_var(--line)]">
-        <p className="text-footnote font-medium text-ink">
-          Usage <span className="font-normal text-ink-3">· follows the props you set</span>
-        </p>
-        <button type="button" onClick={copy} className="ring-focus flex h-8 items-center rounded-full px-3 text-caption font-medium text-ink-2 hover:bg-surface-2 hover:text-ink">
+    <section aria-label="Usage" className={flat ? 'overflow-hidden rounded-[14px] shadow-[0_0_0_1px_var(--line)]' : 'overflow-hidden rounded-[26px] bg-surface shadow-[var(--card-edge)]'}>
+      <div className={`flex items-center justify-between shadow-[inset_0_-1px_0_var(--line)] ${flat ? 'h-11 pl-4 pr-1.5' : 'h-12 px-6'}`}>
+        {flat ? (
+          <p className="font-mono text-[12.5px] text-ink-3">usage.tsx</p>
+        ) : (
+          <p className="text-footnote font-medium text-ink">
+            Usage <span className="font-normal text-ink-3">· follows the props you set</span>
+          </p>
+        )}
+        <button type="button" onClick={copy} className={`ring-focus flex h-8 items-center px-3 text-caption font-medium text-ink-2 hover:text-ink ${flat ? 'rounded-[8px] hover:bg-[var(--shell-hover)]' : 'rounded-full hover:bg-surface-2'}`}>
           <span className="grid">
             <span className={`col-start-1 row-start-1 flex items-center gap-1.5 transition-opacity ${copied ? 'opacity-0' : ''}`}>
               <Copy size={13} /> Copy
@@ -238,12 +246,87 @@ function Usage({ api, props, knobs, value }: { api: Api; props: PropDoc[]; knobs
       </div>
       <pre className="overflow-x-auto py-4 font-mono text-[13px] leading-[22px]" translate="no">
         {all.map((l, i) => (
-          <div key={i} className="relative px-6 transition-colors duration-300" style={{ background: l.changed ? 'color-mix(in oklch, var(--accent) 7%, transparent)' : undefined }}>
+          <div key={i} className={`relative transition-colors ${flat ? 'px-4' : 'px-6'} duration-300`} style={{ background: l.changed ? 'color-mix(in oklch, var(--accent) 7%, transparent)' : undefined }}>
             <span aria-hidden className={`absolute inset-y-0 left-0 w-[2px] bg-[var(--accent)] transition-opacity duration-300 ${l.changed ? '' : 'opacity-0'}`} />
             <span className={l.changed ? 'text-ink' : 'text-ink-2'}>{l.text}</span>
           </div>
         ))}
       </pre>
     </section>
+  )
+}
+
+/**
+ * The props as a page of docs. No table: each prop is a short entry, its name with its type beside
+ * it as a soft chip, what it does under that, and its default at the far end. Controls sit at the
+ * end of the entry when the demo has one. Hairlines between, nothing boxed.
+ */
+function PropsDocs({ api, props, knobs, value, live, bench }: { api: Api; props: PropDoc[]; knobs: Record<string, Knob>; value: (p: PropDoc) => unknown; live: boolean; bench: ReturnType<typeof useBenchState>; events: PropDoc[] }) {
+  // Callbacks last, after what it shows.
+  const shown = [...props.filter((p) => !isEvent(p)), ...props.filter(isEvent)]
+  return (
+    <>
+      <section aria-labelledby="props-h" className="mt-12">
+        <div className="flex items-baseline justify-between gap-6">
+          <h2 id="props-h" className="text-[18px] font-medium tracking-[-0.015em] text-ink">
+            Props <span className="tnum font-normal text-ink-3">{props.length}</span>
+          </h2>
+          {live && <p className="hidden text-[13px] text-ink-3 sm:block">Change one and the preview follows.</p>}
+        </div>
+        <dl className="mt-4 shadow-[inset_0_1px_0_var(--line)]">
+          {shown.map((p) => {
+            const k = knobs[p.name]
+            const v = value(p)
+            const changed = !!k && v !== k.value
+            return (
+              <div key={p.name} className="flex flex-col gap-3 py-5 shadow-[inset_0_-1px_0_var(--line)] sm:flex-row sm:items-start sm:gap-8">
+                <div className="min-w-0 flex-1">
+                  <dt className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+                    <code className={`font-mono text-[13.5px] font-medium transition-colors ${changed ? 'text-[var(--accent-ink)]' : 'text-ink'}`}>{p.name}</code>
+                    <code className="max-w-full truncate rounded-[6px] bg-[color-mix(in_oklch,var(--ink)_5%,transparent)] px-1.5 py-[3px] font-mono text-[11.5px] leading-none text-ink-2" title={p.type}>
+                      {p.type}
+                    </code>
+                    {p.required && <span className="text-[12px] text-[var(--accent-ink)]">Required</span>}
+                  </dt>
+                  {p.note && <dd className="mt-2 max-w-[620px] text-[14px] leading-[1.55] text-ink-3">{p.note}</dd>}
+                </div>
+                <dd className="flex shrink-0 items-center gap-4 sm:min-h-[22px]">
+                  {p.default && (
+                    <span className="flex items-baseline gap-1.5 text-[12.5px] text-ink-3">
+                      Default <code className="font-mono text-ink-2">{p.default}</code>
+                    </span>
+                  )}
+                  {k && <Control k={k} value={v} set={(x) => bench?.set(p.name, x)} name={p.name} />}
+                </dd>
+              </div>
+            )
+          })}
+        </dl>
+        {(api.methods || api.extends) && (
+          <div className="mt-4 flex flex-col gap-1 text-[13px] text-ink-3">
+            {api.methods && (
+              <p>
+                Through a ref:{' '}
+                {api.methods.map((m, i) => (
+                  <code key={m} className="font-mono text-ink-2">
+                    {i ? ', ' : ''}
+                    {m.split('(')[0]}()
+                  </code>
+                ))}
+              </p>
+            )}
+            {api.extends && (
+              <p>
+                Also takes every prop of <code className="font-mono text-ink-2">&lt;{api.extends}&gt;</code>.
+              </p>
+            )}
+          </div>
+        )}
+      </section>
+      <section aria-labelledby="usage-h" className="mt-12">
+        <h2 id="usage-h" className="mb-4 text-[18px] font-medium tracking-[-0.015em] text-ink">Usage</h2>
+        <Usage api={api} props={props} knobs={knobs} value={value} flat />
+      </section>
+    </>
   )
 }

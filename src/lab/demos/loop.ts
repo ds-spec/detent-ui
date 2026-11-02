@@ -66,5 +66,6 @@ export function useLoop(play: (beat: (ms: number) => Promise<void>) => Promise<v
     ...hover(held),
     ...pressed(() => (touched.current = true)),
     onKeyDownCapture: () => (touched.current = true),
+    onDropCapture: () => (touched.current = true),
   }
 }

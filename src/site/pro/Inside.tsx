@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { BLOCKS } from '@/catalog/blocks'
-import { BLOCK_DAYS, COMPONENT_DAYS, PRO_BLOCKS, TEMPLATE_DAYS } from '@/catalog/effort'
+import { PRO_BLOCKS } from '@/catalog/effort'
 import { ENTRIES, entry } from '@/catalog/meta'
 import { FREE_BLOCKS, PLANS, PRO_COMPONENTS } from '@/catalog/pro'
 import { TEMPLATES } from '@/catalog/templates'
@@ -12,10 +12,10 @@ import { Check } from '@/lab/icons'
  * takes to build. Then the plans side by side, row by row, so the difference is a glance.
  */
 
-const GROUPS: { name: string; days: number; note?: string; items: { name: string; href: string }[] }[] = [
-  { name: 'Components', days: COMPONENT_DAYS, items: PRO_COMPONENTS.map((id) => ({ name: entry(id)?.name ?? id, href: `/components/${id}` })) },
-  { name: 'Blocks', days: BLOCK_DAYS, items: PRO_BLOCKS.map((b) => ({ name: b.name, href: `/blocks/${b.id}` })) },
-  { name: 'Templates', days: TEMPLATE_DAYS, note: 'With Pro + Templates', items: TEMPLATES.map((t) => ({ name: `${t.name} · ${t.kind}`, href: `/templates/${t.id}` })) },
+const GROUPS: { name: string; note?: string; items: { name: string; href: string }[] }[] = [
+  { name: 'Components', items: PRO_COMPONENTS.map((id) => ({ name: entry(id)?.name ?? id, href: `/components/${id}` })) },
+  { name: 'Blocks', items: PRO_BLOCKS.map((b) => ({ name: b.name, href: `/blocks/${b.id}` })) },
+  { name: 'Templates', note: 'With Pro + Templates', items: TEMPLATES.map((t) => ({ name: `${t.name} · ${t.kind}`, href: `/templates/${t.id}` })) },
 ]
 
 export function Inside() {
@@ -27,9 +27,7 @@ export function Inside() {
             <p className="text-[19px] tracking-[-0.015em] text-ink">
               {g.name} <span className="tnum text-quiet">{g.items.length}</span>
             </p>
-            <p className="mt-1 text-[13.5px] text-ink-3">
-              About <span className="tnum">{g.days}</span> days to build{g.note ? ` · ${g.note}` : ''}
-            </p>
+            {g.note && <p className="mt-1 text-[13.5px] text-ink-3">{g.note}</p>}
           </div>
           <ul className="columns-2 gap-x-8 sm:columns-3">
             {g.items.map((x) => (
@@ -46,7 +44,7 @@ export function Inside() {
   )
 }
 
-const [pro, all, team] = PLANS
+const [pro, all] = PLANS
 const FREE = ENTRIES.length - PRO_COMPONENTS.length
 const YES = (
   <span role="img" aria-label="Included" className="inline-flex">
@@ -60,20 +58,19 @@ const NO = (
 )
 
 /** Free and each plan, a column each, a row for every difference that matters. */
-const ROWS: [string, ReactNode, ReactNode, ReactNode, ReactNode][] = [
-  ['Price', '$0', `$${pro.price} once`, `$${all.price} once`, `$${team.price} once`],
-  ['Components', FREE, `All ${ENTRIES.length}`, `All ${ENTRIES.length}`, `All ${ENTRIES.length}`],
-  ['Blocks, whole screens', FREE_BLOCKS.length, `All ${BLOCKS.length}`, `All ${BLOCKS.length}`, `All ${BLOCKS.length}`],
-  ['App templates', NO, NO, `${TEMPLATES.length}, and every new one`, `${TEMPLATES.length}, and every new one`],
-  ['AI SDK adapter', NO, YES, YES, YES],
-  ['Takes your shadcn theme', YES, YES, YES, YES],
-  ['Installs from', 'Public registry', 'Private registry', 'Private registry', 'Private registry'],
-  ['People', 'Anyone', 'One', 'One', 'Up to five, plus CI'],
-  ['Licence', 'MIT', 'Unlimited projects', 'Unlimited projects', 'Unlimited projects'],
+const ROWS: [string, ReactNode, ReactNode, ReactNode][] = [
+  ['Price', '$0', `$${pro.price} once`, `$${all.price} once`],
+  ['Components', FREE, `All ${ENTRIES.length}`, `All ${ENTRIES.length}`],
+  ['Blocks, whole screens', FREE_BLOCKS.length, `All ${BLOCKS.length}`, `All ${BLOCKS.length}`],
+  ['App templates', NO, NO, `${TEMPLATES.length}, and every new one`],
+  ['Takes your shadcn theme', YES, YES, YES],
+  ['Installs from', 'Public registry', 'Private registry', 'Private registry'],
+  ['People', 'Anyone', 'One', 'One'],
+  ['Licence', 'MIT', 'Unlimited projects', 'Unlimited projects'],
 ]
 
 export function Compare() {
-  const heads = ['Free', pro.name, all.name, team.name]
+  const heads = ['Free', pro.name, all.name]
   return (
     <div className="md:overflow-x-auto">
       <table className="block w-full table-fixed border-collapse text-left md:table md:min-w-[720px]">

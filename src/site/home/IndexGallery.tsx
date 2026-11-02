@@ -208,7 +208,6 @@ function Caption({ e }: { e: Entry }) {
               {e.name}
               <span className={`rounded-full px-1.5 text-[10.5px] font-semibold leading-[17px] ${pro ? 'bg-ink text-surface' : 'bg-surface-2 text-ink-2'}`}>{pro ? 'Pro' : 'Free'}</span>
             </p>
-            <p className="mt-0.5 truncate text-footnote text-ink-3">{e.line}</p>
           </motion.div>
         </AnimatePresence>
       </div>

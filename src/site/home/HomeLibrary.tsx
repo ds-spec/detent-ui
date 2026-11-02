@@ -20,9 +20,9 @@ import type { LibItem } from './library'
 
 /** The eight, row by row: each pair is wide then narrow, or narrow then wide.  */
 const ROWS: [string, string][] = [
-  ['region', 'activity'],
-  ['upload', 'print'],
-  ['halo', 'readalong'],
+  ['region', 'popup'],
+  ['upload', 'voicenote'],
+  ['halo', 'rewind'],
   ['lens', 'threads'],
 ]
 
@@ -71,7 +71,7 @@ export function HomeLibrary({ lib }: { lib: LibItem[] }) {
             ))}
           </div>
 
-          <SeeAll lib={lib} />
+          <SeeAll />
         </div>
       </div>
     </section>
@@ -89,18 +89,16 @@ function Plate({ e, n, wide }: { e: LibItem; n: number; wide: boolean }) {
       className={`h-[520px] transition-shadow duration-200 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--card-lift)] sm:h-[600px] ${wide ? 'lg:col-span-7' : 'lg:col-span-5'}`}
       caption={
         // The demo is the thing to touch; the caption and its arrow are the way to the part's page.
-        <Link href={`/components/${e.id}`} prefetch={false} {...intent(`/components/${e.id}`)} aria-label={`${e.name}: ${e.line}`} className="ring-focus group/cap flex shrink-0 items-end gap-4 rounded-[20px] px-3 pb-2 pt-4">
+        <Link href={`/components/${e.id}`} prefetch={false} {...intent(`/components/${e.id}`)} aria-label={e.name} className="ring-focus group/cap flex shrink-0 items-end gap-4 rounded-[20px] px-3 pb-2 pt-4">
           <div className="min-w-0 flex-1">
             <p className="flex items-center gap-1.5 text-[13px] text-ink-3">
               {family}
               <span className="size-[3px] rounded-full bg-current opacity-50" />
               <span className={pro ? 'text-ink' : ''}>{pro ? 'Pro' : 'Free'}</span>
             </p>
-            {/* The name and its line: one line on wide screens, stacked on a phone so neither is cut. */}
+            {/* The name. */}
             <p className="mt-2 text-[19px] leading-6 tracking-[-0.015em] text-ink sm:truncate">
               {e.name}
-              <span className="hidden text-quiet sm:inline"> — {e.line}</span>
-              <span className="block text-[15px] leading-5 text-quiet sm:hidden">{e.line}</span>
             </p>
           </div>
           <span className="flex size-10 shrink-0 items-center justify-center rounded-full text-ink shadow-[inset_0_0_0_1px_var(--line-strong)] transition-[background-color,color,box-shadow,transform] duration-200 group-hover/cap:bg-ink group-hover/cap:text-surface group-hover/cap:shadow-none group-active/cap:scale-[0.97]">
@@ -112,22 +110,12 @@ function Plate({ e, n, wide }: { e: LibItem; n: number; wide: boolean }) {
   )
 }
 
-/** Under the wall, the way through to everything: how much more there is, and the button that opens the full library. */
-function SeeAll({ lib }: { lib: LibItem[] }) {
-  const pro = lib.filter((x) => x.pro).length
+/** Under the wall, the way through to everything: one button. */
+function SeeAll() {
   return (
-    <div className="mt-3 flex flex-col items-start gap-6 rounded-[28px] bg-surface px-6 py-6 shadow-[var(--card-edge)] sm:flex-row sm:items-center sm:px-8 sm:py-7">
-      <div className="min-w-0 flex-1">
-        <p className="text-[22px] leading-7 tracking-[-0.02em] text-ink">
-          {lib.length} components, every one live.
-          <span className="text-quiet">
-            {' '}
-            {lib.length - pro} free for good, {pro} in Pro.
-          </span>
-        </p>
-      </div>
+    <div className="mt-10 flex justify-center">
       <Link href={FIRST_COMPONENT} className="ring-focus group/all flex h-12 shrink-0 items-center gap-2 rounded-full bg-ink pl-6 pr-5 text-[15px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.97]">
-        Browse all {lib.length}
+        Browse components
         <ArrowRight size={15} className="transition-transform duration-150 group-hover/all:translate-x-0.5" />
       </Link>
     </div>

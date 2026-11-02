@@ -5,13 +5,15 @@ import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { PLANS } from '@/catalog/pro'
-import { FIRST_BLOCK, FIRST_COMPONENT } from '@/catalog/site'
+import { AI_SDK, FIRST_BLOCK, FIRST_COMPONENT } from '@/catalog/site'
 import { ArrowRight, Clock, Folder, Layers, Orbit, Search, Sliders, Table } from '@/lab/icons'
 import { Rail } from '../exhibit/Rail'
 import type { RailGroup } from '../exhibit/Rail'
 import { Header } from '../Header'
 import { Mark, ThemeButton } from '../parts'
 import { useSite } from '../Providers'
+import { SideNext } from './SideNext'
+import { useSideNew } from './side'
 
 /*
  * The library's own pages, as an app. The sidebar is the frame: the mark, the way to each part
@@ -28,7 +30,7 @@ const NAV = [
   { href: FIRST_COMPONENT, section: '/components', label: 'Components', icon: <Layers size={16} /> },
   { href: FIRST_BLOCK, section: '/blocks', label: 'Blocks', icon: <Table size={16} /> },
   { href: '/templates', section: '/templates', label: 'Templates', icon: <Folder size={16} /> },
-  { href: '/ai-sdk', section: '/ai-sdk', label: 'AI SDK', icon: <Orbit size={16} /> },
+  ...(AI_SDK ? [{ href: '/ai-sdk', section: '/ai-sdk', label: 'AI SDK', icon: <Orbit size={16} /> }] : []),
   { href: '/system', section: '/system', label: 'System', icon: <Sliders size={16} /> },
   { href: '/changelog', section: '/changelog', label: 'Changelog', icon: <Clock size={16} /> },
 ]
@@ -39,6 +41,8 @@ export const scroller = () => document.querySelector<HTMLElement>('[data-scrolle
 export function Shell({ list, bar, children }: { list: ReactNode; bar: ReactNode; children: ReactNode }) {
   const path = usePathname()
   const { openSearch } = useSite()
+  const side = useSideNew()
+  const rail = (list as { props?: { groups?: RailGroup[]; current?: string; onPick?: (id: string) => void; preview?: (id: string, onReady: () => void) => ReactNode; label?: string } } | null)?.props
   return (
     <div className="lg:fixed lg:inset-0 lg:grid lg:grid-cols-[272px_minmax(0,1fr)]" style={{ background: 'var(--shell)' }}>
       <div className="lg:hidden">
@@ -47,6 +51,11 @@ export function Shell({ list, bar, children }: { list: ReactNode; bar: ReactNode
 
       {/* The frame: who, where, and what's here. */}
       {/* Its mark sits at the height of the site header's, so the step in from the home page doesn't jump. */}
+      {side && rail?.groups ? (
+        <aside className="hidden h-dvh min-h-0 flex-col pb-3 pl-3 pt-4 lg:flex">
+          <SideNext groups={rail.groups} current={rail.current ?? ''} onPick={rail.onPick ?? (() => {})} preview={rail.preview} label={rail.label} />
+        </aside>
+      ) : (
       <aside className="hidden h-dvh min-h-0 flex-col pb-3 pl-3 pt-4 lg:flex">
         <div className="flex h-10 items-center gap-2 pl-2 pr-3">
           <Link href="/" className="ring-focus -ml-1 flex items-center gap-2.5 rounded-[8px] px-1 py-1">
@@ -78,11 +87,12 @@ export function Shell({ list, bar, children }: { list: ReactNode; bar: ReactNode
           <ArrowRight size={12} className="text-ink-3 transition-transform duration-150 group-hover/pro:translate-x-0.5" />
         </Link>
       </aside>
+      )}
 
       {/* The page, in its panel. */}
       <div className="min-w-0 lg:h-dvh lg:py-2 lg:pr-2">
         <div data-scroller className="relative lg:h-full lg:overflow-y-auto lg:rounded-[18px] lg:[scrollbar-width:thin]" style={{ background: 'var(--panel)', boxShadow: 'var(--panel-edge)' }}>
-          <div className="sticky top-0 z-30 hidden h-[52px] items-center gap-3 px-6 lg:flex" style={{ background: 'color-mix(in oklch, var(--panel) 88%, transparent)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', boxShadow: 'inset 0 -1px 0 var(--line)' }}>
+          <div className={`sticky top-0 z-30 hidden h-[52px] items-center gap-3 px-6 ${side && rail?.groups ? '' : 'lg:flex'}`} style={{ background: 'color-mix(in oklch, var(--panel) 88%, transparent)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', boxShadow: 'inset 0 -1px 0 var(--line)' }}>
             {bar}
             <span className="flex-1" />
             <ThemeButton />

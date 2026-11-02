@@ -2,7 +2,7 @@ import 'server-only'
 import { randomBytes, randomUUID } from 'node:crypto'
 import type { Plan } from '@/catalog/licence'
 import { db } from './db'
-import { hash, normalEmail } from './session'
+import { hash } from './session'
 
 /*
  * Keys and what they open. Anyone signed in can make a key; what it installs follows the email
@@ -11,19 +11,17 @@ import { hash, normalEmail } from './session'
  */
 
 export const MAX_KEYS = 5
-export const MAX_SEATS = 4
 
 export type Key = { id: string; name: string; hint: string; createdAt: number; usedAt: number | null }
-const RANK: Plan[] = ['pro', 'all', 'team']
+const RANK: Plan[] = ['pro', 'all']
 const best = (plans: unknown[]) => plans.reduce<Plan | null>((top, plan) => (RANK.indexOf(plan as Plan) > (top ? RANK.indexOf(top) : -1) ? (plan as Plan) : top), null)
 
-/** The best plan an email has: bought itself, or as a seat on someone's Team. */
+/** The best plan an email has bought. */
 export async function planFor(email: string): Promise<Plan | null> {
   const client = await db()
   const { rows } = await client.execute({
-    sql: `select plan from purchase where refunded = 0 and email = ?
-          union select 'team' from seat join purchase on purchase.email = seat.owner where seat.email = ? and purchase.plan = 'team' and purchase.refunded = 0`,
-    args: [email, email],
+    sql: 'select plan from purchase where refunded = 0 and email = ?',
+    args: [email],
   })
   return best(rows.map((row) => row.plan))
 }
@@ -57,27 +55,6 @@ export async function keyEmail(secret: string) {
   return String(rows[0].email)
 }
 
-export async function listSeats(owner: string) {
-  const { rows } = await (await db()).execute({ sql: 'select email from seat where owner = ? order by email', args: [owner] })
-  return rows.map((row) => String(row.email))
-}
-
-/** Adds someone to a Team. Says why not, if it can't. */
-export async function addSeat(owner: string, value: unknown) {
-  const email = normalEmail(value)
-  if (!email) return 'That doesn’t look like an email address.'
-  if (email === owner) return 'You’re already on your Team.'
-  if ((await planFor(owner)) !== 'team') return 'Adding people comes with Team.'
-  const seats = await listSeats(owner)
-  if (seats.includes(email)) return null
-  if (seats.length >= MAX_SEATS) return `Team covers you and ${MAX_SEATS} others. Remove someone first.`
-  await (await db()).execute({ sql: 'insert into seat (owner, email) values (?, ?)', args: [owner, email] })
-  return null
-}
-
-export async function removeSeat(owner: string, email: string) {
-  await (await db()).execute({ sql: 'delete from seat where owner = ? and email = ?', args: [owner, email] })
-}
 
 /** Records an order from the store. The store can send the same one twice, and that's fine. */
 /** Keeps a refund once it's seen: the store may deliver or retry a paid event after it. */

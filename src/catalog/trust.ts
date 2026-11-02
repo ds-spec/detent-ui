@@ -13,7 +13,7 @@ export const CONTACT = process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? 'hello@detentui.
 export const REFUND_DAYS = 14
 
 /** When the licence, refund and terms pages last changed. */
-export const UPDATED = '2026-10-24'
+export const UPDATED = '2026-11-02'
 
 export const updated = () => new Date(`${UPDATED}T00:00:00`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
 
@@ -23,35 +23,11 @@ export type Release = { date: string; name: string; title: string; line: string;
 export const RELEASES: Release[] = [
   {
     date: '2026-10-25',
-    name: 'Rapport CRM',
-    title: 'Rapport, a CRM with AI built in',
-    line: 'A whole CRM where the AI does the busywork. Rapport opens on a morning brief written from the day’s calls and email, drafts the replies waiting in the inbox, and keeps the tasks. Deals move across a board, along the quarter or down a list, and every change, yours or Rapport’s, can be undone. Companies, people, reports and settings are all there, with ⌘K to reach any of them. Ask Rapport runs on the AI SDK, and Settings decide what it may do without asking.',
-    items: [
-      { label: 'Rapport template', href: '/templates/rapport', pro: true },
-      { label: 'Ask Rapport' },
-      { label: 'Inbox with drafted replies' },
-      { label: 'Reports' },
-    ],
-  },
-  {
-    date: '2026-10-25',
-    name: 'Tandem dashboard',
-    title: 'Tandem, a SaaS dashboard with AI built in',
-    line: 'A dashboard for a subscription business, where the AI is part of the product. Ask Tandem runs on the AI SDK and answers from the dashboard’s own data through tools, drawing what it found under the answer. Three agents work in the background: they chase failed payments, watch for churn and write the weekly report, and anything that moves money waits for a yes. Settings choose their model, cap what they spend and decide what they may do without asking.',
-    items: [
-      { label: 'Tandem template', href: '/templates/tandem', pro: true },
-      { label: 'Ask Tandem' },
-      { label: 'Background agents' },
-      { label: 'AI settings' },
-    ],
-  },
-  {
-    date: '2026-10-25',
     name: 'AI SDK and theming',
     title: 'Works with the AI SDK, and with your theme',
     line: 'Hand useDetentChat what useChat gives you and it hands back the streaming answer, the run’s waterfall and the approval card, timed as the parts arrive. The Agent chat block puts them in one window, live on a real route you can try. And every free component now takes on your shadcn theme: your primary becomes its accent, and .dark turns it dark.',
     items: [
-      { label: 'AI SDK', href: '/ai-sdk' },
+      { label: 'AI SDK' },
       { label: 'Agent chat', href: '/blocks/agent-chat', pro: true },
       { label: 'Follows your shadcn theme' },
     ],
@@ -105,7 +81,6 @@ export const RELEASES: Release[] = [
     line: 'The components people install a library for, each built to the same bar as the rest.',
     items: [
       { label: 'Live code block', pro: true },
-      { label: 'Ticket history', href: '/components/history' },
       { label: 'Toasts' },
     ],
   },
@@ -113,20 +88,18 @@ export const RELEASES: Release[] = [
     date: '2026-10-23',
     name: 'Free tier and registry',
     title: 'A free tier that installs for real',
-    line: 'Every free component installs with one command from a public registry, bringing its files and the Detent theme without touching yours. A Team plan joins Pro.',
+    line: 'Every free component installs with one command from a public registry, bringing its files and the Detent theme without touching yours.',
     items: [
       { label: 'Public registry', href: '/components/prompt' },
       { label: 'Agent kit', href: '/components/prompt' },
-      { label: 'Team plan', href: '/pro#pricing' },
     ],
   },
   {
     date: '2026-10-23',
     name: 'Stateful surfaces',
     title: 'Stateful surfaces',
-    line: 'The hard surfaces that take weeks to get right: a flow builder you wire by hand, and a composer that formats as you write.',
+    line: 'The hard surfaces that take weeks to get right: a composer that formats as you write.',
     items: [
-      { label: 'Flow builder', href: '/components/flow', pro: true },
       { label: 'Rich composer' },
     ],
   },
@@ -153,7 +126,6 @@ export const RELEASES: Release[] = [
       { label: 'File tree' },
       { label: 'Upload', href: '/components/upload' },
       { label: 'Voice input' },
-      { label: 'Spend cap', href: '/components/usage', pro: true },
     ],
   },
 ]

@@ -26,7 +26,7 @@ const ROW = 4
 const GAP = 16
 
 /** Components that need room: they take two columns wherever there are two to take. Listed in the order they appear. */
-const WIDE_ORDER = ['radar', 'prompt', 'confirm', 'usage', 'dates', 'dialog', 'rewrite', 'trace', 'toasts', 'scaffold']
+const WIDE_ORDER = ['radar', 'prompt', 'confirm', 'dates', 'dialog', 'rewrite', 'trace', 'toasts', 'scaffold']
 const WIDE = new Set(WIDE_ORDER)
 
 /** The column layouts, with each one's card width (one column, and two side by side). */

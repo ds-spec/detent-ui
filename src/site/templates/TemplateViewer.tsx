@@ -17,6 +17,8 @@ import { Modes, Rule, Tool } from '../exhibit/Exhibit'
 import { CopyCommand } from '../parts'
 import { Install } from '../Install'
 import { Desk } from '../blocks/BlockViewer'
+import { DeviceStage } from '../blocks/DeviceStage'
+import { useSideNew } from '../shell/side'
 import { ProTag } from '../blocks/ProTag'
 import { Rail } from '../exhibit/Rail'
 import { DownloadStarter } from './Download'
@@ -73,6 +75,7 @@ function TemplateViewer({ id, go }: { id: string; go: (id: string) => void }) {
   const page = useTheme()
   const [stageTheme, setStageTheme] = useState<'light' | 'dark' | null>(null)
   const shown = stageTheme ?? page
+  const side = useSideNew()
   const scroller = useRef<HTMLDivElement>(null)
   const [at, setAt] = useState(t.parts[0].anchor)
 
@@ -116,14 +119,12 @@ function TemplateViewer({ id, go }: { id: string; go: (id: string) => void }) {
           <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-footnote text-ink-3">
             <ProTag />
             <span>{app ? 'App' : 'Landing page'}</span>
-            <span aria-hidden className="size-[3px] rounded-full bg-ink-3/60" />
-            <span>
-              {t.parts.length} {app ? 'parts' : 'sections'}
-            </span>
-            <span aria-hidden className="size-[3px] rounded-full bg-ink-3/60" />
-            <span>Light and dark</span>
-            <span aria-hidden className="size-[3px] rounded-full bg-ink-3/60" />
-            <span>Fits any width</span>
+            {!side && (
+              <>
+                <span aria-hidden className="size-[3px] rounded-full bg-ink-3/60" />
+                <span>Fits any width</span>
+              </>
+            )}
           </p>
           {/* The list down the side does this on a laptop; below one, this is the way back. */}
           <Link href="/templates" className="ring-focus rounded-[6px] text-footnote text-ink-3 transition-colors hover:text-ink lg:hidden">
@@ -133,7 +134,7 @@ function TemplateViewer({ id, go }: { id: string; go: (id: string) => void }) {
         <div className="mt-4 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between lg:flex-col lg:items-start xl:flex-row xl:items-end">
           <h1 className="min-w-0 text-[clamp(32px,3.8vw,48px)] font-normal leading-[1.08] tracking-[-0.045em] text-ink">
             {t.name}
-            <span className="block text-quiet">For {t.suits}.</span>
+            {!side && <span className="block text-quiet">For {t.suits}.</span>}
           </h1>
           <div className="w-full shrink-0 sm:w-[400px] lg:w-[460px]">
             <Install id={`template-${t.id}`} free={false} />
@@ -141,9 +142,28 @@ function TemplateViewer({ id, go }: { id: string; go: (id: string) => void }) {
         </div>
       </header>
 
-      <Desk title={t.window} chrome="browser" run={run} mode={mode} theme={stageTheme} present={present} onExit={() => setPresent(false)} view={<Page key={run} id={t.id} scroller={scroller} onScroll={onScroll} theme={app ? shown : undefined} />} code={<Code id={`template-${t.id}`} />} />
+      {side ? (
+        <>
+          <DeviceStage
+            title={t.window}
+            chrome="browser"
+            mode={mode}
+            setMode={setMode}
+            pro
+            theme={shown}
+            onReplay={() => (setRun((r) => r + 1), setAt(t.parts[0].anchor))}
+            onFull={() => window.open(`/templates/${t.id}/live`, '_blank', 'noopener')}
+            run={run}
+            view={<Page key={run} id={t.id} scroller={scroller} onScroll={onScroll} theme={app ? shown : undefined} />}
+            code={<Code id={`template-${t.id}`} />}
+          />
+          {present && <Desk title={t.window} chrome="browser" run={run} mode={mode} theme={stageTheme} present onExit={() => setPresent(false)} view={<Page key={run} id={t.id} scroller={scroller} onScroll={onScroll} theme={app ? shown : undefined} />} code={<Code id={`template-${t.id}`} />} />}
+        </>
+      ) : (
+        <Desk title={t.window} chrome="browser" run={run} mode={mode} theme={stageTheme} present={present} onExit={() => setPresent(false)} view={<Page key={run} id={t.id} scroller={scroller} onScroll={onScroll} theme={app ? shown : undefined} />} code={<Code id={`template-${t.id}`} />} />
+      )}
 
-      <div className="mt-5 flex justify-center">
+      <div className={side ? 'hidden' : 'mt-5 flex justify-center'}>
         <div className="flex items-center gap-0.5 rounded-full bg-surface p-1 shadow-float">
           <Modes mode={mode} setMode={setMode} pro />
           <Rule />

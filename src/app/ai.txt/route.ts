@@ -44,7 +44,6 @@ export function GET() {
     `included: /blocks`,
     `included: /templates`,
     `included: /pro`,
-    `included: /ai-sdk`,
     `included: /system`,
     `included: /changelog`,
     `included: /licence`,

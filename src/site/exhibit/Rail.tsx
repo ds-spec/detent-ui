@@ -19,10 +19,14 @@ export type RailGroup = { id: string; name: string; icon?: ReactNode; color?: st
 /** Where each list was left, so moving between pages doesn't send it back to the top. */
 const left = new Map<string, number>()
 
-export function Rail({ groups, current, onPick, label, preview }: { groups: RailGroup[]; current: string; onPick: (id: string) => void; label: string; preview?: (id: string, onReady: () => void) => ReactNode }) {
+type Preview = (id: string, onReady: () => void) => ReactNode
+
+/**
+ * Point at a name for a moment and a small live preview of it opens beside the list. Returns the
+ * handlers for each row and the card itself, so any list down the side can have it.
+ */
+export function usePeek(items: RailItem[], preview?: Preview) {
   const reduce = useReducedMotion()
-  const [q, setQ] = useState('')
-  const [shut, setShut] = useState<string[]>([])
   const [peek, setPeek] = useState<{ id: string; y: number; x: number } | null>(null)
   // What the card shows: the last preview that was ready. The next one loads out of sight behind it
   // and takes over only once it's ready, so moving down the list never flashes a blank card.
@@ -30,9 +34,66 @@ export function Rail({ groups, current, onPick, label, preview }: { groups: Rail
   const [readyId, setReadyId] = useState<string | null>(null)
   // The one under the pointer is ready: it takes the card (state derived while rendering, so there's no extra frame).
   if (peek && readyId === peek.id && (shownAt?.id !== peek.id || shownAt.y !== peek.y)) setShownAt(peek)
-  const list = useRef<HTMLDivElement>(null)
   const timer = useRef(0)
+  useEffect(() => () => clearTimeout(timer.current), [])
+
+  const aim = (id: string, el: HTMLElement) => {
+    if (!preview) return
+    clearTimeout(timer.current)
+    const r = el.getBoundingClientRect()
+    const at = { id, y: r.top + r.height / 2, x: r.right + 18 }
+    // Waits a beat on the first name, then follows at once while a preview is open.
+    timer.current = window.setTimeout(() => setPeek(at), peek ? 0 : 420)
+  }
+  const leave = () => {
+    clearTimeout(timer.current)
+    timer.current = window.setTimeout(() => {
+      setPeek(null)
+      setShownAt(null)
+      setReadyId(null)
+    }, 120)
+  }
+  const peeked = shownAt ? items.find((x) => x.id === shownAt.id) : null
+  const top = shownAt ? Math.max(72, Math.min(shownAt.y - 112, (typeof window === 'undefined' ? 900 : innerHeight) - 252)) : 0
+  const layers = [shownAt?.id, peek?.id].filter((x, i, a): x is string => !!x && a.indexOf(x) === i)
+
+  // The preview of the name under the pointer, beside the list.
+  const card = (
+      <AnimatePresence>
+        {peek && preview && (
+          <motion.div
+            key="peek"
+            aria-hidden
+            className="pointer-events-none fixed left-0 top-0 z-50 w-[288px] overflow-hidden rounded-[16px] bg-surface shadow-modal"
+            initial={{ opacity: 0, scale: 0.97, x: peek.x, y: top }}
+            animate={shownAt ? { opacity: 1, scale: 1, x: shownAt.x, y: top } : { opacity: 0, scale: 0.97, x: peek.x, y: top }}
+            exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.1 } }}
+            transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 520, damping: 42 }}
+          >
+            <div className="relative h-[172px] overflow-hidden">
+              {layers.map((id) => (
+                <div key={id} className="absolute inset-0 transition-opacity duration-150" style={{ opacity: id === shownAt?.id ? 1 : 0 }}>
+                  {preview(id, () => setReadyId(id))}
+                </div>
+              ))}
+            </div>
+            <div className="px-3.5 pb-3 pt-2.5 shadow-[inset_0_1px_0_var(--line)]">
+              <p className="truncate text-[13px] text-ink">{peeked?.name}</p>
+              </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+  )
+  return { aim, leave, card }
+}
+
+export function Rail({ groups, current, onPick, label, preview }: { groups: RailGroup[]; current: string; onPick: (id: string) => void; label: string; preview?: Preview }) {
+  const reduce = useReducedMotion()
+  const [q, setQ] = useState('')
+  const [shut, setShut] = useState<string[]>([])
+  const list = useRef<HTMLDivElement>(null)
   const all = groups.flatMap((g) => g.items)
+  const { aim, leave, card } = usePeek(all, preview)
   const words = q.trim().toLowerCase()
   const shown = groups.map((g) => ({ ...g, items: g.items.filter((x) => !words || `${x.name} ${x.line ?? ''}`.toLowerCase().includes(words)) })).filter((g) => g.items.length)
 
@@ -52,27 +113,6 @@ export function Rail({ groups, current, onPick, label, preview }: { groups: Rail
     }
     arrived.current = true
   }, [current, reduce, label])
-  useEffect(() => () => clearTimeout(timer.current), [])
-
-  const aim = (id: string, el: HTMLElement) => {
-    if (!preview) return
-    clearTimeout(timer.current)
-    const r = el.getBoundingClientRect()
-    const at = { id, y: r.top + r.height / 2, x: r.right + 18 }
-    // Waits a beat on the first name, then follows at once while a preview is open.
-    timer.current = window.setTimeout(() => setPeek(at), peek ? 0 : 420)
-  }
-  const leave = () => {
-    clearTimeout(timer.current)
-    timer.current = window.setTimeout(() => {
-      setPeek(null)
-      setShownAt(null)
-      setReadyId(null)
-    }, 120)
-  }
-  const peeked = shownAt ? all.find((x) => x.id === shownAt.id) : null
-  const top = shownAt ? Math.max(72, Math.min(shownAt.y - 112, (typeof window === 'undefined' ? 900 : innerHeight) - 252)) : 0
-  const layers = [shownAt?.id, peek?.id].filter((x, i, a): x is string => !!x && a.indexOf(x) === i)
 
   return (
     <div aria-label={label} role="navigation" className="relative z-30 flex min-h-0 flex-1 flex-col">
@@ -127,32 +167,7 @@ export function Rail({ groups, current, onPick, label, preview }: { groups: Rail
         {!shown.length && <p className="px-2 pt-6 text-[13px] text-ink-3">Nothing called “{q}”.</p>}
       </div>
 
-      {/* The preview of the name under the pointer, beside the list. */}
-      <AnimatePresence>
-        {peek && preview && (
-          <motion.div
-            key="peek"
-            aria-hidden
-            className="pointer-events-none fixed left-0 top-0 z-50 w-[288px] overflow-hidden rounded-[16px] bg-surface shadow-modal"
-            initial={{ opacity: 0, scale: 0.97, x: peek.x, y: top }}
-            animate={shownAt ? { opacity: 1, scale: 1, x: shownAt.x, y: top } : { opacity: 0, scale: 0.97, x: peek.x, y: top }}
-            exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.1 } }}
-            transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 520, damping: 42 }}
-          >
-            <div className="relative h-[172px] overflow-hidden">
-              {layers.map((id) => (
-                <div key={id} className="absolute inset-0 transition-opacity duration-150" style={{ opacity: id === shownAt?.id ? 1 : 0 }}>
-                  {preview(id, () => setReadyId(id))}
-                </div>
-              ))}
-            </div>
-            <div className="px-3.5 pb-3 pt-2.5 shadow-[inset_0_1px_0_var(--line)]">
-              <p className="truncate text-[13px] text-ink">{peeked?.name}</p>
-              {peeked?.line && <p className="truncate text-[12px] text-ink-3">{peeked.line}</p>}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {card}
     </div>
   )
 }

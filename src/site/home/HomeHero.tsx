@@ -8,11 +8,14 @@ import type { MotionValue } from 'motion/react'
 import { DEMOS } from '@/catalog/demos'
 import { PLANS, installCommand, isProComponent } from '@/catalog/pro'
 import { FIRST_COMPONENT } from '@/catalog/site'
+import { Announcement } from '@/lab/components/announce/Announcement'
 import { ArrowRight, ArrowUpRight, Chart, Note, Play, Prompt } from '@/lab/icons'
 import { Fit } from '@/site/Fit'
 import { CopyCommand } from '@/site/parts'
 import { BRIDGE, CARDS, GRAIN, LAYER, useWide } from './lights'
 import type { Card } from './lights'
+import { BTN, useSideNew } from '../shell/side'
+import { DitherWord } from '../Dither'
 import type { LibItem } from './library'
 
 /*
@@ -32,6 +35,8 @@ if (typeof window !== 'undefined') void import('@/lab/demos/inputs')
 const UI = [0.2, 0, 0, 1] as const
 const OPEN = { type: 'spring', stiffness: 280, damping: 34 } as const
 const DWELL = 6500
+/** The sheets' hairline, drawn round the bridge's curves. */
+const EDGE = 'light-dark(rgb(0 0 0 / 0.07), rgb(255 255 255 / 0.08))'
 /** The radius of the curves that join the bridge to the sheets. */
 const JOIN = 22
 /** How much wider the open plate is than a closed one, and the air between plates. */
@@ -40,9 +45,10 @@ const GAP = 8
 /** A closed plate's width on a laptop. The plates' widths and places are all multiples of it, in CSS, so the server's HTML is right at any width. */
 const UNIT = `var(--plate)`
 const widthOf = (open: number) => `calc(${UNIT} * ${(1 + GROW * open).toFixed(4)})`
-const ICON: Record<string, ReactNode> = { prompt: <Prompt size={15} />, activity: <Note size={15} />, voicenote: <Play size={15} />, metric: <Chart size={15} /> }
+const ICON: Record<string, ReactNode> = { prompt: <Prompt size={15} />, models: <Note size={15} />, voicenote: <Play size={15} />, metric: <Chart size={15} /> }
 
 export function HomeHero({ lib }: { lib: LibItem[] }) {
+  const side = useSideNew()
   const [open, setOpen] = useState(CARDS[0].id)
   const dot = CARDS.find((c) => c.id === open)?.dot
   return (
@@ -50,28 +56,27 @@ export function HomeHero({ lib }: { lib: LibItem[] }) {
       <div className="relative rounded-[26px] sm:rounded-[36px]" style={{ background: 'var(--leaf)', boxShadow: 'var(--leaf-edge)' }}>
         <div className="mx-auto max-w-[1440px] px-4 pb-3 pt-12 sm:px-8 sm:pb-4 sm:pt-16">
           <div className="flex flex-col items-center px-2 text-center">
-            <Link href="/components/region" prefetch={false} className="rise ring-focus group/new inline-flex h-8 items-center gap-2 whitespace-nowrap rounded-full bg-surface pl-1 pr-3 text-[13px] max-[359px]:text-[12px] text-ink-2 shadow-raised transition-[box-shadow,transform] duration-200 hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97]">
-              <span className="rounded-full bg-[color-mix(in_oklch,var(--accent)_12%,transparent)] px-2 text-[11.5px] font-medium leading-6 text-[var(--accent-ink)]">New</span>
-              Region wheel, lit by today’s sun
-              <ArrowRight size={12} className="text-ink-3 transition-transform duration-150 group-hover/new:translate-x-0.5" />
-            </Link>
+            <Announcement href="/components/rewind" linkAs={Link} className="rise">
+              Rewind and Popup
+            </Announcement>
             <h1 className="focus-in mt-7 text-[clamp(42px,5vw,74px)] font-normal leading-[1.01] tracking-[-0.055em] text-ink">
               Most apps look the same.
               <br />
-              <span className="text-quiet">Yours won’t</span>
-              {/* The full stop, in the colour of the open light. */}
-              <span aria-hidden className="ml-[0.03em] inline-block size-[0.15em] rounded-full align-baseline transition-colors duration-700 [transition-timing-function:cubic-bezier(0.2,0,0,1)]" style={{ background: dot }} />
-              <span className="sr-only">.</span>
+              <span className="text-quiet">
+                Yours{' '}
+                {/* The word that answers the line, printed in the open card's light. */}
+                <DitherWord color={dot ?? 'currentColor'}>won’t</DitherWord>.
+              </span>
             </h1>
             <p className="rise mt-6 max-w-[540px] text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
-              Premium React components. <span className="text-ink">{lib.length} components</span> for boards, charts, media, agents and everything around them. Every state worked out, styled by your{'\u00a0'}theme.
+              Well-made React components for your product. Installed with shadcn, styled by your theme, yours to{'\u00a0'}change.
             </p>
             <div className="rise mt-8 flex items-center gap-2.5" style={{ animationDelay: '200ms' }}>
-              <Link href={FIRST_COMPONENT} className="ring-focus group/go flex h-11 items-center whitespace-nowrap gap-1.5 rounded-full bg-ink pl-5 pr-4 text-[14px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.97] max-[359px]:pl-4 max-[359px]:pr-3">
+              <Link href={FIRST_COMPONENT} className={side ? `ring-focus group/go flex h-11 items-center whitespace-nowrap gap-1.5 rounded-[11px] ${BTN.accent} pl-5 pr-4 text-[14px] font-medium transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] active:scale-[0.97] max-[359px]:pl-4 max-[359px]:pr-3` : "ring-focus group/go flex h-11 items-center whitespace-nowrap gap-1.5 rounded-full bg-ink pl-5 pr-4 text-[14px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.97] max-[359px]:pl-4 max-[359px]:pr-3"}>
                 Browse components
                 <ArrowRight size={14} className="transition-transform duration-150 group-hover/go:translate-x-0.5" />
               </Link>
-              <Link href="/pro" className="ring-focus flex h-11 items-center whitespace-nowrap rounded-full bg-surface px-5 text-[14px] font-medium text-ink shadow-raised transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4">
+              <Link href="/pro" className={side ? `ring-focus flex h-11 items-center whitespace-nowrap rounded-[11px] ${BTN.plate} px-5 text-[14px] font-medium transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4` : "ring-focus flex h-11 items-center whitespace-nowrap rounded-full bg-surface px-5 text-[14px] font-medium text-ink shadow-raised transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4"}>
                 Get Pro<span className="hidden sm:inline">&nbsp;· ${PLANS[0].price}</span>
               </Link>
             </div>
@@ -97,10 +102,12 @@ function Bridge({ id }: { id: string }) {
     [y]: 0,
     width: JOIN,
     height: JOIN,
-    background: `radial-gradient(circle at ${x === 'left' ? '0%' : '100%'} ${y === 'top' ? '100%' : '0%'}, transparent ${JOIN - 0.5}px, ${y === 'top' ? 'var(--leaf)' : 'var(--paper)'} ${JOIN}px)`,
+    // Each curve carries the sheets' own hairline, so the edge runs round the bridge instead of stopping at it.
+    background: `radial-gradient(circle at ${x === 'left' ? '0%' : '100%'} ${y === 'top' ? '100%' : '0%'}, transparent ${JOIN - 1}px, ${EDGE} ${JOIN - 0.5}px, ${EDGE} ${JOIN}px, ${y === 'top' ? 'var(--leaf)' : 'var(--paper)'} ${JOIN + 0.5}px)`,
   })
   return (
-    <div className="absolute left-1/2 top-full z-10 flex -translate-x-1/2 items-center px-3" style={{ height: BRIDGE, background: 'linear-gradient(var(--leaf), var(--paper))' }}>
+    // One pixel taller than the gap, so it covers the next sheet's top edge across its width.
+    <div className="absolute left-1/2 top-full z-10 flex -translate-x-1/2 items-center px-3" style={{ height: BRIDGE + 1, background: 'linear-gradient(var(--leaf), var(--paper))' }}>
       <span aria-hidden className="absolute" style={corner('left', 'top')} />
       <span aria-hidden className="absolute" style={corner('right', 'top')} />
       <span aria-hidden className="absolute" style={corner('left', 'bottom')} />
@@ -274,7 +281,7 @@ function Plate({ c, k, grow, item, on, mounted, wide, onAim, onPick }: { c: Card
               animate={{ opacity: 1, transition: { duration: 0.25, ease: UI, delay: 0.2 } }}
               exit={{ opacity: 0, transition: { duration: 0.08 } }}
             >
-              <span className="min-w-0 flex-1 truncate text-white/85">{c.line}</span>
+              <span className="flex-1" />
               <Link href={`/components/${c.id}`} className="ring-focus group/open flex h-7 shrink-0 items-center gap-1 rounded-full bg-white/15 px-3 text-white backdrop-blur-sm transition-[background-color,transform] duration-150 hover:bg-white/25 active:scale-[0.97]">
                 Open
                 <ArrowUpRight size={12} className="transition-transform duration-150 group-hover/open:-translate-y-px group-hover/open:translate-x-px" />
@@ -291,7 +298,4 @@ const CSS = `
 .plates-grain { background-image: ${GRAIN}; opacity: 0.1; mix-blend-mode: overlay; }
 @keyframes plates-drift { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-8%, 10%) scale(1.12); } }
 .plates-drift { animation: plates-drift 9s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; will-change: transform; }
-/* The board's roster has no ground of its own, and here the ground is paint: it sits on a sheet, and on a phone the stage plays alone. */
-@media (min-width: 640px) { .plates-part .agent-activity { padding: 12px; border-radius: 40px; background: var(--surface); box-shadow: var(--elev-float); } }
-@media (max-width: 639px) { .plates-part .agent-activity-roster { display: none; } }
 `

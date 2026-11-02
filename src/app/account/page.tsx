@@ -2,12 +2,12 @@ import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { PLANS } from '@/catalog/pro'
-import { listKeys, listSeats, MAX_SEATS, planFor } from '@/lib/account/keys'
+import { listKeys, planFor } from '@/lib/account/keys'
 import { currentEmail } from '@/lib/account/session'
-import { NewKey, NewSeat, SignIn } from '@/site/account/Forms'
+import { NewKey, SignIn } from '@/site/account/Forms'
 import { Footer } from '@/site/Footer'
 import { Header } from '@/site/Header'
-import { deleteKey, dropSeat, signOut } from './actions'
+import { deleteKey, signOut } from './actions'
 
 export const metadata: Metadata = { title: 'Account', robots: { index: false, follow: false } }
 
@@ -40,7 +40,7 @@ async function Account() {
         <SignIn />
       </>
     )
-  const [plan, keys, seats] = await Promise.all([planFor(email), listKeys(email), listSeats(email)])
+  const [plan, keys] = await Promise.all([planFor(email), listKeys(email)])
   const bought = PLANS.find((p) => p.id === plan)
   return (
     <>
@@ -75,26 +75,6 @@ async function Account() {
           </ul>
         )}
       </section>
-
-      {plan === 'team' && (
-        <section aria-label="Team" className="mt-12">
-          <h2 className="text-headline text-ink">Your team</h2>
-          <p className="mt-1 text-footnote leading-[1.55] text-ink-3">Up to {MAX_SEATS} others. Each signs in with their own email and makes their own keys.</p>
-          <div className="mt-4">
-            <NewSeat />
-          </div>
-          {seats.length > 0 && (
-            <ul className="mt-4">
-              {seats.map((seat) => (
-                <li key={seat} className="flex items-center gap-4 py-3 shadow-[inset_0_1px_0_var(--line)]">
-                  <span className="min-w-0 flex-1 truncate text-callout text-ink">{seat}</span>
-                  <Quiet action={dropSeat} name="email" value={seat} label="Remove" />
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      )}
 
       <div className="mt-12 flex items-center gap-5 text-footnote">
         <Link href="/pro#install" className="ring-focus rounded-[4px] text-ink-3 transition-colors duration-150 hover:text-ink">
