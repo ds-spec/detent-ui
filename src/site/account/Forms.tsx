@@ -15,8 +15,11 @@ const Alert = ({ text }: { text?: string }) =>
     </p>
   ) : null
 
-/** The way in: an email address, then a link in the inbox. No password to make or lose. */
-export function SignIn() {
+/**
+ * The way in: an email address, then a link in the inbox. No password to make or lose. `email`
+ * fills the field ahead of time, as when a buyer arrives back from checkout.
+ */
+export function SignIn({ email }: { email?: string } = {}) {
   const [state, action, pending] = useActionState<LinkState, FormData>(askForLink, {})
   if (state.sent)
     return (
@@ -33,7 +36,7 @@ export function SignIn() {
         Email
       </label>
       <div className="mt-2 flex gap-2">
-        <input key={state.email} id="email" name="email" type="email" required autoComplete="email" defaultValue={state.email} placeholder="you@company.com" className={FIELD} />
+        <input key={state.email} id="email" name="email" type="email" required autoComplete="email" defaultValue={state.email ?? email} placeholder="you@company.com" className={FIELD} />
         <button type="submit" disabled={pending} className={BUTTON}>
           {pending ? 'Sending…' : 'Email me a link'}
         </button>

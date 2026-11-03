@@ -60,14 +60,28 @@ export const KITS: Record<string, { name: string; line: string; items: string[] 
   },
 }
 
+import { SITE } from './site'
+
 export { SITE, installCommand } from './site'
+
+/**
+ * Sends a buyer back to their account once they've paid. A Dodo payment link only redirects when it
+ * carries `redirect_url`; Dodo then adds `payment_id`, `status` and `email` to it. Added here rather
+ * than in the env, so test and live links, on any domain, all come home.
+ */
+const comeBack = (link: string) => {
+  if (!/^https?:\/\//.test(link)) return link
+  const url = new URL(link)
+  if (!url.searchParams.has('redirect_url')) url.searchParams.set('redirect_url', `${SITE}/account?bought=1`)
+  return url.toString()
+}
 
 /**
  * Where each plan is bought: the store's checkout links. Dodo reports each order to /api/dodo.
  */
 export const CHECKOUT = {
-  pro: process.env.NEXT_PUBLIC_CHECKOUT_PRO ?? '#checkout',
-  all: process.env.NEXT_PUBLIC_CHECKOUT_ALL ?? '#checkout',
+  pro: comeBack(process.env.NEXT_PUBLIC_CHECKOUT_PRO ?? '#checkout'),
+  all: comeBack(process.env.NEXT_PUBLIC_CHECKOUT_ALL ?? '#checkout'),
 }
 
 export type Plan = {

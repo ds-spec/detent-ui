@@ -11,6 +11,9 @@
  * - *‌/*, missing Accept, or text/html-preferred = pass through untouched.
  * - Adds a global Link response header advertising /llms.txt, /llms-full.txt and /ai.txt
  *   on all HTML responses.
+ * - Private until launch: with SITE_LOCK set, every page asks for that password once and then
+ *   remembers the browser. /api (the Dodo webhook among it) and /r (the install registry) are
+ *   outside the matcher, so payments and installs keep working. Unset it to open the site.
  */
 
 import { NextResponse } from 'next/server'
@@ -71,10 +74,58 @@ function prefersMarkdown(acceptHeader: string | null): boolean {
   return mdEntry.q > htmlEntry.q
 }
 
+// ─── Private until launch ─────────────────────────────────────────────────────
+
+const LOCK_COOKIE = 'detent_lock'
+const UNLOCK_PATH = '/__unlock'
+
+/** The cookie holds a hash of the password, never the password itself. */
+async function lockToken(secret: string) {
+  const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`detent:${secret}`))
+  return Array.from(new Uint8Array(bytes), (b) => b.toString(16).padStart(2, '0')).join('')
+}
+
+const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`)
+
+/** The one screen a visitor without the password sees. */
+function lockPage(next: string, wrong: boolean) {
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Detent</title>
+<style>:root{color-scheme:light dark;--bg:#fafafa;--ink:#1d1d1f;--ink3:#6e6e73;--field:#f0f0f2;--line:rgb(0 0 0/.08)}@media (prefers-color-scheme:dark){:root{--bg:#141416;--ink:#f5f5f7;--ink3:#a1a1a6;--field:#232327;--line:rgb(255 255 255/.08)}}
+*{box-sizing:border-box}body{margin:0;min-height:100dvh;display:grid;place-items:center;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,system-ui,sans-serif;padding:20px}
+form{width:min(100%,340px)}h1{margin:0;font-size:28px;font-weight:500;letter-spacing:-.04em;line-height:1.1}p{margin:8px 0 22px;color:var(--ink3)}
+.row{display:flex;gap:8px}input{flex:1;min-width:0;height:42px;border:0;border-radius:10px;background:var(--field);color:var(--ink);padding:0 14px;font:inherit;outline:none;box-shadow:inset 0 0 0 1px var(--line)}input:focus{box-shadow:inset 0 0 0 1.5px var(--ink)}
+button{height:42px;border:0;border-radius:10px;background:var(--ink);color:var(--bg);padding:0 16px;font:inherit;font-weight:500;cursor:pointer}.wrong{margin:10px 0 0;color:#d1453b;font-size:13px}</style></head>
+<body><form method="post" action="${UNLOCK_PATH}"><h1>Detent</h1><p>Not open yet.</p><input type="hidden" name="next" value="${escapeHtml(next)}"><div class="row"><input name="password" type="password" placeholder="Password" autocomplete="current-password" autofocus required><button type="submit">Enter</button></div>${wrong ? '<p class="wrong">That isn’t it.</p>' : ''}</form></body></html>`
+  return new NextResponse(html, { status: 401, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-robots-tag': 'noindex, nofollow' } })
+}
+
+/** Returns a response when the site is locked and this browser hasn't unlocked it; otherwise null. */
+async function gate(request: NextRequest): Promise<NextResponse | null> {
+  const secret = process.env.SITE_LOCK
+  if (!secret) return null
+  const token = await lockToken(secret)
+  const { pathname, search } = request.nextUrl
+  if (pathname === UNLOCK_PATH && request.method === 'POST') {
+    const form = await request.formData()
+    const raw = String(form.get('next') ?? '/')
+    // Only ever send someone back somewhere on this site.
+    const next = raw.startsWith('/') && !raw.startsWith('//') ? raw : '/'
+    if (String(form.get('password') ?? '') !== secret) return lockPage(next, true)
+    const res = NextResponse.redirect(new URL(next, request.url), 303)
+    res.cookies.set(LOCK_COOKIE, token, { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 365 })
+    return res
+  }
+  if (request.cookies.get(LOCK_COOKIE)?.value === token) return null
+  return lockPage(pathname + search, false)
+}
+
 // ─── Proxy function ────────────────────────────────────────────────────────────
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  const locked = await gate(request)
+  if (locked) return locked
 
   // 1. .md suffix: /foo/bar.md → /api/md/foo/bar
   if (pathname.endsWith('.md')) {
@@ -94,6 +145,8 @@ export function proxy(request: NextRequest) {
   // 3. All other requests pass through — HTML is untouched.
   //    Advertise /llms.txt, /llms-full.txt and /ai.txt via Link response header.
   const res = NextResponse.next()
+  // While the site is private, nothing in it should be indexed.
+  if (process.env.SITE_LOCK) res.headers.set('x-robots-tag', 'noindex, nofollow')
   res.headers.set(
     'Link',
     `<${SITE}/llms.txt>; rel="describedby", <${SITE}/llms-full.txt>; rel="describedby", <${SITE}/ai.txt>; rel="describedby"`,
