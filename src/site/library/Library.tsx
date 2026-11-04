@@ -8,10 +8,10 @@ import { BLOCK_VIEWS, TemplateBody } from '@pro'
 import { BLOCK_ORDER, KINDS } from '@/catalog/blocks'
 import { DEMOS } from '@/catalog/demos'
 import { CATEGORIES, ENTRIES } from '@/catalog/meta'
-import { isProBlock, isProComponent } from '@/catalog/pro'
+import { PLANS, isProBlock, isProComponent } from '@/catalog/pro'
 import { SIZE } from '@/catalog/sizes'
 import { TEMPLATES } from '@/catalog/templates'
-import { ArrowUpRight, Search } from '@/lab/icons'
+import { ArrowUpRight } from '@/lab/icons'
 import { Mini } from '../Mini'
 import { useNear } from '../near'
 import { TemplateCard } from '../templates/TemplateCard'
@@ -19,20 +19,21 @@ import { wellOf } from '../wells'
 import type { Tone } from '../home/lights'
 
 /*
- * The library, laid out the way Skiper lays out its own: each family a section with its name, its
- * count in brackets and one quiet line, then its pieces three to a row. Each card is a dark-edged
- * tray with the piece running inside it, and its name in a caption inside the tray. Pro pieces carry a small Pro mark in the corner of the preview. Finding
- * things lives in one floating bar at the foot of the window: search, sort, free or Pro, clear.
+ * The library, laid out the way Skiper lays out its own: each family a section with its name and
+ * one quiet line, then its pieces three to a row. Each card is a dark-edged
+ * tray with the piece running inside it, and its name in a caption inside the tray. Pro pieces
+ * carry a small Pro mark in the corner of the preview. Narrowing it down is one switch at the top,
+ * All, Free or Pro, beside what Pro costs.
  * What's ours: every preview is the real piece, live, not a video, and each family keeps its own
  * light in its wells.
  */
 
 export type Shelf = 'components' | 'blocks' | 'templates'
 
-const SHELVES: { id: Shelf; name: string; href: string; count: number }[] = [
-  { id: 'components', name: 'Components', href: '/components', count: ENTRIES.length },
-  { id: 'blocks', name: 'Blocks', href: '/blocks', count: BLOCK_ORDER.length },
-  { id: 'templates', name: 'Templates', href: '/templates', count: TEMPLATES.length },
+const SHELVES: { id: Shelf; name: string; href: string }[] = [
+  { id: 'components', name: 'Components', href: '/components' },
+  { id: 'blocks', name: 'Blocks', href: '/blocks' },
+  { id: 'templates', name: 'Templates', href: '/templates' },
 ]
 
 const LINES: Record<Shelf, string> = {
@@ -59,29 +60,21 @@ const COMPONENT_CARDS: Card[] = ENTRIES.map((e, i) => ({ id: e.id, n: i + 1, nam
 const BLOCK_CARDS: Card[] = BLOCK_ORDER.map((b, i) => ({ id: b.id, n: i + 1, name: b.name, group: b.kind, groupName: `${KINDS[b.kind]}s`, pro: isProBlock(b.id), tone: KIND_TONE[b.kind] ?? 'blue', href: `/blocks/${b.id}` }))
 
 export function Library({ shelf }: { shelf: Shelf }) {
-  const [sort, setSort] = useState<'family' | 'name'>('family')
   const [plan, setPlan] = useState<'all' | 'free' | 'pro'>('all')
-  const [q, setQ] = useState('')
   const cards = shelf === 'components' ? COMPONENT_CARDS : shelf === 'blocks' ? BLOCK_CARDS : []
-  const words = q.trim().toLowerCase()
-  const shown = cards.filter((c) => (plan === 'all' || (plan === 'pro') === c.pro) && (!words || `${c.name} ${c.groupName}`.toLowerCase().includes(words)))
-  // By family, each family is a section; A to Z, it's one.
-  const sections: (Group & { cards: Card[] })[] =
-    sort === 'name'
-      ? [{ id: 'all', name: `All ${shelf}`, blurb: 'Every one, A to Z.', cards: [...shown].sort((a, b) => a.name.localeCompare(b.name)) }]
-      : (shelf === 'components' ? COMPONENT_GROUPS : BLOCK_GROUPS).map((g) => ({ ...g, cards: shown.filter((c) => c.group === g.id) }))
-  const filtered = plan !== 'all' || words.length > 0 || sort !== 'family'
+  const shown = cards.filter((c) => plan === 'all' || (plan === 'pro') === c.pro)
+  const sections = (shelf === 'components' ? COMPONENT_GROUPS : BLOCK_GROUPS).map((g) => ({ ...g, cards: shown.filter((c) => c.group === g.id) }))
+  const pro = cards.filter((c) => c.pro).length
 
   return (
     <main className="mx-auto max-w-[1360px] px-4 pb-40 pt-28 sm:px-8 sm:pt-32">
-      {/* The shelves, as words: the one you're on in ink, the others quiet, each with its count. */}
+      {/* The shelves, as words: the one you're on in ink, the others quiet. */}
       <nav aria-label="Library" className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
         {SHELVES.map((s) => {
           const on = s.id === shelf
           return (
             <Link key={s.id} href={s.href} aria-current={on ? 'page' : undefined} className={`ring-focus rounded-[10px] text-[clamp(30px,3.4vw,46px)] font-normal leading-[1.1] tracking-[-0.045em] transition-colors duration-200 ${on ? 'text-ink' : 'text-ink-3/45 hover:text-ink-3'}`}>
               {s.name}
-              <sup className="tnum ml-1 align-super text-[0.32em] tracking-normal">[{s.count}]</sup>
             </Link>
           )
         })}
@@ -96,12 +89,35 @@ export function Library({ shelf }: { shelf: Shelf }) {
         </div>
       ) : (
         <>
+          {/*
+           * Free or Pro, at the top, beside what Pro costs. Arc and Aceternity both keep the price in
+           * sight while you browse; here it's one plain line: how many are Pro, that it's one payment,
+           * and the way to it. Free pieces stay first-class, since they're what earns the trust.
+           */}
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 sm:mt-10">
+            <div role="radiogroup" aria-label="Show" className="flex items-center gap-1">
+              {(['all', 'free', 'pro'] as const).map((p) => (
+                <button key={p} type="button" role="radio" aria-checked={plan === p} onClick={() => setPlan(p)} className={`ring-focus h-9 rounded-[10px] px-3.5 text-[14px] transition-[background-color,color,transform] duration-150 active:scale-[0.97] ${plan === p ? 'bg-ink text-surface' : 'text-ink-3 hover:bg-[color-mix(in_oklch,var(--ink)_5%,transparent)] hover:text-ink'}`}>
+                  {p === 'all' ? 'All' : p === 'free' ? 'Free' : 'Pro'}
+                  <span className="tnum ml-1.5 opacity-55">{p === 'all' ? cards.length : p === 'pro' ? pro : cards.length - pro}</span>
+                </button>
+              ))}
+            </div>
+            {pro > 0 && (
+              <Link href="/pro" className="ring-focus group/pro flex items-center gap-2 rounded-[10px] text-[14px] text-ink-3 transition-colors hover:text-ink">
+                <span>
+                  <span className="text-ink">{pro} of these are Pro.</span> All of them, and every one we add, for ${PLANS[0].price} once.
+                </span>
+                <ArrowUpRight size={13} className="shrink-0 transition-transform duration-150 group-hover/pro:-translate-y-px group-hover/pro:translate-x-px" />
+              </Link>
+            )}
+          </div>
+
           {sections.map((g) =>
             g.cards.length ? (
               <section key={g.id} aria-labelledby={`g-${g.id}`} className="mt-14 sm:mt-20">
                 <h2 id={`g-${g.id}`} className="text-[19px] font-medium tracking-[-0.02em] text-ink">
                   {g.name}
-                  <sup className="tnum ml-1 align-super text-[11px] font-normal tracking-normal text-ink-3">[{g.cards.length}]</sup>
                 </h2>
                 <p className="mt-1 max-w-[620px] text-[14px] leading-[1.5] text-ink-3">{g.blurb}</p>
                 <ul className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -114,61 +130,9 @@ export function Library({ shelf }: { shelf: Shelf }) {
               </section>
             ) : null,
           )}
-          {!shown.length && <p className="py-32 text-center text-[15px] text-ink-3">Nothing called “{q}” yet.</p>}
-          <Finder q={q} setQ={setQ} sort={sort} setSort={setSort} plan={plan} setPlan={setPlan} count={cards.length} shelf={shelf} filtered={filtered} />
         </>
       )}
     </main>
-  )
-}
-
-/**
- * Finding things, in one bar floating at the foot of the window, as Skiper has it: search, the
- * order, free or Pro, and a way back to everything. Each part is its own small plate.
- */
-function Finder({ q, setQ, sort, setSort, plan, setPlan, count, shelf, filtered }: { q: string; setQ: (q: string) => void; sort: 'family' | 'name'; setSort: (s: 'family' | 'name') => void; plan: 'all' | 'free' | 'pro'; setPlan: (p: 'all' | 'free' | 'pro') => void; count: number; shelf: Shelf; filtered: boolean }) {
-  const plate = 'flex h-11 items-center rounded-[13px] bg-[color-mix(in_oklch,var(--surface)_88%,transparent)] shadow-[0_0_0_1px_var(--line-strong),0_12px_32px_-14px_rgb(0_0_0/0.28)] backdrop-blur-xl'
-  const word = (on: boolean) => `ring-focus h-8 rounded-[9px] px-2.5 text-[13.5px] transition-[background-color,color,transform] duration-150 active:scale-[0.97] ${on ? 'bg-ink text-surface' : 'text-ink-3 hover:text-ink'}`
-  return (
-    <div role="search" aria-label={`Find ${shelf}`} className="pointer-events-none fixed inset-x-0 bottom-4 z-30 flex justify-center px-3 sm:bottom-6">
-      <div className="pointer-events-auto flex w-full max-w-full items-center gap-2 sm:w-auto">
-        <label className={`${plate} min-w-0 flex-1 gap-2 px-3.5 text-ink-3 sm:w-[240px] sm:flex-none`}>
-          <Search size={14} />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Search ${count}`} aria-label={`Search ${shelf}`} className="min-w-0 flex-1 bg-transparent text-[14px] text-ink outline-none placeholder:text-ink-3" />
-        </label>
-        {/* On a phone the order stays by family: search and Free or Pro are what fit under a thumb. */}
-        <div className={`${plate} hidden shrink-0 gap-0.5 px-1.5 sm:flex`}>
-          <span className="px-2 text-[13.5px] text-ink-2">Sort</span>
-          <button type="button" aria-pressed={sort === 'family'} onClick={() => setSort('family')} className={word(sort === 'family')}>
-            Family
-          </button>
-          <button type="button" aria-pressed={sort === 'name'} onClick={() => setSort('name')} className={word(sort === 'name')}>
-            A–Z
-          </button>
-        </div>
-        <div className={`${plate} shrink-0 gap-0.5 px-1.5`}>
-          <span className="hidden px-2 text-[13.5px] text-ink-2 sm:inline">Source</span>
-          {(['free', 'pro'] as const).map((p) => (
-            <button key={p} type="button" aria-pressed={plan === p} onClick={() => setPlan(plan === p ? 'all' : p)} className={word(plan === p)}>
-              {p === 'free' ? 'Free' : 'Pro'}
-            </button>
-          ))}
-        </div>
-        {filtered && (
-          <button
-            type="button"
-            onClick={() => {
-              setQ('')
-              setSort('family')
-              setPlan('all')
-            }}
-            className={`${plate} ring-focus shrink-0 px-4 text-[13.5px] text-ink-2 transition-colors hover:text-ink`}
-          >
-            Clear
-          </button>
-        )}
-      </div>
-    </div>
   )
 }
 

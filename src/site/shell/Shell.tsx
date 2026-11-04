@@ -157,7 +157,8 @@ function Bare({ rail, children }: { rail: { groups: RailGroup[]; current: string
       </div>
       <Strip groups={rail.groups} current={rail.current} onPick={rail.onPick} preview={rail.preview} label={label} open={shown} onHide={() => showIndex(false)} />
       <div data-scroller className="relative lg:h-full lg:overflow-y-auto lg:rounded-[18px] lg:[scrollbar-width:thin]" style={{ background: 'var(--panel)', boxShadow: 'var(--panel-edge)' }}>
-        <div className="sticky top-0 z-30 hidden h-14 items-center gap-1 px-4 lg:flex" style={{ background: 'color-mix(in oklch, var(--panel) 86%, transparent)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
+        {/* Solid graphite, the panel's own colour, with a hairline under it: the previews' colours never tint it as they pass. */}
+        <div className="sticky top-0 z-30 hidden h-14 items-center gap-1 px-4 lg:flex" style={{ background: 'var(--panel)', boxShadow: 'inset 0 -1px 0 var(--line)' }}>
           {!shown && (
             <button type="button" onClick={() => showIndex(true)} aria-label="Show the index" title="Show the index" className={`${tool} mr-1`}>
               <PanelIcon />
