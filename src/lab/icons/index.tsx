@@ -1,8 +1,3 @@
-/**
- * Our icon set. One rule makes them ours: a 2px rounded outline plus exactly one solid part
- * that carries the meaning (the lid of a bin, the head of an arrow, the clapper of a bell).
- * 24px grid, currentColor, round caps and joins.
- */
 import type { SVGProps } from 'react'
 
 type P = SVGProps<SVGSVGElement> & { size?: number }
@@ -33,7 +28,6 @@ export const Plus = (p: P) => (
   </Svg>
 )
 
-/** Bin with a solid lid. */
 export const Bin = (p: P) => (
   <Svg {...p}>
     <rect x="4" y="4.5" width="16" height="3.6" rx="1.8" fill="currentColor" stroke="none" />
@@ -43,7 +37,6 @@ export const Bin = (p: P) => (
   </Svg>
 )
 
-/** Curved arrow with a solid head. */
 export const Undo = (p: P) => (
   <Svg {...p}>
     <path d="M9 9h6.5a4.5 4.5 0 0 1 0 9H10" />
@@ -58,7 +51,6 @@ export const Pause = (p: P) => (
   </Svg>
 )
 
-/** Tray with a solid arrow rising out of it. */
 export const Upload = (p: P) => (
   <Svg {...p}>
     <path d="M4 14.5v2.3A3.2 3.2 0 0 0 7.2 20h9.6a3.2 3.2 0 0 0 3.2-3.2v-2.3" />
@@ -67,7 +59,6 @@ export const Upload = (p: P) => (
   </Svg>
 )
 
-/** Page with a solid folded corner. */
 export const FilePage = (p: P) => (
   <Svg {...p}>
     <path d="M13.5 3H8a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3V8.5" />
@@ -75,7 +66,6 @@ export const FilePage = (p: P) => (
   </Svg>
 )
 
-/** Frame with a solid hill and sun. */
 export const Picture = (p: P) => (
   <Svg {...p}>
     <rect x="3.5" y="4.5" width="17" height="15" rx="4" />
@@ -84,7 +74,6 @@ export const Picture = (p: P) => (
   </Svg>
 )
 
-/** Frame with a solid play mark. */
 export const Film = (p: P) => (
   <Svg {...p}>
     <rect x="3.5" y="4.5" width="17" height="15" rx="4" />
@@ -92,7 +81,6 @@ export const Film = (p: P) => (
   </Svg>
 )
 
-/** Bubble with three solid dots. */
 export const Bubble = (p: P) => (
   <Svg {...p}>
     <path d="M12 4c4.7 0 8.5 3.1 8.5 7s-3.8 7-8.5 7c-1 0-2-.1-2.9-.4L5 19.5l1.1-3.6C4.6 14.6 3.5 12.9 3.5 11c0-3.9 3.8-7 8.5-7z" />
@@ -102,7 +90,6 @@ export const Bubble = (p: P) => (
   </Svg>
 )
 
-/** Card with a solid magnetic stripe. */
 export const Card = (p: P) => (
   <Svg {...p}>
     <rect x="3" y="5.5" width="18" height="13" rx="3.5" />
@@ -111,7 +98,6 @@ export const Card = (p: P) => (
   </Svg>
 )
 
-/** Bell with a solid clapper. */
 export const Bell = (p: P) => (
   <Svg {...p}>
     <path d="M6 15.5V11a6 6 0 1 1 12 0v4.5l1.5 2H4.5z" />
@@ -119,7 +105,6 @@ export const Bell = (p: P) => (
   </Svg>
 )
 
-/** Base line with a solid arrow leaving it: shipping. */
 export const Ship = (p: P) => (
   <Svg {...p}>
     <path d="M5 20h14" />
@@ -128,7 +113,6 @@ export const Ship = (p: P) => (
   </Svg>
 )
 
-/** At sign. */
 export const Mention = (p: P) => (
   <Svg {...p}>
     <circle cx="12" cy="12" r="3.4" fill="currentColor" stroke="none" />
@@ -136,7 +120,6 @@ export const Mention = (p: P) => (
   </Svg>
 )
 
-/** Calendar with a solid header band. */
 export const Calendar = (p: P) => (
   <Svg {...p}>
     <rect x="3.5" y="5" width="17" height="15.5" rx="4" />
@@ -158,7 +141,6 @@ export const ArrowUpRight = (p: P) => (
   </Svg>
 )
 
-/** Sun: solid core, dotted rays. */
 export const Sun = (p: P) => (
   <Svg {...p}>
     <circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none" />
@@ -169,7 +151,6 @@ export const Sun = (p: P) => (
   </Svg>
 )
 
-/** Moon: solid crescent. */
 export const Moon = (p: P) => (
   <Svg {...p}>
     <path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1z" fill="currentColor" stroke="none" />
@@ -183,7 +164,6 @@ export const Expand = (p: P) => (
   </Svg>
 )
 
-/** A selection frame with a solid pointer resting in its corner: look closer at something. */
 export const Inspect = (p: P) => (
   <Svg {...p}>
     <path d="M4 9V6.5A2.5 2.5 0 0 1 6.5 4H9M15 4h2.5A2.5 2.5 0 0 1 20 6.5V9M4 15v2.5A2.5 2.5 0 0 0 6.5 20H9" />
@@ -191,7 +171,6 @@ export const Inspect = (p: P) => (
   </Svg>
 )
 
-/** Folder with a solid tab. */
 export const Folder = (p: P) => (
   <Svg {...p}>
     <path d="M3.5 9.5V17a3 3 0 0 0 3 3h11a3 3 0 0 0 3-3v-6.5a3 3 0 0 0-3-3h-6" />
@@ -199,7 +178,6 @@ export const Folder = (p: P) => (
   </Svg>
 )
 
-/** Two sheets: the one underneath is solid. */
 export const Copy = (p: P) => (
   <Svg {...p}>
     <rect x="4" y="4" width="11" height="11" rx="3" fill="currentColor" stroke="none" />
@@ -207,7 +185,6 @@ export const Copy = (p: P) => (
   </Svg>
 )
 
-/** Cookie with a bite taken out and one solid chip. */
 export const Cookie = (p: P) => (
   <Svg {...p}>
     <path d="M20.6 12.6a8.6 8.6 0 1 1-9.2-9.2 3 3 0 0 0 3.6 3.6 3 3 0 0 0 5.6 5.6z" />
@@ -217,7 +194,6 @@ export const Cookie = (p: P) => (
   </Svg>
 )
 
-/** Clock with solid hands. */
 export const Clock = (p: P) => (
   <Svg {...p}>
     <circle cx="12" cy="12" r="8.5" />
@@ -225,7 +201,6 @@ export const Clock = (p: P) => (
   </Svg>
 )
 
-/** Arrow pointing back. */
 export const ArrowLeft = (p: P) => (
   <Svg {...p}>
     <path d="M19 12H7" />
@@ -233,7 +208,6 @@ export const ArrowLeft = (p: P) => (
   </Svg>
 )
 
-/** Envelope with a solid flap. */
 export const Mail = (p: P) => (
   <Svg {...p}>
     <rect x="3.5" y="5.5" width="17" height="13" rx="3.5" />
@@ -241,7 +215,6 @@ export const Mail = (p: P) => (
   </Svg>
 )
 
-/** Arrow up with a solid head: send. */
 export const ArrowUp = (p: P) => (
   <Svg {...p}>
     <path d="M12 20v-9" />
@@ -249,21 +222,18 @@ export const ArrowUp = (p: P) => (
   </Svg>
 )
 
-/** Solid rounded square: stop. */
 export const Stop = (p: P) => (
   <Svg {...p}>
     <rect x="6.5" y="6.5" width="11" height="11" rx="3" fill="currentColor" stroke="none" />
   </Svg>
 )
 
-/** Solid bolt: quick. */
 export const Bolt = (p: P) => (
   <Svg {...p}>
     <path d="M13.2 3.2 5.8 13h5.6l-.6 7.8 7.4-9.8h-5.6z" fill="currentColor" strokeWidth={1.6} />
   </Svg>
 )
 
-/** An open ring with one solid body travelling on it: the AI, at work. */
 export const Orbit = (p: P) => (
   <Svg {...p}>
     <path d="M18.06 8.5A7 7 0 1 1 15.5 5.94" />
@@ -271,7 +241,6 @@ export const Orbit = (p: P) => (
   </Svg>
 )
 
-/** Lens with a solid handle: search. */
 export const Search = (p: P) => (
   <Svg {...p}>
     <circle cx="10.5" cy="10.5" r="6.2" />
@@ -285,14 +254,12 @@ export const Minus = (p: P) => (
   </Svg>
 )
 
-/** Up and down chevrons: a value you can change. */
 export const Chevrons = (p: P) => (
   <Svg {...p}>
     <path d="M8 9.5 12 5.5l4 4M8 14.5l4 4 4-4" />
   </Svg>
 )
 
-/** Pencil with a solid tip: rename. */
 export const Pencil = (p: P) => (
   <Svg {...p}>
     <path d="M14.5 5.5 18.5 9.5 9 19H5v-4z" />
@@ -300,7 +267,6 @@ export const Pencil = (p: P) => (
   </Svg>
 )
 
-/** Arrow pointing forward. */
 export const ArrowRight = (p: P) => (
   <Svg {...p}>
     <path d="M5 12h12" />
@@ -308,7 +274,6 @@ export const ArrowRight = (p: P) => (
   </Svg>
 )
 
-/** Cup with a solid surface of coffee. */
 export const Cup = (p: P) => (
   <Svg {...p}>
     <path d="M5 8h11v6a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z" />
@@ -317,7 +282,6 @@ export const Cup = (p: P) => (
   </Svg>
 )
 
-/** Shopping bag with a solid band. */
 export const Bag = (p: P) => (
   <Svg {...p}>
     <path d="M5.5 8h13l-1 11.2a2 2 0 0 1-2 1.8h-7a2 2 0 0 1-2-1.8z" />
@@ -326,7 +290,6 @@ export const Bag = (p: P) => (
   </Svg>
 )
 
-/** Banknote with a solid coin mark. */
 export const Note = (p: P) => (
   <Svg {...p}>
     <rect x="3" y="6" width="18" height="12" rx="3" />
@@ -334,7 +297,6 @@ export const Note = (p: P) => (
   </Svg>
 )
 
-/** Paper plane with a solid fold. */
 export const Plane = (p: P) => (
   <Svg {...p}>
     <path d="M20.5 3.5 3.5 10.6l6.3 2.9 2.9 6.3z" />
@@ -342,7 +304,6 @@ export const Plane = (p: P) => (
   </Svg>
 )
 
-/** Building with a solid door. */
 export const Building = (p: P) => (
   <Svg {...p}>
     <path d="M5 21V6a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v15M16 10h2a2 2 0 0 1 2 2v9M3 21h18" />
@@ -350,7 +311,6 @@ export const Building = (p: P) => (
   </Svg>
 )
 
-/** Open folder: the front flap tips forward; the tab stays solid. */
 export const FolderOpen = (p: P) => (
   <Svg {...p}>
     <path d="M3.5 16.5V7A2.5 2.5 0 0 1 6 4.5h3.2a2 2 0 0 1 1.6.8l1.5 2.2H17a2.5 2.5 0 0 1 2.5 2.5v1" />
@@ -359,7 +319,6 @@ export const FolderOpen = (p: P) => (
   </Svg>
 )
 
-/** Angle brackets with a solid slash: code. */
 export const Code = (p: P) => (
   <Svg {...p}>
     <path d="M8 7.5 3.5 12 8 16.5M16 7.5l4.5 4.5-4.5 4.5" />
@@ -367,7 +326,6 @@ export const Code = (p: P) => (
   </Svg>
 )
 
-/** Wrench with a solid end: a tool. */
 export const Wrench = (p: P) => (
   <Svg {...p}>
     <path d="M15.4 3.6a4.6 4.6 0 0 0-4.3 6.1l-6.6 6.6a2.2 2.2 0 1 0 3.1 3.1l6.6-6.6a4.6 4.6 0 0 0 6.1-4.3l-2.9 2.9-2.6-.6-.6-2.6z" />
@@ -375,7 +333,6 @@ export const Wrench = (p: P) => (
   </Svg>
 )
 
-/** A prompt with a solid cursor: terminal. */
 export const Prompt = (p: P) => (
   <Svg {...p}>
     <path d="M5 7.5 9.5 12 5 16.5" />
@@ -383,7 +340,6 @@ export const Prompt = (p: P) => (
   </Svg>
 )
 
-/** A ring with a solid core: an agent, or any node that runs others. */
 export const Node = (p: P) => (
   <Svg {...p}>
     <circle cx="12" cy="12" r="8" />
@@ -391,7 +347,6 @@ export const Node = (p: P) => (
   </Svg>
 )
 
-/** A circular arrow with a solid head: run again. */
 export const Refresh = (p: P) => (
   <Svg {...p}>
     <path d="M19.2 13.2A7.4 7.4 0 1 1 16.8 6" />
@@ -399,7 +354,6 @@ export const Refresh = (p: P) => (
   </Svg>
 )
 
-/** A thumb with a solid cuff: good answer. Flip it for bad. */
 export const Thumb = ({ down, ...p }: P & { down?: boolean }) => (
   <Svg {...p} style={{ transform: down ? 'scale(1, -1)' : undefined, ...p.style }}>
     <path d="M8 10.5 11.5 4a1.7 1.7 0 0 1 3.1 1.2l-.7 4h5a2 2 0 0 1 2 2.4l-1.2 6.3A2 2 0 0 1 17.7 19.5H8" />
@@ -407,7 +361,6 @@ export const Thumb = ({ down, ...p }: P & { down?: boolean }) => (
   </Svg>
 )
 
-/** A line that climbs to one solid point: the reading you're on. */
 export const Chart = (p: P) => (
   <Svg {...p}>
     <path d="M3.5 17.5 8.5 12l3.5 3.5 5-6" />
@@ -416,7 +369,6 @@ export const Chart = (p: P) => (
   </Svg>
 )
 
-/** A table whose header row is the solid part. */
 export const Table = (p: P) => (
   <Svg {...p}>
     <rect x="3.5" y="4.5" width="17" height="15" rx="3.5" />
@@ -425,21 +377,18 @@ export const Table = (p: P) => (
   </Svg>
 )
 
-/** Play: the triangle is the solid part. */
 export const Play = (p: P) => (
   <Svg {...p}>
     <path d="M8 5.8v12.4l9.6-6.2z" fill="currentColor" />
   </Svg>
 )
 
-/** A drag handle: two columns of round dots. */
 export const Grip = (p: P) => (
   <Svg {...p} strokeWidth={3.2}>
     <path d="M9 6.5h.01M15 6.5h.01M9 12h.01M15 12h.01M9 17.5h.01M15 17.5h.01" />
   </Svg>
 )
 
-/** A microphone whose capsule is the solid part. */
 export const Mic = (p: P) => (
   <Svg {...p}>
     <rect x="9" y="3" width="6" height="11.5" rx="3" fill="currentColor" stroke="none" />
@@ -447,7 +396,6 @@ export const Mic = (p: P) => (
   </Svg>
 )
 
-/** A speaker whose cone is the solid part; muted adds a cross where the waves were. */
 export const Speaker = ({ muted, ...p }: P & { muted?: boolean }) => (
   <Svg {...p}>
     <path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z" fill="currentColor" />
@@ -461,7 +409,6 @@ export const ChevronRight = (p: P) => (
   </Svg>
 )
 
-/** A window over another: the near one solid. */
 export const Layers = (p: P) => (
   <Svg {...p}>
     <path d="M8 4.5h9.5A2.5 2.5 0 0 1 20 7v9.5" />
@@ -469,7 +416,6 @@ export const Layers = (p: P) => (
   </Svg>
 )
 
-/** Two links of a chain, and the dot where they join. */
 export const Link = (p: P) => (
   <Svg {...p}>
     <path d="M10.5 13.5a3.5 3.5 0 0 0 5 0l3-3a3.5 3.5 0 0 0-5-5l-.8.8" />
@@ -478,7 +424,6 @@ export const Link = (p: P) => (
   </Svg>
 )
 
-/** Three dots for more. */
 export const More = (p: P) => (
   <Svg {...p}>
     <circle cx="6" cy="12" r="1.6" fill="currentColor" stroke="none" />
@@ -487,7 +432,6 @@ export const More = (p: P) => (
   </Svg>
 )
 
-/** An eye, its pupil solid. */
 export const Eye = (p: P) => (
   <Svg {...p}>
     <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
@@ -495,7 +439,6 @@ export const Eye = (p: P) => (
   </Svg>
 )
 
-/** An eye with a line through it: hidden. */
 export const EyeOff = (p: P) => (
   <Svg {...p}>
     <path d="M6.6 7.2C4 8.9 2.5 12 2.5 12S6 18.5 12 18.5c1.9 0 3.5-.6 4.9-1.5M10 5.7c.6-.1 1.3-.2 2-.2 6 0 9.5 6.5 9.5 6.5s-.8 1.5-2.3 3.1" />
@@ -503,7 +446,6 @@ export const EyeOff = (p: P) => (
   </Svg>
 )
 
-/** A circle with a solid mark: something needs attention. */
 export const Alert = (p: P) => (
   <Svg {...p}>
     <circle cx="12" cy="12" r="9" />
@@ -512,9 +454,6 @@ export const Alert = (p: P) => (
   </Svg>
 )
 
-/* ── For workflows: one glyph per kind of step ── */
-
-/** What starts a run: a bolt in a ring. */
 export const Spark = (p: P) => (
   <Svg {...p}>
     <circle cx="12" cy="12" r="9" />
@@ -522,7 +461,6 @@ export const Spark = (p: P) => (
   </Svg>
 )
 
-/** A model: a cube, its top face solid. */
 export const Cube = (p: P) => (
   <Svg {...p}>
     <path d="M12 3.2 19.6 7.4v9.2L12 20.8l-7.6-4.2V7.4z" />
@@ -531,7 +469,6 @@ export const Cube = (p: P) => (
   </Svg>
 )
 
-/** A tool: a plug, its prongs solid. */
 export const Plug = (p: P) => (
   <Svg {...p}>
     <path d="M6.5 9.5h11v2.5a5.5 5.5 0 0 1-11 0z" />
@@ -541,7 +478,6 @@ export const Plug = (p: P) => (
   </Svg>
 )
 
-/** A branch: one path splitting in two at a solid point. */
 export const Fork = (p: P) => (
   <Svg {...p}>
     <path d="M4 12h6" />
@@ -551,7 +487,6 @@ export const Fork = (p: P) => (
   </Svg>
 )
 
-/** A person's say-so: a shield with a solid check. */
 export const Shield = (p: P) => (
   <Svg {...p}>
     <path d="M12 3 19 5.8v5.4c0 4.4-3 7.9-7 9.8-4-1.9-7-5.4-7-9.8V5.8z" />
@@ -559,7 +494,6 @@ export const Shield = (p: P) => (
   </Svg>
 )
 
-/** Sending something out: a paper plane, its fold solid. */
 export const Send = (p: P) => (
   <Svg {...p}>
     <path d="M20.5 3.5 3.5 10.3l6.6 2.9 2.9 6.6z" />

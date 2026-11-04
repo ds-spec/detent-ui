@@ -2,35 +2,10 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import type { KeyboardEvent, PointerEvent as ReactPointerEvent } from 'react'
 import { useReducedMotion } from 'motion/react'
 
-/*
- * Detent: the click a dial makes as it settles, as a motion engine.
- *
- * One value, carried by the hand, that keeps its velocity through everything. It lives in a
- * coordinate `u`; what you see is `out(u)`, which bends that space two ways:
- *
- *   - around a stop the space is compressed, so the value drags in the notch and hurries between
- *     notches. A detent is a warp of space, not a force, which is why it can never fight a spring.
- *   - past an edge it stretches like a rubber band, with no corner where the band begins.
- *
- * Everything else moves `u`: the hand one to one, plus a residual that bleeds off whatever the value
- * was already doing, so grabbing something in flight never jumps in position or speed. Let go and a
- * flick projects where it would come to rest, picks the nearest stop, coasts, then settles on a
- * closed-form spring that is exact at any frame rate.
- *
- * It runs on requestAnimationFrame only while something moves, and hands the value to `onFrame`,
- * which writes transforms and opacity directly. No React state per frame, no layout.
- */
-
 export const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n))
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t
-/** `value` between two numbers that multiply rather than add, such as prices. */
 export const glide = (a: number, b: number, t: number) => (a > 0 && b > 0 ? a * Math.pow(b / a, t) : lerp(a, b, t))
 
-/**
- * A notch in a free value: within `reach` of a centre it drags, either side it hurries to catch up,
- * and outside it nothing has changed. For values that can rest anywhere, so `stops` won't do. The
- * curve has no corner at its edges, so the hand never feels where it starts.
- */
 export const notched = (x: number, centres: number[], reach: number, hold = 0.7) => {
   for (const c of centres) {
     const d = (x - c) / reach
@@ -39,16 +14,14 @@ export const notched = (x: number, centres: number[], reach: number, hold = 0.7)
   return x
 }
 
-/** Reads a list at a fractional index. */
 export const at = (list: number[], i: number, mix = lerp) => {
   const a = clamp(Math.floor(i), 0, list.length - 1)
   return mix(list[a], list[Math.min(list.length - 1, a + 1)], clamp(i - a, 0, 1))
 }
 
-export type Spring = { /** Natural frequency, in radians a second: higher is quicker. */ w: number; /** 1 is critically damped; a little under leaves one soft overshoot, kept for a gesture that carried momentum. */ z: number }
+export type Spring = { w: number; z: number }
 export type Body = { x: number; v: number }
 
-/** Steps a spring exactly, so it behaves the same at 30fps, 60fps or 120fps. */
 export function springStep(b: Body, target: number, { w, z }: Spring, dt: number) {
   const a = b.x - target
   if (z >= 1) {
@@ -70,10 +43,8 @@ export function springStep(b: Body, target: number, { w, z }: Spring, dt: number
 
 const still = (b: Body, target: number, eps: number) => Math.abs(b.x - target) < eps && Math.abs(b.v) < eps * 12
 
-/** How far along a stretch of rubber the hand gets for pulling `d`, with slope `s` where it begins. */
 const rubber = (d: number, reach: number, s: number) => reach * (1 - 1 / (1 + (s * d) / reach))
 
-/** Estimates velocity by fitting a line to the last few samples, so one coalesced event can't spike it. */
 function tracker(window = 90) {
   const samples: [number, number][] = []
   return {
@@ -94,11 +65,6 @@ function tracker(window = 90) {
   }
 }
 
-/**
- * The library's one voice: a soft click, felt more than heard, and as loud as the gesture was fast.
- * Silent until a real gesture has woken it, and `set(false)` is the one off switch for sound and
- * haptics everywhere. Every piece that clicks goes through here.
- */
 export const feedback = (() => {
   let audio: AudioContext | null = null
   let last = 0
@@ -106,7 +72,6 @@ export const feedback = (() => {
   let on = true
   let cancel: (() => void) | null = null
   let holding = false
-  // The first context in a page is a long task, so it's never built while a hand is on something.
   const open = () => {
     cancel = null
     audio ??= new AudioContext()
@@ -142,7 +107,6 @@ export const feedback = (() => {
     tone.stop(t + 0.034)
   }
   return {
-    /** The off switch. Off, nothing sounds or buzzes and no audio is even set up. */
     set(next: boolean) {
       on = next
       if (on) return
@@ -150,9 +114,7 @@ export const feedback = (() => {
       cancel = null
       void audio?.suspend()
     },
-    /** Readies the sound in idle time, for when a hand is on its way. It still waits for a gesture to play. */
     warm,
-    /** `grab` says a pointer has just come down: if the sound isn't ready, it waits for the hand to lift. */
     wake(grab = false) {
       if (!on) return
       asked = true
@@ -167,7 +129,6 @@ export const feedback = (() => {
         addEventListener('pointercancel', letGo)
       }
     },
-    /** `heavy` is for the one moment in a component that earns it. `speed`, 0 to 1, is how fast the gesture was going. */
     tick(heavy = false, speed = 1) {
       if (!on || !asked) return
       const now = performance.now()
@@ -176,7 +137,6 @@ export const feedback = (() => {
       if (typeof navigator !== 'undefined' && 'vibrate' in navigator) navigator.vibrate(heavy ? 10 : 4)
       if (!audio) return
       const loud = 0.45 + 0.55 * clamp(speed, 0, 1)
-      // A first gesture's sound is still waking: it plays the moment it's ready.
       if (audio.state === 'running') play(heavy, loud)
       else void audio.resume().then(() => on && play(heavy, loud))
     },
@@ -184,41 +144,26 @@ export const feedback = (() => {
 })()
 
 export type FrameInfo = {
-  /** Seconds since the last frame. */
   dt: number
-  /** What the value is doing. */
   mode: Mode
-  /** True while a hand or a flick is moving it, false while it's going home or at rest. */
   live: boolean
 }
 export type Mode = 'rest' | 'held' | 'coast' | 'settle' | 'sweep'
 
 export type DetentOptions = {
-  /** Where it starts. */
   value: number
-  /** The stops, ascending. Left out, every value is a resting place between `min` and `max`. */
   stops?: number[]
   min?: number
   max?: number
-  /** How strongly stops hold, 0 to 0.9. */
   magnet?: number
-  /** How far past an edge the rubber band can ever stretch, in the value's units. */
   reach?: number
-  /** Seconds of travel a flick is worth: the landing is `position + velocity * throw`. */
   throw?: number
-  /** How it settles. Its `z` only applies when a gesture carried momentum: everything else lands at 1. */
   spring?: Spring
-  /** How quickly whatever it was doing bleeds off once a hand takes it, or the hand's offset closes. */
   catch?: Spring
-  /** Stay silent. Ticks only ever play for a real gesture. */
   muted?: boolean
-  /** Reduced motion: it follows the hand but goes everywhere else at once. */
   reduce?: boolean
-  /** Called every frame. Return true to keep the loop running for your own followers. */
   onFrame: (x: number, v: number, info: FrameInfo) => boolean | void
-  /** Called as the value enters a new stop's notch. */
   onStop?: (i: number) => void
-  /** Called when it comes to rest. */
   onRest?: (x: number, i: number) => void
 }
 
@@ -226,9 +171,7 @@ export type Detent = ReturnType<typeof createDetent>
 
 const SPRING: Spring = { w: 17, z: 0.92 }
 const CATCH: Spring = { w: 24, z: 1 }
-/** Stops a second a hand has to be moving for its letting go to count as momentum. */
 const MOMENTUM = 1
-/** Stops a second that count as fast, for how loud a click is. */
 const SWIFT = 8
 
 export function createDetent(read: () => DetentOptions) {
@@ -255,7 +198,6 @@ export function createDetent(read: () => DetentOptions) {
     return { o, s, lo: o.min ?? s?.[0] ?? -Infinity, hi: o.max ?? s?.[s.length - 1] ?? Infinity, m: o.reduce ? 0 : o.magnet ?? 0, reach: o.reach ?? ((s && s.length > 1 ? s[1] - s[0] : 1) * 0.5) }
   }
 
-  /** What you see for a place in the engine's own space. */
   const out = (u: number) => {
     const { s, lo, hi, m, reach } = span()
     if (u < lo) return lo - rubber(lo - u, reach, 1 - m)
@@ -348,14 +290,12 @@ export function createDetent(read: () => DetentOptions) {
     const { s } = span()
     return s && s.length > 1 ? (s[s.length - 1] - s[0]) / (s.length - 1) : 1
   }
-  /** A spring lands dead unless what's arriving brought momentum with it. */
   const landing = (s: Spring, v: number): Spring => (Math.abs(v) > gap() * MOMENTUM ? s : { ...s, z: 1 })
   const coastEnd = () => gap() * 0.7
   const settleEps = () => gap() * 0.0015
 
   function loop(now: number) {
     frame = 0
-    // The frame's clock can start a little before the wake that asked for it.
     const dt = clamp((now - then) / 1000, 1 / 240, 0.05)
     then = now
     const was = mode
@@ -368,7 +308,6 @@ export function createDetent(read: () => DetentOptions) {
     if (mode !== 'rest' || more) frame = requestAnimationFrame(loop)
   }
 
-  /** A long way to go coasts on friction tuned to arrive there, then settles. A short way just settles. */
   const launch = () => {
     const away = target - body.x
     if (Math.abs(away) > gap() * 1.6 && Math.sign(away) === Math.sign(body.v)) {
@@ -378,7 +317,6 @@ export function createDetent(read: () => DetentOptions) {
     start()
   }
 
-  /** Goes to a place from wherever it is, keeping its speed. */
   const to = (value: number, opts: { spring?: Spring; instant?: boolean; velocity?: number; feel?: boolean } = {}) => {
     const { o, lo, hi } = span()
     target = clamp(value, lo, hi)
@@ -401,19 +339,12 @@ export function createDetent(read: () => DetentOptions) {
 
   const api = {
     get: () => shown,
-    /**
-     * Where a hand should pick it up. A moving value runs on a little as it's caught, so the hand
-     * takes it there: it then slows into the hand in one clean curve, never drifting back.
-     */
     place: () => body.x + (mode === 'rest' ? 0 : body.v / (span().o.catch ?? CATCH).w),
     velocity: () => slope(body.x) * body.v,
     mode: () => mode,
-    /** Where it's heading. */
     target: () => target,
-    /** The nearest stop to a value. */
     nearest,
 
-    /** Moves at once, with nothing carried over. */
     set(value: number) {
       body.x = target = hand = value
       body.v = residual.x = residual.v = 0
@@ -425,7 +356,6 @@ export function createDetent(read: () => DetentOptions) {
     },
     to,
 
-    /** Takes it in hand at `at`. Whatever it was doing carries on as a residual that bleeds off. */
     grab(place: number, { feel: touching = true }: { feel?: boolean } = {}) {
       const { o } = span()
       residual.x = o.reduce ? 0 : body.x - place
@@ -437,13 +367,11 @@ export function createDetent(read: () => DetentOptions) {
       mode = 'held'
       start()
     },
-    /** Moves the hand. */
     drag(place: number) {
       if (mode !== 'held') return
       hand = place
       track.add(performance.now(), place)
     },
-    /** Lets go. With `flick`, the hand's speed decides the landing; otherwise it goes to `home`, or the nearest stop. */
     release({ flick = true, home }: { flick?: boolean; home?: number } = {}) {
       if (mode !== 'held') return
       const { o, lo, hi } = span()
@@ -460,7 +388,6 @@ export function createDetent(read: () => DetentOptions) {
       }
       launch()
     },
-    /** Throws it, as a demo's hand would: same landing, same coast, no hand. */
     fling(velocity: number) {
       const { o, lo, hi } = span()
       const rest = nearest(clamp(body.x + velocity * (o.throw ?? 0.16), lo, hi)).value
@@ -472,7 +399,6 @@ export function createDetent(read: () => DetentOptions) {
       spring = o.spring ?? SPRING
       launch()
     },
-    /** Walks it to a place at a hand's pace, easing out of and into the stop, for a scripted demo. */
     sweep(value: number, ms: number) {
       const { o } = span()
       if (o.reduce) return to(value)
@@ -484,10 +410,6 @@ export function createDetent(read: () => DetentOptions) {
       mode = 'sweep'
       start()
     },
-    /**
-     * One stop along, for a key. A held key doesn't animate: there's no time to see it, and it
-     * would only make the key feel slow.
-     */
     step(by: number, repeat = false) {
       const { o, s, lo, hi } = span()
       const now = performance.now()
@@ -499,7 +421,6 @@ export function createDetent(read: () => DetentOptions) {
       to(next, { instant: quick, feel: !quick })
       return next
     },
-    /** Asks for another frame, for followers that have started moving of their own accord. */
     wake: start,
     dispose() {
       cancelAnimationFrame(frame)
@@ -509,7 +430,6 @@ export function createDetent(read: () => DetentOptions) {
   return api
 }
 
-/** An engine that lives as long as the component and always reads its latest options. */
 export function useDetent(options: Omit<DetentOptions, 'reduce'>) {
   const reduce = !!useReducedMotion()
   const latest = useRef<DetentOptions>({ ...options, reduce })
@@ -522,37 +442,21 @@ export function useDetent(options: Omit<DetentOptions, 'reduce'>) {
 }
 
 export type DragConfig = {
-  /** Which way the hand moves it. */
   axis?: 'x' | 'y'
-  /** The element whose size sets the scale. Measured in client pixels, so a CSS zoom is fine. */
   box: () => HTMLElement | null
-  /** How many of the value's units one full length of `box` is worth. */
   units: number
-  /** Where a pixel lands, for controls where a finger means a place rather than a nudge. */
   absolute?: (fraction: number) => number
-  /** A mouse moves it just by pointing. */
   hover?: boolean
-  /** The value belongs to the pointer: a hand always takes it to its own place, even mid-flight. */
   follow?: boolean
-  /** Called for a press that didn't move, with where it landed as a fraction of the box. */
   onTap?: (fraction: number) => void
-  /** Called when the mouse leaves, or a finger's gesture is taken away by the page scrolling. */
   onLeave?: () => void
-  /** Called when a hand takes it. */
   onGrab?: () => void
-  /** Called just before it's let go, with what it'll do then. */
   release?: () => { flick?: boolean; home?: number }
   muted?: boolean
 }
 
-/** How far a press can wander and still be a tap. A finger wobbles more than a mouse. */
 const SLOP = { mouse: 5, touch: 10 }
 
-/**
- * Pointer handlers for an engine. Spread them on the element, and give it `touch-pan-y` (or
- * `touch-pan-x` for a vertical control) so the page still scrolls past it. A finger that means to
- * scroll is handed to the browser, which cancels the pointer; nothing has moved by then.
- */
 export function dragProps(d: Detent, read: () => DragConfig) {
   let press: { id: number; px: number; py: number; from: number; moved: boolean; held: boolean; caught: boolean } | null = null
   const place = (e: ReactPointerEvent) => {
@@ -584,10 +488,7 @@ export function dragProps(d: Detent, read: () => DragConfig) {
       const c = read()
       if (!c.muted) feedback.wake(true)
       e.currentTarget.setPointerCapture?.(e.pointerId)
-      // Something caught in flight stays where it was caught, however the control normally maps a hand.
       press = { id: e.pointerId, px: e.clientX, py: e.clientY, from: d.place(), moved: false, held: false, caught: inFlight() && !c.follow }
-      // A finger on a resting control might be a scroll, so a place isn't taken until it moves
-      // sideways. One that catches something moving, or a mouse, takes hold at once.
       if (e.pointerType !== 'touch' || press.caught || !c.absolute) take(e)
     },
     onPointerMove(e: ReactPointerEvent) {
@@ -639,7 +540,6 @@ export function dragProps(d: Detent, read: () => DragConfig) {
   }
 }
 
-/** Arrow keys for an engine, for a horizontal control. Returns true if it used the key. */
 export const stepKey = (d: Detent, e: KeyboardEvent, keys: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1 }) => {
   const by = keys[e.key]
   if (!by) return false
@@ -651,14 +551,6 @@ export const stepKey = (d: Detent, e: KeyboardEvent, keys: Record<string, number
 const COLUMN = 'display:inline-block;height:1.25em;overflow:hidden;vertical-align:top'
 const STRIP = '0123456789'
 
-/**
- * A number on real wheels: each digit is a strip that turns with the value, tens carrying as the
- * units come round, written as transforms so it costs no layout. As the value slows, every digit
- * falls into its own notch and reads exactly what `format` says.
- *
- * `pad` keeps that many digit columns whether they're needed or not, so a number can gain a digit
- * without moving. `built` is told when the columns change, for a number that's coloured across them.
- */
 export function createRoller(el: HTMLElement, format: (n: number) => string, pad = 0, built?: (columns: HTMLElement[]) => void) {
   let shape = ''
   let wheels: { strip: HTMLElement; col: HTMLElement }[] = []
@@ -708,7 +600,6 @@ export function createRoller(el: HTMLElement, format: (n: number) => string, pad
     if (shownNumber > 0) scale = Math.abs(value) / shownNumber
     const place = Math.pow(10, -decimals) * (scale || 1)
     const q = Math.abs(value) / place
-    // How much of a digit's own place the value covers in a second decides how free the wheels run.
     const free = clamp(Math.abs(speed) / (place * 6), 0, 1)
     const count = wheels.length
     const whole = digits.padStart(count, '0')
@@ -722,7 +613,6 @@ export function createRoller(el: HTMLElement, format: (n: number) => string, pad
       const off = ((digit - running + 15) % 10) - 5
       const pos = (running + off * (1 - free) + 10) % 10
       strip.style.transform = `translateY(${(-pos * 100) / 11}%)`
-      // A leading zero in a padded column is a space until its digit comes round.
       if (pad) {
         const higher = Math.floor(q / unit)
         const fade = k === 0 ? 1 : higher > 0 ? 1 : clamp(lower - (unit - 1), 0, 1)
@@ -732,7 +622,6 @@ export function createRoller(el: HTMLElement, format: (n: number) => string, pad
   }
 }
 
-/** Writes text only when it changes, so a value running through the same reading costs nothing. */
 export const write = (el: HTMLElement | null | undefined, text: string) => {
   if (el && el.textContent !== text) el.textContent = text
 }

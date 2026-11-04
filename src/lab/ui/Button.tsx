@@ -23,15 +23,9 @@ const VARIANT: Record<Variant, string> = {
   danger: 'chip text-danger [--chip-wash:11%] [--chip:var(--danger)] hover:[--chip-wash:17%]',
 }
 
-/** What a button of this variant and size wears, for buttons built on the same tokens. */
 export const buttonClass = (variant: Variant = 'secondary', size: Size = 'md', icon = false) =>
   `sink ring-focus relative inline-flex shrink-0 select-none items-center justify-center font-medium transition-[background-color,color,box-shadow] duration-150 disabled:pointer-events-none disabled:opacity-45 ${icon ? ICON[size] : SIZE[size]} ${VARIANT[variant]}`
 
-/**
- * The default button. Presses settle to 0.97. Loading swaps the label for a spinner, and
- * `done` swaps it for a result ("Published", with a check), both without changing the
- * button's width, because the label keeps its space while hidden.
- */
 export function Button({
   variant = 'secondary',
   size = 'md',
@@ -43,17 +37,11 @@ export function Button({
   onPointerDown,
   ...rest
 }: Omit<ComponentProps<typeof motion.button>, 'children'> & {
-  /** Primary for the one main action, secondary, ghost for quiet ones, danger for destructive ones. */
   variant?: Variant
-  /** Small, medium or large. */
   size?: Size
-  /** A square button holding only an icon. Give it an aria-label. */
   icon?: boolean
-  /** Show a spinner in place of the label. The button keeps its width. */
   loading?: boolean
-  /** Shown for a moment in place of the label once the action has finished, e.g. a check. */
   done?: ReactNode
-  /** The label. */
   children?: ReactNode
 }) {
   const hidden = loading || !!done

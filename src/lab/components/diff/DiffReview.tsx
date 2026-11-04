@@ -14,7 +14,6 @@ import { FileGlyph } from '@/lab/ui/FileGlyph'
 import { Spinner } from '@/lab/ui/Spinner'
 
 export type DiffLine = ['ctx' | 'add' | 'del', string]
-/** A hunk starts at line `o` of the old file and line `n` of the new one. */
 export type Hunk = { id: string; scope: string; o: number; n: number; lines: DiffLine[] }
 export type Verdict = 'pending' | 'accepted' | 'rejected'
 export type DiffView = 'unified' | 'split'
@@ -23,20 +22,6 @@ export type DiffHandle = { next(): void; prev(): void; accept(): void; reject():
 const RH = 20
 const HEAD = 32
 
-/**
- * Code changes proposed by an agent, reviewed hunk by hunk.
- *
- * Lines stream in as the agent writes them. Every row is placed from a small layout model
- * (a row index and a side), so switching between unified and split, or accepting a hunk,
- * is one spring from where each line is to where it belongs: removed lines slide across
- * to pair with their replacements, accepted hunks resolve into the final code. Nothing is
- * measured and nothing outside the body ever moves. Changed words inside a line are marked.
- *
- * It reads calm on purpose. The code is set in near-monochrome, so green and red mean only what
- * changed; each hunk sits on one hairline, and the hunk you're on is the only thing in the accent.
- * A verdict reads as a soft pill, as verdicts do across the library, and the header counts the
- * change as a fine ruler: a tick for each line added, then each line removed.
- */
 export function DiffReview({
   title,
   file,
@@ -46,17 +31,11 @@ export function DiffReview({
   onApply,
   ref,
 }: {
-  /** What the change is, in the header. */
   title: string
-  /** The file's path. */
   file: string
-  /** The change, a hunk at a time: where it is, and its lines as context, added or removed. */
   hunks: Hunk[]
-  /** Called with each hunk's verdict when a person applies the review. */
   onApply?: (verdicts: Record<string, Verdict>) => void
-  /** The review's frame; it never changes while you work. */
   size?: { w: number; h: number }
-  /** How many lines the agent has written so far, across all hunks. Leave out when complete. */
   shown?: number
   ref?: Ref<DiffHandle>
 }) {
@@ -69,27 +48,21 @@ export function DiffReview({
   const [applied, setApplied] = useState(false)
   const root = useRef<HTMLDivElement>(null)
   const scroller = useRef<HTMLDivElement>(null)
-  // Hunks spring to their height and are stacked by transform, so one growing never moves the rest in the layout.
   const stack = useRef<HTMLDivElement>(null)
   useStack(stack, 10)
-  // The review takes the size it's given, or less when its container is narrower. Below 560px
-  // there's no room for two columns of code, so it reads unified and the switch steps away.
   const { w: seen } = useSize(root)
   const width = seen || size.w
   const roomy = width >= 560
   const split = view === 'split' && roomy
-  // The body's width inside its padding: where a split row's right half starts.
   const body = width - 24
 
   const verdict = (h: Hunk) => verdicts[h.id] ?? 'pending'
   const pending = hunks.filter((h) => verdict(h) === 'pending')
   const resolved = ready && !pending.length
 
-  // Lines written so far, per hunk: whatever's left after the hunks before it.
   const visible = hunks.map((h, i) => Math.max(0, Math.min(h.lines.length, written - hunks.slice(0, i).reduce((t, x) => t + x.lines.length, 0))))
   const writing = ready ? -1 : visible.findIndex((n, i) => n < hunks[i].lines.length)
 
-  // What the file gains and loses, leaving out anything rejected.
   let adds = 0
   let dels = 0
   hunks.forEach((h, i) => {
@@ -102,7 +75,6 @@ export function DiffReview({
     const h = hunks[focus]
     if (!h || verdict(h) !== 'pending') return
     setVerdicts((m) => ({ ...m, [h.id]: v }))
-    // Move on to the next hunk that still needs a look.
     const order = [...hunks.slice(focus + 1), ...hunks.slice(0, focus)]
     const nextUp = order.find((x) => x.id !== h.id && verdict(x) === 'pending')
     if (nextUp) setFocus(hunks.indexOf(nextUp))
@@ -132,7 +104,6 @@ export function DiffReview({
     }
   }
 
-  // Keep the focused hunk in view, inside the body only.
   useEffect(() => {
     const box = scroller.current
     const el = box?.querySelector<HTMLElement>(`[data-hunk="${focus}"]`)
@@ -204,7 +175,6 @@ export function DiffReview({
                   />
                 ),
             )}
-            {/* Where the change ends, so the file doesn't just stop. */}
             {ready && (
               <motion.p key="end" className="flex h-8 items-center justify-center gap-2 text-caption text-ink-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.2, ease: ease.out }}>
                 <span className="h-px w-6 bg-[var(--line)]" />
@@ -217,7 +187,6 @@ export function DiffReview({
       </div>
 
       <footer className="flex h-14 shrink-0 items-center gap-3 pl-4 pr-3 shadow-[inset_0_1px_0_var(--line)]">
-        {/* One segment a hunk: green kept, red turned down, grey still to look at, blue where you are. */}
         <span className="flex shrink-0 items-center gap-[3px] @max-[420px]:hidden" aria-hidden>
           {hunks.map((h, i) => {
             const v = verdict(h)
@@ -279,8 +248,6 @@ export function DiffReview({
   )
 }
 
-/* ───────────────────────────── Hunks and rows ───────────────────────────── */
-
 type Num = { k: DiffLine[0]; text: string; o: number; n: number; i: number }
 type Row = { l: Num; num: number; y: number; side: 'full' | 'left' | 'right'; tone: 'ctx' | 'add' | 'del'; gone: boolean; hl?: [number, number] }
 type Fill = { key: string; y: number; side: 'left' | 'right' }
@@ -288,7 +255,6 @@ type Fill = { key: string; y: number; side: 'left' | 'right' }
 const TOKEN = /\s+|\w+|'[^']*'?|[^\w\s]/g
 const lex = (s: string) => s.match(TOKEN) ?? []
 
-/** The words that changed between a removed line and its replacement, as token ranges. Very different lines get no marks. */
 function changed(a: string, b: string): [[number, number], [number, number]] | null {
   const x = lex(a)
   const y = lex(b)
@@ -304,7 +270,6 @@ function changed(a: string, b: string): [[number, number], [number, number]] | n
   ]
 }
 
-/** Where every line of a hunk sits, for a given view and verdict. */
 function place(lines: Num[], verdict: Verdict, split: boolean, hid: string) {
   const rows: Row[] = []
   const fills: Fill[] = []
@@ -312,9 +277,7 @@ function place(lines: Num[], verdict: Verdict, split: boolean, hid: string) {
   for (let i = 0; i < lines.length;) {
     const l = lines[i]
     if (verdict !== 'pending' || l.k === 'ctx') {
-      // Resolved hunks read as plain code: the lines that lost fade out where they stood.
       const gone = (verdict === 'accepted' && l.k === 'del') || (verdict === 'rejected' && l.k === 'add')
-      // A resolved hunk counts lines the way the file it kept does: new numbers if accepted, old if rejected.
       const num = verdict === 'rejected' || (verdict === 'pending' && l.k === 'del') ? l.o : l.n
       rows.push({ l, num, y, side: 'full', tone: verdict === 'pending' ? l.k : 'ctx', gone })
       if (!gone) y++
@@ -382,7 +345,6 @@ function HunkView({
       transition={{ height: spring.smooth, opacity: { duration: 0.2, ease: ease.out } }}
     >
       <div className="relative z-10 flex items-center gap-2 pl-3 pr-1.5 shadow-[inset_0_-1px_0_var(--line)]" style={{ height: HEAD, background: 'color-mix(in oklch, var(--ink) 2.5%, var(--surface))' }}>
-        {/* Where it is: the function it's in, then the lines, in words rather than @@ marks. */}
         <span className="flex min-w-0 items-center gap-1.5 truncate font-mono text-[11.5px] text-ink">
           <span aria-hidden className="italic text-ink-3">
             ƒ
@@ -423,12 +385,10 @@ function HunkView({
 const wash = (c: string, light: number, dark: number) => `light-dark(color-mix(in oklch, var(${c}) ${light}%, transparent), color-mix(in oklch, var(${c}) ${dark}%, transparent))`
 const TINT = { ctx: 'transparent', add: wash('--ok', 7, 10), del: wash('--danger', 6.5, 10) }
 const MARK = { add: wash('--ok', 22, 30), del: wash('--danger', 19, 28) }
-/** The colour of a change as a mark: the line's edge, its sign, and the counts in the header. */
 const SIGN = { add: 'color-mix(in oklch, var(--ok) 85%, var(--ink))', del: 'color-mix(in oklch, var(--danger) 85%, var(--ink))' }
 
 function RowView({ r, split, body }: { r: Row; split: boolean; body: number }) {
   const full = r.side === 'full'
-  // Across by transform: a removed line sliding over to pair with its replacement moves nothing in the layout.
   const at = { y: r.y * RH, x: r.side === 'right' ? body / 2 : 0, width: full ? '100%' : '50%' }
   const num = r.num
   return (
@@ -457,7 +417,6 @@ function Seg({ num, tone, text, hl }: { num: number; tone: Row['tone']; text: st
   const toks = lex(text)
   return (
     <div className="relative flex h-full whitespace-pre">
-      {/* A changed line is marked at its edge, not by tinting its number. */}
       {tone !== 'ctx' && <span aria-hidden className="absolute inset-y-0 left-0 w-[2px]" style={{ background: SIGN[tone] }} />}
       <span className="tnum w-11 shrink-0 select-none pr-3 text-right" style={{ color: tone === 'ctx' ? 'color-mix(in oklch, var(--ink) 32%, transparent)' : `color-mix(in oklch, ${SIGN[tone]} 70%, var(--ink-3))` }}>
         {num || ''}
@@ -487,10 +446,6 @@ function Seg({ num, tone, text, hl }: { num: number; tone: Row['tone']; text: st
   )
 }
 
-/**
- * Near-monochrome syntax, so colour is left to the change itself: keywords set a step heavier,
- * values and calls in full ink, names in the body grey, punctuation stepping back.
- */
 function syntax(t: string, next?: string) {
   if (/^\s/.test(t)) return undefined
   if (KW.has(t)) return { color: 'var(--ink)', fontWeight: 500 }
@@ -499,14 +454,8 @@ function syntax(t: string, next?: string) {
   return { color: 'color-mix(in oklch, var(--ink) 40%, transparent)' }
 }
 
-/* ───────────────────────────── Header ───────────────────────────── */
-
 const TICKS = 22
 
-/**
- * The change as a fine ruler of a fixed length: a green tick for each line added, then a red one
- * for each removed, scaled to fit; the rest stay faint. Its width never changes as the counts roll.
- */
 function Ticks({ adds, dels }: { adds: number; dels: number }) {
   const total = adds + dels
   const k = total > TICKS ? TICKS / total : 1
@@ -521,7 +470,6 @@ function Ticks({ adds, dels }: { adds: number; dels: number }) {
   )
 }
 
-/** The footer's line, in two tones: the count in ink, what it means in grey. */
 function Status({ text }: { text: string }) {
   const m = text.match(/^(\d+ of \d+|\d+ accepted · \d+ rejected)(.*)$/)
   return m ? (
@@ -535,12 +483,9 @@ function Status({ text }: { text: string }) {
   )
 }
 
-/* ───────────────────────────── Verdicts ───────────────────────────── */
-
 function Verdicts({ verdict, writing, canDecide, focused, onDecide }: { verdict: Verdict; writing: boolean; canDecide: boolean; focused: boolean; onDecide: (v: Verdict) => void }) {
   const state = writing ? 'writing' : verdict !== 'pending' ? verdict : canDecide ? 'ask' : 'wait'
   return (
-    // One fixed slot: the buttons, the stamp and the writing state all live in the same space.
     <span className="relative flex h-6 w-[172px] @max-[420px]:w-[132px] shrink-0 items-center justify-end">
       <AnimatePresence initial={false} mode="popLayout">
         {state === 'writing' && (
@@ -581,7 +526,6 @@ const fade = {
   transition: { duration: 0.18, ease: ease.out },
 }
 
-/** The verdict as a soft tinted pill, the way verdicts read across the library: green kept, red turned down. */
 function Mark({ ok }: { ok: boolean }) {
   const c = ok ? 'var(--ok)' : 'var(--danger)'
   return (
@@ -603,7 +547,6 @@ function Small({ onClick, hint, focused, strong, children }: { onClick: () => vo
       }`}
     >
       {children}
-      {/* The shortcut is always there, only brighter on the hunk you're on, so nothing shifts. */}
       <span
         className={`ml-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-[5px] px-1 font-mono pointer-coarse:hidden @max-[420px]:hidden text-[10.5px] leading-none transition-opacity duration-200 ${strong && focused ? 'bg-[color-mix(in_oklch,var(--surface)_18%,transparent)] text-surface' : 'bg-surface-2 text-ink-3'}`}
         style={{ opacity: focused ? 1 : 0.45 }}
@@ -613,8 +556,6 @@ function Small({ onClick, hint, focused, strong, children }: { onClick: () => vo
     </motion.button>
   )
 }
-
-/* ───────────────────────────── View switch ───────────────────────────── */
 
 function Segmented({ value, onChange }: { value: DiffView; onChange: (v: DiffView) => void }) {
   const id = useId()

@@ -1,5 +1,3 @@
-/** The questions people ask before they start, by topic. */
-
 export type Question = { id: string; topic: string; q: string; a: string }
 
 export const QUESTIONS: Question[] = [

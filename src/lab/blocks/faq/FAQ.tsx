@@ -16,33 +16,15 @@ import type { BlockProps } from '@/lab/blocks/kit/props'
 import { QUESTIONS } from './content'
 import type { Question } from './content'
 
-/**
- * The questions people ask before they start. Type and the list narrows as you go, with what
- * matched marked in place; when the match is only in an answer, a line of that answer comes up
- * under its question so you can see why it's there. Topics filter the same list, and every
- * answer asks whether it helped.
- *
- * The list stacks its rows by transform: answers open and rows come and go by their own height
- * while nothing else on the page moves. Beside it on wide screens, the heading, the search and a
- * way to reach a person stay put.
- */
-
 export type FAQProps = BlockProps & {
-  /** The product's name, wherever the default questions name it. */
   product?: string
   eyebrow?: string
-  /** The heading, set in two tones. */
   title?: [string, string]
   subline?: string
-  /** The questions. Topics come from them, in the order they first appear. */
   questions?: Question[]
-  /** Let more than one answer be open at once. */
   multiple?: boolean
-  /** Called with what a person searched for when nothing answers it. */
   onAsk?: (query: string) => void
-  /** Called when a person asks to talk to someone. */
   onContact?: () => void
-  /** Called when a person says whether an answer helped. */
   onFeedback?: (id: string, helpful: boolean) => void
 }
 
@@ -146,7 +128,6 @@ export function FAQ({
               <Close size={14} />
             </button>
           </label>
-          {/* What the search found, in one line that holds its place. */}
           <p aria-live="polite" className="mt-2.5 h-5 px-4 text-caption text-ink-3">
             {words.length ? (shown.length ? `${shown.length} ${shown.length === 1 ? 'answer' : 'answers'} for “${query.trim()}”` : `Nothing for “${query.trim()}” yet`) : `${questions.length} questions`}
           </p>
@@ -186,11 +167,6 @@ export function FAQ({
   )
 }
 
-/**
- * Each search word, marked wherever it appears. The mark pads itself and gives the space back, so
- * text never reflows. Each search gets fresh text nodes: reusing the old ones would move their
- * starts as the split points change, and the page would count that as a shift.
- */
 function marked(text: string, words: string[]): ReactNode {
   if (!words.length) return text
   const re = new RegExp(`(${words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'gi')
@@ -209,12 +185,10 @@ function marked(text: string, words: string[]): ReactNode {
   )
 }
 
-/** A line of the answer around the first match, for a question that only matched in its answer. */
 function snippet(answer: string, words: string[]) {
   const low = answer.toLowerCase()
   const at = Math.min(...words.map((w) => low.indexOf(w)).filter((i) => i >= 0))
   if (!Number.isFinite(at)) return null
-  // From the start of its sentence when that's close, otherwise from a word boundary just before it.
   const sentence = Math.max(answer.lastIndexOf('. ', at), answer.lastIndexOf('? ', at))
   let start = sentence >= 0 && at - sentence < 64 ? sentence + 2 : Math.max(0, at - 34)
   if (start > 0 && start !== sentence + 2) start = answer.indexOf(' ', start) + 1
@@ -249,12 +223,10 @@ function List({
   const id = useId()
   const stack = useRef<HTMLDivElement>(null)
   const holder = useRef<HTMLDivElement>(null)
-  // If a search ever makes the list taller than the reserve, the box grows to fit rather than overlap what follows.
   useStack(stack, 0, () => {
     if (holder.current && stack.current) holder.current.style.minHeight = `${stack.current.offsetHeight}px`
   })
   const longest = all.reduce((a, b) => (b.a.length > a.a.length ? b : a), all[0])
-  // Up and down move between questions, the way an accordion should.
   const nav = (e: KeyboardEvent) => {
     const all = Array.from(stack.current?.querySelectorAll<HTMLButtonElement>('[data-q]') ?? [])
     const i = all.indexOf(e.target as HTMLButtonElement)
@@ -271,8 +243,6 @@ function List({
   }
   return (
     <div ref={holder} className="relative mt-6">
-      {/* The tallest the list gets: every question, the longest answer open. It holds the height, so
-          filtering and opening never move what comes after; the real list rides on top. */}
       {!multiple && (
         <div aria-hidden inert className="invisible">
           {all.map((x) => (
@@ -353,7 +323,6 @@ function List({
   )
 }
 
-/** A row's size, without its behaviour: the same type and spacing as the real one. */
 function Sizer({ q, a }: { q: string; a: string | null }) {
   return (
     <div className="shadow-[inset_0_-1px_0_var(--line)]">
@@ -371,7 +340,6 @@ function Sizer({ q, a }: { q: string; a: string | null }) {
   )
 }
 
-/** Whether it helped, in one line that becomes a thank-you in the same place. */
 function Helpful({ value, onPick }: { value: boolean | undefined; onPick: (v: boolean) => void }) {
   const done = value !== undefined
   return (

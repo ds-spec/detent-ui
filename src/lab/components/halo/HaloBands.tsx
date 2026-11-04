@@ -20,19 +20,12 @@ const BANDS = [
   { w: 108, h: 164, speed: 2.7 },
   { w: 88, h: 150, speed: 2.1 },
 ]
-/** How much of a band's height each glow covers, as a share. */
 const GLOW = 0.92
 
 type Rgb = [number, number, number]
 const rgb = (hex: string): Rgb => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)) as Rgb
 const css = (c: Rgb, a = 1) => `rgb(${c.map(Math.round).join(' ')} / ${a})`
 
-/**
- * Light bent through stacked lenses. Curved bands sit one inside the next and the colour starts
- * again at every edge, so a single glow reads as glass. The light drifts by itself and glides after
- * the pointer, each band a beat behind the last, and a press melts in the next palette. The glow
- * moves on the GPU, so it stays smooth behind anything you put in it.
- */
 export function HaloBands({
   children,
   palettes = HALOS,
@@ -41,17 +34,11 @@ export function HaloBands({
   onPaletteChange,
   className = '',
 }: {
-  /** What sits in the clear middle. */
   children?: ReactNode
-  /** The colours to move between. */
   palettes?: HaloPalette[]
-  /** Which palette it opens on. */
   defaultPalette?: number
-  /** Whether a press melts in the next palette. */
   pressToChange?: boolean
-  /** Called when the palette changes. */
   onPaletteChange?: (palette: HaloPalette) => void
-  /** Classes for the frame. Give it a height, or let its content set one. */
   className?: string
 }) {
   const [palette, setPalette] = useState(defaultPalette)
@@ -76,8 +63,6 @@ export function HaloBands({
     let seen = true
     let last = 0
 
-    // On a light page the glow fades through its pale edge into white. On a dark one that same pale
-    // colour turns to mud, so the two themes draw it differently.
     const isDark = () => {
       const [r = 255, g = 255, b = 255] = getComputedStyle(el).backgroundColor.match(/[\d.]+/g)?.map(Number) ?? []
       return 0.2126 * r + 0.7152 * g + 0.0722 * b < 90
@@ -85,7 +70,6 @@ export function HaloBands({
     let dark = isDark()
     let checked = 0
     const fill = () => {
-      // In the dark, light is scarce: a tighter, dimmer glow reads as lit glass, a full one as paint.
       const glow = dark
         ? `radial-gradient(closest-side, ${css(colours.core, 0.9)} 0%, ${css(colours.mid, 0.82)} 24%, ${css(colours.mid, 0.3)} 50%, ${css(colours.mid, 0)} 76%)`
         : `radial-gradient(closest-side, ${css(colours.core)} 0%, ${css(colours.mid)} 40%, ${css(colours.edge, 0.75)} 68%, ${css(colours.edge, 0)} 100%)`

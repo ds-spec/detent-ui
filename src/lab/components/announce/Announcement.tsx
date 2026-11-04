@@ -14,21 +14,16 @@ const CSS = `
 `
 
 export type AnnouncementProps = {
-  /** What it says. */
   children: ReactNode
   href: string
-  /** The word in the tag, which rolls to `action` when you reach for it. */
   tag?: string
   action?: string
-  /** Show a close button. Pair it with `onDismiss` to remember the choice. */
   dismissible?: boolean
   onDismiss?: () => void
-  /** Your router's link, if it has one. */
   linkAs?: ElementType
   className?: string
 }
 
-/** The "New" pill above a headline. A line of light runs round its edge once when you reach for it, and the tag says what pressing it will do. */
 export function Announcement({ children, href, tag = 'New', action = 'View', dismissible = false, onDismiss, linkAs: Link = 'a', className = '' }: AnnouncementProps) {
   const [near, setNear] = useState(false)
   const [gone, setGone] = useState(false)

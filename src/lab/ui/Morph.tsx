@@ -9,13 +9,6 @@ import { ease, spring } from '../lib/motion'
 type Anchor = 'top' | 'bottom' | 'center'
 type Justify = 'start' | 'center' | 'end'
 
-/**
- * A surface that morphs between views by animating its real width, height and radius.
- * Every view is measured up front, so the surface is never stretched (no squashed text) and the
- * surface knows its target size before it moves. Content crossfades on top, without blur.
- * Each view is laid out at the surface's top-left and moved to its edge by transform, so a
- * resize never shifts it in the layout; keep the surface's own top-left still and nothing moves.
- */
 export function Morph({
   view,
   views,
@@ -32,7 +25,6 @@ export function Morph({
   views: Record<string, ReactNode>
   radius?: number | Record<string, number>
   anchor?: Anchor
-  /** Horizontal edge the content stays pinned to while the surface resizes. */
   justify?: Justify
   transition?: Transition
   className?: string
@@ -65,14 +57,11 @@ export function Morph({
 
   useLayoutEffect(() => {
     if (!size) return
-    // The first size lands instantly; every change after that springs.
     if (!placed.current) {
       placed.current = true
       w.set(size.w)
       h.set(size.h)
       r.set(targetR)
-      // Motion paints these on its next frame; put the size on now, so a layout animation around
-      // the surface measuring this commit sees its real size, not an empty box.
       const el = surface.current
       if (el) {
         el.style.width = `${size.w}px`
@@ -92,7 +81,6 @@ export function Morph({
 
   const align = anchor === 'top' ? 'items-start' : anchor === 'bottom' ? 'items-end' : 'items-center'
   const along = justify === 'start' ? 'justify-start' : justify === 'end' ? 'justify-end' : 'justify-center'
-  // How much of the room left over sits before the view, across and down.
   const fx = justify === 'start' ? 0 : justify === 'end' ? 1 : 0.5
   const fy = anchor === 'top' ? 0 : anchor === 'bottom' ? 1 : 0.5
 
@@ -101,8 +89,6 @@ export function Morph({
       <motion.div
         ref={surface}
         className={`relative overflow-hidden ${className}`}
-        // Until it's measured (and before hydration) the surface just wraps the current view, so it
-        // paints at its real size from the first frame instead of popping in.
         style={{ ...style, ...(size ? { width: w, height: h } : { width: 'max-content' }), borderRadius: r }}
         onPointerEnter={onPointerEnter}
         onPointerLeave={onPointerLeave}
@@ -116,7 +102,6 @@ export function Morph({
         </div>
       </motion.div>
 
-      {/* Probes: every view rendered invisibly so its natural size is known before it's needed. */}
       <div aria-hidden className="pointer-events-none invisible absolute left-0 top-0 -z-50 size-0 overflow-clip" {...{ inert: true }}>
         {Object.entries(views).map(([k, v]) => (
           <div
@@ -134,10 +119,6 @@ export function Morph({
   )
 }
 
-/**
- * One view. Once measured it sits at the surface's top-left and is carried to its edge by
- * transform, following the surface's size frame by frame, so it stays put on screen and in the layout.
- */
 function Pane({ w, h, size, fx, fy, ref, children }: { w: MotionValue<number>; h: MotionValue<number>; size?: { w: number; h: number }; fx: number; fy: number; ref?: Ref<HTMLDivElement>; children: ReactNode }) {
   const x = useTransform(w, (v) => (size ? (v - size.w) * fx : 0))
   const y = useTransform(h, (v) => (size ? (v - size.h) * fy : 0))
@@ -147,7 +128,6 @@ function Pane({ w, h, size, fx, fy, ref, children }: { w: MotionValue<number>; h
       className={`w-max shrink-0 ${size ? 'absolute left-0 top-0' : ''}`}
       style={{ x, y }}
       initial={{ opacity: 0, scale: 0.96 }}
-      // Incoming content waits a beat so the surface has made room before it appears.
       animate={{ opacity: 1, scale: 1, transition: { duration: 0.22, delay: 0.1, ease: ease.out } }}
       exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.1, ease: ease.out } }}
     >

@@ -5,12 +5,6 @@ import { siGithub, siGrafana, siIntercom, siLinear, siNotion, siPagerduty, siTyp
 import { Orbit } from '@/lab/blocks/kit/icons'
 import { Orb } from '@/lab/ui/Orb'
 
-/**
- * The tools a product connects to, as app icons: each brand's own mark (from Simple Icons, CC0)
- * on a squircle in the brand's colour, with a thread of light along the top edge and a hairline
- * around it. Third-party marks belong to their owners; they're here to say what connects to
- * what, and they're data you swap for your own integrations.
- */
 export type App = 'grafana' | 'linear' | 'github' | 'pagerduty' | 'notion' | 'meet' | 'typeform' | 'intercom' | 'agents'
 
 type Mark = { path: string } | { glyph: (p: { size?: number }) => ReactNode }
@@ -57,7 +51,6 @@ export function AppIcon({ app, size = 20, className = '', style }: { app: App; s
   )
 }
 
-/** A brand's mark on its own, at text size: for buttons like "Continue with GitHub". */
 export function BrandMark({ brand, size = 16 }: { brand: 'github' | 'google'; size?: number }) {
   if (brand === 'github')
     return (
@@ -65,7 +58,6 @@ export function BrandMark({ brand, size = 16 }: { brand: 'github' | 'google'; si
         <path d={siGithub.path} />
       </svg>
     )
-  // Google's sign-in mark is always the four-colour G.
   return (
     <svg aria-hidden width={size} height={size} viewBox="0 0 24 24">
       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -76,7 +68,6 @@ export function BrandMark({ brand, size = 16 }: { brand: 'github' | 'google'; si
   )
 }
 
-/** A person: a two-tone gradient of their colour with their initials in white. */
 export function Person({ name, hue, size = 28, quiet = false, className = '' }: { name: string; hue: number; size?: number; quiet?: boolean; className?: string }) {
   return <Orb seed={name} hue={hue} size={size} quiet={quiet} className={className} />
 }

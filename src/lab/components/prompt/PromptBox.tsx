@@ -18,14 +18,10 @@ export type Attachment = {
   url?: string
   file?: File
 }
-/** A way of answering. `badge` is the small word beside its name; `aside` and `level` are kept for hosts that use them. */
 export type Mode = { id: string; name: string; note: string; icon?: ReactNode; level?: number; aside?: string; badge?: string }
-/** A model to offer. Bring your own `icon`, about 16px. `short` is what the row shows, when the icon already says whose it is. */
 export type Model = { name: string; short?: string; icon?: ReactNode }
 export type Message = { text: string; files: Attachment[]; mode: string; model?: string; project?: string | null }
-/** For demos and tests: write, attach, switch mode, send and focus. */
 export type PromptHandle = { type(text: string): void; attach(files: Attachment[]): void; mode(id: string): void; send(): void; focus(): void }
-/** A prompt to start from. `prompt` is what it sends; by default, the sentence. */
 export type Starter = { label: string; lead: string; rest?: string; prompt?: string }
 
 const icon = (d: ReactNode) => (
@@ -51,12 +47,6 @@ const DEFAULT_MODES: Mode[] = [
   },
 ]
 
-/**
- * The material. Each step in dark is the same step in light: the card lifted off the page, the tray one
- * step under it, an edge one step past both. Colours are `light-dark()` pairs, not `dark:` classes, so
- * they read the element's own colour scheme and a panel forced light on a dark page stays light. Set
- * `--prompt-send` on any ancestor to take your own colour for the key. Spread it on the page behind the box.
- */
 export const PROMPT_MATERIAL = {
   '--c-ground': 'light-dark(#ffffff, #1a1a1e)',
   '--c-field': 'light-dark(#ffffff, #26262a)',
@@ -79,41 +69,28 @@ export const PROMPT_MATERIAL = {
 const LINE = 24
 const MIN_LINES = 2
 const MAX_LINES = 8
-/** Sizes are in pixels on purpose: `.pro-app` rescales Tailwind's spacing, and these have to add up. */
 const ROW = 34
 const PAD = 14
 const FRAME = 18 + ROW + PAD
 const GAP = 24
-/** Corners nest: a round key, the padding around it, and the card's corner. */
 const R = ROW / 2 + PAD
 const REST = LINE * MIN_LINES + GAP
 const SHELF = 44
 const HEAD = 26
-/** The plate is this tall and slides, so the field changes size with a transform and no layout. */
 const PLATE = 640
-/** The tray under the card: what it's filed under at rest, what it's doing while it answers. */
 const STRIP = 42
-/** The height a PromptBox takes at rest, for a host that reserves its room. Add `PROMPT_STRIP` if it has projects. */
 export const PROMPT_H = FRAME + REST + HEAD
-/** The height at rest of a PromptBox given no label. */
 export const PROMPT_H_BARE = FRAME + REST
 export const PROMPT_STRIP = STRIP
 
 const TEXT = 'text-[17px]! tracking-[-0.011em]'
 const ROW_TEXT = 'text-[16px] tracking-[-0.006em]'
-/** On a touch screen, a small key is tappable out to 44px by a hit area that reaches past it. */
 const HIT = "pointer-coarse:before:absolute pointer-coarse:before:left-1/2 pointer-coarse:before:top-1/2 pointer-coarse:before:size-[44px] pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']"
-/** Press: 0.97, reached in 100ms from the frame the pointer comes down, and back from wherever it got to. */
 const TAP = { whileTap: press, transition: { scale: { duration: 0.1, ease: ease.out } } }
-/** A mouse press on a key doesn't take focus out of the words. */
 const keep = (e: ReactMouseEvent) => e.preventDefault()
-/** A press that moves this far means a slide, not a tap. */
 const SLOP = 10
-/** A send has a moment to land before Stop takes a press: a double click isn't a change of mind. */
 const ARMS = 320
-/** How long with no new status before it says it's still waiting. No shimmer: it says what it knows. */
 const STALL = 20
-/** The card's give at the limit: about 3px, there and back. */
 const GIVE = 160
 const SIZE: Spring = { w: (2 * Math.PI) / 0.3, z: 1 }
 const FAR: Spring = { w: (2 * Math.PI) / 0.44, z: 1 }
@@ -128,7 +105,6 @@ const fromFile = (f: File): Attachment => ({
   file: f,
   url: f.type.startsWith('image/') ? URL.createObjectURL(f) : undefined,
 })
-/** A finger and no mouse: return makes a new line there, because a phone has no Shift+Enter. */
 const fingers = () => matchMedia('(hover: none) and (pointer: coarse)').matches
 const thenable = (v: unknown): v is PromiseLike<unknown> => typeof (v as PromiseLike<unknown> | undefined)?.then === 'function'
 const blank = (t: EventTarget) => !(t as Element).closest('button,a,input,textarea,label,[role^="menuitem"]')
@@ -136,20 +112,6 @@ const blank = (t: EventTarget) => !(t as Element).closest('button,a,input,textar
 type Part = 'head' | 'files' | 'words' | 'lift'
 type Size = Body & { t: number }
 
-/**
- * A prompt box. A white card on a quiet tray, round keys, and one dark key that speaks or sends.
- * It keeps a fixed footprint and grows upward as you write, so nothing beneath it ever moves.
- *
- * The modes sit in a capsule, the chosen one lifted with its name. Given `models`, the model is a menu:
- * press and slide to a row, or tap. Given `projects`, the tray under the card offers them. While it
- * answers, the tray says what it's doing and for how long, in real seconds, and admits it when it's
- * still waiting; with no projects it slides out from under the card for that, and the card rises.
- *
- * Send clears the box at once. Drop or paste files anywhere on it. Enter sends, Shift+Enter adds a line
- * (on a phone return does), Escape stops, and Cmd+Z straight after a send brings the words back. If a
- * send fails, they come back by themselves. Given suggestions, the focused empty box offers one, and
- * Tab takes it. PromptStarters, beside it, offers whole prompts to begin with.
- */
 export function PromptBox({
   onSend,
   onStop,
@@ -172,43 +134,24 @@ export function PromptBox({
   onGrow,
   ref,
 }: {
-  /** Return a promise to show the working state until it settles; if it rejects, the words come back to the box. */
   onSend?: (message: Message) => Promise<unknown> | void
-  /** Called when a person stops what's working. */
   onStop?: () => void
-  /** Shown while the box is empty. */
   placeholder?: string
-  /** The rest of the placeholder: "or drop a file to start from it." */
   hint?: string
-  /** A quiet line over the words, e.g. "New chat". */
   label?: string
-  /** The modes to choose between. */
   modes?: Mode[]
-  /** The id of the mode it starts in. */
   initialMode?: string
-  /** Files already attached when it opens. */
   initialFiles?: Attachment[]
-  /** Prompts to offer; the focused, empty box shows the first, and Tab takes it. */
   suggestions?: string[]
-  /** The box's width. It grows in height only, as far as its own scroll. */
   width?: number
-  /** Whether an answer is coming, when you track that yourself. Leave it out and the box follows the promise `onSend` returns. */
   busy?: boolean
-  /** What it's doing while it answers: "Reading the board update". Only ever what you say. */
   status?: string
-  /** The model, named beside Send. With `models`, the one it starts on. */
   model?: string
-  /** Models to choose between, each with your own icon. Without them `model` is plain text, with no chevron pretending to be a menu. */
   models?: Model[]
-  /** Called when a person picks a model. */
   onModel?: (name: string) => void
-  /** Projects to file this under. Given, a slim strip under the field offers them. */
   projects?: string[]
-  /** Called when a person picks a project, or null for none. */
   onProject?: (name: string | null) => void
-  /** Shows a microphone key; called when it's pressed. */
   onVoice?: () => void
-  /** Called as the box grows above its resting height, with how far, so whatever sits above it can make room. */
   onGrow?: (by: number) => void
   ref?: Ref<PromptHandle>
 }) {
@@ -247,7 +190,6 @@ export function PromptBox({
   const limit = useRef(false)
   const count = useRef(files.length)
   const filesRef = useRef(files)
-  // What just left, for Cmd+Z. Any edit forgets it, so Cmd+Z goes back to meaning undo.
   const last = useRef<{ text: string; files: Attachment[] } | null>(null)
   useLayoutEffect(() => {
     filesRef.current = files
@@ -261,11 +203,8 @@ export function PromptBox({
   const base = FRAME + REST + (head ? HEAD : 0) + under
   const edge = `inset 0 0 0 1px var(${focused ? '--c-edge-on' : '--c-edge'})`
   const tray = useRef<HTMLDivElement>(null)
-  // The tray shows while it answers or after a failed send; with projects it's always there and holds still.
   const telling = busy || failed
 
-  // The card is the sum of three parts, each a spring from its live value: one source of truth for
-  // every height, so nothing chases anything, and a change mid-flight keeps its speed.
   const sizes = useRef<Record<Part, Size>>({
     head: { x: head ? HEAD : 0, v: 0, t: head ? HEAD : 0 },
     files: { x: initialFiles.length ? SHELF : 0, v: 0, t: initialFiles.length ? SHELF : 0 },
@@ -283,8 +222,6 @@ export function PromptBox({
     underRef.current = under
     still.current = reduce
   })
-  // Layout was set once, at the final size. Each frame is transforms only: the plate slides, and
-  // what's above the keys is held where the spring says it is. Nothing here costs a layout.
   const paint = useCallback(() => {
     const s = sizes.current
     const total = FRAME + s.head.x + s.files.x + s.words.x
@@ -298,7 +235,6 @@ export function PromptBox({
       filesBox.current.style.clipPath = f > 0 ? `inset(0 0 ${f}px 0)` : ''
     }
     if (headBox.current) headBox.current.style.transform = `translate3d(0,${w + f + h}px,0)`
-    // The card rises off the tray as it slides out, by transform like everything else.
     const up = s.lift.x
     if (card.current) card.current.style.transform = up ? `translate3d(0,${-up}px,0)` : ''
     if (tray.current && !underRef.current) {
@@ -334,7 +270,6 @@ export function PromptBox({
       const b = sizes.current[part]
       if (b.t === to) return
       b.t = to
-      // The one layout: straight to the final size, and held in the same breath by its transform.
       const s = sizes.current
       if (headBox.current) headBox.current.style.height = `${s.head.t}px`
       if (filesBox.current) filesBox.current.style.height = `${s.files.t}px`
@@ -357,15 +292,12 @@ export function PromptBox({
     }
   }, [])
 
-  // Past the limit the words fade on any side that has more, so text cut off reads as text that continues.
   const more = () => {
     const a = area.current
     if (!a) return
     a.style.setProperty('--fade-t', `${Math.min(18, a.scrollTop)}px`)
     a.style.setProperty('--fade-b', `${Math.min(18, Math.max(0, a.scrollHeight - a.clientHeight - a.scrollTop))}px`)
   }
-  // The textarea takes its new height at once. A hidden twin does the measuring, so the real one is
-  // never touched: no flash of zero height, no lost scroll.
   const fit = () => {
     const a = area.current
     const h = ghost.current
@@ -373,7 +305,6 @@ export function PromptBox({
     const top = LINE * MAX_LINES
     const over = a.scrollHeight > top + 2
     const b = sizes.current.words
-    // The first line past the limit: the card gives a little and comes back, the answer to "why did it stop growing?"
     if (over && !limit.current && !still.current && a.clientHeight === top) {
       b.v += GIVE
       wake()
@@ -420,7 +351,6 @@ export function PromptBox({
     void document.fonts?.ready.then(() => fitRef.current())
     return () => ro.disconnect()
   }, [])
-  // The row of files fades only on a side that has more, and a new file always comes into view.
   const edges = () => {
     const r = rail.current
     if (!r) return
@@ -436,12 +366,10 @@ export function PromptBox({
   useEffect(() => () => filesRef.current.forEach((f) => f.url && URL.revokeObjectURL(f.url)), [])
 
   const canSend = !busy && (text.trim().length > 0 || files.length > 0)
-  // One suggestion, offered only when someone has come to the box: nothing moves at rest.
   const offer = !text && !busy && focused && suggestions?.length ? suggestions[0] : null
 
   const send = () => {
     if (!canSend) {
-      // Words are waiting and an answer is coming: say so at the key that's in the way.
       if (busy && text.trim() && !reduce) sendKey.current?.animate([{ transform: 'scale(0.92)' }, { transform: 'scale(1)' }], { duration: 260, easing: 'cubic-bezier(0.2,0.9,0.25,1)' })
       return
     }
@@ -465,7 +393,6 @@ export function PromptBox({
         if (run.current === id) setPending(false)
       },
       () => {
-        // A send that failed gives the words back. A stopped one was meant to end.
         if (run.current !== id) return
         setPending(false)
         setFailed(true)
@@ -501,7 +428,6 @@ export function PromptBox({
     })
     if (byKey) area.current?.focus()
   }
-  // Through the browser's own editing, so Cmd+Z undoes it and the caret lands after it.
   const insert = (words: string) => {
     const el = area.current
     if (!el) return
@@ -516,7 +442,6 @@ export function PromptBox({
 
   return (
     <div className="@container relative" style={{ width, maxWidth: '100%', height: base, ...PROMPT_MATERIAL }}>
-      {/* The tray: under the card, its corners the card's own. It tells, and with projects it files. */}
       <div
         ref={tray}
         aria-hidden={!under && !telling}
@@ -604,7 +529,6 @@ export function PromptBox({
         }}
         onDragOver={(e) => e.dataTransfer.types.includes('Files') && e.preventDefault()}
         onDrop={(e) => {
-          // Text dragged in is the textarea's to take.
           if (!e.dataTransfer.types.includes('Files')) return
           e.preventDefault()
           depth.current = 0
@@ -612,8 +536,6 @@ export function PromptBox({
           add(e.dataTransfer.files)
         }}
       >
-        {/* The card: a plate that slides up and a fixed foot, so its size changes by transform alone. Its
-            shadow is drawn from the clipped shape, so it follows the card at any height. */}
         <div aria-hidden className="pointer-events-none absolute inset-0" style={{ filter: 'drop-shadow(0 1px 1px var(--c-shadow)) drop-shadow(0 6px 14px var(--c-shadow))' }}>
           <div className="absolute inset-x-0 bottom-0 overflow-clip" style={{ height: PLATE, borderBottomLeftRadius: R, borderBottomRightRadius: R }}>
             <div ref={plate} className="absolute inset-x-0 top-0 bg-[var(--c-field)] transition-shadow duration-150 will-change-transform" style={{ height: PLATE, transform: `translate3d(0,${plateAt}px,0)`, boxShadow: edge, borderTopLeftRadius: R, borderTopRightRadius: R }} />
@@ -622,13 +544,11 @@ export function PromptBox({
         </div>
 
         <div className="relative flex h-full cursor-text flex-col rounded-[inherit]" style={{ padding: `18px ${PAD}px ${PAD}px` }} onMouseDown={(e) => blank(e.target) && e.preventDefault()} onClick={(e) => blank(e.target) && area.current?.focus()}>
-          {/* What rides above the keys. Its bottom edge is the keys' top. */}
           <div className="shrink-0" style={{ clipPath: 'inset(-640px -24px 0 -24px)' }}>
             <div ref={headBox} className="relative shrink-0 overflow-clip text-[13px] leading-[18px] text-[var(--c-ink-3)]" style={{ height: head ? HEAD : 0 }}>
               <span className="block truncate">{label}</span>
             </div>
 
-            {/* Files: named, removable, nothing more. Many scroll sideways. */}
             <div ref={filesBox} className="relative shrink-0 overflow-clip" style={{ height: initialFiles.length ? SHELF : 0 }}>
               <div ref={rail} onScroll={edges} className="flex gap-[6px] overflow-x-auto [scrollbar-width:none]" style={{ maskImage: 'linear-gradient(90deg, transparent, #000 var(--fade-l, 0px), #000 calc(100% - var(--fade-r, 0px)), transparent)' }}>
                 <AnimatePresence key={sent} initial={false} mode="popLayout">
@@ -641,7 +561,6 @@ export function PromptBox({
 
             <div ref={wordsBox} className="relative shrink-0" style={{ height: REST }}>
               <span aria-hidden className={`pointer-events-none absolute inset-x-0 top-0 flex items-center gap-[8px] overflow-hidden ${TEXT} text-[var(--c-ink-3)]`} style={{ height: LINE, lineHeight: `${LINE}px`, visibility: text ? 'hidden' : 'visible' }}>
-                {/* Keyed on the send: the old sentence goes at once, and the next comes in after. */}
                 <motion.span key={sent} className="flex min-w-0 items-center gap-[8px]" initial={sent ? { opacity: 0 } : false} animate={{ opacity: 1, transition: { duration: 0.2, ease: ease.out, delay: 0.16 } }}>
                   <span className="truncate">{busy ? 'Add a follow-up' : (offer ?? `${placeholder}${hint ? `, ${hint}` : ''}`)}</span>
                   {offer && <span className="shrink-0 rounded-[6px] px-[6px] text-[13px] leading-[20px] tracking-normal shadow-[inset_0_0_0_1px_var(--c-edge-on)] pointer-coarse:hidden">Tab</span>}
@@ -684,7 +603,6 @@ export function PromptBox({
                 onPaste={(e) => {
                   const d = e.clipboardData
                   if (!d.files.length) return
-                  // A table copied from a spreadsheet arrives as text and as a picture of itself. The text is what was meant.
                   if (d.types.includes('text/html') && d.getData('text/plain').trim()) return
                   e.preventDefault()
                   add(d.files)
@@ -736,7 +654,6 @@ export function PromptBox({
               onVoice={onVoice}
               onSend={(byKey) => {
                 send()
-                // A press on an empty key still gets an answer: the caret, where the words go.
                 if (byKey || !canSend) area.current?.focus()
               }}
               onStop={stop}
@@ -763,22 +680,16 @@ export function PromptBox({
   )
 }
 
-/**
- * Prompts to start from, for the empty state beside a PromptBox: a quiet numbered list. Press one, or
- * its number while none is focused, and `onPick` gets the prompt.
- */
 export function PromptStarters({ items, onPick, width = 420 }: { items: Starter[]; onPick: (prompt: string) => void; width?: number }) {
   const held = useRef('')
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null
-      // A digit still held after it picked is the same press, even though focus is in the box now.
       if (e.repeat && e.key === held.current) return e.preventDefault()
       held.current = ''
       if (e.repeat || (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))) return
       const n = +e.key - 1
       if (Number.isInteger(n) && n >= 0 && n < items.length && !e.metaKey && !e.ctrlKey && !e.altKey) {
-        // Taken here, or the digit follows focus into the box and types itself.
         e.preventDefault()
         held.current = e.key
         onPick(items[n].prompt ?? [items[n].lead, items[n].rest].filter(Boolean).join(' '))
@@ -802,9 +713,6 @@ export function PromptStarters({ items, onPick, width = 420 }: { items: Starter[
   )
 }
 
-/* ───────────────────────────── Parts ───────────────────────────── */
-
-/** The Seated D, beside the mode. */
 function Seat() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden className="shrink-0">
@@ -814,7 +722,6 @@ function Seat() {
   )
 }
 
-/** A round key with a hairline, its corner nested in the card's. */
 function Key({ label, onClick, children }: { label: string; onClick: () => void; children: ReactNode }) {
   return (
     <motion.button type="button" {...TAP} aria-label={label} title={label} onMouseDown={keep} onClick={onClick} className={`ring-focus relative flex shrink-0 items-center justify-center rounded-full text-[var(--c-ink-2)] shadow-[inset_0_0_0_1px_var(--c-key)] transition-colors duration-150 hover:bg-[var(--c-hover)] hover:text-[var(--c-ink)] ${HIT}`} style={{ width: ROW, height: ROW }}>
@@ -825,15 +732,9 @@ function Key({ label, onClick, children }: { label: string; onClick: () => void;
   )
 }
 
-/**
- * The modes, in a well. The chosen one is lifted out of it and says its name; the rest are their marks.
- * The well is as wide as its longest name at all times, so choosing never moves what sits beside it:
- * only the lift travels, and the segments trade widths inside. Arrow keys move it.
- */
 function Modes({ modes, mode, onMode }: { modes: Mode[]; mode: string; onMode: (id: string) => void }) {
   const keys = useRef<(HTMLButtonElement | null)[]>([])
   const names = useRef<HTMLSpanElement>(null)
-  // Until it's measured, a fair guess, so the first paint is already close.
   const [nameW, setNameW] = useState(() => Math.max(...modes.map((m) => m.name.length)) * 8.6)
   const at = Math.max(0, modes.findIndex((m) => m.id === mode))
   useLayoutEffect(() => {
@@ -852,14 +753,12 @@ function Modes({ modes, mode, onMode }: { modes: Mode[]; mode: string; onMode: (
     keys.current[n]?.focus()
   }
   const KEY = ROW - 4
-  // The chosen one: its mark, a gap, the longest name, and room each side. With names hidden, just a wider mark.
   const wide = nameW ? 10 + 16 + 6 + Math.ceil(nameW) + 12 : KEY + 12
   const widthOf = (m: Mode, on: boolean) => (on ? wide : m.icon ? KEY : wide)
   const left = 2 + modes.slice(0, at).reduce((sum, m) => sum + widthOf(m, false), 0)
   const move = 'duration-300 ease-[cubic-bezier(0.2,0.9,0.25,1)] motion-reduce:transition-none'
   return (
     <div role="radiogroup" aria-label="Mode" className="relative flex min-w-0 shrink-0 items-center rounded-full bg-[var(--c-well)] p-[2px]" style={{ height: ROW }}>
-      {/* The longest name, unseen: the well's width comes from it. Hidden with the names on a narrow box. */}
       <span aria-hidden className={`pointer-events-none invisible absolute grid whitespace-nowrap @max-[380px]:hidden ${ROW_TEXT}`}>
         <span ref={names} className="col-start-1 row-start-1 grid">
           {modes.map((m) => (
@@ -906,7 +805,6 @@ function Modes({ modes, mode, onMode }: { modes: Mode[]; mode: string; onMode: (
   )
 }
 
-/** One reading in the tray. */
 function Told({ reduce, children, ref }: { reduce: boolean; children: ReactNode; ref?: Ref<HTMLDivElement> }) {
   return (
     <motion.div ref={ref} className="flex min-w-0 flex-1 items-center gap-[9px] pl-[6px] pr-[8px] text-[15px] tracking-[-0.006em] text-[var(--c-ink-2)]" initial={{ opacity: 0, y: reduce ? 0 : 4 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: ease.out, delay: 0.06 } }} exit={{ opacity: 0, transition: { duration: 0.1, ease: ease.out } }}>
@@ -915,7 +813,6 @@ function Told({ reduce, children, ref }: { reduce: boolean; children: ReactNode;
   )
 }
 
-/** A thin ring with one open arc, under the key it answers to. Held still for reduced motion. */
 function Spin({ still }: { still: boolean }) {
   return (
     <span className="mr-[6px] flex size-[18px] shrink-0 items-center justify-center text-[var(--c-ink-2)]">
@@ -927,7 +824,6 @@ function Spin({ still }: { still: boolean }) {
   )
 }
 
-/** A file: its name and a way to remove it. An image shows itself. */
 function Chip({ file, onRemove, ref }: { file: Attachment; onRemove: (byKey: boolean) => void; ref?: Ref<HTMLDivElement> }) {
   return (
     <motion.div ref={ref} layout="position" data-file={file.id} className="flex h-[36px] max-w-[236px] shrink-0 cursor-default items-center gap-[6px] rounded-[11px] pl-[12px] pr-[4px] text-[15px] text-[var(--c-ink)] shadow-[inset_0_0_0_1px_var(--c-edge-on)]" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: ease.out } }} exit={{ opacity: 0, y: 6, transition: { duration: 0.12, ease: ease.out } }}>
@@ -942,14 +838,9 @@ function Chip({ file, onRemove, ref }: { file: Attachment; onRemove: (byKey: boo
 
 type Item = { id: string; name: string; badge?: string; icon?: ReactNode; on?: boolean; run: () => void }
 
-/**
- * A small menu. Press and it opens on the way down. Let go and it stays. Or slide to a row and let go,
- * one gesture instead of two clicks; let go anywhere else and nothing happened.
- */
 function Reach({ items, open, setOpen, layer, className, label, children }: { items: Item[]; open: boolean; setOpen: (v: boolean) => void; layer: HTMLElement | null; className: string; label: string; children: ReactNode }) {
   const [hi, setHi] = useState(-1)
   const [place, setPlace] = useState({ left: 0, bottom: 0, ox: 24 })
-  // Opened or closed from the keyboard, it's simply there or gone.
   const [byKey, setByKey] = useState(false)
   const button = useRef<HTMLButtonElement>(null)
   const list = useRef<HTMLDivElement>(null)
@@ -1061,7 +952,6 @@ function Reach({ items, open, setOpen, layer, className, label, children }: { it
           slide.current = null
         }}
         onClick={(e) => {
-          // The press that opened it has done its work; this click is only the hand coming up.
           if (opening.current) {
             opening.current = false
             return
@@ -1133,12 +1023,6 @@ function Reach({ items, open, setOpen, layer, className, label, children }: { it
   )
 }
 
-/**
- * The one dark key. Empty, with `onVoice`, it's a voice key and shows a wave; words turn the wave into
- * Send, and Send into Stop while it answers: the shaft widens into the square and the head folds away,
- * and back from wherever it got to. Never `disabled`: that would drop keyboard focus onto the page the
- * moment the words left.
- */
 function SendKey({ canSend, busy, onSend, onStop, onVoice, ref }: { canSend: boolean; busy: boolean; onSend: (byKey: boolean) => void; onStop: () => void; onVoice?: () => void; ref?: Ref<HTMLButtonElement> }) {
   const voice = !!onVoice && !canSend && !busy
   const lit = canSend || busy || voice
@@ -1166,7 +1050,6 @@ function SendKey({ canSend, busy, onSend, onStop, onVoice, ref }: { canSend: boo
       style={{ width: ROW, height: ROW, backgroundImage: lit ? 'linear-gradient(180deg, rgba(255,255,255,0.12), rgba(0,0,0,0.1))' : undefined }}
     >
       <span aria-hidden className="relative block size-[16px]">
-        {/* The wave: five bars, the middle tallest, that fold into the shaft as words arrive. */}
         <span className={`absolute inset-0 flex items-center justify-center gap-[2px] ${glyph}`} style={{ opacity: voice ? 1 : 0, transform: voice ? 'none' : 'scale(0.4, 0.6)' }}>
           {[5, 9, 13, 9, 5].map((h, i) => (
             <span key={i} className="block w-[1.6px] rounded-full bg-current" style={{ height: h }} />
@@ -1181,7 +1064,6 @@ function SendKey({ canSend, busy, onSend, onStop, onVoice, ref }: { canSend: boo
   )
 }
 
-/** Real seconds, from the first second on. After a stretch with no new status it says so. Mounts with each status, so the quiet count starts again. */
 function Elapsed({ since }: { since: { current: number } }) {
   const [t, setT] = useState({ s: 0, quiet: 0 })
   useEffect(() => {

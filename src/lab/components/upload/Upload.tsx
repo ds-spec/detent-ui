@@ -12,7 +12,6 @@ import { RollingText } from '../../ui/RollingText'
 type Kind = 'image' | 'pdf' | 'video' | 'zip' | 'doc'
 type Item = { id: string; name: string; size: number; kind: Kind; preview?: string; url?: string; progress: number; done: boolean; speed: number }
 
-/** For demos and tests: hold files over the folder, drop the samples, start over. */
 export type UploadHandle = { hover(n: number): void; drop(): void; clear(): void }
 
 const kindOf = (f: File): Kind => (f.type.startsWith('image/') ? 'image' : f.type === 'application/pdf' ? 'pdf' : f.type.startsWith('video/') ? 'video' : /zip|compressed/.test(f.type) ? 'zip' : 'doc')
@@ -29,19 +28,12 @@ const SAMPLES: Omit<Item, 'id' | 'progress' | 'done' | 'speed'>[] = [
 const ROW = 56
 const VISIBLE_ROWS = 3
 
-/**
- * Upload as a folder. Files hovering over it tip the front flap open; dropped files fall in as
- * sheets carrying their thumbnails. The list below has a fixed height, so the component never
- * changes size as files arrive.
- */
 export function Upload({
   accept = 'PNG, JPG, PDF or MP4',
   onFiles,
   ref,
 }: {
-  /** What it takes, in words, under the drop zone. */
   accept?: string
-  /** Called with the files a person drops or picks. Start the real upload here. */
   onFiles?: (files: File[]) => void
   ref?: Ref<UploadHandle>
 }) {
@@ -165,7 +157,6 @@ export function Upload({
         />
       </div>
 
-      {/* Fixed-height list: arrivals scroll inside it instead of growing the component. */}
       <div className="relative mt-3" style={{ height: ROW * VISIBLE_ROWS + 8 }}>
         <ul className="h-full overflow-y-auto pb-2 [scrollbar-width:none]" style={{ maskImage: items.length > VISIBLE_ROWS ? 'linear-gradient(to bottom, black 80%, transparent)' : undefined }}>
           <AnimatePresence initial={false}>
@@ -193,7 +184,6 @@ export function Upload({
                   </span>
                 </span>
                 <span className="tnum w-[64px] shrink-0 text-right text-caption text-ink-3">{fmtSize(i.size)}</span>
-                {/* Status and cancel share one fixed slot. */}
                 <span className="relative flex size-7 shrink-0 items-center justify-center">
                   <AnimatePresence initial={false}>
                     {i.done ? (
@@ -245,8 +235,6 @@ export function Upload({
   )
 }
 
-/* ───────────────────────────── Folder ───────────────────────────── */
-
 const FW = 224
 const FH = 168
 const PLACEHOLDERS = ['p1', 'p2']
@@ -256,11 +244,9 @@ function Folder({ open, items, pct, busy }: { open: boolean; items: Item[]; pct:
   const papers: { id: string; item?: Item }[] = sheets.length ? sheets.map((s) => ({ id: s.id, item: s })) : PLACEHOLDERS.map((id) => ({ id }))
   return (
     <div className="relative" style={{ width: FW, height: FH, perspective: 720 }}>
-      {/* Back panel with its tab */}
       <div className="absolute left-0 top-0 h-[30px] w-[96px] bg-[var(--folder-back)]" style={{ borderRadius: '14px 14px 0 0', clipPath: 'polygon(0 0, 78% 0, 100% 100%, 0 100%)' }} />
       <div className="absolute inset-x-0 bottom-0 top-[22px] rounded-[18px] bg-[var(--folder-back)]" style={{ boxShadow: 'inset 0 -12px 24px -16px rgb(0 0 0 / 0.25)' }} />
 
-      {/* Papers: two blanks while empty, then one sheet per file (newest in front) */}
       <AnimatePresence initial={false}>
         {papers.map((p, k) => {
           const h = hash(p.id)
@@ -283,7 +269,6 @@ function Folder({ open, items, pct, busy }: { open: boolean; items: Item[]; pct:
         })}
       </AnimatePresence>
 
-      {/* Front flap: tips open toward you while files hover */}
       <motion.div
         className="absolute inset-x-0 bottom-0 h-[112px] rounded-[18px] bg-[var(--folder-front)]"
         style={{ transformOrigin: '50% 100%', boxShadow: 'inset 0 1px 0 light-dark(rgb(255 255 255 / 0.55), transparent), inset 0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.145)), 0 -8px 20px -12px rgb(0 0 0 / 0.25)' }}
@@ -316,7 +301,6 @@ function Folder({ open, items, pct, busy }: { open: boolean; items: Item[]; pct:
 function SheetFace({ item }: { item: Item }) {
   return (
     <>
-      {/* Images show themselves; everything else is a quiet panel with its extension. */}
       <span
         className="flex h-[62px] items-center justify-center rounded-[7px] text-[10px] font-semibold tracking-[0.06em] text-[var(--folder-ink)]"
         style={{ background: item.preview ?? 'color-mix(in oklch, var(--sheet-line) 55%, var(--sheet))' }}
@@ -329,7 +313,6 @@ function SheetFace({ item }: { item: Item }) {
   )
 }
 
-/** Text that crossfades in place; the caller fixes the width so nothing reflows. */
 function Swap({ k, className, children }: { k: string; className: string; children: ReactNode }) {
   return (
     <span className={`relative block h-[22px] overflow-hidden ${className}`}>

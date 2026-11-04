@@ -6,11 +6,6 @@ import { motion, useInView, useReducedMotion } from 'motion/react'
 
 const OUT = [0.16, 1, 0.3, 1] as const
 
-/**
- * A headline cut into fine strips that fly in from both sides and align into sharp letters. Once
- * it's in place it stays alive: move over it and it cuts apart around the pointer, then heals when
- * you leave. The real words stay in the page for screen readers.
- */
 export function SliceText({
   text,
   strips = 16,
@@ -19,17 +14,11 @@ export function SliceText({
   interactive = true,
   className = '',
 }: {
-  /** The words. One line works best. */
   text: string
-  /** How many strips it's cut into. */
   strips?: number
-  /** Any CSS background for the letters. Leave it out to use the text colour. */
   fill?: string
-  /** How far the strips part under the pointer, in pixels. */
   reach?: number
-  /** Whether it cuts apart under the pointer. */
   interactive?: boolean
-  /** Classes for the text: its size, weight and tracking. */
   className?: string
 }) {
   const box = useRef<HTMLSpanElement>(null)
@@ -40,7 +29,6 @@ export function SliceText({
   const reduce = useReducedMotion()
   const mid = (strips - 1) / 2
 
-  // Too wide for what holds it: the type steps down to fit, and goes back to its own size when there's room.
   useLayoutEffect(() => {
     const el = box.current
     const host = el?.parentElement
@@ -64,7 +52,6 @@ export function SliceText({
     let raf = 0
     let last = 0
     let shown = true
-    // It runs only while a strip has somewhere to go, and only on screen.
     const loop = (time: number) => {
       raf = 0
       const dt = Math.min(0.05, (time - last) / 1000 || 0.016)

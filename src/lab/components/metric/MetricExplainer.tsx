@@ -7,51 +7,28 @@ import { ease, spring, dur } from '@/lab/lib/motion'
 import { RollingText } from '@/lab/ui/RollingText'
 
 export type Driver = {
-  /** What moved it, e.g. "AWS". */
   name: string
-  /** What happened, in a few words, e.g. "the new eu-west region, live since Oct 9". */
   note?: string
-  /** How much it moved the metric, in the metric's own unit: +8920 pushed it up by 8,920. */
   amount: number
-  /** The words in the reading that are about it, e.g. "the new AWS region". They light up together. */
   phrase?: string
 }
 
 export type Metric = {
   id: string
-  /** Its name on the tab, e.g. "Burn". */
   name: string
   value: number
-  /** The value the period before, so the change can be said in words. */
   previous: number
-  /** How a value reads, e.g. dollars. A string that starts with a symbol rolls best. */
   format?: (n: number) => string
-  /** The period it's compared with, as it reads in a sentence, e.g. "September". */
   vs: string
-  /** Why it moved, in a sentence or two. The AI's reading of the drivers. */
   reason: string
-  /** What moved it, biggest first. The first four are shown. */
   drivers: Driver[]
-  /** Where the reading comes from, e.g. "From 1,284 transactions in the ledger". */
   basis?: string
 }
 
-/** The four drivers shown, biggest first. */
 const topDrivers = (m: Metric) => [...m.drivers].sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount)).slice(0, 4)
 const plain = (n: number) => Math.round(n).toLocaleString('en-US')
 const signed = (n: number, format: (n: number) => string) => `${n < 0 ? '−' : '+'}${format(Math.abs(n))}`
 
-/**
- * A metric that explains itself. The number first, the change said in words, then why it moved:
- * the AI's reading in a sentence, and the drivers behind it ranked by how much each contributed,
- * each with what happened.
- *
- * Point at a driver and the number answers "what if this hadn't happened": it rolls to the value
- * without that driver and goes quiet, the line under it says so, and the words in the reading that
- * are about it light up. Point at those words and their driver lights the same way. Pick another
- * metric and the number rolls to it, the reading arrives word by word, and its drivers settle into
- * the same rows. It holds one size whichever metric is shown.
- */
 export function MetricExplainer({
   metrics,
   metric,
@@ -63,18 +40,12 @@ export function MetricExplainer({
   highlight = null,
 }: {
   metrics: Metric[]
-  /** The metric shown, if you control it. */
   metric?: string
-  /** The metric shown first, if you don't. */
   defaultMetric?: string
   onMetricChange?: (id: string) => void
-  /** What the numbers cover, at the top right, e.g. "October · as of Oct 28". */
   period?: string
-  /** Its width. The height never changes as metrics switch. */
   width?: number
-  /** Quiet actions under the basis line, e.g. "Show the AWS lines". */
   footer?: ReactNode
-  /** A driver to point at from outside, by name, as a person pointing would. A scripted demo uses it. */
   highlight?: string | null
 }) {
   const [own, setOwn] = useState(defaultMetric ?? metrics[0]?.id)
@@ -82,7 +53,6 @@ export function MetricExplainer({
   const m = metrics.find((x) => x.id === at) ?? metrics[0]
   const reduce = useReducedMotion()
   const group = useId()
-  // The driver being pointed at, kept with its metric so switching metrics lets it go.
   const [aim, setAim] = useState<{ metric: string; name: string } | null>(null)
   if (!m) return null
 
@@ -95,14 +65,12 @@ export function MetricExplainer({
   const up = diff >= 0
   const pct = m.previous ? Math.abs(diff / m.previous) * 100 : 0
   const drivers = topDrivers(m)
-  // What carried the change in its direction reads in ink; what pulled the other way, quietly.
   const withIt = (d: Driver) => (d.amount >= 0) === up
   const lit = (aim?.metric === m.id ? aim.name : null) ?? highlight
   const without = drivers.find((d) => d.name === lit)
   const point = (name: string | null) => setAim(name ? { metric: m.id, name } : null)
   const pointers = (name: string) => ({ onPointerEnter: () => point(name), onPointerLeave: () => point(null), onFocus: () => point(name), onBlur: () => point(null) })
 
-  // The reading, cut where a driver's words are, so each phrase can light up with its driver.
   const parts: { text: string; driver?: string }[] = []
   let rest = m.reason
   for (;;) {
@@ -143,13 +111,10 @@ export function MetricExplainer({
         {period && <span className="shrink-0 text-footnote text-ink-3">{period}</span>}
       </div>
 
-      {/* The number, and the change in words. */}
       <div className="mt-7">
-        {/* Without the driver pointed at, the number rolls to what it would have been, and goes quiet. */}
         <p className={`tnum flex text-[40px] @min-[520px]:text-[52px] font-normal leading-none tracking-[-0.045em] transition-colors duration-300 ${without ? 'text-quiet' : 'text-ink'}`}>
           <RollingText text={format(without ? m.value - without.amount : m.value)} proportional />
         </p>
-        {/* On a narrow card the line can wrap; unseen copies of every state hold the tallest so the card never resizes. */}
         <div className="mt-2.5 grid min-h-5 text-callout text-ink-3 @min-[520px]:h-5">
           <p className="col-start-1 row-start-1 @min-[520px]:truncate">
             {without ? (
@@ -186,7 +151,6 @@ export function MetricExplainer({
         </div>
       </div>
 
-      {/* Why it moved: the reading arrives word by word, in a space held for three lines. */}
       <div className="mt-6 grid min-h-[120px] @min-[520px]:h-[72px] @min-[520px]:min-h-0 @min-[520px]:overflow-hidden">
         <AnimatePresence mode="wait" initial={false}>
           <motion.p key={m.id} className="col-start-1 row-start-1 text-[15px] leading-6 text-ink [text-wrap:wrap] @min-[520px]:line-clamp-3" exit={{ opacity: 0, transition: { duration: dur.exit, ease: ease.out } }}>
@@ -203,7 +167,6 @@ export function MetricExplainer({
               if (!part.driver) return <span key={k}>{words}</span>
               const on = lit === part.driver
               return (
-                // A driver's words: a faint hairline at rest, lit with their driver. Solid, so it runs unbroken across words.
                 <span
                   key={k}
                   {...pointers(part.driver)}
@@ -222,8 +185,6 @@ export function MetricExplainer({
         ))}
       </div>
 
-      {/* What moved it, biggest first, in rows of fixed height. A new metric's drivers swap in as one list:
-          the old ones fade out first, so two sets of rows never draw over each other. */}
       <div className="mt-4 grid @min-[520px]:h-[196px]">
         <AnimatePresence mode="wait" initial={false}>
           <motion.ul key={m.id} className="col-start-1 row-start-1" exit={{ opacity: 0, transition: { duration: dur.exit, ease: ease.out } }}>

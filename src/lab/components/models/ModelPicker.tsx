@@ -10,13 +10,9 @@ import { ease, spring, press } from '@/lab/lib/motion'
 export type Model = {
   id: string
   name: string
-  /** What it's for, in a few words. */
   blurb: string
-  /** Seconds for a typical reply at medium effort. */
   time: number
-  /** Dollars for a typical reply at medium effort. */
   cost: number
-  /** False if effort makes no difference to this model. */
   reasons?: boolean
 }
 export type Effort = { label: string; time: number; cost: number }
@@ -32,27 +28,13 @@ const EFFORTS: Effort[] = [
 const secs = (n: number) => `${n < 10 ? n.toFixed(1) : Math.round(n)}s`
 const price = (n: number) => (n < 1 ? `${(n * 100).toFixed(1)}¢` : `$${n.toFixed(2)}`)
 
-/**
- * Choosing a model, and how hard it should think.
- *
- * Effort is a real detent: drag or flick the plate along Low, Medium, High and Max and it catches in
- * each notch, while the time and cost on every row run continuously with your finger, so you feel
- * what thinking harder costs on each model before you choose. One soft plate marks the model in use.
- */
 export function ModelPicker({ models, value, onChange, efforts = EFFORTS, defaultOpen = false, lift = 10, muted, ref }: {
-  /** The models to choose from. */
   models: Model[]
-  /** The model and effort in use. */
   value: ModelValue
-  /** Called when either changes. */
   onChange: (v: ModelValue) => void
-  /** The effort levels, with what each does to time and cost. */
   efforts?: Effort[]
-  /** Start with the menu open. */
   defaultOpen?: boolean
-  /** How far above the trigger the menu sits, in px, to clear a composer. */
   lift?: number
-  /** Silence the soft tick effort makes as it catches a notch. */
   muted?: boolean
   ref?: Ref<PickerHandle>
 }) {
@@ -66,7 +48,6 @@ export function ModelPicker({ models, value, onChange, efforts = EFFORTS, defaul
   const ofEffort = (m: Model) => (m.reasons === false ? efforts[1] ?? efforts[0] : efforts[value.effort])
   const say = (v: ModelValue) => onChange(v)
 
-  // The dial: everything below is written straight from it, never through React.
   const n = efforts.length
   const stops = useRef(Array.from({ length: n }, (_, i) => i))
   if (stops.current.length !== n) stops.current = Array.from({ length: n }, (_, i) => i)
@@ -79,7 +60,6 @@ export function ModelPicker({ models, value, onChange, efforts = EFFORTS, defaul
   useLayoutEffect(() => {
     latest.current = { value, models, efforts, onChange }
   })
-  // What we last told the parent, so its answer coming back isn't taken for a new instruction.
   const told = useRef(value.effort)
   const byHand = useRef(false)
   const tell = (i: number) => {
@@ -90,8 +70,6 @@ export function ModelPicker({ models, value, onChange, efforts = EFFORTS, defaul
   const paint = (x: number, v = 0) => {
     const { models, efforts } = latest.current
     const e = clamp(x, 0, efforts.length - 1)
-    // The plate runs a little long at speed and comes back as it arrives. Past an end it stays
-    // inside the track, pressed against the wall and giving, rather than poking out.
     if (plate.current) {
       const over = x - e
       const stretch = Math.min(0.12, Math.abs(v) * 0.022, 2 * Math.min(e, efforts.length - 1 - e))
@@ -129,7 +107,6 @@ export function ModelPicker({ models, value, onChange, efforts = EFFORTS, defaul
     told.current = value.effort
     dial.to(value.effort)
   }, [value.effort, dial])
-  // The panel comes and goes; whatever it opens on is painted before it's seen.
   useLayoutEffect(() => {
     if (open) paint(dial.get())
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -198,7 +175,6 @@ export function ModelPicker({ models, value, onChange, efforts = EFFORTS, defaul
           >
             <div className="flex items-center gap-3 pb-2 pl-3">
               <span className="text-[13px] text-ink-3">Effort</span>
-              {/* The track is the dial: grab it anywhere. A tap still lands on the level under it. */}
               <div ref={track} {...drag} className="relative grid min-w-0 flex-1 cursor-grab touch-pan-y select-none rounded-full bg-surface-2 p-0.5 active:cursor-grabbing" style={{ gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` }}>
                 <span ref={plate} aria-hidden className="pointer-events-none absolute inset-y-0.5 left-0.5 rounded-full bg-surface shadow-[0_0_0_1px_var(--line),0_1px_3px_rgb(0_0_0/0.08)] will-change-transform dark:bg-[#2c2c2e]" style={{ width: `calc((100% - 4px) / ${n})`, transform: `translate3d(${first * 100}%,0,0)` }} />
                 {efforts.map((e, i) => (
@@ -222,7 +198,6 @@ export function ModelPicker({ models, value, onChange, efforts = EFFORTS, defaul
                 const e = ofEffort(m)
                 const time = m.time * e.time
                 const cost = m.cost * e.cost
-                // These two only ever set the first frame; the dial writes every one after it.
                 const from = m.reasons === false ? e : efforts[first]
                 return (
                   <button
@@ -239,7 +214,6 @@ export function ModelPicker({ models, value, onChange, efforts = EFFORTS, defaul
                     onPointerLeave={() => setCursor(-1)}
                     className="ring-focus relative flex h-[60px] w-full items-center gap-3 rounded-[14px] px-3 text-left"
                   >
-                    {/* Every plate is the row's full width: hover is a tint, the model in use one soft plate that glides. */}
                     {k === cursor && !on && <span aria-hidden className="absolute inset-0 rounded-[14px] bg-[color-mix(in_oklch,var(--ink)_4%,transparent)]" />}
                     {on && <motion.span aria-hidden layoutId={`${uid}model`} transition={reduce ? { duration: 0 } : spring.smooth} className="absolute inset-0 rounded-[14px] bg-[color-mix(in_oklch,var(--accent)_10%,transparent)] dark:bg-[color-mix(in_oklch,var(--accent)_20%,transparent)]" />}
                     <span className="relative min-w-0 flex-1">
@@ -249,7 +223,6 @@ export function ModelPicker({ models, value, onChange, efforts = EFFORTS, defaul
                       </span>
                       <span className="block truncate text-[13px] leading-[18px] text-ink-3">{m.blurb}</span>
                     </span>
-                    {/* Two fixed columns, so the figures line up down the list and never push each other. */}
                     <span aria-hidden className="tnum relative flex shrink-0 gap-3 text-[13px] text-ink-2">
                       <span
                         ref={(el) => {

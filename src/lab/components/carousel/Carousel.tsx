@@ -6,37 +6,21 @@ import { animate, motion, useInView, useMotionValue, useMotionValueEvent, useRed
 import { clamp, dragProps, useDetent } from '@/lab/lib/detent'
 import { press } from '@/lab/lib/motion'
 
-/*
- * The titles are the pager. Instead of dots, each slide's name sits under the picture in large
- * type, so you can see what's there before you go to it. The current one fills with ink as its
- * slide plays, and pointing at the carousel holds it where it is.
- *
- * The pictures sit on one strip and the hand carries it: the picture is under your finger from the
- * first pixel, stops at each slide, gives at the ends, and a flick coasts. The ink is worked out from
- * the same value, so it drains from a word exactly as its picture leaves, with your hand on it.
- */
-
 export type Slide = {
   id: string
-  /** The word that stands for it in the pager. */
   title: string
-  /** A picture to fill the frame. */
   src?: string
-  /** What the picture shows, for screen readers. */
   alt?: string
-  /** Anything else to fill the frame, instead of a picture. */
   content?: ReactNode
 }
 export type CarouselHandle = { go(i: number): void; next(): void; prev(): void }
 
-/** The space between pictures on the strip, in px. */
 const GAP = 8
 const CONTROL = 'a,button,input,textarea,select,[role="button"]'
 const SOON = { w: 13, z: 1 }
 const AUTO = { w: 9, z: 1 }
 const REST = 'color-mix(in oklch, var(--ink) 22%, transparent)'
 
-/** A word with ink between two points along it, each edge soft, closing to nothing as they meet. */
 const inked = (from: number, to: number) => {
   const a = from * 130
   const b = to * 130
@@ -46,15 +30,10 @@ const inked = (from: number, to: number) => {
 const shift = (slots: number) => (slots ? `translate3d(calc(${slots * 100}% + ${slots * GAP}px),0,0)` : '')
 
 export function Carousel({ slides, autoplay = 5000, aspect = '16 / 8.4', label = 'Slides', onChange, ref }: {
-  /** The slides, each with a title for the pager. */
   slides: Slide[]
-  /** How long each slide stays, in ms. 0 leaves it to the person. */
   autoplay?: number
-  /** The frame's shape. */
   aspect?: string
-  /** Names it for screen readers. */
   label?: string
-  /** Called with the slide it moved to. */
   onChange?: (i: number) => void
   ref?: Ref<CarouselHandle>
 }) {
@@ -70,8 +49,6 @@ export function Carousel({ slides, autoplay = 5000, aspect = '16 / 8.4', label =
   const clock = useMotionValue(0)
   const reduce = !!useReducedMotion()
   const seen = useInView(box, { amount: 0.4 })
-  // A picture on a clipped strip never counts as near the screen, so all of them load together
-  // once the carousel itself is close.
   const near = useInView(box, { once: true, margin: '300px' })
 
   const timed = !!autoplay && !reduce
@@ -79,7 +56,6 @@ export function Carousel({ slides, autoplay = 5000, aspect = '16 / 8.4', label =
   useLayoutEffect(() => {
     latest.current = { n, timed, onChange }
   })
-  // The slide that holds the clock's ink, and the last one anyone was told about.
   const holder = useRef(0)
   const told = useRef(0)
   const inks = useRef<string[]>([])
@@ -88,7 +64,6 @@ export function Carousel({ slides, autoplay = 5000, aspect = '16 / 8.4', label =
   const paint = (x: number) => {
     const { n, timed } = latest.current
     if (strip.current) strip.current.style.transform = `translate3d(calc(${(-x * 100).toFixed(3)}% - ${(x * GAP).toFixed(2)}px),0,0)`
-    // Going round from an end, the first or last picture waits just past the other end of the strip.
     const hi = stops.current[stops.current.length - 1]
     const lo = stops.current[0]
     const first = hi === n && x > (n - 1) / 2 ? n : 0
@@ -106,7 +81,6 @@ export function Carousel({ slides, autoplay = 5000, aspect = '16 / 8.4', label =
     const c = clock.get()
     const count = words.current?.children.length ?? 0
     for (let k = 0; k < count; k++) {
-      // Going round, the far end of the strip is the same word as the near end.
       const pos = first && x > n - 1 && k === 0 ? x - n : last && x < 0 && k === n - 1 ? x + n : x
       const t = clamp(pos - k, -1, 1)
       let ink: string
@@ -121,7 +95,6 @@ export function Carousel({ slides, autoplay = 5000, aspect = '16 / 8.4', label =
     }
   }
 
-  // Read live by the engine, so a step off either end can carry on round instead of rewinding.
   const stops = useRef(Array.from({ length: n }, (_, k) => k))
   const span = (lo: number, hi: number) => {
     stops.current.length = 0
@@ -167,7 +140,6 @@ export function Carousel({ slides, autoplay = 5000, aspect = '16 / 8.4', label =
     const { n } = latest.current
     if (n < 2) return
     const to = ((k % n) + n) % n
-    // Already going round: finish that at once, so the next step starts from a real slide.
     if (dial.target() < 0 || dial.target() >= n) dial.set(((dial.target() % n) + n) % n)
     const from = Math.round(dial.target())
     if (to === from && dial.mode() === 'rest') return
@@ -197,7 +169,6 @@ export function Carousel({ slides, autoplay = 5000, aspect = '16 / 8.4', label =
     const c = animate(clock, 1, { duration: ((1 - clock.get()) * autoplay) / 1000, ease: 'linear', onComplete: () => autoStep.current() })
     return () => c.stop()
   }, [i, autoplay, reduce, hover, seen, moving, clock])
-  // The clock's own step is the gentlest move there is: nobody asked for it.
   const autoStep = useRef(() => {})
   useEffect(() => {
     autoStep.current = () => {
@@ -225,13 +196,11 @@ export function Carousel({ slides, autoplay = 5000, aspect = '16 / 8.4', label =
 
   const [drag] = useState(() =>
     dragProps(dial, () => {
-      // One frame's width of hand moves the strip one frame's width: a slide is that plus the gap.
       const w = frame.current?.clientWidth || 1
       return { box: () => frame.current, units: -w / (w + GAP), muted: true, onGrab: () => setMoving(true) }
     }),
   )
   const onDown = (e: PointerEvent) => {
-    // A control inside a slide keeps its press.
     if (!(e.target as Element).closest?.(CONTROL)) drag.onPointerDown(e)
   }
 

@@ -5,23 +5,6 @@ import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerE
 import { useReducedMotion } from 'motion/react'
 import { clamp, feedback, notched, useDetent } from '../../lib/detent'
 
-/*
- * A textarea you can rewind. Tap ⌘Z and it steps back one thought. Hold it and move the mouse, or
- * scroll, or drag the pill, and your writing rewinds under your hand.
- *
- * Nothing vanishes. Every letter ever typed sits on one tape with the moment it was born and the
- * moment it died, so going back dims what you haven't written yet while the page holds still, and
- * words you later deleted come back in colour, where they were. Every pause you made is a soft notch,
- * so it stops where your thinking stopped rather than on some random letter.
- *
- * A shader draws the letters. At the edge of time each is fine points of light condensing into ink.
- * At Now there is no shader at all: it's a plain textarea, so typing costs nothing and selection,
- * spellcheck and IME are the browser's own. The letters only wake when you go back. It reads its
- * font from your CSS.
- *
- * It refuses to scrub on a timer, to show a timeline, and to touch your text until you type.
- */
-
 export type RewindStep = { text: string; caret: number; t: number }
 export type RewindCell = { id: number; c: string; born: number; died: number }
 export type RewindHistory = { steps: RewindStep[]; tape: RewindCell[] }
@@ -31,21 +14,13 @@ export type RewindProps = {
   value?: string
   defaultValue?: string
   onChange?: (value: string) => void
-  /** A tape saved from `onHistory`, so rewinding survives a reload. */
   history?: RewindHistory
-  /** Called after each edit with the whole tape, ready to store. */
   onHistory?: (history: RewindHistory) => void
-  /** Show the pill. Off, ⌘Z and the wheel still rewind. */
   pill?: boolean
-  /** The colour deleted words come back in. */
   lost?: string
-  /** How faint text you haven't written yet is, 0 to 1. */
   ghost?: number
-  /** Plays itself once when first seen: runs back to this step, holds, and comes home. For demos. A touch ends it. */
   intro?: number
-  /** Lines it opens at. */
   rows?: number
-  /** Taller than this and it scrolls. */
   maxHeight?: number
   placeholder?: string
   label?: string
@@ -74,7 +49,6 @@ void main(){
   vec2 g=gl_FragCoord.xy/cell;
   float h=hash(floor(g));
   float d=length(fract(g)-.5)*2.;
-  // Points arrive one by one, each its own moment, then close up into a solid letter.
   float on=smoothstep(h-.08,h+.08,L*1.16-.08);
   float dot_=mix(smoothstep(1.05,.55,d),1.,smoothstep(.62,.98,L));
   float lit=L>.992?1.:on*dot_;
@@ -93,13 +67,11 @@ const rgb = (color: string) => {
 }
 
 const living = (tape: RewindCell[]) => tape.filter((m) => m.died === NEVER)
-/** New letters go after anything already deleted here, so what you cut comes back where it was. */
 const slot = (tape: RewindCell[], at: number) => {
   while (at < tape.length && tape[at].died !== NEVER) at++
   return at
 }
 
-// Words stay whole so they can glide, and deleted runs are their own words so they can breathe.
 function tokens(tape: RewindCell[]) {
   const out: Token[] = []
   tape.forEach((m, k) => {
@@ -112,7 +84,6 @@ function tokens(tape: RewindCell[]) {
   return out
 }
 
-// A new tape has no time yet: its first edit stamps it, so nothing reads the clock while rendering.
 const fresh = (text: string): RewindHistory => {
   return { steps: [{ text, caret: text.length, t: 0 }], tape: [...text].map((c, id) => ({ id, c, born: 0, died: NEVER })) }
 }
@@ -201,7 +172,6 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
         const seat = seats.current.get(k)
         if (!seat) continue
         const y = seat.y - top + (shift?.y ?? 0)
-        // Only what's on screen is drawn, so a long document costs the same as a short one.
         if (y < -size * 2 || y > root.clientHeight + size) continue
         const m = tape.current[k]
         const on = m.born <= i && i < m.died
@@ -269,7 +239,6 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
         el.style.display = seen ? '' : 'none'
         const after = words[n + 1]
         const ends = !after || tape.current[after.cells[0]].died === NEVER
-        // Text that's come back gets a word's breath on its far side.
         if (!w.space) el.style.marginRight = seen && ends && tape.current[w.cells[0]].died !== NEVER ? '.26em' : ''
       })
       for (const w of words) {
@@ -285,10 +254,8 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
           const seat = { x: q.left - r.left, y: q.top - r.top }
           const old = seats.current.get(k)
           if (old && first && !reduce) {
-            // A word whose first letter has moved glides there, from wherever it visibly is.
             const was = drift.current.get(w.cells[0]) ?? { x: 0, y: 0 }
             const dx = old.x + was.x - seat.x, dy = old.y + was.y - seat.y
-            // Sliding along a line reads as text making room. Crossing lines would fly through other words.
             if (Math.abs(dy) > size_ / 2) drift.current.delete(w.cells[0])
             else if (Math.abs(dx) > 0.5) drift.current.set(w.cells[0], { x: dx, y: 0 })
           }
@@ -314,7 +281,6 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
       mark.style.opacity = i === end ? '0' : '1'
       mark.style.height = q ? `${q.height}px` : '1.3em'
       mark.style.transform = `translate3d(${q ? q.right - r.left : 0}px,${y}px,0)`
-      // The page follows the place you're rewinding through, but only once it would leave the view.
       const pad = 48
       if (i !== end && (y < frame.scrollTop + pad || y > frame.scrollTop + frame.clientHeight - pad)) chase.current = clamp(y - frame.clientHeight / 2, 0, frame.scrollHeight - frame.clientHeight)
     }
@@ -324,7 +290,6 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
 
   const show = (x: number) => {
     if (quiet.current) return
-    // The soft edge reads the exact place, so it keeps moving between two letters.
     exact.current = x
     if (playing.current) {
       const i = clamp(Math.round(x), 0, steps.current.length - 1)
@@ -335,7 +300,6 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
       } else draw()
       return
     }
-    // Only the nearest pause pulls, so two close together can't hold you off either one.
     const near = marks.reduce((a, m) => (Math.abs(m - x) < Math.abs(a - x) ? m : a), marks[0] ?? 0)
     const i = clamp(Math.round(notched(x, [near], 5, 0.6)), 0, steps.current.length - 1)
     if (i === shown.current) return draw()
@@ -344,8 +308,6 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
     setAt(i)
     paint(i)
   }
-  // A wheel arrives in steps and a hand in jolts, so the tape follows them through a soft copy.
-  // These loops outlive a render, so they call through here and never hold an old copy of the words.
   const latest = useRef({ show, draw, settle, glide: (_: number) => {} })
   latest.current = { ...latest.current, show, draw, settle }
   const goal = useRef(seed.steps.length - 1)
@@ -468,7 +430,6 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
   const prev = () => [...marks].reverse().find((m) => m < shown.current) ?? 0
   const next = () => marks.find((m) => m > shown.current) ?? steps.current.length - 1
 
-  // While ⌘Z is down the mouse and the wheel both turn the tape.
   useEffect(() => {
     if (!live) return
     const over = (e: MouseEvent) => {
@@ -500,7 +461,6 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
     e.preventDefault()
     if (e.repeat) return
     if (e.shiftKey) return stepTo(next())
-    // A tap is an ordinary undo. Still down after a moment, and it becomes the scrubber.
     window.clearTimeout(timer.current)
     const was = shown.current
     timer.current = window.setTimeout(() => {
@@ -516,7 +476,6 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
     addEventListener('keyup', lift)
   }
 
-  // An edit is the one thing that ends the future: it collapses and this becomes now.
   const record = (text: string, caret: number) => {
     const i = shown.current
     const old = steps.current[i].text
@@ -538,7 +497,6 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
     const now = Date.now() / 1000
     if (!keep[0].t) keep[0] = { ...keep[0], t: now }
     keep.push({ text, caret, t: now })
-    // A very long life is forgotten from the oldest end, so the tape can't grow for ever.
     if (keep.length > LIMIT) {
       const cut = keep.length - LIMIT
       keep.splice(0, cut)
@@ -549,7 +507,6 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
     setCount(keep.length)
     setAt(keep.length - 1)
     setVersion((v) => v + 1)
-    // Typing outranks anything still settling, such as a redo that hasn't landed.
     quiet.current = true
     d.set(keep.length - 1)
     quiet.current = false
@@ -581,7 +538,6 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
     move(e.clientX - mouse.current)
     mouse.current = e.clientX
   }
-  // The demo proves itself: once, when it's first seen, and never against a hand.
   const show_ = useRef<number[]>([])
   const stopIntro = () => {
     show_.current.forEach((t) => window.clearTimeout(t))

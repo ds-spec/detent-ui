@@ -1,10 +1,5 @@
 'use client'
 
-/**
- * Each kind of file has its colour, the one people already know it by. It touches only the
- * folded corner and the extension, so a list of files reads at a glance without turning loud.
- * The PDF red is a rose, kept clear of the red that means something went wrong.
- */
 const KIND: [RegExp, string][] = [
   [/^pdf$/, 'light-dark(oklch(0.57 0.17 18), oklch(0.74 0.14 18))'],
   [/^(fig|sketch|xd)$/, 'light-dark(oklch(0.55 0.2 300), oklch(0.74 0.15 300))'],
@@ -20,10 +15,6 @@ export const fileTint = (name: string) => {
   return KIND.find(([re]) => re.test(ext))?.[1] ?? null
 }
 
-/**
- * A file as a small page: a folded corner and the extension set small along the foot, both in
- * the kind's colour. Images get a soft preview in the same footprint instead.
- */
 export function FileGlyph({ name, size = 34, preview, className = '' }: { name: string; size?: number; preview?: string; className?: string }) {
   const ext = (name.includes('.') ? name.split('.').pop()! : '').slice(0, 4).toUpperCase()
   const tint = fileTint(name)
@@ -39,7 +30,6 @@ export function FileGlyph({ name, size = 34, preview, className = '' }: { name: 
   return (
     <svg aria-hidden width={width} height={size} viewBox="0 0 28 34" fill="none" className={`shrink-0 ${className}`}>
       <path d="M5 .5h12.4c.8 0 1.5.3 2.1.9l7.1 7.1c.6.6.9 1.3.9 2.1V29a4.5 4.5 0 0 1-4.5 4.5H5A4.5 4.5 0 0 1 .5 29V5A4.5 4.5 0 0 1 5 .5Z" fill="var(--surface)" stroke="var(--line-strong)" />
-      {/* The fold: a small tinted triangle, the one place the page itself takes the colour. */}
       <path
         d="M17.5.8V6A3.5 3.5 0 0 0 21 9.5h6.2Z"
         strokeLinejoin="round"

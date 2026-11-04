@@ -5,14 +5,8 @@ import type { ReactNode } from 'react'
 import { motion } from 'motion/react'
 import { ease } from '@/lab/lib/motion'
 
-/**
- * A soft plate that follows the pointer through a list, sliding from row to row rather than each
- * row lighting up on its own. Mark rows with `data-row`. It appears where you first point, glides
- * while you move, and fades when you leave. It moves by transform only, so nothing shifts.
- */
 export function Hover({ children, className = '', radius = 7, as: Tag = 'div', label }: { children: ReactNode; className?: string; radius?: number; as?: 'div' | 'nav' | 'ul'; label?: string }) {
   const box = useRef<HTMLElement>(null)
-  // Where the light sits, and whether it got there by jumping (just arrived) or gliding.
   const [at, setAt] = useState<{ x: number; y: number; w: number; h: number; jump: boolean } | null>(null)
   const move = (e: React.PointerEvent) => {
     const el = box.current

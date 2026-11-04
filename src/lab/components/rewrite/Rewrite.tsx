@@ -11,7 +11,6 @@ import { Sweep } from '@/lab/ui/Outcome'
 import { ease, dur, spring, press } from '@/lab/lib/motion'
 
 type Phase = 'idle' | 'selected' | 'working' | 'review'
-/** For demos and tests: select, type an ask, run it and decide, without a pointer or focus. */
 export type RewriteHandle = { select(start: number, end: number): void; ask(text: string): void; run(action?: string): void; accept(): void; reject(): void }
 
 const PACE = 34
@@ -19,18 +18,6 @@ const BAR_W = 420
 
 const count = (s: string) => s.trim().split(/\s+/).filter(Boolean).length
 
-/**
- * Select a phrase and have it written differently, right where it is. A bar docks under the
- * selection: say what you want in your own words, or pick a quick ask. While the assistant
- * works, the bar wears the Intelligence edge and the words you chose shimmer in place; then its
- * version streams in after them, the original struck through and the new words in the accent,
- * the way a tracked change reads, with how much shorter or longer it came out. Tab takes it: the
- * old words fold away and the new ones settle into the paragraph with a sweep of green. Escape
- * puts everything back as it was.
- *
- * The bar sits below the change, never on the words you're deciding about, and the paragraph is
- * the only thing that reflows.
- */
 export function Rewrite({
   text: initial,
   rewrite,
@@ -39,15 +26,10 @@ export function Rewrite({
   onChange,
   ref,
 }: {
-  /** The paragraph to edit. */
   text: string
-  /** Writes the new version of the selected words, from a quick ask or your own words. Resolve with the replacement. */
   rewrite: (selected: string, ask: string) => Promise<string>
-  /** The quick asks the bar offers beside the field. */
   actions?: string[]
-  /** What the assistant is called while it works. */
   assistant?: string
-  /** Called with the whole paragraph after a change is accepted. */
   onChange?: (text: string) => void
   ref?: Ref<RewriteHandle>
 }) {
@@ -75,8 +57,6 @@ export function Rewrite({
   const streaming = phase === 'review' && shown < words.length
   const delta = count(next) - count(picked)
 
-  // The bar docks under the change, starting where it starts, kept inside the paragraph's width;
-  // in a paragraph narrower than the bar, it takes the paragraph's width.
   useLayoutEffect(() => {
     const m = mark.current
     const p = para.current
@@ -85,7 +65,6 @@ export function Rewrite({
     setBar({ x: Math.min(Math.max(0, m.offsetLeft - 12), Math.max(0, p.offsetWidth - w)), y: m.offsetTop + m.offsetHeight + 10, w })
   }, [range, phase, text, shown])
 
-  // A selection made by hand puts the cursor in the field, ready to say what you want.
   useEffect(() => {
     if (phase === 'selected' && byHand.current) field.current?.focus({ preventScroll: true })
   }, [phase])
@@ -120,7 +99,6 @@ export function Rewrite({
     setNext(out)
     setPhase('review')
   }
-  // The suggestion streams in a word at a time.
   useEffect(() => {
     if (phase !== 'review' || shown >= words.length) return
     const t = setTimeout(() => setShown((n) => n + 1), reduce ? 0 : PACE)
@@ -160,7 +138,6 @@ export function Rewrite({
     [],
   )
 
-  // A selection made by hand: read it as offsets into the paragraph's text.
   const onUp = () => {
     const sel = window.getSelection()
     const p = para.current
@@ -175,7 +152,6 @@ export function Rewrite({
     sel.removeAllRanges()
   }
 
-  // Keys: Tab accepts, Escape steps back, wherever focus is inside.
   const onKey = (e: KeyboardEvent) => {
     if (e.key === 'Tab' && phase === 'review') {
       e.preventDefault()
@@ -186,7 +162,6 @@ export function Rewrite({
     }
   }
 
-  // The words that just landed hold the eye for a moment, then become part of the paragraph.
   useEffect(() => {
     if (!landed) return
     const t = setTimeout(() => setLanded(null), 1800)
@@ -210,7 +185,6 @@ export function Rewrite({
         ) : range ? (
           <>
             {before}
-            {/* The change: the words you chose, and once there's a suggestion, the new ones after them. */}
             <span ref={mark}>
               <span
                 className={`rounded-[3px] transition-[color,background-color] duration-200 ${
@@ -242,7 +216,6 @@ export function Rewrite({
         )}
       </p>
 
-      {/* The bar, docked under the change: what you want, then the assistant at work, then the decision. */}
       <AnimatePresence>
         {range && (
           <motion.div
@@ -308,7 +281,6 @@ export function Rewrite({
                 )}
                 {phase === 'review' && (
                   <motion.span key="decide" className="flex flex-1 items-center gap-1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: dur.exit, ease: ease.out } }} transition={{ duration: dur.enter, ease: ease.out }}>
-                    {/* How much the change moved, so you can judge it at a glance. */}
                     <span className={`tnum min-w-0 flex-1 truncate px-2 text-caption ${streaming ? 'opacity-0' : ''} transition-opacity duration-300 ${delta < 0 ? 'text-[color-mix(in_oklch,var(--ok)_80%,var(--ink))]' : 'text-ink-3'}`}>
                       {delta === 0 ? 'Same length' : `${delta < 0 ? '−' : '+'}${Math.abs(delta)} words`}
                     </span>

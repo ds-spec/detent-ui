@@ -11,17 +11,13 @@ import { compact } from './parts'
 export { ChartCard } from './ChartCard'
 export { compact } from './parts'
 
-/** A goal and how far it had got by each day so far: `series[i]` is the running total at the end of day i. */
 export type Goal = { id: string; label: string; goal: number; series: number[]; format?: (n: number) => string }
 export type GoalsHandle = {
   point(id: string | null): void
-  /** Goes to a day, or back to today with null. */
   scrub(day: number | null): void
-  /** Walks to a day at a hand's pace, for a demo. Pressing against a goal works just as it does by hand. */
   sweep(day: number, ms: number): void
 }
 
-/** What follows the count: after a dot, or on its own line where the row is narrow. */
 const Note = ({ className = '', children }: { className?: string; children: ReactNode }) => (
   <span className={`${className} @max-[300px]:block`}>
     <span className="@max-[300px]:hidden"> · </span>
@@ -29,11 +25,9 @@ const Note = ({ className = '', children }: { className?: string; children: Reac
   </span>
 )
 
-/** The fill's colour, soft enough to read type through: the accent, or amber past the goal. */
 const FILL = 'bg-[color-mix(in_oklch,var(--accent)_15%,transparent)] dark:bg-[color-mix(in_oklch,var(--accent)_30%,transparent)]'
 const FILL_OVER = 'bg-[color-mix(in_oklch,var(--warn)_24%,transparent)] dark:bg-[color-mix(in_oklch,var(--warn)_20%,transparent)]'
 
-/** How far a bar's end gives before it breaks, as a share of its width. */
 const GIVE = 0.022
 const HOLDING = { w: 46, z: 1 }
 const SNAPPING = { w: 30, z: 0.34 }
@@ -41,11 +35,9 @@ const FLOOD = { w: 15, z: 1 }
 const CATCH_UP = { w: 22, z: 1 }
 const RISE = { w: 8.5, z: 1 }
 
-/** One goal's own physics, all of it driven by the day. */
 type Row = { through: boolean; held: Body; strain: Body; flood: Body; last: number; pct: number; wall: number }
 type Parts = { track: HTMLElement | null; fill: HTMLElement | null; over: HTMLElement | null; number: ((v: number, speed: number) => void) | null }
 
-/** How much further than the goal the hand must push before it gives way: about a day and a half. */
 const wallOf = (g: Goal) => {
   const i = g.series.findIndex((v) => v >= g.goal)
   const daily = i > 0 ? g.series[i] - g.series[i - 1] : 0
@@ -53,15 +45,6 @@ const wallOf = (g: Goal) => {
 }
 const blank = (): Row => ({ through: false, held: { x: 0, v: 0 }, strain: { x: 0, v: 0 }, flood: { x: 0, v: 0 }, last: 0, pct: 0, wall: 0.02 })
 
-/**
- * Goals you can read at a glance. Each goal is one soft bar that fills as far as it has got, with its
- * percentage set large on top, the bar and the number turning on the same value. Under the goals is
- * the period: drag or flick along it and the whole card runs back through the days with momentum.
- *
- * A goal is a wall. Push a bar into 100% and it stops, the number holding while the end of the bar
- * gives under your hand; keep pushing and it breaks through, the number running up to where it really
- * is and the bar flooding amber from the far end. Pull back and it closes again.
- */
 export function GoalNumerals({
   goals,
   days,
@@ -73,17 +56,11 @@ export function GoalNumerals({
   ref,
 }: {
   goals: Goal[]
-  /** How many days the period has. */
   days: number
-  /** Which day is today, counting from 0. The scrubber stops here. */
   today: number
-  /** How to name a day on the scrubber, e.g. (d) => `Oct ${d + 1}`. */
   dayLabel?: (day: number) => string
-  /** Called with the day being read, or null when it's back on today. */
   onDayChange?: (day: number | null) => void
-  /** Called with the goals past their wall, the moment one breaks through or falls back. */
   onOver?: (ids: string[]) => void
-  /** Silence the soft click as a bar breaks through. */
   muted?: boolean
   ref?: Ref<GoalsHandle>
 }) {
@@ -104,7 +81,6 @@ export function GoalNumerals({
   const walls = useMemo(() => Object.fromEntries(goals.map((g) => [g.id, wallOf(g)])), [goals])
   const parts = useRef<Record<string, Parts>>({})
   const rows = useRef<Record<string, Row>>({})
-  // The bars rise from empty the first time, on the same physics, so the first look is the fill arriving.
   const rise = useRef<Body>({ x: reduce ? 1 : 0, v: 0 })
   const thumb = useRef<HTMLSpanElement>(null)
   const line = useRef<HTMLSpanElement>(null)
@@ -135,13 +111,11 @@ export function GoalNumerals({
       const p = (at(g.series, Math.min(reading, g.series.length - 1)) / g.goal) * e.x
       const pressing = dt > 0 && v > 0.04
       const wall = walls[g.id] ?? 0.02
-      // Moving into it, it holds. Stopped, it can't: a number at rest always tells the truth.
       if (p <= 1 && row.through) {
         row.through = false
         mark(g.id, false)
       } else if (p > 1 && !row.through && (p > 1 + wall || !pressing)) {
         row.through = true
-        // What the bar was holding back runs out through the same place.
         row.held.x = 1 - p
         row.held.v = 0
         mark(g.id, true)
@@ -194,12 +168,10 @@ export function GoalNumerals({
   })
   useImperativeHandle(ref, () => ({
     point: setAt,
-    // A script never takes it out of a hand.
     scrub: (d) => void (dial.mode() !== 'held' && dial.to(d === null ? today : clamp(d, 0, today), { spring: { w: 22, z: 1 } })),
     sweep: (d, ms) => void (dial.mode() !== 'held' && dial.sweep(clamp(d, 0, today), ms)),
   }))
 
-  // Painted once before it's seen, then the rise plays.
   useLayoutEffect(() => {
     paint(dial.get(), 0, 0)
     dial.wake()
@@ -209,7 +181,6 @@ export function GoalNumerals({
   const d = day ?? today
   const pace = (d + 1) / days
 
-  // A finger can't leave: what it touched stays shown until a tap lands somewhere else.
   const root = useRef<HTMLDivElement>(null)
   const touched = hovered !== null || day !== null
   useEffect(() => {
@@ -245,7 +216,6 @@ export function GoalNumerals({
                 aria-label={`${g.label}: ${f(v)} of ${f(g.goal)}, ${pct}%${p > 1 ? `, ${pct - 100}% over` : ahead ? ', ahead of pace' : ''}`}
                 className={`ring-focus relative flex w-full items-center gap-3 rounded-[16px] px-4 py-3 text-left transition-opacity duration-150 ${hovered && hovered !== g.id ? 'opacity-45' : ''}`}
               >
-                {/* The bar is its own layer, so it can give under the hand without the type moving. */}
                 <span
                   aria-hidden
                   ref={(n) => {
@@ -294,7 +264,6 @@ export function GoalNumerals({
 
 const whole = (n: number) => String(Math.round(n))
 
-/** The percentage on its wheels. React only ever renders the empty slot; the dial turns them. */
 function Wheels({ onReady }: { onReady: (set: (v: number, speed: number) => void) => void }) {
   const el = useRef<HTMLSpanElement>(null)
   useLayoutEffect(() => {
@@ -306,11 +275,6 @@ function Wheels({ onReady }: { onReady: (set: (v: number, speed: number) => void
   return <span ref={el} aria-hidden className="tnum inline-flex" style={{ lineHeight: '1.25em', height: '1.25em', minWidth: '3ch', justifyContent: 'flex-end' }} />
 }
 
-/**
- * The period. Hover or drag along it to read a day, flick it and the whole card runs on with
- * momentum and comes to rest on a day; arrow keys step it. Days still to come are out of reach, so
- * the end gives like a rubber band, and an amber dot sits on the day each goal went over.
- */
 function DayScrubber({ goals, days, today, day, label, dial, thumb, line, byHand, muted }: { goals: Goal[]; days: number; today: number; day: number | null; label: (d: number) => string; dial: ReturnType<typeof useDetent>; thumb: Ref<HTMLSpanElement>; line: Ref<HTMLSpanElement>; byHand: { current: boolean }; muted?: boolean }) {
   const track = useRef<HTMLDivElement>(null)
   const d = day ?? today
@@ -363,7 +327,6 @@ function DayScrubber({ goals, days, today, day, label, dial, thumb, line, byHand
         {...drag}
         className="ring-focus relative flex h-8 flex-1 cursor-ew-resize touch-pan-y select-none items-center rounded-full pointer-coarse:h-10"
       >
-        {/* The whole period, the days so far, and the days being read: three depths of one line. */}
         <span className="absolute inset-x-0 h-1.5 rounded-full bg-[color-mix(in_oklch,var(--ink)_6%,transparent)]" />
         <span className="absolute left-0 h-1.5 rounded-full bg-[color-mix(in_oklch,var(--ink)_8%,transparent)]" style={{ width: x(today) }} />
         <span className="absolute inset-x-0 h-1.5 overflow-hidden rounded-full">

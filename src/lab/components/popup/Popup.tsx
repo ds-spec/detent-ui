@@ -6,17 +6,6 @@ import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 
 import { clamp, feedback, lerp, notched } from '../../lib/detent'
 import { Layer, fill, frameOf, inFrame, useDismiss, useHost, useReposition } from '../../lib/layer'
 
-/*
- * A popup that opens around what you pressed. The pill never goes away: its label stays exactly under
- * your finger and the menu unfolds above and below it, so the thing you're holding is already the
- * current choice. Keep holding and slide, let go to choose: one gesture, not two taps.
- *
- * The black plate is a second copy of the list clipped to a moving window, so the text turns white at
- * the plate's edge, part of a letter at a time. Choosing closes the list in place, back onto the pill,
- * and the pill, already the row you picked, comes up through it as it goes. Nothing slides, and the
- * tick stays where it was until the list is gone.
- */
-
 const ROW = 36
 const PAD = 6
 const LEFT = 14
@@ -48,24 +37,17 @@ function Updown() {
 }
 
 export type PopupProps = {
-  /** The choices. Made for short lists: everything shows at once, with no scrolling. */
   options: string[]
-  /** The chosen option, for a controlled popup. */
   value?: string
   defaultValue?: string
   onChange?: (value: string) => void
-  /** What it chooses, for screen readers. */
   label?: string
-  /** Set to submit the value with a form. */
   name?: string
-  /** Corner radius of the closed pill, for one sitting inside something round. */
   radius?: number
-  /** Type for the pill and the menu, for one sitting beside other text. */
   textClass?: string
   className?: string
 }
 
-/** A popup you press, slide and let go. It opens around the current choice, so the label never leaves your finger. */
 export function Popup({ options, value: controlled, defaultValue, onChange, label, name, radius = 10, textClass = 'text-[14px] font-medium', className = '' }: PopupProps) {
   const reduce = !!useReducedMotion()
   const id = useId()
@@ -75,7 +57,6 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
   const start = value
   const [shown, setShown] = useState(false)
   const [active, setActive] = useState(start)
-  // The choice the list opened on: its tick stays there while the list closes, so nothing jumps first.
   const [from, setFrom] = useState(start)
   const [spot, setSpot] = useState({ x: 0, y: 0 })
   const [width, setWidth] = useState(0)
@@ -92,7 +73,6 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
   const pull = useMotionValue(0)
   const pillW = useMotionValue(0)
   const on = useMotionValue(1)
-  // The list while it's up; the pill shows through as it goes.
   const fade = useMotionValue(0)
   const pillO = useTransform(fade, (f) => 1 - f)
   const height = PAD * 2 + ROW * options.length
@@ -168,10 +148,8 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
   const hide = (instant = false) => {
     const s = live.current
     s.mode = 'shut'
-    // A press while it's closing belongs to the pill underneath, which catches it in flight.
     if (sheet.current) sheet.current.style.pointerEvents = 'none'
     animate(pull, 0, SHUT)
-    // It closes onto the row it opened on, which is where the pill is: the list never slides.
     animate(pillW, widths()[s.value], instant || reduce ? NOW : SHUT)
     animate(fade, 0, instant || reduce ? NOW : { duration: 0.18, ease: [0.2, 0.9, 0.25, 1] })
     animate(open, 0, instant || reduce ? NOW : SHUT).then(() => {
@@ -224,7 +202,6 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
   const up = () => {
     const s = live.current
     if (s.mode !== 'press') return
-    // A click of any length stays open. Only sliding to another row turns the press into a choice.
     if (s.lost) return hide()
     if (!s.left) {
       s.mode = 'tap'
@@ -299,12 +276,10 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
         onPointerMove={move}
         onPointerUp={up}
         onPointerCancel={() => hide()}
-        // A tap's late click would land on the row that just opened under the finger and shut the menu.
         onTouchEnd={(e) => e.preventDefault()}
         onKeyDown={keys}
         onBlur={() => live.current.mode === 'tap' && hide(true)}
         className={`ring-focus relative flex touch-none select-none items-center whitespace-nowrap bg-surface text-ink before:absolute before:-inset-y-1 before:inset-x-0 ${textClass}`}
-        // Inline, because a site's own button rules often set touch-action and would turn the slide into a scroll.
         style={{ height: ROW, paddingLeft: LEFT, paddingRight: 10, filter: EDGE, borderRadius: radius, touchAction: 'none', opacity: pillO }}
       >
         <span style={{ paddingRight: RIGHT - 10 }}>{options[value]}</span>
@@ -334,7 +309,6 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
               ref={sheet}
               role="listbox"
               aria-label={label}
-              // Pressing a row must not take focus from the pill, or it closes before the click lands.
               onPointerDown={(e) => e.preventDefault()}
               onMouseDown={(e) => e.preventDefault()}
               className={`pointer-events-auto relative select-none bg-surface text-ink ${textClass}`}

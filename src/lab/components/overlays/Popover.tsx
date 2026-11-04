@@ -8,20 +8,10 @@ import { ease, spring } from '../../lib/motion'
 import { Layer, fill, frameOf, inFrame, originOf, place, useDismiss, useHost, useReposition } from '../../lib/layer'
 import type { Align, Side } from '../../lib/layer'
 
-/** For demos and tests: open and close it without touching focus. */
 export type PopoverHandle = { open(): void; close(): void }
 
 const ROTATE: Record<Side, number> = { bottom: 0, top: 180, right: -90, left: 90 }
 
-/**
- * A panel that opens beside its button and points at it. It grows out of the point it's
- * pointing from, flips to the other side when there's no room, and slides along to stay on
- * screen; when it slides, the arrow slides the other way and keeps pointing at the button. It
- * follows the button as the page scrolls, and resizes with whatever is inside.
- *
- * Opening moves focus into it, Escape or a press outside closes it, and focus goes back to
- * the button.
- */
 export function Popover({
   trigger,
   children,
@@ -32,19 +22,12 @@ export function Popover({
   className = '',
   ref,
 }: {
-  /** The button that opens it. It gets the popover's ARIA wiring. */
   trigger: ReactElement<Record<string, unknown>>
-  /** What's inside. */
   children: ReactNode
-  /** Which side of the button it prefers. */
   side?: Side
-  /** How it lines up with the button along that side. */
   align?: Align
-  /** Draw the arrow that points at the button. */
   arrow?: boolean
-  /** Accessible name for the panel. */
   label: string
-  /** Classes for the panel: its width and padding, say. */
   className?: string
   ref?: Ref<PopoverHandle>
 }) {
@@ -65,7 +48,6 @@ export function Popover({
     if (state && !at) measure()
   })
   useReposition(!!state, measure)
-  // Whatever's inside can change size; stay on the button when it does.
   useEffect(() => {
     if (!state || !panel.current) return
     const ro = new ResizeObserver(() => measure())
@@ -81,12 +63,10 @@ export function Popover({
   }
   useDismiss(!!state, [panel, anchor], close)
 
-  // Move focus in once it's placed, unless a demo opened it.
   useEffect(() => {
     if (!state || state.quiet || !at) return
     const first = panel.current?.querySelector<HTMLElement>('a[href],button:not([disabled]),input:not([disabled]),textarea,select,[tabindex]:not([tabindex="-1"])')
     ;(first ?? panel.current)?.focus({ preventScroll: true })
-    // Only when it first lands, not on every reposition.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, at === null])
 
@@ -140,7 +120,6 @@ export function Popover({
   )
 }
 
-/** The point on the panel's near edge: the panel's own surface, with its hairline drawn up the two slopes. */
 function Arrow({ side, at }: { side: Side; at: number }) {
   const across = side === 'top' || side === 'bottom'
   const pos = across ? { left: at - 9, [side === 'bottom' ? 'top' : 'bottom']: -8 } : { top: at - 4, [side === 'right' ? 'left' : 'right']: -13 }

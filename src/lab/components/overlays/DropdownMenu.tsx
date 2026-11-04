@@ -9,15 +9,8 @@ import type { Align, Side } from '../../lib/layer'
 import { MenuPanel } from './Menu'
 import type { MenuControl, MenuItem } from './Menu'
 
-/** For demos and tests: open the menu and point at or choose items by path, without touching focus. */
 export type DropdownHandle = MenuControl & { open(): void; close(): void }
 
-/**
- * A menu that opens from a button. It grows out of the button's edge, flips to the other side
- * when there's no room, and slides along to stay on screen. The keyboard opens it with the
- * first item ready; the pointer opens it with nothing highlighted until you point. Items can
- * carry an icon, a shortcut, a check, a submenu or a warning colour.
- */
 export function DropdownMenu({
   trigger,
   items,
@@ -26,15 +19,10 @@ export function DropdownMenu({
   align = 'start',
   ref,
 }: {
-  /** The button that opens it. It gets the menu's ARIA wiring. */
   trigger: ReactElement<Record<string, unknown>>
-  /** What's in the menu: items, checks, submenus, separators and labels. */
   items: MenuItem[]
-  /** Accessible name for the menu. */
   label: string
-  /** Which side of the button it prefers. */
   side?: Side
-  /** How it lines up with the button along that side. */
   align?: Align
   ref?: Ref<DropdownHandle>
 }) {

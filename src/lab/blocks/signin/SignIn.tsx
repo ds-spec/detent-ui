@@ -17,27 +17,15 @@ import { Orb } from '@/lab/ui/Orb'
 import { Names, accentVars, useNames } from '@/lab/blocks/kit/props'
 import type { BlockProps } from '@/lab/blocks/kit/props'
 
-/**
- * Sign in: Google or GitHub in one press, or a code by email. Every state holds the same place and
- * crossfades, so nothing on the page moves between them. The code arrives the way it does on a
- * phone: a notification you can tap, and a suggestion under the field that fills it in. Then
- * you pick a workspace and you're in.
- *
- * Beside the form, what's waiting on the other side: its shape is there from the start, its words
- * redacted, and they come into focus row by row the moment you're in. Below 896px the form has
- * the window to itself.
- */
-
 type Stage = 'start' | 'code' | 'workspace' | 'done'
 const CODE = '482913'
 const EMAIL = 'maya@harbor.dev'
-export type Workspace = { id: string; name: string; note: string; /** The tile's hue, 0–360. */ hue?: number }
+export type Workspace = { id: string; name: string; note: string; hue?: number }
 export type Provider = 'google' | 'github'
 const SPACES: Workspace[] = [
   { id: 'harbor', name: 'Harbor', note: '24 members · Admin', hue: 250 },
   { id: 'fieldwork', name: 'Fieldwork', note: '8 members · Member', hue: 150 },
 ]
-/** Something that happened while you were away. A person's orb, or the agent's mark when `agent` is set. */
 export type Waiting = { id: string; who: string; hue?: number; agent?: boolean; title: string; note: string; when: string }
 const WAITING: Waiting[] = [
   { id: 'eval', who: 'Detent', agent: true, title: 'Detent finished the refund eval', note: 'v13 passes 70% · 2 regressions to decide', when: '2h' },
@@ -49,15 +37,10 @@ const COUNT = ['none', 'one', 'two', 'three', 'four', 'five']
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-')
 
 export type SignInProps = BlockProps & {
-  /** The product being signed in to: the heading, the mark's label, the email and the consent sheet. */
   product?: string
-  /** Which one-press providers to offer, in order. Email is always there. */
   providers?: Provider[]
-  /** The workspaces to choose from once you're signed in. */
   workspaces?: Workspace[]
-  /** What's waiting on the other side, beside the form and redacted until a person is in. An empty list gives the form the whole window. */
   waiting?: Waiting[]
-  /** Called with the workspace a person picks. */
   onComplete?: (workspace: Workspace) => void
 }
 
@@ -67,7 +50,6 @@ export function SignIn({ autoplay = true, accent, product = 'Detent', providers 
   useLayoutEffect(() => {
     done.current = onComplete
   })
-  // Whether a person has taken over: callbacks fire for people, never for the script.
   const handedRef = useRef(!autoplay)
   const [stage, setStage] = useState<Stage>('start')
   const [email, setEmail] = useState('')
@@ -107,12 +89,10 @@ export function SignIn({ autoplay = true, accent, product = 'Detent', providers 
     later(700, () => {
       setSending(false)
       setStage('code')
-      // The code arrives a moment later, as mail does.
       later(1100, () => setMail(true))
     })
   }
 
-  // GitHub asks before it shares anything: the consent sheet, then back to Detent.
   const github = () => {
     tap()
     setSheet('ask')
@@ -153,7 +133,6 @@ export function SignIn({ autoplay = true, accent, product = 'Detent', providers 
         tap()
         sendCode(EMAIL)
         await wait(700 + 1100 + 1300)
-        // Take the code from the suggestion, as you would on a phone.
         setMail(false)
         code.current?.type(CODE)
         await wait(2300)
@@ -178,13 +157,11 @@ export function SignIn({ autoplay = true, accent, product = 'Detent', providers 
     <Names.Provider value={names}>
       <div className={`pro-app @container relative flex h-full w-full overflow-hidden bg-surface text-ink ${className}`} style={accentVars(accent)} onPointerDownCapture={director.onPointerDownCapture} onPointerUpCapture={director.onPointerUpCapture} onKeyDownCapture={director.onKeyDownCapture}>
         <div className="relative min-w-0 flex-1">
-          {/* The mark sits in the corner as far in as the panel on the right: its top on the panel's top edge. */}
           <div className="absolute left-5 top-5 flex items-center gap-2 @4xl:left-3 @4xl:top-3">
             <Mark />
             <span className="text-headline">{product}</span>
           </div>
 
-          {/* Every stage holds the same place and crossfades: nothing moves between them. */}
           <AnimatePresence initial={false}>
             <motion.div
               key={`${stage}-${run}`}
@@ -216,8 +193,6 @@ export function SignIn({ autoplay = true, accent, product = 'Detent', providers 
     </Names.Provider>
   )
 }
-
-/* ───────────────────────────── Stages ───────────────────────────── */
 
 function Start({ email, setEmail, error, sending, providers, onGitHub, onEmail }: { email: string; setEmail: (v: string) => void; error: string | null; sending: boolean; providers: Provider[]; onGitHub: () => void; onEmail: () => void }) {
   const { product } = useNames()
@@ -272,7 +247,6 @@ function Start({ email, setEmail, error, sending, providers, onGitHub, onEmail }
           aria-describedby="signin-hint"
           className={`mt-1.5 block h-11 w-full rounded-[9px] px-3.5 text-body text-ink outline-none transition-[background-color,box-shadow] placeholder:text-ink-3 ${error ? 'bg-plate shadow-field-error' : 'bg-[color-mix(in_oklch,var(--ink)_4.5%,transparent)] focus:bg-plate focus:shadow-[0_0_0_1px_color-mix(in_oklch,var(--accent)_50%,transparent),0_0_0_4px_color-mix(in_oklch,var(--accent)_13%,transparent)]'}`}
         />
-        {/* One line held for the hint or the error, so the button below never moves. */}
         <p id="signin-hint" aria-live="polite" className={`mt-1.5 h-[18px] text-caption ${error ? 'text-danger' : 'text-ink-3'}`}>
           {error ?? 'We’ll email you a 6-digit code.'}
         </p>
@@ -315,7 +289,6 @@ function Code({ email, codeRef, onBack, onVerified, suggest }: { email: string; 
         }}
         onVerified={onVerified}
       />
-      {/* The code from Mail, offered the way a phone offers it. Its row is always held. */}
       <div className="relative mt-4 h-8">
         <AnimatePresence initial={false}>
           {suggest ? (
@@ -396,13 +369,6 @@ function Done({ at, name }: { at: number | null; name?: string }) {
   )
 }
 
-/* ───────────────────────────── While you were away ───────────────────────────── */
-
-/**
- * What's waiting on the other side of the form. Signed out, every row keeps its shape with its
- * words redacted; once you're in, they come into focus one after another. Each line's text and
- * its redaction share one cell, so revealing them moves nothing.
- */
 function Away({ items, stage, email, space }: { items: Waiting[]; stage: Stage; email: string; space?: Workspace }) {
   const open = stage === 'workspace' || stage === 'done'
   const n = COUNT[items.length] ?? String(items.length)
@@ -442,7 +408,6 @@ function Away({ items, stage, email, space }: { items: Waiting[]; stage: Stage; 
             ))}
           </ul>
 
-          {/* One line, held for every state: what's hidden, then whose account it is. */}
           <p className="mt-4 grid h-5 text-caption text-ink-3">
             {(['Hidden until you sign in', 'Checking it’s you…', `Signed in as ${email}`] as const).map((t) => (
               <span key={t} aria-hidden={t !== note} className={`col-start-1 row-start-1 flex items-center gap-1.5 transition-opacity duration-300 ${t === note ? '' : 'opacity-0'}`}>
@@ -457,7 +422,6 @@ function Away({ items, stage, email, space }: { items: Waiting[]; stage: Stage; 
   )
 }
 
-/** Two texts in one cell: whichever is on shows. */
 function Swap({ on, className, children }: { on: boolean; className: string; children: ReactNode }) {
   return (
     <span aria-hidden={!on} className={`col-start-1 row-start-1 transition-[opacity,translate] duration-500 ${on ? '' : 'translate-y-1 opacity-0'} ${className}`}>
@@ -466,7 +430,6 @@ function Swap({ on, className, children }: { on: boolean; className: string; chi
   )
 }
 
-/** A line of text and its redaction in one cell, so the reveal never moves the row. */
 function Redacted({ text, open, at, className }: { text: string; open: boolean; at: number; className: string }) {
   const delay = { transitionDelay: open ? `${120 + at * 90}ms` : '0ms' }
   return (
@@ -481,9 +444,6 @@ function Redacted({ text, open, at, className }: { text: string; open: boolean; 
   )
 }
 
-/* ───────────────────────────── System moments ───────────────────────────── */
-
-/** The code arriving, as a notification at the top of the window. Tap it to fill the code. */
 function MailToast({ onOpen }: { onOpen: () => void }) {
   const { product } = useNames()
   return (
@@ -513,7 +473,6 @@ function MailToast({ onOpen }: { onOpen: () => void }) {
   )
 }
 
-/** GitHub's consent step, as GitHub shows it: who's asking, exactly what they'll see, and one green button. */
 function OAuthSheet({ going, onAuthorize, onCancel }: { going: boolean; onAuthorize: () => void; onCancel: () => void }) {
   const { product } = useNames()
   const org = `${slug(product)}-labs`
@@ -578,8 +537,6 @@ function OAuthSheet({ going, onAuthorize, onCancel }: { going: boolean; onAuthor
     </>
   )
 }
-
-/* ───────────────────────────── Marks ───────────────────────────── */
 
 function Mark({ size = 28, className = '' }: { size?: number; className?: string }) {
   return <DetentMark size={size} className={className} />

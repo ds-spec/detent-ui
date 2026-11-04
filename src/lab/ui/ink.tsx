@@ -1,10 +1,3 @@
-/**
- * Print: grain ink for data fills. A fill run through one of these filters turns to speckle, as if
- * printed, and two inks laid a hair out of register read as a riso print. Use it on data areas only,
- * never on text or chrome.
- */
-
-/** Grain filters for an SVG's <defs>: `${id}grain`, and `${id}grainB`, a second seed for a second ink. */
 export function InkDefs({ id }: { id: string }) {
   return (
     <>
@@ -24,5 +17,4 @@ export function InkDefs({ id }: { id: string }) {
   )
 }
 
-/** Blend for printed inks: multiply on paper, screen on black. */
 export const INK = 'mix-blend-multiply dark:mix-blend-screen'

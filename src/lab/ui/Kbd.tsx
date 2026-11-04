@@ -1,6 +1,5 @@
 'use client'
 
-/** ↵, drawn: fonts set it small and low. Open-headed, like the font's own ↑ ↓ beside it. */
 function Return() {
   return (
     <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.25} strokeLinecap="round" strokeLinejoin="round" role="img" aria-label="Return">
@@ -9,7 +8,6 @@ function Return() {
   )
 }
 
-/** A key's label, with the return key drawn and the rest left as text. */
 export function keyLabel(text: string) {
   return text
     .split(/(↵)/)
@@ -17,7 +15,6 @@ export function keyLabel(text: string) {
     .map((part, i) => (part === '↵' ? <Return key={i} /> : part))
 }
 
-/** A key cap for shortcut hints. `onInk` for use inside dark (primary) buttons. */
 export function Kbd({ children, onInk = false }: { children: string; onInk?: boolean }) {
   return (
     <kbd

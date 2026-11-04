@@ -12,20 +12,11 @@ import { Bloom, DrawnCheck, Sweep } from '../../ui/Outcome'
 const CELL = 52
 const H = 60
 const GAP = 8
-/** The wider gap between the two halves of the code. */
 const SPLIT = 18
 
 type Status = 'idle' | 'checking' | 'error' | 'done'
-/** For demos and tests: type a code without taking focus from the page. */
 export type CodeHandle = { type(code: string): void }
 
-/**
- * A one-time code field. One focus ring glides from cell to cell as you type, pasted codes
- * land digit by digit, and while the code is checked a soft wave runs through it. A wrong
- * code shakes once and clears from the end; a right one fuses into a single Verified bar.
- *
- * It's one real input underneath, so autofill from SMS or email and paste just work.
- */
 export function CodeInput({
   length = 6,
   onVerify,
@@ -34,15 +25,10 @@ export function CodeInput({
   onResend,
   ref,
 }: {
-  /** How many digits the code has. */
   length?: number
-  /** Resolve true when the code is right. */
   onVerify: (code: string) => Promise<boolean> | boolean
-  /** Called once a code has been accepted. */
   onVerified?: () => void
-  /** Seconds before a new code can be asked for. */
   resendAfter?: number
-  /** Called when a person asks for a new code. */
   onResend?: () => void
   ref?: Ref<CodeHandle>
 }) {
@@ -53,11 +39,9 @@ export function CodeInput({
   const [clearing, setClearing] = useState(false)
   const input = useRef<HTMLInputElement>(null)
   const row = useAnimationControls()
-  // Driven from code: the ring shows as if focused, but focus itself is never taken.
   const [driven, setDriven] = useState(false)
   const drivenRef = useRef(false)
   const reduce = useReducedMotion()
-  // A check can still be running when the field goes away (a card scrolled off, a page left): its answer is then dropped.
   const alive = useRef(true)
   useEffect(() => {
     alive.current = true
@@ -67,7 +51,6 @@ export function CodeInput({
   }, [])
 
   const half = length % 2 === 0 ? length / 2 : -1
-  // Cells keep their size when there's room, and share what there is when there isn't.
   const box = useRef<HTMLDivElement>(null)
   const { w: room } = useSize(box)
   const gaps = (length - 1) * GAP + (half > 0 ? SPLIT - GAP : 0)
@@ -87,7 +70,6 @@ export function CodeInput({
     }
     setStatus('error')
     if (!reduce) row.start({ x: [0, -7, 6, -4, 3, 0], transition: { duration: 0.36, ease: ease.out } })
-    // Let the error register, then clear from the last digit back to the first.
     window.setTimeout(() => {
       if (!alive.current) return
       setClearing(true)
@@ -125,7 +107,6 @@ export function CodeInput({
   return (
     <div ref={box} style={{ width: length * CELL + gaps, maxWidth: '100%' }}>
       <motion.div animate={row} className="relative" style={{ height: H }}>
-        {/* The backing bar the cells fuse into. */}
         <motion.div
           className="absolute inset-0 overflow-hidden rounded-row"
           initial={false}
@@ -133,10 +114,8 @@ export function CodeInput({
           transition={{ duration: 0.25, delay: done ? 0.12 : 0, ease: ease.out }}
           style={{ background: 'color-mix(in oklch, var(--ok) 11%, var(--surface))', boxShadow: '0 0 0 1px color-mix(in oklch, var(--ok) 22%, transparent)' }}
         >
-          {/* Verified: a glint of light crosses the bar once. */}
           <Sweep k={done ? 'verified' : null} delay={0.42} />
         </motion.div>
-        {/* And one band of light leaves it. */}
         <Bloom k={done ? 'verified' : null} radius="var(--radius-row)" delay={0.36} />
 
         {Array.from({ length }, (_, i) => {
@@ -182,7 +161,6 @@ export function CodeInput({
                     animate="show"
                     exit="out"
                   >
-                    {/* While checking, a wave runs through the digits. */}
                     <motion.span
                       className="block"
                       animate={status === 'checking' && !reduce ? { opacity: [1, 0.3, 1] } : { opacity: 1 }}
@@ -197,14 +175,12 @@ export function CodeInput({
           )
         })}
 
-        {/* One ring that travels between cells, with a native-feeling caret inside. */}
         <motion.div
           aria-hidden
           className="pointer-events-none absolute top-0 flex items-center justify-center rounded-row"
           style={{
             width: cell,
             height: H,
-            // The default focus colour; red while a wrong code is on screen.
             boxShadow: `0 0 0 1.5px color-mix(in oklch, var(${status === 'error' ? '--danger' : '--accent'}) 65%, transparent), 0 0 0 5px color-mix(in oklch, var(${status === 'error' ? '--danger' : '--accent'}) 14%, transparent)`,
           }}
           initial={false}
@@ -239,7 +215,6 @@ export function CodeInput({
           onChange={(e) => change(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          // The caret always lives at the end; clicking a cell never strands it mid-code.
           onSelect={(e) => {
             const el = e.currentTarget
             if (el.selectionStart !== el.value.length) el.setSelectionRange(el.value.length, el.value.length)
@@ -261,7 +236,6 @@ export function CodeInput({
   )
 }
 
-/** One fixed line under the code: the error, or when you can ask for a new code. */
 function Footer({ status, resendAfter, onResend }: {
   status: Status
   resendAfter: number

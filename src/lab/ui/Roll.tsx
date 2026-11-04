@@ -5,10 +5,6 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 
 const SMOOTH = { type: 'spring', bounce: 0, duration: 0.42 } as const
 
-/**
- * One word replaced by rolling through a clipped slot. The slot animates its real width, so the text
- * beside it glides over and nothing is ever stretched.
- */
 export function Roll({ word, className = '' }: { word: string; className?: string }) {
   const reduce = useReducedMotion()
   const probe = useRef<HTMLSpanElement>(null)

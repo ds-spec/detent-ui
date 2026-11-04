@@ -15,16 +15,6 @@ import { useDirector } from '@/lab/blocks/kit/director'
 import { accentVars } from '@/lab/blocks/kit/props'
 import type { BlockProps } from '@/lab/blocks/kit/props'
 
-/**
- * The closing call to action: one line to want it, an email to start with, and the queue it
- * promises to clear, running beside it. Tickets rise from the bottom and turn resolved as they
- * cross the assistant's line; the count of today's resolved ticks over with each one.
- *
- * The column is drawn twice, waiting below the line and resolved above it, each half clipped to
- * its side and both moved by the same transform, so a ticket changes as it crosses with no state
- * changing at all. Below 896px the queue sits under the form.
- */
-
 export type Ticket = { from: string; hue: number; text: string; outcome: string; handed?: boolean }
 
 const TICKETS: Ticket[] = [
@@ -41,19 +31,13 @@ const TICKETS: Ticket[] = [
 ]
 
 export type CTAProps = BlockProps & {
-  /** The product's name, on its line through the queue and in the sentence under the heading. */
   product?: string
-  /** The heading, set in two tones. */
   title?: [string, string]
   subline?: string
   placeholder?: string
-  /** The button's words. */
   action?: string
-  /** The small line under the field. */
   note?: string
-  /** The tickets in the queue. Each says who, what they asked, and how it ended. */
   tickets?: Ticket[]
-  /** Called with the email a person starts with. Return a promise to keep the button busy until it settles. */
   onSubmit?: (email: string) => Promise<void> | void
 }
 
@@ -94,7 +78,6 @@ export function CTA({
     await Promise.all([handed.current ? calls.current.onSubmit?.(email) : undefined, new Promise((r) => setTimeout(r, 900))])
     setPhase('sent')
   }
-  // The script submits through this, so it sends what's in the field now, not when its pass began.
   const latest = useRef(submit)
   useLayoutEffect(() => {
     latest.current = submit
@@ -141,7 +124,6 @@ export function CTA({
               </h2>
               <p className="mt-5 max-w-[460px] text-[15px] leading-[23px] text-ink-2">{subline ?? `${product} answers what it can, asks before it acts, and hands your team the rest. Set it up this afternoon.`}</p>
 
-              {/* The form, and in the same place once it's sent, where to look next. */}
               <div className="mt-8 grid max-w-[460px] grid-cols-[minmax(0,1fr)]">
                 <motion.form
                   noValidate
@@ -220,7 +202,6 @@ const AREA = 336
 const LINE = 176
 const SPEED = 26
 
-/** The queue, rising through the assistant's line. Waiting below it, resolved above it. */
 function Queue({ tickets, product }: { tickets: Ticket[]; product: string }) {
   const reduce = useReducedMotion()
   const box = useRef<HTMLDivElement>(null)
@@ -228,7 +209,6 @@ function Queue({ tickets, product }: { tickets: Ticket[]; product: string }) {
   const y = useMotionValue(0)
   const dist = useRef(0)
   const loop = tickets.length * ROW
-  // How many tickets' middles have passed the line after travelling d.
   const over = (d: number) => Math.floor((LINE + d - 20) / ROW)
   const last = useRef(over(0))
   const [count, setCount] = useState(1284)
@@ -272,7 +252,6 @@ function Queue({ tickets, product }: { tickets: Ticket[]; product: string }) {
             ))}
           </motion.ul>
         </div>
-        {/* The line where tickets get answered, with the assistant on it. */}
         <div className="pointer-events-none absolute inset-x-0" style={{ top: LINE }}>
           <span className="absolute left-5 right-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, var(--accent), color-mix(in oklch, var(--accent) 15%, transparent))' }} />
           <span className="absolute left-[14px] top-0 -translate-y-1/2 rounded-full shadow-[0_0_0_3px_var(--card),0_0_14px_color-mix(in_oklch,var(--accent)_45%,transparent)]">

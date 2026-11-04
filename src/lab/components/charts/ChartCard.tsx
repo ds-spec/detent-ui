@@ -7,7 +7,6 @@ import { spring, ease } from '@/lab/lib/motion'
 
 export type Table = { head: string[]; rows: (string | number)[][] }
 
-/** A chart's frame: what it is, its headline, and a switch to read it as a table at the chart's own height. */
 export function ChartCard({ title, headline, actions, table, className = '', children }: { title: string; headline?: ReactNode; actions?: ReactNode; table?: Table; className?: string; children: ReactNode }) {
   const [view, setView] = useState<'chart' | 'table'>('chart')
   const body = useRef<HTMLDivElement>(null)
@@ -22,7 +21,6 @@ export function ChartCard({ title, headline, actions, table, className = '', chi
   }, [view])
   return (
     <section className={`lit @container flex min-w-0 flex-col rounded-[20px] bg-surface p-5 ring-1 ring-[color-mix(in_oklch,var(--ink)_7%,transparent)] ${className}`}>
-      {/* Narrow, the switches drop under the title instead of squeezing it onto three lines. */}
       <header className="flex flex-col gap-3 @min-[440px]:flex-row @min-[440px]:items-start @min-[440px]:justify-between @min-[440px]:gap-4">
         <div className="min-w-0">
           <h3 className="text-footnote font-medium text-ink-2">{title}</h3>

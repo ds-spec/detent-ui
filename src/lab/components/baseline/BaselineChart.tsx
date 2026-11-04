@@ -9,9 +9,7 @@ import { INK, InkDefs } from '@/lab/ui/ink'
 
 export type Reading = { label: string; value: number }
 export type BaselineHandle = {
-  /** Make this reading the starting point. */
   start(i: number): void
-  /** Point at a reading, or null to let go. */
   read(i: number | null): void
 }
 
@@ -23,26 +21,12 @@ const INKS = '[--bl-up:#2f5fe0] [--bl-down:#d24a4a] [--bl-word-up:#2f5fe0] [--bl
 const GLIDE = { w: 13, z: 1 }
 const FOLLOW = { w: 22, z: 1 }
 
-/**
- * A metric against any day you choose.
- *
- * Every number on a chart is relative to something, and here that something is yours to set. Click
- * a day and it becomes the level: what sits above it prints in blue, what sits below in red, and
- * the sentence over the chart reads again from there. Point along the line to read to any other day:
- * the reading runs along the line and catches on each day.
- */
 export function BaselineChart({ data, start = 0, format = (n) => n.toLocaleString('en-US'), label = 'Metric', look = 'ink', onStart, ref }: {
-  /** The readings, oldest first. */
   data: Reading[]
-  /** Which reading it starts from. */
   start?: number
-  /** Formats an amount for the sentence. */
   format?: (n: number) => string
-  /** Names the chart for screen readers. */
   label?: string
-  /** Grain ink, or flat fills. */
   look?: 'ink' | 'plain'
-  /** Called with the reading a person chose to start from. */
   onStart?: (i: number) => void
   ref?: Ref<BaselineHandle>
 }) {
@@ -61,7 +45,6 @@ export function BaselineChart({ data, start = 0, format = (n) => n.toLocaleStrin
   const post = useRef<SVGLineElement>(null)
   const seatDot = useRef<SVGCircleElement>(null)
   const readDot = useRef<SVGCircleElement>(null)
-  // Where the level is drawn, which glides to where it's been set: across and up at once, each keeping its speed.
   const paintSeat = () => {
     const sx = X(seatI.get())
     const lv = Y(seatV.get())
@@ -112,7 +95,6 @@ export function BaselineChart({ data, start = 0, format = (n) => n.toLocaleStrin
     byHand.current = false
     setAt(i)
     if (i === null) return
-    // A reading that wasn't showing starts where it's asked for; one that was runs there.
     if (hiding()) reading.set(i)
     else reading.to(i, { spring: FOLLOW, instant })
   }
@@ -143,7 +125,6 @@ export function BaselineChart({ data, start = 0, format = (n) => n.toLocaleStrin
   const gain = data[end].value - data[from].value
   const pct = Math.abs((gain / (data[from].value || 1)) * 100).toFixed(1)
   const word = gain > 0 ? `up ${format(gain)}` : gain < 0 ? `down ${format(-gain)}` : 'flat'
-  // Reading back past the start, "since" no longer fits, so it compares the two days instead.
   const back = end < from
   const than = gain < 0 ? `${format(-gain)} lower` : `${format(gain)} higher`
   const said = back ? `${data[end].label} was ${than} than ${data[from].label}` : `Since ${data[from].label}, ${word} by ${data[end].label}`

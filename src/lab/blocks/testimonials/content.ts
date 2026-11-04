@@ -1,8 +1,3 @@
-/**
- * The customers. Every quote carries its receipt: the featured ones a before and after, the
- * short ones a result. In a quote, {braces} mark the phrase that gets highlighted.
- */
-
 export type Story = {
   id: string
   name: string
@@ -10,7 +5,6 @@ export type Story = {
   company: string
   hue: number
   quote: string
-  /** What moved, with the number before and after. */
   metric: string
   before: string
   after: string

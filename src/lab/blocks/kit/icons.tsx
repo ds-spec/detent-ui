@@ -1,9 +1,3 @@
-/**
- * Icons for the Pro apps. Where the library's icons carry one solid part, these are pure line:
- * a 1.5px stroke on a 24px grid, round caps and joins, open counters and nothing filled except
- * the few marks that are controls in themselves (stop, a dot). At 13–16px, inside a dense app,
- * line reads the way native apps do: quiet, even, and the same weight as the text beside it.
- */
 import { useId } from 'react'
 import type { SVGProps } from 'react'
 
@@ -41,7 +35,6 @@ export const ChevronLeft = (p: P) => (
   </Svg>
 )
 
-/** Back to where it started: a circle turning the other way. */
 export const Reset = (p: P) => (
   <Svg {...p}>
     <path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3" />
@@ -68,7 +61,6 @@ export const Search = (p: P) => (
   </Svg>
 )
 
-/** An open ring with a small body on it: the one mark that means the AI. */
 export const Orbit = (p: P) => (
   <Svg {...p}>
     <path d="M18.06 8.5A7 7 0 1 1 15.5 5.94" />
@@ -83,7 +75,6 @@ export const Refresh = (p: P) => (
   </Svg>
 )
 
-/** A page with lines: a document. */
 export const Note = (p: P) => (
   <Svg {...p}>
     <rect x="5" y="3.5" width="14" height="17" rx="2.5" />
@@ -91,7 +82,6 @@ export const Note = (p: P) => (
   </Svg>
 )
 
-/** A page with a folded corner: a file. */
 export const FilePage = (p: P) => (
   <Svg {...p}>
     <path d="M13.5 3.5H8A2.5 2.5 0 0 0 5.5 6v12A2.5 2.5 0 0 0 8 20.5h8a2.5 2.5 0 0 0 2.5-2.5V8.5Z" />
@@ -124,7 +114,6 @@ export const ArrowLeft = (p: P) => (
   </Svg>
 )
 
-/** The enter key. Drawn, because fonts set ↵ small and low. */
 export const Return = (p: P) => (
   <Svg {...p}>
     <path d="M18.5 5.5V11a3 3 0 0 1-3 3H5.5M10 9.5 5.5 14l4.5 4.5" />
@@ -137,7 +126,6 @@ export const ArrowUpRight = (p: P) => (
   </Svg>
 )
 
-/** A square with a pen across its corner: write something new. */
 export const Pencil = (p: P) => (
   <Svg {...p}>
     <path d="M11.5 4.5H7A2.5 2.5 0 0 0 4.5 7v10A2.5 2.5 0 0 0 7 19.5h10a2.5 2.5 0 0 0 2.5-2.5v-4.5" />
@@ -189,7 +177,6 @@ export const Moon = (p: P) => (
   </Svg>
 )
 
-/** Stop is a control in itself, so it's the one solid square. */
 export const Stop = (p: P) => (
   <Svg {...p}>
     <rect x="7" y="7" width="10" height="10" rx="2.25" fill="currentColor" stroke="none" />
@@ -243,7 +230,6 @@ export const Person = (p: P) => (
   </Svg>
 )
 
-/** Two sliders: general preferences. */
 export const Sliders = (p: P) => (
   <Svg {...p}>
     <path d="M4.5 7.5h8.5M17 7.5h2.5M4.5 16.5H7M11 16.5h8.5" />
@@ -273,7 +259,6 @@ export const Lock = (p: P) => (
   </Svg>
 )
 
-/** A window with its sidebar marked off: show or hide the sidebar. */
 export const Sidebar = (p: P) => (
   <Svg {...p}>
     <rect x="3.5" y="4.5" width="17" height="15" rx="3" />
@@ -281,7 +266,6 @@ export const Sidebar = (p: P) => (
   </Svg>
 )
 
-/** Two branches joining: a pull request. */
 export const PullRequest = (p: P) => (
   <Svg {...p}>
     <circle cx="6.5" cy="6" r="2" />
@@ -319,7 +303,6 @@ export const Mic = (p: P) => (
   </Svg>
 )
 
-/** The mic with a stroke through it: muted. */
 export const MicOff = (p: P) => (
   <Svg {...p}>
     <path d="M15 9.5V6.5a3 3 0 0 0-5.6-1.5M9 9v2.5a3 3 0 0 0 4.9 2.3" />
@@ -327,7 +310,6 @@ export const MicOff = (p: P) => (
   </Svg>
 )
 
-/** A screen with two lines: captions. */
 export const Captions = (p: P) => (
   <Svg {...p}>
     <rect x="3.5" y="5.5" width="17" height="13" rx="3" />
@@ -335,12 +317,6 @@ export const Captions = (p: P) => (
   </Svg>
 )
 
-/*
- * Call controls. These are controls in themselves, held in big round buttons, so they're solid:
- * at 22–26px inside a 52px disc a 1.5px line reads as thin and far away. Each is balanced on the
- * grid's centre, so it sits dead in the middle of its button, and the handset is drawn level so
- * turning it to answer or hang up turns it about its own middle.
- */
 function Solid({ size = 22, children, ...rest }: P) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden {...rest}>
@@ -351,7 +327,6 @@ function Solid({ size = 22, children, ...rest }: P) {
 
 const HANDSET = 'M2.75 12.9C2.75 9.55 6.9 7.6 12 7.6S21.25 9.55 21.25 12.9v1.55c0 .95-.8 1.65-1.75 1.5l-2.6-.4a1.6 1.6 0 0 1-1.35-1.58v-1.4A12.6 12.6 0 0 0 12 11.9c-1.25 0-2.4.18-3.55.67v1.4a1.6 1.6 0 0 1-1.35 1.58l-2.6.4c-.95.15-1.75-.55-1.75-1.5Z'
 
-/** A solid microphone on its stand. */
 export const MicSolid = (p: P) => (
   <Solid {...p}>
     <rect x="8.25" y="2.5" width="7.5" height="12.5" rx="3.75" />
@@ -359,7 +334,6 @@ export const MicSolid = (p: P) => (
   </Solid>
 )
 
-/** The microphone struck through, with a gap cut round the stroke so the two never blur together. */
 export function MicOffSolid(p: P) {
   const id = useId()
   return (
@@ -377,14 +351,12 @@ export function MicOffSolid(p: P) {
   )
 }
 
-/** A handset laid level, as for hanging up. Turn it -135° about its middle to answer. */
 export const Handset = (p: P) => (
   <Solid {...p}>
     <path d={HANDSET} />
   </Solid>
 )
 
-/** A caption card: two lines of words cut out of a solid screen. */
 export function CaptionsSolid(p: P) {
   const id = useId()
   return (
@@ -424,7 +396,6 @@ export const Chats = (p: P) => (
   </Svg>
 )
 
-/** An arrow leaving a tray: share. */
 export const Share = (p: P) => (
   <Svg {...p}>
     <path d="M12 14V3.5M8.25 7.25 12 3.5l3.75 3.75" />
@@ -432,7 +403,6 @@ export const Share = (p: P) => (
   </Svg>
 )
 
-/** Two links of a chain: a link to something. */
 export const Link = (p: P) => (
   <Svg {...p}>
     <path d="M10.5 13.5a3.5 3.5 0 0 0 5 0l3-3a3.5 3.5 0 0 0-5-5l-1 1" />
@@ -446,7 +416,6 @@ export const Trash = (p: P) => (
   </Svg>
 )
 
-/** A door with an arrow leaving it: sign out. */
 export const LogOut = (p: P) => (
   <Svg {...p}>
     <path d="M14 4.5H7A2.5 2.5 0 0 0 4.5 7v10A2.5 2.5 0 0 0 7 19.5h7M10.5 12h9M16.5 8.5 20 12l-3.5 3.5" />
@@ -461,7 +430,6 @@ export const Help = (p: P) => (
   </Svg>
 )
 
-/** Four tiles: apps and plugins. */
 export const Grid = (p: P) => (
   <Svg {...p}>
     <rect x="4.5" y="4.5" width="6" height="6" rx="1.75" />
@@ -477,7 +445,6 @@ export const Paperclip = (p: P) => (
   </Svg>
 )
 
-/** A frame with a hill and a sun: a photo. */
 export const Photo = (p: P) => (
   <Svg {...p}>
     <rect x="4" y="5" width="16" height="14" rx="3" />
@@ -486,14 +453,12 @@ export const Photo = (p: P) => (
   </Svg>
 )
 
-/** Ticked lines: a plan to follow. */
 export const Plan = (p: P) => (
   <Svg {...p}>
     <path d="m4.5 7 1.5 1.5L8.75 5.75M4.5 15l1.5 1.5 2.75-2.75M11.5 7.5h8M11.5 15.5h8" />
   </Svg>
 )
 
-/** An at sign: mention something. */
 export const At = (p: P) => (
   <Svg {...p}>
     <circle cx="12" cy="12" r="3.25" />
@@ -501,7 +466,6 @@ export const At = (p: P) => (
   </Svg>
 )
 
-/** A slash in a rounded square: a command, or a skill. */
 export const Slash = (p: P) => (
   <Svg {...p}>
     <rect x="4" y="4" width="16" height="16" rx="4.5" />

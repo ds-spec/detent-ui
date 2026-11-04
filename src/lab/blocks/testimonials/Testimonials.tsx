@@ -13,26 +13,13 @@ import { QUOTES, STORIES } from './content'
 import type { Short, Story } from './content'
 import { ease, press } from '@/lab/lib/motion'
 
-/**
- * Testimonials with receipts. One customer at a time writes their quote in, word by word, the
- * way an answer streams: every word lands in the accent and cools to ink, and the line that
- * matters gets a highlighter pass once it's written. Beside it, the number that moved, before
- * and after. Under it, a wall of short quotes, each with its result.
- *
- * Every quote holds its place from the start, so the card never changes size as they turn.
- */
-
 const DWELL = 7600
 
 export type TestimonialsProps = BlockProps & {
-  /** The product's name, on the after side of each number and in the default quotes. */
   product?: string
   eyebrow?: string
-  /** The heading, set in two tones. */
   title?: [string, string]
-  /** The featured customers, in turn. In a quote, {braces} mark the phrase to highlight. */
   stories?: Story[]
-  /** The wall of short quotes under them. */
   quotes?: Short[]
 }
 
@@ -81,7 +68,6 @@ export function Testimonials({
             <span aria-hidden className="block h-7 text-[60px] leading-[0.9] text-[var(--accent)]">
               “
             </span>
-            {/* Every quote sits in the same cell, so the tallest sets the height and turning never resizes the card. */}
             <blockquote className="mt-3 grid text-[clamp(20px,2.5cqi,27px)] leading-[1.32] tracking-[-0.022em] text-ink">
               {stories.map((s, i) => (
                 <p key={s.id} aria-hidden={i !== at} className={cell(i === at)}>
@@ -105,7 +91,6 @@ export function Testimonials({
           </div>
 
           <div className="flex flex-col justify-between gap-6">
-            {/* The receipt: what moved, before and after. */}
             <div className="grid">
               {stories.map((s, i) => (
                 <div key={s.id} aria-hidden={i !== at} className={`${cell(i === at)} rounded-[16px] bg-surface p-5 shadow-raised`}>
@@ -127,7 +112,6 @@ export function Testimonials({
               ))}
             </div>
 
-            {/* Who's next. The ring fills while the quote is up, and stops once someone picks. */}
             <div role="radiogroup" aria-label="Customer" className="flex gap-1.5" onPointerDownCapture={director.onPointerDownCapture} onPointerUpCapture={director.onPointerUpCapture} onKeyDownCapture={director.onKeyDownCapture}>
               {stories.map((s, i) => (
                 <motion.button whileTap={press}
@@ -160,7 +144,6 @@ export function Testimonials({
           </div>
         </figure>
 
-        {/* The wall: short quotes, each with its result. */}
         <ul className="mt-3 columns-1 gap-3 @3xl:columns-2 @5xl:columns-3">
           {quotes.map((q) => (
             <li key={q.name} className="mb-3 break-inside-avoid rounded-[20px] bg-[var(--card)] p-5 shadow-[0_0_0_1px_var(--line)]">
@@ -190,7 +173,6 @@ const pieces = (q: string): Piece[] =>
     .filter(Boolean)
     .map((s) => (s.startsWith('{') ? { t: s.slice(1, -1), mark: true } : { t: s, mark: false }))
 
-/** A highlighter pass along the phrase, line after line. It paints a background, so nothing moves. */
 const highlight = (on: boolean): CSSProperties => ({
   color: 'inherit',
   backgroundColor: 'transparent',
@@ -201,10 +183,6 @@ const highlight = (on: boolean): CSSProperties => ({
   transition: 'background-size 1100ms cubic-bezier(0.6, 0, 0.3, 1)',
 })
 
-/**
- * The quote, written in. Every word holds its place from the start and spaces stay real text, so
- * lines break exactly where the finished quote's will. The highlight runs once its phrase is down.
- */
 function Writing({ text, delay = 0, pace = 30 }: { text: string; delay?: number; pace?: number }) {
   const reduce = useReducedMotion()
   const ps = pieces(text)
@@ -238,7 +216,6 @@ function Writing({ text, delay = 0, pace = 30 }: { text: string; delay?: number;
   })
 }
 
-/** A quote at rest, for the ones waiting their turn: there only to hold the cell's size. */
 function Plain({ text }: { text: string }) {
   return pieces(text).map((p, k) => (p.mark ? <mark key={k} style={highlight(true)}>{p.t}</mark> : <span key={k}>{p.t}</span>))
 }

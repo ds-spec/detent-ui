@@ -6,21 +6,9 @@ import type { MotionValue } from 'motion/react'
 import { ArrowUp } from '@/lab/icons'
 import { ease, spring } from '@/lab/lib/motion'
 
-/*
- * What the charts share: one validated set of colours, a number format, clean scales, curves that
- * never overshoot, and data that springs from shape to shape instead of redrawing.
- */
-
-/**
- * Series colours, in order, never cycled: blue, green, violet, orange. Checked with the data-viz
- * validator for lightness, chroma, colour-blind and normal-vision separation (worst adjacent ΔE 22)
- * and 3:1 contrast, in light and in dark, where they're re-stepped for the dark surface.
- */
 export const SERIES = ['light-dark(#135fc8, #498beb)', 'light-dark(#127541, #29ac68)', 'light-dark(#5b4fe0, #8470e5)', 'light-dark(#a8530b, #d67523)'] as const
-/** Last period, or anything that should step back. */
 export const GHOST = 'color-mix(in oklch, var(--ink) 26%, transparent)'
 
-/** 1,284 · 12.9K · 4.2M. */
 export const compact = (n: number) => {
   const a = Math.abs(n)
   if (a >= 1e6) return `${(n / 1e6).toFixed(a >= 1e7 ? 0 : 1).replace(/\.0$/, '')}M`
@@ -28,14 +16,12 @@ export const compact = (n: number) => {
   return Math.round(n).toLocaleString('en-US')
 }
 
-/** Springs: a reading clicking into place, a shape settling into new data, a ring sweeping round. */
 export const detent = { type: 'spring', stiffness: 900, damping: 52, mass: 0.6 } as const
 export const morph = spring.data
 export const sweep = { type: 'spring', stiffness: 60, damping: 18, mass: 1 } as const
 
 const lerp = (a: number[], b: number[], t: number) => (a.length === b.length ? b.map((y, i) => a[i] + (y - a[i]) * t) : b)
 
-/** Numbers that spring from shape to shape, compared by value. `still` sets them at once, while a hand drags. */
 export function useMorph(target: number[], still = false) {
   const key = target.join(',')
   const t = useMotionValue(1)
@@ -59,7 +45,6 @@ export function useMorph(target: number[], still = false) {
   return useTransform(t, (v) => lerp(a.current, b.current, v))
 }
 
-/** A clean axis for values up to `max`: about four steps of 1, 2, 2.5 or 5 times a power of ten. */
 export function scale(max: number, steps = 4) {
   const raw = Math.max(max, 1e-9) / steps
   const p = 10 ** Math.floor(Math.log10(raw))
@@ -68,7 +53,6 @@ export function scale(max: number, steps = 4) {
   return { top, ticks: Array.from({ length: Math.round(top / step) + 1 }, (_, i) => i * step) }
 }
 
-/** A smooth line through points: monotone, so it never overshoots a reading. */
 export function smooth(xs: number[], ys: number[]) {
   const n = xs.length
   if (n < 2) return n ? `M${xs[0]},${ys[0]}` : ''
@@ -86,7 +70,6 @@ export function smooth(xs: number[], ys: number[]) {
 export const Key = ({ color, area = false }: { color: string; area?: boolean }) =>
   area ? <span className="size-2.5 shrink-0 rounded-[3px]" style={{ background: color }} /> : <span className="h-[3px] w-3 shrink-0 rounded-full" style={{ background: color }} />
 
-/** A change, as a chip: arrow, sign and size, green or red by whether that direction is good news. */
 export function Change({ value, good = 'up' }: { value: number; good?: 'up' | 'down' }) {
   const up = value >= 0
   const happy = up === (good === 'up')
@@ -99,13 +82,11 @@ export function Change({ value, good = 'up' }: { value: number; good?: 'up' | 'd
   )
 }
 
-/** A line that draws itself in the first time, then follows its data. */
 export function Drawn({ d, still, color, width = 2 }: { d: MotionValue<string>; still: string; color: string; width?: number }) {
   const reduce = useReducedMotion()
   return <motion.path d={reduce ? still : d} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" initial={reduce ? false : { pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.1, ease: ease.out }} />
 }
 
-/** The latest reading, breathing softly so the eye finds now. */
 export function Pulse({ cx, cy, color }: { cx: number | MotionValue<number>; cy: MotionValue<number>; color: string }) {
   const reduce = useReducedMotion()
   return (

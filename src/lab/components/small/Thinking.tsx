@@ -6,7 +6,6 @@ import { ChevronDown } from '../../icons'
 import { tap } from '../../lib/feel'
 import { ease, spring, dur } from '../../lib/motion'
 
-/** What a step is doing. It picks the pattern the dots play while the step runs. */
 export type ThoughtKind = 'think' | 'read' | 'search' | 'compare' | 'write'
 
 const VERBS: [RegExp, ThoughtKind][] = [
@@ -16,25 +15,16 @@ const VERBS: [RegExp, ThoughtKind][] = [
   [/^(writ|draft|answer|summar|compos|edit)/i, 'write'],
 ]
 
-/** The kind a step reads as, from its first word: "Searching 3 sources" searches. */
 export const kindOf = (step: string): ThoughtKind => VERBS.find(([r]) => r.test(step.trim()))?.[1] ?? 'think'
 
-/*
- * The mark is a 5×5 field of dots, and each kind of step plays its own pattern in it: reading
- * scans line by line, searching sweeps like radar, comparing weighs two bars against each other,
- * writing fills the field in the order you'd type it. When the thought is done, the field draws a
- * check, one dot at a time. Every dot is lit by a function of time, so a new step blends from the
- * old pattern into the next instead of cutting.
- */
 const N = 5
 const DIM = 0.1
-const CHECK = [15, 21, 17, 13, 9] // (row 3, col 0) → (4, 1) → (3, 2) → (2, 3) → (1, 4), in drawing order
-const RING = [0, 1, 2, 3, 4, 9, 14, 19, 24, 23, 22, 21, 20, 15, 10, 5] // the edge, clockwise
+const CHECK = [15, 21, 17, 13, 9]
+const RING = [0, 1, 2, 3, 4, 9, 14, 19, 24, 23, 22, 21, 20, 15, 10, 5]
 const clamp = (v: number) => Math.min(1, Math.max(0, v))
 
 export type Pattern = ThoughtKind | 'done'
 
-/** Each kind caught as one still, for the list of steps: the dots that are lit. */
 const STILL: Record<ThoughtKind, number[]> = {
   think: [1, 2, 3, 4, 12],
   read: [0, 1, 2, 3, 4, 10, 11, 12, 13, 20, 21],
@@ -48,7 +38,6 @@ function level(p: Pattern, t: number, i: number): number {
   const c = i % N
   switch (p) {
     case 'think': {
-      // One dot travels the edge with a fading tail; the centre breathes.
       if (i === 12) return 0.35 + 0.2 * Math.sin(t * 3)
       const k = RING.indexOf(i)
       if (k < 0) return 0
@@ -56,25 +45,21 @@ function level(p: Pattern, t: number, i: number): number {
       return clamp(1 - d / 5)
     }
     case 'read': {
-      // A cursor runs along each line in turn, leaving a short wake.
       const d = (t * 16 - i + 300) % 30
       return d > 25 ? 0 : clamp(1 - d / 5)
     }
     case 'search': {
-      // A beam sweeps round the centre.
       if (i === 12) return 0.7
       const a = Math.atan2(r - 2, c - 2)
       const d = (((t * 4.2 - a) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)
       return clamp(1 - d / 2.4) * (Math.hypot(r - 2, c - 2) > 1.5 ? 1 : 0.8)
     }
     case 'compare': {
-      // Two bars, rising and falling against each other.
       if (c !== 1 && c !== 3) return 0
       const h = 2.6 + (c === 1 ? 1 : -1) * 1.6 * Math.sin(t * 3.2)
       return clamp(h - (N - 1 - r))
     }
     case 'write': {
-      // Dots set down in reading order, hold a beat full, then clear.
       const head = (t * 11) % 34
       return head > 30 ? clamp(1 - (head - 30) / 3) : head > i ? (head - i < 1.4 ? 1 : 0.62) : 0
     }
@@ -85,7 +70,6 @@ function level(p: Pattern, t: number, i: number): number {
   }
 }
 
-/** The dot field. `kind` changes blend over a quarter second; `still` draws one frame and stops. */
 export function Dots({ kind, size = 17, still = false, tint }: { kind: Pattern; size?: number; still?: boolean; tint?: string }) {
   const refs = useRef<(SVGCircleElement | null)[]>([])
   const reduce = useReducedMotion()
@@ -106,7 +90,6 @@ export function Dots({ kind, size = 17, still = false, tint }: { kind: Pattern; 
       const t = (now - (s.to === 'done' ? s.t0 : 0)) / 1000
       const m = clamp((now - s.at) / 260)
       const k = m * m * (3 - 2 * m)
-      // The finished check stands alone: the dots around it go out.
       const base = s.to === 'done' ? DIM + (0.03 - DIM) * k : DIM
       refs.current.forEach((dot, i) => {
         if (!dot) return
@@ -117,7 +100,6 @@ export function Dots({ kind, size = 17, still = false, tint }: { kind: Pattern; 
       return s.to === 'done' && t > 0.8
     }
     if (still || reduce) {
-      // One representative frame: the kind's still, or the finished check.
       const to = swap.current.to
       if (to === 'done') paint(swap.current.t0 + 900)
       else refs.current.forEach((dot, i) => dot && (dot.style.opacity = String(STILL[to].includes(i) ? 1 : DIM)))
@@ -142,7 +124,6 @@ export function Dots({ kind, size = 17, still = false, tint }: { kind: Pattern; 
   )
 }
 
-/** "Searching 3 sources": the verb in ink, what it acts on in grey. */
 function TwoTone({ text }: { text: string }) {
   const at = text.indexOf(' ')
   return at < 0 ? <>{text}</> : (
@@ -155,23 +136,13 @@ function TwoTone({ text }: { text: string }) {
 
 const secs = (ms: number) => (ms < 9500 ? `${(ms / 1000).toFixed(1)}s` : `${Math.round(ms / 1000)}s`)
 
-/**
- * A model at work, in one line. A field of dots plays what the current step is doing, the step
- * rolls in under the last, and a clock keeps time. When it's done, the dots draw a check and the
- * line settles into "Thought for 6s". It opens to every step with how long each took, over
- * whatever is below, so nothing moves.
- */
 export function Thinking({ steps, done, expanded = false }: {
-  /** What it's thought so far, a line each. The newest shows on the line; its first word picks the pattern. */
   steps: string[]
-  /** Thinking has finished: the line settles into how long it took. */
   done: boolean
-  /** Open the steps from outside, e.g. in a demo. */
   expanded?: boolean
 }) {
   const [mine, setOpen] = useState(false)
   const open = done && (mine || expanded)
-  // When each step began and when the thought ended; the clock and every duration come from these.
   const clock = useRef({ marks: [] as number[], end: 0 })
   const [time, setTime] = useState({ elapsed: 0, took: [] as number[] })
   const [accent, setAccent] = useState(false)
@@ -195,7 +166,6 @@ export function Thinking({ steps, done, expanded = false }: {
 
   useEffect(() => {
     if (!done) return
-    // The check lands in the accent, then cools to ink.
     const on = window.setTimeout(() => setAccent(true))
     const off = window.setTimeout(() => setAccent(false), 900)
     return () => {
@@ -238,7 +208,6 @@ export function Thinking({ steps, done, expanded = false }: {
             </motion.span>
           </AnimatePresence>
         </span>
-        {/* One slot on the right: the clock while it works, then the chevron. Same width either way. */}
         <span className="flex w-10 shrink-0 justify-end">
           {done ? (
             <motion.span className="flex text-ink-3" initial={{ opacity: 0 }} animate={{ opacity: 1, rotate: open ? 180 : 0 }} transition={spring.snappy}>

@@ -25,27 +25,17 @@ import {
   siZendesk,
 } from 'simple-icons'
 
-/**
- * The tools that drift through the glass, dealt across three rows. Marks are Simple Icons paths
- * (CC0) on a 24×24 box; the brands belong to their owners and are here as data you swap for your own.
- */
 export type Integration = {
   id: string
   name: string
-  /** What kind of tool it is. */
   kind: string
-  /** What the product does there, in one sentence that follows its name: “answers new tickets…”. */
   does: string
-  /** The mark, as a path on a 24×24 box. */
   mark: string
-  /** The mark's own colour, under the glass and once it's connected. A colour too faint for the theme falls back to ink. */
   color: string
-  /** What connecting lets the product do there, one line each. Defaults to what tools of its kind need. */
   access?: string[]
   connected?: boolean
 }
 
-/** What a tool of each kind is asked for when it's connected. */
 export const ACCESS: Record<string, string[]> = {
   'Help desk': ['Read tickets, macros and customers', 'Reply, tag and hand over to your team'],
   'Live chat': ['Read conversations in Messenger', 'Reply and pass threads to your team'],

@@ -1,6 +1,5 @@
 'use client'
 
-/** A small arc that turns. Inherits the text colour; stays still for reduced motion. */
 export function Spinner({ size = 16, className = '' }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden className={`motion-safe:animate-spin ${className}`} style={{ animationDuration: '0.7s' }}>

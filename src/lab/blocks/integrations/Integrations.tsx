@@ -17,45 +17,22 @@ import { ACCESS, INTEGRATIONS } from './content'
 import type { Integration } from './content'
 import { ease, dur, spring } from '@/lab/lib/motion'
 
-/** The dialog's main button takes focus without moving the page: the block's demo opens it unasked. */
 const takeFocus = (el: HTMLButtonElement | null) => el?.focus({ preventScroll: true })
 
-/**
- * The tools a product connects to, seen through glass. Three rows of marks drift in ink, each its
- * own way; a capsule of glass floats over the middle, and whatever passes behind it swells, bends
- * at the rim and takes its own colour, with its name under it. Press a tool and the rows ease to a
- * stop with it under the glass; the glass opens into a frosted panel there, with what connecting
- * it does and Connect. Once connected, a tool keeps its colour everywhere, so the rows fill with
- * colour as the stack comes together. The glass's light follows the pointer; grab the rows to pull
- * them through it, and let go to see them coast.
- *
- * The glass is an SVG filter: the rows drawn a second time, magnified, in colour and named,
- * pushed through a displacement map shaped like the capsule's bevel, with its three colours
- * parted a little at the rim.
- */
-
 export type IntegrationsProps = BlockProps & {
-  /** The product's name, in the line under the glass and on the panel. */
   product?: string
-  /** The heading, set in two tones. */
   title?: [string, string]
   subline?: string
-  /** The tools, dealt across three rows in turn. Eighteen to thirty sit best. */
   integrations?: Integration[]
-  /** The link under the line. */
   more?: { label: string; href: string }
-  /** How fast the rows drift, in pixels a second. */
   speed?: number
-  /** Called when a person presses Connect. Return a promise to keep it busy until it settles. */
   onConnect?: (id: string) => Promise<void> | void
 }
 
 const mod = (a: number, n: number) => ((a % n) + n) % n
-/** Seconds of travel a flick is worth: what the rows' old drag of 0.04 a second came to. */
 const COAST = 0.31
 const GLIDE = { w: 13, z: 1 }
 
-/** A brand colour that would vanish on the theme's ground gives way to ink there. */
 function markFill(hex: string) {
   const c = hex.replace('#', '')
   const [r, g, b] = [0, 2, 4].map((i) => parseInt(c.slice(i, i + 2), 16) / 255)
@@ -63,10 +40,6 @@ function markFill(hex: string) {
   return `light-dark(${lum > 0.78 ? 'var(--ink)' : hex}, ${lum < 0.22 ? 'var(--ink)' : hex})`
 }
 
-/**
- * The capsule's bevel as a displacement map, `pad` wider than the glass on every side: flat in the
- * middle, bending harder toward the rim, then easing back to nothing just outside it.
- */
 function capsuleMap(w: number, h: number, pad: number, density: number) {
   const W = Math.round((w + pad * 2) * density)
   const H = Math.round((h + pad * 2) * density)
@@ -103,7 +76,6 @@ function capsuleMap(w: number, h: number, pad: number, density: number) {
   return c.toDataURL()
 }
 
-/** Measures a box before it paints, and again whenever it changes size. */
 function useSize<T extends HTMLElement>(fallback: number) {
   const ref = useRef<T>(null)
   const [w, setW] = useState(fallback)
@@ -145,11 +117,9 @@ export function Integrations({
   })
   const reduce = useReducedMotion()
   const inPlay = useContext(InPlay)
-  // Ids for the glass's gradients and filters, safe inside url(#…) and unique per block on a page.
   const id = `glass${useId().replace(/[^a-zA-Z0-9]/g, '')}`
   const handed = useRef(!autoplay)
 
-  // ── Geometry, from the stage's measured width ─────────────────────────────────────────────
   const [box, W] = useSize<HTMLDivElement>(1100)
   const seen = useInView(box)
   const rowH = Math.round(Math.min(76, Math.max(56, W * 0.066)))
@@ -167,13 +137,11 @@ export function Integrations({
   const M = 1.22
   const mark = Math.round(rowH * 0.38)
   const map = useMemo(() => (typeof document === 'undefined' ? '' : capsuleMap(Gw, Gh, pad, 1.5)), [Gw, Gh, pad])
-  // Which way each row drifts, and how fast against the others.
   const drift = [-1, 0.8, -1.15]
 
   const [connected, setConnected] = useState(() => new Set(integrations.filter((t) => t.connected).map((t) => t.id)))
   const [open, setOpen] = useState<{ id: string; phase: 'ask' | 'busy' | 'done' } | null>(null)
 
-  // ── The drift, the hand and the light, kept outside React and painted each frame ──────────
   const travel = useRef(0)
   const scrub = useRef({ at: 0 })
   const pace = useRef(1)
@@ -208,11 +176,9 @@ export function Integrations({
     }
     lens.current?.setAttribute('transform', `translate(${gx} ${gy})`)
     copy.current?.setAttribute('transform', `scale(${M}) translate(${-gx} ${-gy})`)
-    // The rim's light comes from the pointer's side; the glint leans toward it.
     rim.current?.setAttribute('gradientTransform', `rotate(${(Math.atan2(l.y, l.x || 0.0001) * 180) / Math.PI + 135} 0.5 0.5)`)
     glint.current?.setAttribute('transform', `translate(${l.x * Gw * 0.12} 0)`)
   }
-  /** The tool at the glass's middle names the line under it. */
   const name = () => {
     const row = rows[1]
     const j = Math.round((W / 2 + light.current.x * 10 - offset(1) - chipW / 2) / step)
@@ -228,7 +194,6 @@ export function Integrations({
     paint()
   })
 
-  // The rows are one value in the hand: a flick coasts about as far as it always did, and it can be caught.
   const dial = useDetent({
     value: 0,
     throw: COAST,
@@ -253,7 +218,6 @@ export function Integrations({
   useAnimationFrame((_, delta) => {
     if (!seen || !inPlay) return
     const dt = Math.min(delta, 64) / 1000
-    // Pointing at the stage slows the drift to a crawl so a name can be read; a panel stops it.
     pace.current += ((held.current ? 0 : hover.current ? 0.22 : 1) - pace.current) * Math.min(1, dt * 4)
     if (autoplay && !reduce && dial.mode() !== 'held') travel.current += speed * pace.current * dt
     const l = light.current
@@ -263,11 +227,9 @@ export function Integrations({
     latest.current.name()
   })
 
-  /** Slides the rows so a chip's middle comes to rest under the glass. */
   const bring = (cx: number) => {
     dial.to(dial.get() + (W / 2 - cx))
   }
-  /** Where a tool's nearest chip sits now, and in which row. */
   const where = (tid: string) => {
     const r = rows.findIndex((row) => row.some((t) => t.id === tid))
     const i = rows[r].findIndex((t) => t.id === tid)
@@ -295,7 +257,6 @@ export function Integrations({
     setConnected((s) => new Set(s).add(tid))
     setOpen({ id: tid, phase: 'done' })
   }
-  // Connected: the panel says so for a moment, then folds back into the glass.
   useEffect(() => {
     if (open?.phase !== 'done') return
     const t = setTimeout(() => {
@@ -327,13 +288,11 @@ export function Integrations({
       handed.current = true
     },
   )
-  // ── The hand: drag to pull the rows, press a chip to connect it ───────────────────────────
   const local = (e: { clientX: number; clientY: number }) => {
     const r = box.current!.getBoundingClientRect()
     const k = r.width / W
     return { x: (e.clientX - r.left) / k, y: (e.clientY - r.top) / k }
   }
-  /** The tool under a point on the stage, if the point is on a chip. */
   const chipAt = (p: { x: number; y: number }) => {
     const r = [0, 1, 2].find((q) => p.y >= rowY(q) && p.y <= rowY(q) + rowH)
     if (r === undefined) return null
@@ -389,7 +348,6 @@ export function Integrations({
   }
 
   const asked = open ? integrations.find((t) => t.id === open.id) : null
-  // The line names the tool in the glass, or the one whose panel is open.
   const tool = asked ?? integrations.find((t) => t.id === focus) ?? integrations[0]
   const swap = {
     initial: { opacity: 0, y: reduce ? 0 : 6 },
@@ -398,7 +356,6 @@ export function Integrations({
   }
   const pw = Math.min(400, W - 32)
 
-  /** One row of chips, repeated so it never runs out: in ink (connected ones in colour), or in colour and named for under the glass. */
   const row = (r: number, glass: boolean) => {
     const list = rows[r]
     const len = list.length * step
@@ -446,7 +403,6 @@ export function Integrations({
             of {integrations.length} connected
           </p>
 
-          {/* ── The rows, the glass over them, and the panel it opens into ── */}
           <div
             ref={box}
             tabIndex={0}
@@ -480,7 +436,6 @@ export function Integrations({
                 <filter id={`${id}-edge`} x="-50%" y="-50%" width="200%" height="200%">
                   <feGaussianBlur stdDeviation={1.6} />
                 </filter>
-                {/* The glass: the lit rows, magnified, pushed through the bevel, each colour a little further than the last. */}
                 <filter id={`${id}-glass`} filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" x={-Gw / 2 - pad} y={-Gh / 2 - pad} width={Gw + pad * 2} height={Gh + pad * 2} colorInterpolationFilters="sRGB">
                   <feImage href={map} x={-Gw / 2 - pad} y={-Gh / 2 - pad} width={Gw + pad * 2} height={Gh + pad * 2} preserveAspectRatio="none" result="map" />
                   <feDisplacementMap in="SourceGraphic" in2="map" scale={Gh * 0.27} xChannelSelector="R" yChannelSelector="G" result="r0" />
@@ -544,7 +499,6 @@ export function Integrations({
               </g>
             </svg>
 
-            {/* The glass, opened: a frosted panel grown from the capsule, with what connecting does and Connect. */}
             <AnimatePresence>
               {asked && open && (
                 <motion.div
@@ -612,7 +566,6 @@ export function Integrations({
             </AnimatePresence>
           </div>
 
-          {/* What the product does in the tool at the glass's middle. It holds its room, so nothing below moves. */}
           <div className="mx-auto mt-8 grid min-h-[48px] max-w-[540px] @3xl:mt-10" aria-live="polite">
             <AnimatePresence initial={false} mode="popLayout">
               <motion.p key={tool.id} {...swap} transition={spring.snappy} className="col-start-1 row-start-1 text-footnote leading-[1.6] text-ink-2">

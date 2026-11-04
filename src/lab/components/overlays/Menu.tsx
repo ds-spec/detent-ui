@@ -9,30 +9,19 @@ import { ease, spring, dur } from '../../lib/motion'
 import { frameOf, inFrame, originOf, place, useHost } from '../../lib/layer'
 import type { Side } from '../../lib/layer'
 
-/*
- * The inside of every menu: the list a dropdown and a context menu both open. A plate sits
- * under the item you're on and glides after the pointer, but jumps for the keyboard, so arrow
- * keys never wait on an animation. Typing jumps to an item by its first letters. Choosing an
- * item flashes it once, the way a desktop menu confirms, before the menu closes. Submenus open
- * beside their item and stay open while the pointer heads toward them, even on a diagonal that
- * crosses other items on the way.
- */
-
 export type MenuItem =
   | { kind?: 'item'; label: string; icon?: ReactNode; shortcut?: string; danger?: boolean; disabled?: boolean; onSelect?: () => void }
   | { kind: 'check'; label: string; icon?: ReactNode; shortcut?: string; checked: boolean; onCheckedChange: (next: boolean) => void; disabled?: boolean }
-  | { kind: 'sub'; label: string; icon?: ReactNode; /** The current choice inside, shown before the arrow. */ shortcut?: string; items: MenuItem[]; disabled?: boolean }
+  | { kind: 'sub'; label: string; icon?: ReactNode; shortcut?: string; items: MenuItem[]; disabled?: boolean }
   | { kind: 'separator' }
   | { kind: 'label'; label: string }
 
-/** For demos and tests: point at, open or choose an item by its path, without touching focus. */
 export type MenuControl = { point(path: number[]): void; choose(path: number[]): void }
 
 const usable = (it: MenuItem) => (it.kind === undefined || it.kind === 'item' || it.kind === 'check' || it.kind === 'sub') && !('disabled' in it && it.disabled)
 const labelOf = (it: MenuItem) => ('label' in it ? it.label : '')
 
 type Pt = { x: number; y: number }
-/** Whether `p` is inside the triangle a, b, c. */
 const inside = (p: Pt, a: Pt, b: Pt, c: Pt) => {
   const s = (p1: Pt, p2: Pt, p3: Pt) => (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y)
   const d1 = s(p, a, b)
@@ -58,19 +47,13 @@ export function MenuPanel({
 }: {
   items: MenuItem[]
   label: string
-  /** How the menu was opened: by pointer, or by keys (then the first item starts highlighted). */
   via: 'pointer' | 'keys'
-  /** Opens with no animation: what a key or a right click starts is there at once. Keys by default. */
   instant?: boolean
-  /** Opened by a demo: never takes focus. */
   quiet: boolean
-  /** Close the whole menu; `chose` when an item was picked. */
   onClose: (chose: boolean) => void
-  /** Close just this submenu and go back to its parent. */
   onBack?: () => void
   side?: Side
   arrow?: number
-  /** Where the panel sits in its frame, once placed. */
   at: { x: number; y: number } | null
   control?: Ref<MenuControl>
   panelRef?: (el: HTMLDivElement | null) => void
@@ -92,13 +75,11 @@ export function MenuPanel({
   const reduce = useReducedMotion()
   const { frame } = useHost()
 
-  // The plate follows the active row, measured from the row itself.
   useLayoutEffect(() => {
     const el = active >= 0 ? rows.current[active] : null
     setPlate(el ? { y: el.offsetTop, h: el.offsetHeight } : null)
   }, [active])
 
-  // Focus the list itself, so arrow keys work, unless a demo opened it.
   useEffect(() => {
     if (at && !quiet) box.current?.focus({ preventScroll: true })
   }, [at, quiet])
@@ -112,7 +93,6 @@ export function MenuPanel({
     setSubAt(null)
   }
 
-  // Place a submenu beside its row once it has a size.
   useLayoutEffect(() => {
     if (!sub || subAt || !subBox.current) return
     const row = rows.current[sub.index]
@@ -120,7 +100,6 @@ export function MenuPanel({
     const f = frameOf(frame)
     const anchor = inFrame(row.getBoundingClientRect(), f)
     const size = { w: subBox.current.offsetWidth, h: subBox.current.offsetHeight }
-    // The submenu's first row lines up with the row that opened it.
     const p = place({ ...anchor, y: anchor.y - 4 }, size, f, 'right', 'start', 2, 8)
     setSubAt({ x: p.x, y: p.y, side: p.side })
   }, [sub, subAt, frame])
@@ -133,7 +112,6 @@ export function MenuPanel({
       it.onCheckedChange(!it.checked)
       return
     }
-    // Flash the row once, then close and act.
     if (!reduce) await flash.start({ opacity: [1, 0.25, 1], transition: { duration: 0.16, times: [0, 0.5, 1], ease: ease.out } })
     onClose(true)
     if (it.kind === undefined || it.kind === 'item') it.onSelect?.()
@@ -187,7 +165,6 @@ export function MenuPanel({
       e.preventDefault()
       onBack()
     } else if (e.key.length === 1 && /\S/.test(e.key)) {
-      // Type to jump: letters typed close together build up a prefix.
       const now = e.timeStamp
       typed.current = { text: (now - typed.current.at < 600 ? typed.current.text : '') + e.key.toLowerCase(), at: now }
       const q = typed.current.text
@@ -199,7 +176,6 @@ export function MenuPanel({
     }
   }
 
-  // While the pointer travels from a row toward its open submenu, rows it crosses don't steal it.
   const heading = (p: Pt, now: number) => {
     const a = aim.current
     const s = subBox.current?.getBoundingClientRect()
@@ -243,7 +219,6 @@ export function MenuPanel({
         transition={{ duration: 0.18, ease: ease.out }}
       >
         <div className="relative">
-          {/* The plate under the active row. It glides for the pointer and jumps for the keys. */}
           <motion.div
             aria-hidden
             className={`pointer-events-none absolute inset-x-0 top-0 rounded-[10px] ${danger ? 'bg-[color-mix(in_oklch,var(--danger)_12%,transparent)]' : 'bg-surface-2'}`}

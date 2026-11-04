@@ -10,7 +10,6 @@ import { INK, InkDefs } from '@/lab/ui/ink'
 export type Past = { label: string; value: number }
 export type Ahead = { label: string; low: number; high: number }
 export type OutlookHandle = {
-  /** Read this day ahead, counted from the first. */
   read(i: number): void
 }
 
@@ -21,29 +20,14 @@ const AXIS = 'fill-[var(--ink-3)] font-mono text-[10px] uppercase tracking-[0.06
 const INKS = '[--ol-ink:#2f5fe0] dark:[--ol-ink:#7c9bf5]'
 const ODDS = (t: number) => (t < 0.34 ? 'Likely' : t < 0.7 ? 'Possible' : 'A long shot')
 
-/**
- * A forecast that says how sure it is.
- *
- * What happened is a line. What might happen is a band of ink that widens and thins as it runs
- * out, so the part you can trust is the part that's solid. Point along it and the sentence gives
- * the range for that day, and how far to believe it, in words.
- */
 export function OutlookChart({ history, forecast, format = (n) => n.toLocaleString('en-US'), unit = '', today = 'Today', odds = ODDS, look = 'ink', onRead, ref }: {
-  /** What happened, oldest first. */
   history: Past[]
-  /** What might, nearest first, as a low and a high for each day. */
   forecast: Ahead[]
-  /** Formats an amount for the sentence. */
   format?: (n: number) => string
-  /** Follows the range, e.g. "tokens a day". */
   unit?: string
-  /** Labels the point where the data stops. */
   today?: string
-  /** Turns how far ahead it is, from 0 to 1, into words. */
   odds?: (t: number) => string
-  /** Grain ink, or a flat fill. */
   look?: 'ink' | 'plain'
-  /** Called with the day ahead being read. */
   onRead?: (i: number) => void
   ref?: Ref<OutlookHandle>
 }) {
@@ -65,7 +49,6 @@ export function OutlookChart({ history, forecast, format = (n) => n.toLocaleStri
   const span = useRef<SVGLineElement>(null)
   const capTop = useRef<SVGLineElement>(null)
   const capLow = useRef<SVGLineElement>(null)
-  // The reading runs between days, so the range opens and narrows as you move instead of stepping.
   const paint = (x: number) => {
     const u = Math.max(0, Math.min(ahead - 1, x))
     const hi = Y(lerpAt(forecast.map((f) => f.high), u))
@@ -155,7 +138,6 @@ export function OutlookChart({ history, forecast, format = (n) => n.toLocaleStri
   return (
     <div className={`@container ${INKS}`}>
       <p aria-live="polite" className="min-h-[2lh] text-[clamp(22px,4.6cqi,30px)] leading-[1.24] tracking-[-0.03em] text-ink @[560px]:min-h-0">
-        {/* Keyed on the words, so a new reading is new text rather than old text re-wrapping. */}
         <span key={`${f.label}|${range}|${sure}`}>
           By {f.label}, {range}. <span className="text-ink-3">{sure}.</span>
         </span>
