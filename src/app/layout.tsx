@@ -50,11 +50,14 @@ export const viewport: Viewport = {
 // there, so the header shows the person's menu, not Sign in, from the first frame.
 const theme = `try{var s=localStorage.getItem('theme');var d=s==='dark'||(s==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=d?'dark':'light'}catch(e){document.documentElement.dataset.theme='light'}if(/(?:^|;\\s*)detent\\.in=1/.test(document.cookie))document.documentElement.dataset.in=''`
 
+const BEACON = process.env.NEXT_PUBLIC_CF_BEACON
+
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable}`} data-theme="light" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: theme }} />
+        {BEACON && <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: BEACON })} />}
       </head>
       <body>
         <Providers>{children}</Providers>

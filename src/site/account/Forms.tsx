@@ -315,6 +315,10 @@ export function SignIn({
                   By continuing you agree to the{' '}
                   <Link href="/terms" className={LINK}>
                     Terms
+                  </Link>{' '}
+                  and{' '}
+                  <Link href="/privacy" className={LINK}>
+                    Privacy policy
                   </Link>
                   .
                 </p>

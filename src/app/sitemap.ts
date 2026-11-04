@@ -26,5 +26,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     at('/licence', 0.3, 'monthly'),
     at('/refunds', 0.2, 'yearly'),
     at('/terms', 0.2, 'yearly'),
+    at('/privacy', 0.2, 'yearly'),
   ]
 }

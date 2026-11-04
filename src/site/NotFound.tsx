@@ -9,7 +9,7 @@ const plain = (p: string): Page => ({ path: p, href: p })
 
 /** Every page a miss could have meant, and the names people reach for that live somewhere else. */
 const PAGES: Page[] = [
-  ...['/components', '/blocks', '/templates', '/pro', '/system', '/changelog', '/licence', '/refunds', '/terms'].map(plain),
+  ...['/components', '/blocks', '/templates', '/pro', '/system', '/changelog', '/licence', '/refunds', '/terms', '/privacy'].map(plain),
   { path: '/pricing', href: '/pro' },
   { path: '/docs', href: '/components' },
   ...ENTRIES.map((e) => plain(`/components/${e.id}`)),

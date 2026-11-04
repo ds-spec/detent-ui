@@ -34,6 +34,7 @@ const COLUMNS: { title: string; items: Item[] }[] = [
       { href: '/licence', label: 'Licence' },
       { href: '/refunds', label: 'Refunds' },
       { href: '/terms', label: 'Terms' },
+      { href: '/privacy', label: 'Privacy' },
     ],
   },
   {
