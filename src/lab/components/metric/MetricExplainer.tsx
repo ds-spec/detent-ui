@@ -38,6 +38,7 @@ export function MetricExplainer({
   width = 640,
   footer,
   highlight = null,
+  tabs = true,
 }: {
   metrics: Metric[]
   metric?: string
@@ -47,6 +48,8 @@ export function MetricExplainer({
   width?: number
   footer?: ReactNode
   highlight?: string | null
+  /** Show the row of metric names to switch between. Off when the page around it does the choosing. */
+  tabs?: boolean
 }) {
   const [own, setOwn] = useState(defaultMetric ?? metrics[0]?.id)
   const at = metric ?? own
@@ -88,6 +91,7 @@ export function MetricExplainer({
     <div className="@container" style={{ width, maxWidth: '100%' }}>
     <div className="rounded-[22px] bg-surface p-5 shadow-[var(--card-edge)] @min-[520px]:p-7">
       <div className="flex flex-col gap-2 @min-[520px]:flex-row @min-[520px]:items-center @min-[520px]:justify-between @min-[520px]:gap-4">
+        {tabs && (
         <LayoutGroup id={group}>
           <div role="tablist" aria-label="Metric" className="-ml-1 flex min-w-0 gap-0.5 overflow-x-auto [scrollbar-width:none]">
             {metrics.map((x) => {
@@ -108,6 +112,8 @@ export function MetricExplainer({
             })}
           </div>
         </LayoutGroup>
+        )}
+        {!tabs && <span className="text-footnote font-medium text-ink">{m.name}</span>}
         {period && <span className="shrink-0 text-footnote text-ink-3">{period}</span>}
       </div>
 

@@ -321,7 +321,7 @@ export const BLOCKS: Block[] = [
       { name: 'onRangeChange', type: '(range: string) => void', note: 'Called when a person changes the range. The script doesn’t call it.' },
       { name: 'onApprove', type: '(id: string) => void', note: 'Called with the request a person approves.' },
       { name: 'onDeny', type: '(id: string) => void', note: 'Called with the request a person denies.' },
-      { name: 'sidebar', type: 'boolean', default: 'true', note: 'Draw the product’s sidebar. Turn it off to drop the screen into your own layout.' },
+      { name: 'sidebar', type: 'boolean', default: 'false', note: 'Draw a sidebar for the rest of your app. Turn it on together with onNavigate, so every item goes somewhere.' },
       { name: 'onNavigate', type: '(page: SidebarPage) => void', note: 'Called with a sidebar page a person presses. Without it the sidebar is a picture.' },
       { name: 'onFixGap', type: '(id: string) => void', note: 'Called when a person fixes a question it couldn’t answer: drafts the doc or adds the rule.' },
     ],
@@ -560,12 +560,13 @@ export const BLOCKS: Block[] = [
   {
     id: 'settings',
     name: 'Settings',
-    short: 'Keys, members and a danger zone',
+    short: 'Workspace, members, keys and security',
     component: 'Settings',
     kind: 'app',
     window: 'Detent · Settings',
-    line: 'API keys that rotate in place, members with roles, and a careful danger zone. Built to be trusted.',
+    line: 'A whole settings area where every page is real: the workspace, members with roles, API keys that rotate in place, and security with a careful danger zone.',
     details: [
+      'Every item in the sidebar is a page that works, laid out the way Vercel and GitHub lay out settings: a card per setting, with a footer whose Save only wakes once something has changed.',
       'A new key is shown once, and it decrypts into place, one character settling after another, so you know it’s real.',
       'Copying it blooms once; the new key lands at the top of the list with a soft highlight that fades as you take it in.',
       'Rotating changes the key in place, column by column, and keeps the old one working for a day, with the time left counting down beside it.',
@@ -586,7 +587,6 @@ export const BLOCKS: Block[] = [
       { name: 'onRotateKey', type: '(id: string) => void', note: 'Called with a key’s id when a person rotates it.' },
       { name: 'onInvite', type: '(email: string) => void', note: 'Called with the address a person invites.' },
       { name: 'onDeleteWorkspace', type: '(deleted: boolean) => void', note: 'Called when a person holds to delete, and with false if they undo it.' },
-      { name: 'onNavigate', type: '(page: string) => void', note: 'Called with a sidebar item that isn’t on this page, like General or Billing, so it can open your own page. Without it, those items are quiet labels.' },
     ],
   },
   {
