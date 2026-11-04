@@ -146,7 +146,7 @@ export function Choose() {
     <div className="flex min-w-0 flex-col gap-6">
       <Question title="Edition." quiet="What you’re building.">
         <Tile name="edition" on={edition === 'pro'} onPick={() => setEdition('pro')} title="Pro" price={owned === 'pro' ? 'Yours' : `$${plan('pro').price}`} line={`${PRO_COMPONENTS.length} Pro components and ${PRO_BLOCK_COUNT} whole screens, already working.`} />
-        <Tile name="edition" on={edition === 'all'} onPick={() => setEdition('all')} title="Pro + Templates" price={upgrade || owned === 'pro' ? `+$${UPGRADE.price}` : `$${plan('all').price}`} line={`Everything in Pro, plus ${TEMPLATE_COUNT}, with every new one.`} />
+        <Tile name="edition" on={edition === 'all'} onPick={() => setEdition('all')} title="Pro + Templates" price={upgrade || owned === 'pro' ? `+$${UPGRADE.price}` : `$${plan('all').price}`} line={`Everything in Pro, plus ${TEMPLATE_COUNT}, with every new one.`} note={TEMPLATES.length === 1 ? 'One template today. More are shipping fast, and only ones we’d use ourselves.' : undefined} />
       </Question>
       <Summary />
     </div>
@@ -306,6 +306,7 @@ export function BuyBar() {
         <span className="text-ink-2">
           {what}, for {plan.seats}.
         </span>{' '}
+        {edition === 'all' && <span className="text-ink-2">More templates are shipping fast, and only ones we’d use ourselves. </span>}
         One payment · Every update for life · {REFUND_DAYS}-day refund · The source is yours
       </p>
     </div>

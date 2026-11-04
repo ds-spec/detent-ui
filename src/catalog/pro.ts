@@ -110,7 +110,7 @@ export const PLANS: Plan[] = [
     cta: 'Get everything',
     href: '/checkout/all',
     best: true,
-    features: ['Everything in Pro', 'The Detent app template', 'Every new template as it ships', 'Real routes, data and AI wired in', 'Every update, for life', 'Unlimited projects'],
+    features: ['Everything in Pro', 'The Detent app template', 'More shipping fast, and only good ones', 'Real routes, data and AI wired in', 'Every update, for life', 'Unlimited projects'],
   },
 ]
 
