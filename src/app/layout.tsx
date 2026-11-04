@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   },
   // The shared image is app/opengraph-image.tsx; sections and detail pages draw their own.
   openGraph: { title: `${NAME} — ${TAGLINE}`, description: DESCRIPTION, siteName: NAME, type: 'website', locale: 'en_US' },
-  twitter: { card: 'summary_large_image', title: `${NAME} — ${TAGLINE}`, description: DESCRIPTION },
+  twitter: { card: 'summary_large_image', site: '@next_gendev', creator: '@next_gendev', title: `${NAME} — ${TAGLINE}`, description: DESCRIPTION },
 }
 
 export const viewport: Viewport = {

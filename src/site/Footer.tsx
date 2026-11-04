@@ -41,7 +41,7 @@ const COLUMNS: { title: string; items: Item[] }[] = [
     title: 'Follow',
     items: [
       { href: 'https://github.com/ds-spec/detent-ui', label: 'GitHub', out: true },
-      { href: 'https://x.com', label: 'X', out: true },
+      { href: 'https://x.com/next_gendev', label: 'X', out: true },
     ],
   },
 ]

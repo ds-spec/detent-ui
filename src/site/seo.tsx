@@ -45,7 +45,7 @@ export function page({ title, description, path, absolute = false, noindex = fal
       'ai-summary': description,
     },
     openGraph: { title: full, description, url: path, siteName: NAME, type: 'website', locale: 'en_US', ...images },
-    twitter: { card: 'summary_large_image', title: full, description, ...images },
+    twitter: { card: 'summary_large_image', site: '@next_gendev', creator: '@next_gendev', title: full, description, ...images },
     ...(noindex ? { robots: { index: false, follow: true } } : {}),
   }
 }
@@ -55,7 +55,7 @@ export function JsonLd({ data }: { data: object }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, '\\u003c') }} />
 }
 
-const org = { '@type': 'Organization', '@id': `${url()}/#organization`, name: NAME, url: url(), logo: url('/icon.svg') }
+const org = { '@type': 'Organization', '@id': `${url()}/#organization`, name: NAME, url: url(), logo: url('/icon.svg'), sameAs: ['https://x.com/next_gendev', 'https://github.com/ds-spec/detent-ui'] }
 
 /** The site, who makes it, and what it is: for the home page. */
 export const siteGraph = () => ({
