@@ -8,6 +8,7 @@ import { PLANS } from '@/catalog/pro'
 import type { SourceFile } from '@/catalog/source'
 import { BTN, useSideNew } from '../shell/side'
 import { ProTag } from '../blocks/ProTag'
+import { track } from '../track'
 
 // Fetched once per component, then kept for the session.
 const cache = new Map<string, Promise<SourceFile[]>>()
@@ -52,6 +53,7 @@ export function Code({ id }: { id: string }) {
     } catch {
       /* Clipboard blocked: the code is right there to select. */
     }
+    track('copy_code', { item: id, file: file.name })
     setCopied(true)
     clearTimeout(t.current)
     t.current = window.setTimeout(() => setCopied(false), 1500)

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { SITE } from '@/catalog/pro'
+import { Analytics } from '@/site/Analytics'
 import { Providers } from '@/site/Providers'
 import { DESCRIPTION, NAME, TAGLINE } from '@/site/seo'
 
@@ -51,16 +52,22 @@ export const viewport: Viewport = {
 const theme = `try{var s=localStorage.getItem('theme');var d=s==='dark'||(s==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=d?'dark':'light'}catch(e){document.documentElement.dataset.theme='light'}if(/(?:^|;\\s*)detent\\.in=1/.test(document.cookie))document.documentElement.dataset.in=''`
 
 const BEACON = process.env.NEXT_PUBLIC_CF_BEACON
+const GA = process.env.NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_GA_ID : undefined
+
+const tag = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${GA}')`
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable}`} data-theme="light" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: theme }} />
+        {GA && <script dangerouslySetInnerHTML={{ __html: tag }} />}
+        {GA && <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA}`} />}
         {BEACON && <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: BEACON })} />}
       </head>
       <body>
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   )

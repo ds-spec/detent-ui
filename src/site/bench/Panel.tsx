@@ -8,6 +8,7 @@ import type { Knob } from '@/catalog/knobs'
 import { Check, Copy } from '@/lab/icons'
 import { Stepper } from '@/lab/components/stepper/Stepper'
 import { Switch } from '@/lab/ui/Switch'
+import { track } from '@/site/track'
 import { useBenchState } from './state'
 import { BTN, useSideNew } from '../shell/side'
 import type { Call } from './state'
@@ -220,6 +221,7 @@ function Usage({ api, props, knobs, value, flat = false }: { api: Api; props: Pr
   const all = lines.length ? [{ text: `<${api.component}` }, ...lines, { text: takesChildren ? '>' : '/>' }, ...(takesChildren ? [{ text: '  …' }, { text: `</${api.component}>` }] : [])] : [{ text: `<${api.component} />` }]
   const copy = () => {
     void navigator.clipboard?.writeText(all.map((l) => l.text).join('\n'))
+    track('copy_code', { item: api.component, file: 'props' })
     setCopied(true)
     setTimeout(() => setCopied(false), 1400)
   }

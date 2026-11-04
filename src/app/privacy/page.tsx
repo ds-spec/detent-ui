@@ -5,7 +5,7 @@ import { page } from '@/site/seo'
 
 export const metadata: Metadata = page({
   title: 'Privacy',
-  description: 'What Detent keeps about you, why, who helps run it, and how to have it removed. No ads, no tracking, nothing sold.',
+  description: 'What Detent keeps about you, why, who helps run it, and how to have it removed. No ads, nothing sold.',
   path: '/privacy',
   image: '/opengraph-image',
 })
@@ -42,7 +42,17 @@ export default function Privacy() {
         {
           id: 'not',
           title: 'What we don’t do',
-          body: <List items={['No advertising, and no ad or tracking cookies.', 'No analytics that follow you around: our visitor counts come from Cloudflare Web Analytics, which uses no cookies and doesn’t identify you.', 'We don’t sell or rent your data to anyone.', 'The live demos run in your browser or against a scripted demo. We don’t keep what you type into them.']} />,
+          body: <List items={['No advertising, and no ad cookies. Google Analytics’ advertising features are off.', 'We don’t sell or rent your data to anyone.', 'The live demos run in your browser or against a scripted demo. We don’t keep what you type into them.']} />,
+        },
+        {
+          id: 'analytics',
+          title: 'How we count visits',
+          body: (
+            <>
+              <P>Google Analytics shows us which pages people visit, which components and blocks they open, copy and install, what they search for, and when they start a purchase. That tells us what to make next. Cloudflare Web Analytics also counts visits, without cookies.</P>
+              <P>Google Analytics sets its own cookies to tell visits apart, and Google receives your IP address and browser details to do this, under its own privacy policy. You can block it with any content blocker, or with Google’s opt-out add-on, and the site works the same.</P>
+            </>
+          ),
         },
         {
           id: 'who',
@@ -54,6 +64,7 @@ export default function Privacy() {
                 items={[
                   'Dodo Payments takes payment as the merchant of record: your payment details, billing address and receipts are handled by them, under their privacy policy.',
                   'Cloudflare hosts the site, keeps standard request logs such as IP addresses to keep it running and secure, and counts visits in aggregate for our traffic numbers.',
+                  'Google Analytics counts visits and what people open, copy and buy, as described above.',
                   'Turso stores our database: accounts, purchases and keys.',
                   'Resend sends our emails: sign-in links and messages about your purchase.',
                   'GitHub, only if you choose to sign in with it.',
@@ -65,7 +76,7 @@ export default function Privacy() {
         {
           id: 'cookies',
           title: 'Cookies and storage',
-          body: <P>We use cookies only to keep you signed in. Your browser also remembers small preferences, like light or dark mode and whether the side index is open. None of it is used to track you.</P>,
+          body: <P>Our own cookies keep you signed in. Google Analytics sets its own to tell visits apart, as described above. Your browser also remembers small preferences, like light or dark mode, and your package manager.</P>,
         },
         {
           id: 'keep',

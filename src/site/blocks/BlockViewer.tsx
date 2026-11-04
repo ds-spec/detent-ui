@@ -1,5 +1,6 @@
 'use client'
 
+import { track } from '@/site/track'
 import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ComponentType, ReactNode } from 'react'
 import Link from 'next/link'
@@ -151,7 +152,10 @@ function BlockViewer({ b, go }: { b: Block; go: (id: string) => void }) {
           pro={isProBlock(b.id)}
           theme={shown}
           onReplay={() => setRun((r) => r + 1)}
-          onFull={() => window.open(`/full/blocks/${b.id}`, '_blank', 'noopener')}
+          onFull={() => {
+            track('open_full', { item: b.id })
+            window.open(`/full/blocks/${b.id}`, '_blank', 'noopener')
+          }}
           run={run}
           view={<Live id={b.id} />}
           code={<Code id={b.id} />}
@@ -380,6 +384,7 @@ function Usage({ b }: { b: Block }) {
           aria-label={copied ? 'Copied' : 'Copy usage'}
           onClick={() => {
             navigator.clipboard?.writeText(text).catch(() => {})
+            track('copy_code', { item: b.id, file: 'usage' })
             setCopied(true)
             setTimeout(() => setCopied(false), 1400)
           }}

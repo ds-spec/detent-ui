@@ -9,6 +9,7 @@ import { ENTRIES } from '@/catalog/meta'
 import { isProBlock, isProComponent } from '@/catalog/pro'
 import { FIRST_COMPONENT, installCommand, withManager } from '@/catalog/site'
 import { useManager } from './manager'
+import { track } from './track'
 import { clamp } from '@/lab/lib/detent'
 import { Layer, useDismiss } from '@/lab/lib/layer'
 
@@ -137,6 +138,7 @@ export function Palette({ open, onOpenChange, sound, toggleSound }: { open: bool
             icon: COPY,
             run: () => {
               void navigator.clipboard?.writeText(withManager(installCommand(here.id, here.free), manager)).catch(() => {})
+              track('copy_install', { item: here.id, manager, from: 'palette' })
               setDone(true)
               window.setTimeout(close, 620)
             },
@@ -214,13 +216,17 @@ export function Palette({ open, onOpenChange, sound, toggleSound }: { open: bool
     setPlace(p)
     setQuery('')
   }
+  const pick = (it: Item) => {
+    if (!it.id.startsWith('place-')) track('search', { search_term: query.trim().toLowerCase(), item: it.id })
+    it.run()
+  }
   const keys = (e: KeyboardEvent) => {
     const by = { ArrowDown: 1, ArrowUp: -1 }[e.key]
     if (by && items.length) {
       e.preventDefault()
       go((at + by + items.length) % items.length, e.repeat)
     }
-    if (e.key === 'Enter') items[at]?.run()
+    if (e.key === 'Enter' && items[at]) pick(items[at])
     if (e.key === 'Tab' && items[at]) {
       // Tab takes the ghost. If it was a place, you're now inside it.
       e.preventDefault()
@@ -338,7 +344,7 @@ export function Palette({ open, onOpenChange, sound, toggleSound }: { open: bool
                               mouse.current = { x: e.clientX, y: e.clientY }
                               if (!on) go(i)
                             }}
-                            onClick={() => it.run()}
+                            onClick={() => pick(it)}
                             className="relative flex cursor-default items-center gap-2 rounded-[8px] px-2.5"
                             style={{ height: ROW }}
                           >

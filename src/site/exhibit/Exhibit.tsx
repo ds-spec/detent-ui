@@ -10,6 +10,7 @@ import { DEMOS, preloadDemo } from '@/catalog/demos'
 import { CATEGORIES, ENTRIES } from '@/catalog/meta'
 import { SIZE } from '@/catalog/sizes'
 import { isProComponent } from '@/catalog/pro'
+import { track } from '@/site/track'
 import { Code as CodeIcon, Expand, Eye, Moon, Refresh, Sun } from '@/lab/icons'
 import { useTheme } from '@/lab/lib/hooks'
 import { Kbd } from '@/lab/ui/Kbd'
@@ -53,7 +54,10 @@ const HOLDS_HEIGHT = new Set(['checklist', 'readalong', 'secret', 'halo', 'slice
 
 const first = (s: string) => s.split(/(?<=\.)\s/)[0]
 /** Full screen is its own address, in its own tab, so it can be resized and shared. */
-const open = (id: string) => void window.open(`/full/components/${id}`, '_blank', 'noopener')
+const open = (id: string) => {
+  track('open_full', { item: id })
+  window.open(`/full/components/${id}`, '_blank', 'noopener')
+}
 
 /** Every component for the list down the side, family by family. */
 const RAIL: RailGroup[] = CATEGORIES.map((c) => ({

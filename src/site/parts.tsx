@@ -10,6 +10,7 @@ import { Kbd } from '@/lab/ui/Kbd'
 import { MANAGERS, isManaged, withManager } from '@/catalog/site'
 import { Popup } from '@/lab/components/popup/Popup'
 import { useManager } from './manager'
+import { track } from './track'
 import { BTN, useSideNew } from './shell/side'
 import { useSite } from './Providers'
 
@@ -137,6 +138,7 @@ export function CopyCommand({ command: given, fill = false, onCopy }: { command:
       /* Clipboard blocked: the command is still there to select. */
     }
     setCopied((n) => n + 1)
+    track('copy_install', { item: name, manager })
     onCopy?.()
     clearTimeout(timer.current)
     timer.current = window.setTimeout(() => setCopied(0), 1600)
