@@ -9,7 +9,7 @@ import { BLOCK_ORDER, KINDS } from '@/catalog/blocks'
 import { DEMOS } from '@/catalog/demos'
 import { CATEGORIES, ENTRIES } from '@/catalog/meta'
 import { PLANS, isProBlock, isProComponent } from '@/catalog/pro'
-import { SIZE } from '@/catalog/sizes'
+import { SIZE, TILE } from '@/catalog/sizes'
 import { TEMPLATES } from '@/catalog/templates'
 import { ArrowUpRight } from '@/lab/icons'
 import { Mini } from '../Mini'
@@ -147,7 +147,7 @@ function Tile({ card, shelf }: { card: Card; shelf: Shelf }) {
   return (
     <motion.div initial={reduce ? false : { opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-30px' }} transition={{ type: 'spring', stiffness: 260, damping: 32 }}>
       <Link ref={box} href={card.href} className="ring-focus group/tile block rounded-[16px] bg-[var(--mount)] p-2 shadow-[0_0_0_1px_var(--line)] transition-shadow duration-300 hover:shadow-[0_0_0_1px_var(--line-strong)]">
-        <div className="relative isolate aspect-[4/3] overflow-hidden rounded-[10px] shadow-[0_0_0_1px_var(--line)]" style={{ background: wellOf(card.tone) }}>
+        <div className="relative isolate aspect-[4/3] overflow-clip rounded-[10px] shadow-[0_0_0_1px_var(--line)]" style={{ background: wellOf(card.tone) }}>
           <div aria-hidden inert className="pointer-events-none absolute inset-0 transition-transform duration-500 [transition-timing-function:cubic-bezier(0.2,0.9,0.25,1)] group-hover/tile:scale-[1.025]">
             {near && (shelf === 'components' ? <ComponentPiece id={card.id} /> : <BlockPiece id={card.id} />)}
           </div>
@@ -206,8 +206,8 @@ function ComponentPiece({ id }: { id: string }) {
   return (
     <Mini pad={28} max={0.9}>
       {/* A demo that fills its parent has no size of its own here, so it gets its stage size to fill. */}
-      {e.bleed && SIZE[id] ? (
-        <div className="relative" style={{ width: SIZE[id][0], height: SIZE[id][1] }}>
+      {e.bleed && (TILE[id] ?? SIZE[id]) ? (
+        <div className="relative" style={{ width: (TILE[id] ?? SIZE[id])[0], height: (TILE[id] ?? SIZE[id])[1] }}>
           <Demo />
         </div>
       ) : (

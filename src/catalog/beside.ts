@@ -15,4 +15,5 @@ export const BESIDE: Record<string, string> = {
   chart: 'forecast', // The month behind you, and the cash ahead.
   trend: 'askchart', // A range you can trust, and a question to ask of it.
   carousel: 'region', // A run of places, and the wheel that picks one.
+  phrase: 'popup',
 }

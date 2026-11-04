@@ -29,6 +29,7 @@ export const SIZE: Record<string, [number, number]> = {
   chart: [760, 366],
   trend: [760, 366],
   carousel: [760, 490],
+  phrase: [600, 440],
   lens: [760, 390],
   extract: [902, 700],
   dates: [700, 452],
@@ -89,4 +90,8 @@ export const SPOT_SIZE: Record<string, [number, number]> = {
   answer: [420, 400],
   diff: [420, 312],
   approval: [364, 360],
+}
+
+export const TILE: Record<string, [number, number]> = {
+  region: [980, 600],
 }

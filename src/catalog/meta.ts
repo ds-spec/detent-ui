@@ -1577,6 +1577,23 @@ const ALL: Entry[] = [
     keys: [['Arrows', 'Open it, then move through the choices'], ['Enter', 'Choose'], ['Esc', 'Close without changing']],
   },
   {
+    id: 'phrase',
+    name: 'Phrase',
+    short: 'Settings that read like a sentence',
+    category: 'inputs',
+    feel: ['press', 'drag'],
+    tags: ['New', 'Keyboard'],
+    line: 'Settings written as one sentence. Only the words you can change are dark: tap a word to pick another, drag a number sideways to dial it, and the line under it says what your choice means.',
+    details: [
+      'Mix words and numbers in one sentence through `parts`: plain text, a choice with `options`, or a number with `min`, `max` and `step`.',
+      'A word opens a short menu under itself. A number rolls as you drag it, and a tap opens − and + for people who don’t drag.',
+      'Pass `says` to write the line under it from the current values, so people see what their choice does before they leave.',
+      'Only the part you change moves: it eases to its new width, the sentence flows around it, and the card eases if a line wraps.',
+      'Use `value` and `onChange` to control it, or `defaultValue` to let it keep its own state. With reduced motion every change is instant.',
+    ],
+    keys: [['Enter', 'Open a word'], ['Arrows', 'Move through choices, or step a number'], ['Shift + arrows', 'Step a number by ten'], ['Esc', 'Close']],
+  },
+  {
     id: 'announce',
     name: 'Announcement pill',
     short: 'The New pill above a headline',

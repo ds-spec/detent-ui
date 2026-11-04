@@ -24,4 +24,4 @@ export const UNLISTED = new Set([
   // 2026-11-01: the owner's cut from the board of 45.
   'scaffold', 'ask', 'images', 'signature', 'video', 'presence', 'checklist', 'secret', 'reveal', 'approval',
   // 2026-10-31: quality over quantity. No idea of their own, or a stronger piece covers them.
-  'versions', 'thinking', 'toasts', 'tags', 'rename', 'waitlist', 'files', 'tree', 'composer', 'meter', 'inbox', 'voice', 'undo','buttons', 'tabs', 'select', 'stepper', 'code', 'toaster', 'dialog', 'confirm', 'popover', 'tooltip', 'dropdown', 'context-menu', 'hovercard', 'combobox', 'command', 'sidebar', 'chips', 'retry', 'typing', 'bars', 'waffle', 'run', 'context'])
+  'versions', 'thinking', 'toasts', 'tags', 'rename', 'waitlist', 'files', 'tree', 'composer', 'meter', 'inbox', 'voice', 'undo','buttons', 'tabs', 'select', 'stepper', 'code', 'toaster', 'dialog', 'confirm', 'popover', 'tooltip', 'dropdown', 'context-menu', 'hovercard', 'combobox', 'command', 'sidebar', 'chips', 'retry', 'typing', 'bars', 'waffle', 'run', 'context', 'carousel'])

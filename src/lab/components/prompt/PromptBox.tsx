@@ -73,7 +73,6 @@ const ROW = 34
 const PAD = 10
 const FRAME = 18 + ROW + PAD
 const GAP = 24
-const R = ROW / 2 + PAD
 const REST = LINE * MIN_LINES + GAP
 const SHELF = 44
 const HEAD = 26
@@ -159,7 +158,7 @@ export function PromptBox({
   compact?: boolean
   ref?: Ref<PromptHandle>
 }) {
-  const r = compact ? 20 : R
+  const r = compact ? 16 : 22
   const [text, setText] = useState('')
   const [files, setFiles] = useState<Attachment[]>(initialFiles)
   const [mode, setMode] = useState(initialMode ?? modes[1]?.id ?? modes[0].id)

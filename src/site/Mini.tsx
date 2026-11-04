@@ -57,7 +57,7 @@ export function Mini({ children, pad = 14, max = 0.6, onReady }: { children: Rea
   }, [pad, max])
 
   return (
-    <div ref={outer} className="absolute inset-0 overflow-hidden">
+    <div ref={outer} className="absolute inset-0 overflow-clip">
       <div ref={inner} className="absolute left-1/2 top-1/2 w-max" style={{ transform: `translate(-50%, -50%) scale(${scale})`, opacity: scale ? 1 : 0 }}>
         {children}
       </div>

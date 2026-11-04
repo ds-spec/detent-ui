@@ -45,22 +45,18 @@ export const RELEASES: Release[] = [
     date: '2026-10-24',
     name: 'Free components rebuilt',
     title: 'The free components, rebuilt to the Pro bar',
-    line: 'Two new ones: a signature that a pencil writes as you type your name, and a voice note you can read along with. And thinking dots that play each step, and a voice meter made of dots.',
+    line: 'A new one: a voice note you can read along with, each word lighting as it’s spoken.',
     items: [
-      { label: 'Signature' },
       { label: 'Voice note', href: '/components/voicenote' },
-      { label: 'Thinking indicator' },
-      { label: 'Voice input' },
     ],
   },
   {
     date: '2026-10-24',
     name: 'Agent workspace',
     title: 'An agent workspace, the first app template',
-    line: 'A whole agent workspace to start from: sessions, a thread that shows its work, a composer that queues what you ask while it answers, reasoning set on a ramp of dots, and photos that open full size. And a prompt playground block, to compare models side by side.',
+    line: 'A whole agent workspace to start from: sessions, a thread that shows its work, a composer that queues what you ask while it answers, reasoning set on a ramp of dots, and photos that open full size.',
     items: [
       { label: 'Agent workspace template', href: '/templates/detent', pro: true },
-      { label: 'Prompt playground', pro: true },
     ],
   },
   {
@@ -70,18 +66,7 @@ export const RELEASES: Release[] = [
     line: 'The chart kit split into components you can take on their own, each with its own page, and all of them redrawn as instruments.',
     items: [
       { label: 'Goal numerals', href: '/components/rings' },
-      { label: 'Tick meter' },
       { label: 'Stat tiles', href: '/components/metric' },
-    ],
-  },
-  {
-    date: '2026-10-23',
-    name: 'Most asked-for pieces',
-    title: 'The most asked-for pieces',
-    line: 'The components people install a library for, each built to the same bar as the rest.',
-    items: [
-      { label: 'Live code block', pro: true },
-      { label: 'Toasts' },
     ],
   },
   {
@@ -95,23 +80,12 @@ export const RELEASES: Release[] = [
     ],
   },
   {
-    date: '2026-10-23',
-    name: 'Stateful surfaces',
-    title: 'Stateful surfaces',
-    line: 'The hard surfaces that take weeks to get right: a composer that formats as you write.',
-    items: [
-      { label: 'Rich composer' },
-    ],
-  },
-  {
     date: '2026-10-22',
     name: 'Agents and blocks',
     title: 'Agents, and whole screens',
     line: 'The components an AI product is made of, and the blocks they make together.',
     items: [
-      { label: 'Streaming answer', pro: true },
       { label: 'Run trace', href: '/components/trace', pro: true },
-      { label: 'Approval tray', href: '/components/approval', pro: true },
       { label: 'Prompt box', href: '/components/prompt' },
       { label: 'Typed date range', href: '/components/dates', pro: true },
       { label: 'Blocks', href: '/blocks/live-features' },
@@ -121,11 +95,9 @@ export const RELEASES: Release[] = [
     date: '2026-10-21',
     name: 'The first pieces',
     title: 'The first pieces',
-    line: 'Where it started: a file tree and the inputs around it.',
+    line: 'Where it started: the inputs a product is built on.',
     items: [
-      { label: 'File tree' },
       { label: 'Upload', href: '/components/upload' },
-      { label: 'Voice input' },
     ],
   },
 ]

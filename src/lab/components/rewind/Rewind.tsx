@@ -231,6 +231,7 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
     })
     if (root) {
       const r = root.getBoundingClientRect()
+      const scale = root.offsetWidth ? r.width / root.offsetWidth || 1 : 1
       const size_ = parseFloat(getComputedStyle(root).fontSize)
       words.forEach((w, n) => {
         const el = wordEls.current[n]
@@ -251,7 +252,7 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
             continue
           }
           const q = el.getBoundingClientRect()
-          const seat = { x: q.left - r.left, y: q.top - r.top }
+          const seat = { x: (q.left - r.left) / scale, y: (q.top - r.top) / scale }
           const old = seats.current.get(k)
           if (old && first && !reduce) {
             const was = drift.current.get(w.cells[0]) ?? { x: 0, y: 0 }
@@ -277,10 +278,11 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
         }
       }
       const q = prior?.getBoundingClientRect(), r = root.getBoundingClientRect()
-      const y = q ? q.top - r.top : 0
+      const scale = root.offsetWidth ? r.width / root.offsetWidth || 1 : 1
+      const y = q ? (q.top - r.top) / scale : 0
       mark.style.opacity = i === end ? '0' : '1'
-      mark.style.height = q ? `${q.height}px` : '1.3em'
-      mark.style.transform = `translate3d(${q ? q.right - r.left : 0}px,${y}px,0)`
+      mark.style.height = q ? `${q.height / scale}px` : '1.3em'
+      mark.style.transform = `translate3d(${q ? (q.right - r.left) / scale : 0}px,${y}px,0)`
       const pad = 48
       if (i !== end && (y < frame.scrollTop + pad || y > frame.scrollTop + frame.clientHeight - pad)) chase.current = clamp(y - frame.clientHeight / 2, 0, frame.scrollHeight - frame.clientHeight)
     }

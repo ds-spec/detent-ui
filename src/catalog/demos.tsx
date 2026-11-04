@@ -74,6 +74,7 @@ const FREE: Record<string, ComponentType> = {
   chart: lazy('chart', () => import('@/lab/demos/chart').then((m) => m.ChartDemo)),
   trend: lazy('trend', () => import('@/lab/demos/trend').then((m) => m.TrendDemo)),
   carousel: lazy('carousel', () => import('@/lab/demos/carousel').then((m) => m.CarouselDemo)),
+  phrase: lazy('phrase', () => import('@/lab/demos/phrase').then((m) => m.PhraseDemo)),
 }
 
 /** Starts downloading a demo before anything renders it, so it's there the moment it's asked for. */

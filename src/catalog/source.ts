@@ -52,6 +52,7 @@ export const FILES: Record<string, string[]> = {
   lens: ['../pro/components/lens/LensChart.tsx', 'lib/detent.ts'],
   sidebar: ['../pro/components/sidebar/AppSidebar.tsx', 'components/overlays/Tooltip.tsx', 'lib/layer.tsx'],
   carousel: ['components/carousel/Carousel.tsx', 'lib/detent.ts'],
+  phrase: ['components/phrase/Phrase.tsx'],
   toaster: ['components/toast/Toaster.tsx', 'lib/layer.tsx', 'ui/RollingText.tsx'],
   signature: ['components/signature/Signature.tsx'],
   video: ['../pro/components/video/VideoPlayer.tsx', 'components/overlays/DropdownMenu.tsx', 'components/overlays/Menu.tsx', 'components/overlays/Tooltip.tsx', 'lib/layer.tsx'],
