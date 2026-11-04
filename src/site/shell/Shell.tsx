@@ -107,7 +107,7 @@ export function Shell({ list, bar, children, bare = false }: { list: ReactNode; 
 }
 
 /** Whether the index is shown, kept in the browser so a hidden index stays hidden from page to page. */
-const INDEX_KEY = 'detent.index'
+const INDEX_KEY = 'detent.index.v2'
 const indexShown = () => {
   try {
     return localStorage.getItem(INDEX_KEY) === 'shown'
