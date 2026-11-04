@@ -10,11 +10,10 @@ import { BTN } from '../shell/side'
 import { Window } from './Studio'
 import type { Chrome } from './Studio'
 
-export type Device = 'desktop' | 'tablet' | 'phone'
+export type Device = 'desktop' | 'phone'
 
 /** The two devices a block is tried on: the width it's laid out at, the height of the screen, and the frame round it. */
 const DEVICES = {
-  tablet: { w: 768, h: 1024, bezel: 12, radius: 30 },
   phone: { w: 390, h: 844, bezel: 10, radius: 48 },
 } as const
 
@@ -25,12 +24,6 @@ const ICONS: Record<Device, ReactNode> = {
       <path d="M9 20h6M12 16.5V20" />
     </svg>
   ),
-  tablet: (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <rect x="5" y="3" width="14" height="18" rx="2.5" />
-      <path d="M11 18h2" />
-    </svg>
-  ),
   phone: (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
       <rect x="7" y="3" width="10" height="18" rx="2.5" />
@@ -38,7 +31,7 @@ const ICONS: Record<Device, ReactNode> = {
     </svg>
   ),
 }
-const NAMES: Record<Device, string> = { desktop: 'Desktop', tablet: 'Tablet', phone: 'Phone' }
+const NAMES: Record<Device, string> = { desktop: 'Desktop', phone: 'Phone' }
 
 /**
  * The stage a block or a template runs on, the same as a component's: Preview or Code on the left
@@ -56,7 +49,8 @@ export function DeviceStage({ title, chrome, mode, setMode, pro, theme, onReplay
         <ModesLine mode={mode} setMode={setMode} pro={pro} />
         <span className="flex items-center gap-1.5">
           <Devices device={device} setDevice={setDevice} />
-          <span aria-hidden className="mx-1 h-4 w-px bg-line-strong" />
+          {/* The device switch is for a laptop's screen; on a phone there's nothing to set it apart from. */}
+          <span aria-hidden className="mx-1 hidden h-4 w-px bg-line-strong sm:block" />
           <Tool small label="Replay" onClick={onReplay}>
             <motion.span key={run} className="flex" initial={{ rotate: -180 }} animate={{ rotate: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 22 }}>
               <Refresh size={15} />
@@ -86,7 +80,7 @@ export function DeviceStage({ title, chrome, mode, setMode, pro, theme, onReplay
   )
 }
 
-/** Desktop, tablet or phone: the same sunk track and raised plate as Preview / Code, icons only. */
+/** Desktop or phone: the same sunk track and raised plate as Preview / Code, icons only. */
 function Devices({ device, setDevice }: { device: Device; setDevice: (d: Device) => void }) {
   const id = useId()
   return (

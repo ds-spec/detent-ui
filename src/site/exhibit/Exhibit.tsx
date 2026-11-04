@@ -25,7 +25,7 @@ import { useSite } from '../Providers'
 import { BenchProvider } from '../bench/state'
 import { ProTag } from '../blocks/ProTag'
 import { Beside } from './Beside'
-import { Index } from './Index'
+import { MoreLike } from '../library/Library'
 import { Rail } from './Rail'
 import { Shell, Trail, scroller } from '../shell/Shell'
 import { BTN, useSideNew } from '../shell/side'
@@ -65,13 +65,13 @@ const RAIL: RailGroup[] = CATEGORIES.map((c) => ({
 })).filter((g) => g.items.length)
 
 /** A component, small, in its family's well: what the list shows beside a name you point at. */
-function peek(id: string, onReady: () => void) {
+function peek(id: string, onReady: () => void, big = false) {
   const x = ENTRIES.find((e) => e.id === id)
   const Demo = DEMOS[id]
   if (!x || !Demo) return null
   return (
     <div className="absolute inset-0" style={{ background: wellOf(FAMILY_TONE[x.category] ?? 'blue') }}>
-      <Mini pad={14} max={0.55} onReady={onReady}>
+      <Mini pad={big ? 72 : 14} max={big ? 1 : 0.55} onReady={onReady}>
         {/* A demo that fills its parent has no size of its own here, so it gets its stage size to fill. */}
         {x.bleed && SIZE[id] ? (
           <div className="relative" style={{ width: SIZE[id][0], height: SIZE[id][1] }}>
@@ -119,7 +119,6 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
   const { tick } = useSite()
   const [run, setRun] = useState(0)
   const [inspect, setInspect] = useState(false)
-  const [index, setIndex] = useState(false)
   const page = useTheme()
   const stage = useRef<HTMLElement>(null)
   // How tall the demo gets on a phone, where it sets the stage's height. It only grows, so a demo
@@ -222,13 +221,12 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
   useEffect(() => {
     const key = (ev: KeyboardEvent) => {
       const t = ev.target instanceof Element ? ev.target : document.body
-      if (ev.metaKey || ev.ctrlKey || ev.altKey || ev.defaultPrevented || index) return
+      if (ev.metaKey || ev.ctrlKey || ev.altKey || ev.defaultPrevented) return
       if (t.closest('input, textarea, [contenteditable], [role=listbox], [role=tree], [role=slider], [role=spinbutton], [role=dialog], [role=grid], [role=radiogroup]')) return
       const k = ev.key.toLowerCase()
       const { go: to, prev: p, next: n } = latest.current
       if (k === 'arrowright' || k === 'j') to(n.id)
       else if (k === 'arrowleft' || k === 'k') to(p.id)
-      else if (k === '/') setIndex(true)
       else if (k === 'i') setInspect((v) => !v)
       else if (k === 'p') open(id)
       else if (k === 'escape') setInspect(false)
@@ -237,11 +235,11 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
     }
     window.addEventListener('keydown', key)
     return () => window.removeEventListener('keydown', key)
-  }, [index])
+  }, [])
 
   const side = useSideNew()
   return (
-    <Shell list={<Rail label="Components" groups={RAIL} current={id} onPick={go} preview={peek} />} bar={<Trail steps={['Components', family.name, e.name]} />}>
+    <Shell bare list={<Rail label="Components" groups={RAIL} current={id} onPick={go} preview={peek} />} bar={<Trail steps={['Components', family.name, e.name]} />}>
     <main className="mx-auto max-w-[1280px] px-4 pb-20 sm:px-8 lg:pb-0">
       <div className="pb-6 sm:pb-8">
       {/* One calm line: what this is, what it costs, and how to get it. */}
@@ -376,17 +374,11 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
       {/* What a free part usually sits beside, from Pro, running. */}
       {BESIDE[e.id] && <Beside key={`beside-${e.id}`} id={BESIDE[e.id]} />}
 
+      {/* The way on: more from the same family. */}
+      <MoreLike key={`more-${e.id}`} shelf="components" id={e.id} />
+
       <Pager prev={{ name: prev.name, href: prev.id }} next={{ name: next.name, href: next.id }} onPick={go} />
 
-      <Index
-        open={index}
-        current={id}
-        onClose={() => setIndex(false)}
-        onPick={(to) => {
-          setIndex(false)
-          go(to)
-        }}
-      />
       </div>
     </main>
     </Shell>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
@@ -13,7 +13,8 @@ import { Header } from '../Header'
 import { Mark, ThemeButton } from '../parts'
 import { useSite } from '../Providers'
 import { SideNext } from './SideNext'
-import { useSideNew } from './side'
+import { BTN, useSideNew } from './side'
+import { PanelIcon, STRIP_GAP, STRIP_W, Strip } from './Strip'
 
 /*
  * The library's own pages, as an app. The sidebar is the frame: the mark, the way to each part
@@ -38,11 +39,12 @@ const NAV = [
 /** The scrolling panel, for anything that needs to scroll the page. */
 export const scroller = () => document.querySelector<HTMLElement>('[data-scroller]')
 
-export function Shell({ list, bar, children }: { list: ReactNode; bar: ReactNode; children: ReactNode }) {
+export function Shell({ list, bar, children, bare = false }: { list: ReactNode; bar: ReactNode; children: ReactNode; /** The page has the whole window: no sidebar, and the list waits in a drawer behind one button. */ bare?: boolean }) {
   const path = usePathname()
   const { openSearch } = useSite()
   const side = useSideNew()
   const rail = (list as { props?: { groups?: RailGroup[]; current?: string; onPick?: (id: string) => void; preview?: (id: string, onReady: () => void) => ReactNode; label?: string } } | null)?.props
+  if (bare && rail?.groups) return <Bare rail={rail as Required<NonNullable<typeof rail>>}>{children}</Bare>
   return (
     <div className="lg:fixed lg:inset-0 lg:grid lg:grid-cols-[272px_minmax(0,1fr)]" style={{ background: 'var(--shell)' }}>
       <div className="lg:hidden">
@@ -99,6 +101,86 @@ export function Shell({ list, bar, children }: { list: ReactNode; bar: ReactNode
           </div>
           {children}
         </div>
+      </div>
+    </div>
+  )
+}
+
+/** Whether the index is shown, kept in the browser so a hidden index stays hidden from page to page. */
+const INDEX_KEY = 'detent.index'
+const indexShown = () => {
+  try {
+    return localStorage.getItem(INDEX_KEY) !== 'hidden'
+  } catch {
+    return true
+  }
+}
+const onIndexChange = (on: () => void) => {
+  window.addEventListener('storage', on)
+  window.addEventListener(INDEX_KEY, on)
+  return () => {
+    window.removeEventListener('storage', on)
+    window.removeEventListener(INDEX_KEY, on)
+  }
+}
+const showIndex = (v: boolean) => {
+  try {
+    localStorage.setItem(INDEX_KEY, v ? 'shown' : 'hidden')
+  } catch {}
+  window.dispatchEvent(new Event(INDEX_KEY))
+}
+
+/**
+ * The page beside the index: every piece numbered on a ruler in a panel down the left, to point
+ * at for a live look or click, and to hide with one press. Along the top, one quiet bar: the mark and the way
+ * back to the library's shelf on the left, search and theme on the right. At the foot, more from
+ * the same family. Below a laptop the site's header comes back and the strip steps aside.
+ */
+function Bare({ rail, children }: { rail: { groups: RailGroup[]; current: string; onPick: (id: string) => void; preview?: (id: string, onReady: () => void) => ReactNode; label?: string }; children: ReactNode }) {
+  const { openSearch } = useSite()
+  const label = rail.label ?? 'Components'
+  // The index down the side only has room from a laptop up, and stays hidden once you've hidden it.
+  const [wide, setWide] = useState(false)
+  const shown = useSyncExternalStore(onIndexChange, indexShown, () => true)
+  useEffect(() => {
+    const m = matchMedia('(min-width: 1024px)')
+    const on = () => setWide(m.matches)
+    on()
+    m.addEventListener('change', on)
+    return () => m.removeEventListener('change', on)
+  }, [])
+  const tool = 'ring-focus grid size-9 place-items-center rounded-[10px] text-ink-3 transition-[background-color,color,transform] duration-150 hover:bg-[var(--shell-hover)] hover:text-ink active:scale-[0.94]'
+  return (
+    <div className="lg:fixed lg:inset-0 lg:p-2 lg:transition-[padding] lg:duration-300 lg:[transition-timing-function:cubic-bezier(0.2,0.9,0.25,1)]" style={{ background: 'var(--shell)', paddingLeft: wide && shown ? STRIP_W + STRIP_GAP * 2 : undefined }}>
+      <div className="lg:hidden">
+        <Header />
+      </div>
+      <Strip groups={rail.groups} current={rail.current} onPick={rail.onPick} preview={rail.preview} label={label} open={shown} onHide={() => showIndex(false)} />
+      <div data-scroller className="relative lg:h-full lg:overflow-y-auto lg:rounded-[18px] lg:[scrollbar-width:thin]" style={{ background: 'var(--panel)', boxShadow: 'var(--panel-edge)' }}>
+        <div className="sticky top-0 z-30 hidden h-14 items-center gap-1 px-4 lg:flex" style={{ background: 'color-mix(in oklch, var(--panel) 86%, transparent)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
+          {!shown && (
+            <button type="button" onClick={() => showIndex(true)} aria-label="Show the index" title="Show the index" className={`${tool} mr-1`}>
+              <PanelIcon />
+            </button>
+          )}
+          <Link href="/" aria-label="Detent home" className="ring-focus flex items-center gap-2 rounded-[8px] px-1.5 py-1">
+            <Mark />
+            <span className="text-[15px] font-medium tracking-[-0.02em] text-ink">Detent</span>
+          </Link>
+          <span aria-hidden className="mx-1.5 text-ink-3/50">/</span>
+          <Link href={`/${label.toLowerCase()}`} className="ring-focus group/back flex h-9 items-center gap-1.5 rounded-[10px] px-2 text-[14px] text-ink-3 transition-colors hover:bg-[var(--shell-hover)] hover:text-ink">
+            {label}
+          </Link>
+          <span className="flex-1" />
+          <button type="button" onClick={openSearch} data-search aria-label="Search (⌘K)" className={tool}>
+            <Search size={15} />
+          </button>
+          <ThemeButton />
+          <Link href="/pro" className={`ring-focus ml-1.5 flex h-8 items-center rounded-[9px] px-3 text-[13px] font-medium transition-transform duration-150 active:scale-[0.97] ${BTN.accent}`}>
+            Get Pro
+          </Link>
+        </div>
+        {children}
       </div>
     </div>
   )

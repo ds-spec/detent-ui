@@ -19,12 +19,13 @@ export type RailGroup = { id: string; name: string; icon?: ReactNode; color?: st
 /** Where each list was left, so moving between pages doesn't send it back to the top. */
 const left = new Map<string, number>()
 
-type Preview = (id: string, onReady: () => void) => ReactNode
+type Preview = (id: string, onReady: () => void, big?: boolean) => ReactNode
 
 /**
  * Point at a name for a moment and a small live preview of it opens beside the list. Returns the
  * handlers for each row and the card itself, so any list down the side can have it.
  */
+export type { Preview }
 export function usePeek(items: RailItem[], preview?: Preview) {
   const reduce = useReducedMotion()
   const [peek, setPeek] = useState<{ id: string; y: number; x: number } | null>(null)
@@ -78,7 +79,10 @@ export function usePeek(items: RailItem[], preview?: Preview) {
               ))}
             </div>
             <div className="px-3.5 pb-3 pt-2.5 shadow-[inset_0_1px_0_var(--line)]">
-              <p className="truncate text-[13px] text-ink">{peeked?.name}</p>
+              <p className="flex items-center gap-2 text-[13px] text-ink">
+                <span className="truncate">{peeked?.name}</span>
+                {peeked?.pro && <span className="ml-auto shrink-0 rounded-[5px] bg-[var(--accent)] px-1.5 text-[10.5px] font-medium leading-[17px] text-white">Pro</span>}
+              </p>
               </div>
           </motion.div>
         )}

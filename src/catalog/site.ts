@@ -13,8 +13,8 @@ export const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.NODE_ENV =
  * Where the library opens. The site's own links go straight here rather than through the
  * /components and /blocks redirects, which those pages keep for typed URLs.
  */
-export const FIRST_COMPONENT = '/components/region'
-export const FIRST_BLOCK = '/blocks/live-features'
+export const FIRST_COMPONENT = '/components'
+export const FIRST_BLOCK = '/blocks'
 
 /** The AI SDK page and everything that points to it, set aside for now. True brings it all back. */
 export const AI_SDK: boolean = false

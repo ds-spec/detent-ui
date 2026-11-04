@@ -26,6 +26,8 @@ import { Pager } from '../shell/Pager'
 import { Shell, Trail } from '../shell/Shell'
 import { useWant } from '../shell/want'
 import { TEMPLATE_RAIL } from './rail'
+import { TemplatePiece } from '../library/Library'
+import { wellOf } from '../wells'
 
 /** The template, scrolling in its own window, kept out of the viewer's renders so resizing stays smooth. */
 const Page = memo(function Page({ id, scroller, onScroll, theme }: { id: string; scroller: RefObject<HTMLDivElement | null>; onScroll: () => void; theme?: 'light' | 'dark' }) {
@@ -40,13 +42,21 @@ const Page = memo(function Page({ id, scroller, onScroll, theme }: { id: string;
  * The templates' layout: the frame stays put and only what's in it changes. It holds the list of
  * templates and each template; the running app at /live is the one page with no frame at all.
  */
+/** A template, small, on its well: what the strip shows beside a mark you point at. */
+const peekTemplate = (id: string, onReady: () => void) => (
+  <div className="absolute inset-0" style={{ background: wellOf('violet') }}>
+    <TemplatePiece id={id} onReady={onReady} />
+  </div>
+)
+
 export function TemplateExhibit({ children }: { children: ReactNode }) {
   const [, , slug = '', own] = usePathname().split('/')
   const { id, go } = useWant(slug, '/templates')
   const t = template(id)
-  if (own || (id && !t)) return children
+  // The shelf itself is the library's page, drawn by the route.
+  if (own || !slug || (id && !t)) return children
   return (
-    <Shell list={<Rail label="Templates" groups={TEMPLATE_RAIL} current={id} onPick={go} />} bar={<Trail steps={t ? ['Templates', t.name] : ['Templates']} />}>
+    <Shell bare list={<Rail label="Templates" groups={TEMPLATE_RAIL} current={id} onPick={go} preview={peekTemplate} />} bar={<Trail steps={t ? ['Templates', t.name] : ['Templates']} />}>
       {t && <TemplateViewer key={t.id} id={t.id} go={go} />}
       {/* The list's page while it's the one open; a template's own part draws nothing. */}
       <div className="contents" style={{ display: id === slug ? undefined : 'none' }}>

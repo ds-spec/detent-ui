@@ -29,6 +29,8 @@ import type { RailGroup } from '../exhibit/Rail'
 import { Backdrop, Window } from './Studio'
 import { DeviceStage } from './DeviceStage'
 import { useSideNew } from '../shell/side'
+import { BlockPiece, MoreLike } from '../library/Library'
+import { wellOf } from '../wells'
 
 /** Widths the frame clicks into as you drag it: the sizes a screen most often meets. */
 const DETENTS = [
@@ -52,6 +54,13 @@ const movesTo = (go: (id: string) => void, id: string) => (e: React.MouseEvent) 
 const KIND_LOOK = { app: { icon: <Layers size={12} />, color: 'var(--data)' }, flow: { icon: <Node size={12} />, color: 'var(--agents)' }, section: { icon: <Note size={12} />, color: 'var(--marketing)' } } as const
 const RAIL: RailGroup[] = BLOCK_GROUPS.filter((g) => g.items.length).map((g) => ({ id: g.k, name: `${KINDS[g.k]}s`, ...KIND_LOOK[g.k], items: g.items.map((b) => ({ id: b.id, name: b.name, line: b.short, pro: isProBlock(b.id), free: !isProBlock(b.id) })) }))
 
+/** A block, small, on its well: what the strip shows beside a mark you point at. */
+const peekBlock = (id: string, onReady: () => void) => (
+  <div className="absolute inset-0" style={{ background: wellOf('blue') }}>
+    <BlockPiece id={id} onReady={onReady} />
+  </div>
+)
+
 /**
  * The blocks' layout: the frame stays put and only the block in it changes, so moving between them
  * is one continuous page. `children` is the route's own part, which adds nothing visible.
@@ -69,8 +78,11 @@ export function BlockExhibit({ children }: { children: ReactNode }) {
   }, [router, next, prev])
   if (!b) return children
   return (
-    <Shell list={<Rail label="Blocks" groups={RAIL} current={b.id} onPick={go} />} bar={<Trail steps={['Blocks', `${KINDS[b.kind]}s`, b.name]} />}>
+    <Shell bare list={<Rail label="Blocks" groups={RAIL} current={b.id} onPick={go} preview={peekBlock} />} bar={<Trail steps={['Blocks', `${KINDS[b.kind]}s`, b.name]} />}>
       <BlockViewer key={b.id} b={b} go={go} />
+      <div className="mx-auto max-w-[1280px] px-4 pb-24 sm:px-8">
+        <MoreLike key={`more-${b.id}`} shelf="blocks" id={b.id} />
+      </div>
       {children}
     </Shell>
   )
