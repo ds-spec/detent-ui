@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "detent",
   "account_id": "e899bae6a5bc4e8bdb660ca2496cd339",
-  "workers_dev": true,
+  "workers_dev": false,
   "routes": [
     { "pattern": "detentui.com", "custom_domain": true }
   ],
