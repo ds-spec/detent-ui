@@ -25,7 +25,7 @@ export async function askForLink(_: LinkState, form: FormData): Promise<LinkStat
   }
 }
 
-/** Off to GitHub or Google; they send the person back through /api/auth, signed in, to where they were going. */
+/** Off to GitHub; it sends the person back through /api/auth, signed in, to where they were going. */
 export async function signInWith(form: FormData) {
   const provider = String(form.get('provider')) as Provider
   if (!(provider in socialProviders())) redirect('/account')

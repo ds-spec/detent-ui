@@ -10,29 +10,29 @@ import { askForLink, deleteKey, makeKey, signInWith, type KeyState, type LinkSta
 import type { Provider } from '@/lib/account/auth'
 import { safeNext, type Next } from '@/lib/account/next'
 import { BrandMark } from '@/lab/blocks/kit/AppIcon'
-import { ArrowLeft, ArrowRight, ArrowUpRight, Key, Lock, Mail, Plus, Terminal } from '@/lab/blocks/kit/icons'
+import { ArrowLeft, ArrowRight, ArrowUpRight, Key, Mail, Plus, Terminal } from '@/lab/blocks/kit/icons'
 import { Check, Copy } from '@/lab/icons'
 import { ease } from '@/lab/lib/motion'
 import { DetentMark } from '@/lab/ui/DetentMark'
 import { Bloom, DrawnCheck } from '@/lab/ui/Outcome'
 import { Spinner } from '@/lab/ui/Spinner'
 import { BTN } from '@/site/shell/side'
-import { Field } from './Field'
-import { ProBadge } from './ProBadge'
+import { Light } from './Light'
+import { SMALL } from './Settings'
 
 /*
  * Signing in and the account, set the way Apple sets its own: one quiet surface per step, type that
- * does the work, a single field with its arrow inside, white plates for the other ways in, and
+ * does the work, two quiet fields and one button, white plates for the other ways in, and
  * nothing that moves without a reason.
  */
-const PRIMARY = 'ring-focus grid h-12 items-center rounded-[12px] bg-ink text-callout font-medium text-surface shadow-[inset_0_1px_0_rgb(255_255_255/0.14),0_1px_2px_rgb(0_0_0/0.18)] transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-60'
-const PLATE = `ring-focus relative grid h-12 w-full items-center rounded-[12px] ${BTN.plate} text-callout font-medium transition-[background-color,transform] duration-150 hover:bg-surface-2 active:scale-[0.98] disabled:opacity-70`
+const PRIMARY = 'ring-focus grid h-10 items-center rounded-[10px] bg-ink text-[14px] font-medium text-surface shadow-[inset_0_1px_0_rgb(255_255_255/0.14),0_1px_2px_rgb(0_0_0/0.18)] transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-60'
+const PLATE = `ring-focus relative grid h-10 w-full items-center rounded-[10px] ${BTN.plate} text-[14px] font-medium transition-[background-color,transform] duration-150 hover:bg-surface-2 active:scale-[0.98] disabled:opacity-70`
 const QUIET = 'ring-focus flex h-8 items-center gap-1.5 rounded-[8px] px-2.5 text-footnote text-ink-3 transition-colors duration-150 hover:bg-[color-mix(in_oklch,var(--ink)_7%,transparent)] hover:text-ink'
-/* The field, Apple's way: its label sits inside and rises as you type. 16px on phones, so iOS doesn't zoom in. */
-const FIELD = 'peer block h-[52px] w-full rounded-[12px] px-4 pb-1.5 pt-[21px] text-[16px] text-ink outline-none transition-[background-color,box-shadow] duration-150 sm:text-body'
-const FIELD_IDLE = 'bg-[color-mix(in_oklch,var(--ink)_4.5%,transparent)] hover:bg-[color-mix(in_oklch,var(--ink)_6%,transparent)] focus:bg-plate focus:shadow-[0_0_0_1px_color-mix(in_oklch,var(--accent)_55%,transparent),0_0_0_4px_color-mix(in_oklch,var(--accent)_14%,transparent)]'
-const FIELD_ERROR = 'bg-plate shadow-field-error'
-const FLOAT = 'pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[16px] text-ink-3 transition-all duration-150 ease-out sm:text-body peer-focus:top-[16px] peer-focus:text-[11.5px] sm:peer-focus:text-[11.5px] peer-[:not(:placeholder-shown)]:top-[16px] peer-[:not(:placeholder-shown)]:text-[11.5px] sm:peer-[:not(:placeholder-shown)]:text-[11.5px]'
+/* The field, compact the way Vercel and Stripe set theirs: a hairline, a label above, 16px on phones so iOS doesn't zoom in. */
+const FIELD = 'block h-10 w-full rounded-[10px] px-3 text-[16px] text-ink outline-none transition-[box-shadow] duration-150 placeholder:text-ink-3 sm:text-[14px]'
+const FIELD_IDLE = 'bg-surface shadow-[inset_0_0_0_1px_var(--line-strong)] hover:shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--ink)_28%,transparent)] focus:shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--accent)_70%,transparent),0_0_0_3px_color-mix(in_oklch,var(--accent)_16%,transparent)]'
+const FIELD_ERROR = 'bg-surface shadow-field-error'
+const LABEL = 'mb-1.5 block text-[13px] font-medium text-ink-2'
 const LINK = 'ring-focus rounded-[4px] text-[var(--accent-ink)] underline decoration-[color-mix(in_oklch,var(--accent)_35%,transparent)] underline-offset-2 hover:decoration-[var(--accent-ink)]'
 const ACCENT_TILE = 'bg-[linear-gradient(180deg,color-mix(in_oklch,var(--accent),white_14%),var(--accent))] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_8px_20px_-8px_color-mix(in_oklch,var(--accent)_70%,transparent)]'
 
@@ -59,9 +59,9 @@ function Busy({ busy, children }: { busy: boolean; children: ReactNode }) {
 export function AuthHead({ title, lead, mark = true }: { title: string; lead: ReactNode; mark?: boolean }) {
   return (
     <>
-      {mark && <DetentMark size={44} className="mb-7 drop-shadow-[0_6px_14px_rgb(0_0_0/0.16)]" />}
-      <h1 className="text-[28px] font-normal leading-[34px] tracking-[-0.03em] text-ink sm:text-[32px] sm:leading-[38px]">{title}</h1>
-      <p className="mt-2.5 text-callout leading-[1.55] text-ink-3">{lead}</p>
+      {mark && <DetentMark size={34} className="mb-5" />}
+      <h1 className="text-[22px] font-semibold leading-[28px] tracking-[-0.03em] text-ink">{title}</h1>
+      <p className="mt-1.5 text-[14px] leading-[1.5] text-ink-3">{lead}</p>
     </>
   )
 }
@@ -83,133 +83,47 @@ function Stage({ id, children }: { id: string; children: ReactNode }) {
   )
 }
 
-/* ───────────────────────── Beside the form: what's on the other side ───────────────────────── */
+/* ───────────────────────── The card, over the light ───────────────────────── */
 
 /** The plan someone is on their way to buy. */
 export type Buying = { id: 'pro' | 'all'; name: string; price: number; line: string; features: string[] }
 
 /**
- * Laid out as Detent's Sign in block: the form on the left, and on the right what's waiting once
- * you're in. Below a laptop the form has the screen to itself.
+ * Every signed-out step sits on one white card floating over Detent's midnight light, the way
+ * Stripe and Clerk set theirs: the light is the brand moment, and the card stays plain. On the way
+ * to buy, a slim strip above the card says what comes after.
  */
-function Split({ label, panel, children }: { label: string; panel: ReactNode; children: ReactNode }) {
+function Split({ plan, children }: { plan?: Buying; children: ReactNode }) {
   return (
-    <div className="mx-auto grid min-h-[calc(100svh-72px)] max-w-[1440px] lg:grid-cols-2 lg:gap-3 lg:pb-3">
-      <div className="flex flex-col justify-center pb-28 pt-12 lg:pb-24">
-        <div className="mx-auto w-full max-w-[360px]">{children}</div>
+    <div className="relative isolate -mx-5 grid min-h-[calc(100svh-72px)] place-items-center overflow-hidden px-4 pb-16 pt-10 sm:-mx-6 lg:mx-0 lg:mb-3 lg:rounded-[20px]">
+      <Light />
+      <div className="relative w-full max-w-[400px]">
+        {plan && (
+          <p className="mx-auto mb-4 flex w-fit items-center gap-2 rounded-full bg-white/12 px-3.5 py-1.5 text-[13px] text-white shadow-[inset_0_0_0_1px_rgb(255_255_255/0.16)] backdrop-blur-md">
+            <span className="text-white/70">Next, checkout</span>
+            <span className="text-white/40">·</span>
+            <span className="font-medium">{plan.name}</span>
+            <span className="tnum text-white/70">${plan.price}</span>
+          </p>
+        )}
+        <div className="overflow-hidden rounded-[16px] bg-surface text-ink shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_28px_70px_-24px_rgb(2_6_40/0.7),0_10px_24px_-12px_rgb(2_6_40/0.4)]">{children}</div>
+        <p className="mt-5 text-center text-[12px] text-white/65">Pro follows your email · You stay signed in for 30 days</p>
       </div>
-      {/* Blue smoke, with the panel's glass over it. */}
-      <aside aria-label={label} className="relative hidden items-center justify-center overflow-hidden rounded-[18px] px-10 lg:flex">
-        <Field />
-        <div className="relative w-full max-w-[420px]">{panel}</div>
-      </aside>
     </div>
   )
 }
 
-/** Words not shown until you're in: the line's shape, without the line. */
-const Bar = ({ w, thin = false }: { w: string; thin?: boolean }) => <span aria-hidden className={`block rounded-full bg-[color-mix(in_oklch,var(--ink)_9%,transparent)] ${thin ? 'h-1.5' : 'h-2'}`} style={{ width: w }} />
+/** The card's own padding, for what sits on it. */
+const Body = ({ children }: { children: ReactNode }) => <div className="px-6 pb-7 pt-7 sm:px-8 sm:pt-8">{children}</div>
 
-/** The line under the panel, which follows where you are: hidden, waiting on the link, checking. */
-function Note({ icon, text }: { icon: ReactNode; text: string }) {
-  return (
-    <p className="mt-4 grid h-5 text-caption text-white/80">
-      <AnimatePresence initial={false}>
-        <motion.span key={text} className="col-start-1 row-start-1 flex items-center gap-1.5" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { duration: 0.3, ease: ease.out } }} exit={{ opacity: 0, transition: { duration: 0.15 } }}>
-          {icon}
-          {text}
-        </motion.span>
-      </AnimatePresence>
-    </p>
-  )
-}
-
-const KEY_ROWS = [
-  { when: '2h', name: '30%', sub: '62%' },
-  { when: 'Yesterday', name: '18%', sub: '50%' },
-  { when: 'Mon', name: '36%', sub: '58%' },
-]
-
-/** Your account as it'll be: the badge, the keys and the install, their words redacted. */
-function AccountPanel({ note, icon }: { note: string; icon: ReactNode }) {
-  return (
-    <>
-      <p className="flex items-center gap-2 text-footnote text-white/90">
-        <DetentMark size={18} />
-        Your account
-      </p>
-      <h2 className="mt-4 text-title text-white">Your keys are waiting</h2>
-      <p className="mt-1.5 text-callout text-white/80">Pro, the keys that install it, and every update, on one account.</p>
-      <div className="mt-7 overflow-hidden rounded-[14px] bg-surface/[0.94] backdrop-blur-xl shadow-[0_30px_70px_-30px_rgb(0_0_0/0.65),0_0_0_1px_rgb(255_255_255/0.08)]">
-        <div className="flex h-[60px] items-center gap-3 px-4">
-          <span aria-hidden className="size-8 shrink-0 rounded-full bg-surface-3" />
-          <span className="grid min-w-0 flex-1 gap-1.5">
-            <Bar w="34%" />
-            <Bar w="52%" thin />
-          </span>
-          <ProBadge plan="pro" />
-        </div>
-        {KEY_ROWS.map((k) => (
-          <div key={k.when} className="flex h-[60px] items-center gap-3 px-4 shadow-[inset_0_1px_0_var(--line)]">
-            <span className="grid size-8 shrink-0 place-items-center rounded-[8px] bg-[color-mix(in_oklch,var(--ink)_5%,transparent)] text-ink-3">
-              <Key size={14} />
-            </span>
-            <span className="grid min-w-0 flex-1 gap-1.5">
-              <Bar w={k.name} />
-              <Bar w={k.sub} thin />
-            </span>
-            <span className="tnum shrink-0 self-start pt-[13px] text-caption text-ink-3">{k.when}</span>
-          </div>
-        ))}
-        <div className="flex h-[52px] items-center gap-2.5 bg-[color-mix(in_oklch,var(--ink)_2.5%,transparent)] px-4 font-mono text-caption text-ink-2 shadow-[inset_0_1px_0_var(--line)]" translate="no">
-          <Terminal size={13} className="shrink-0 text-ink-3" />
-          npx shadcn add @detent-pro/
-          <Bar w="56px" />
-        </div>
-      </div>
-      <Note icon={icon} text={note} />
-    </>
-  )
-}
-
-/** On the way to buy: the plan, its price and everything in it, so the step before checkout says what it's for. */
-function BuyPanel({ plan, note, icon }: { plan: Buying; note: string; icon: ReactNode }) {
-  return (
-    <>
-      <p className="flex items-center gap-2 text-footnote text-white/90">
-        <DetentMark size={18} />
-        You’re getting
-      </p>
-      {/* In the glass: the badge carries the plan's name, so the heading is the price. On the wallpaper the badge would be blue on blue. */}
-      <div className="mt-4 overflow-hidden rounded-[14px] bg-surface/[0.94] backdrop-blur-xl shadow-[0_30px_70px_-30px_rgb(0_0_0/0.65),0_0_0_1px_rgb(255_255_255/0.08)]">
-        <div className="px-5 pb-5 pt-5">
-          <ProBadge plan={plan.id} size="lg" />
-          <h2 className="sr-only">{plan.name}</h2>
-          <p className="mt-4 flex items-baseline gap-2">
-            <span className="tnum text-large text-ink">${plan.price}</span>
-            <span className="text-footnote text-ink-3">one payment</span>
-          </p>
-          <p className="mt-1 text-callout text-ink-3">{plan.line}</p>
-        </div>
-        <ul>
-          {plan.features.map((f) => (
-            <li key={f} className="flex min-h-[46px] items-center gap-3 px-5 py-3 text-footnote text-ink shadow-[inset_0_1px_0_var(--line)]">
-              <span className="grid size-5 shrink-0 place-items-center rounded-full bg-[color-mix(in_oklch,var(--accent)_14%,transparent)] text-[var(--accent-ink)]">
-                <Check size={11} strokeWidth={3} />
-              </span>
-              {f}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <Note icon={icon} text={note} />
-    </>
-  )
-}
+/** The grey band across the card's foot, for the one other way in. */
+const Foot = ({ children }: { children: ReactNode }) => (
+  <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 bg-[color-mix(in_oklch,var(--ink)_3.5%,transparent)] px-6 py-3.5 text-[13px] text-ink-3 shadow-[inset_0_1px_0_var(--line)] sm:px-8">{children}</div>
+)
 
 /* ───────────────────────── The form ───────────────────────── */
 
-const NAMES: Record<Provider, string> = { github: 'GitHub', google: 'Google' }
+const NAMES: Record<Provider, string> = { github: 'GitHub' }
 
 /** How this browser signed in last time, on the way that was. */
 const LastUsed = () => <span className="rounded-full bg-[color-mix(in_oklch,var(--accent)_12%,transparent)] px-2 py-px text-[11px] font-medium leading-4 text-[var(--accent-ink)]">Last used</span>
@@ -229,20 +143,6 @@ function ProviderButton({ provider, last }: { provider: Provider; last: boolean 
           <LastUsed />
         </span>
       )}
-    </button>
-  )
-}
-
-/** The arrow inside the email field: dim until the address looks like one, then ink. */
-function Arrow({ busy }: { busy: boolean }) {
-  return (
-    <button
-      type="submit"
-      disabled={busy}
-      aria-label="Continue with email"
-      className="ring-focus absolute right-2 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded-full bg-ink text-surface transition-[background-color,color,transform,opacity] duration-150 hover:opacity-90 active:scale-95 peer-invalid:bg-[color-mix(in_oklch,var(--ink)_10%,transparent)] peer-invalid:text-ink-3"
-    >
-      {busy ? <Spinner size={15} /> : <ArrowRight size={16} />}
     </button>
   )
 }
@@ -318,9 +218,9 @@ function Sent({ email, next, onBack }: { email: string; next: Next; onBack: () =
 }
 
 /**
- * The way in: GitHub and Google where they're set up, or an email and then a link in the inbox. No
- * password to make or lose. `email` fills the field ahead of time, as when a buyer arrives back
- * from checkout; `error` is why GitHub or Google came back without signing anyone in; `lastUsed`
+ * The way in: GitHub where it's set up, or an email and then a link in the inbox. No password to
+ * make or lose. `email` fills the field ahead of time, as when a buyer arrives back
+ * from checkout; `error` is why GitHub came back without signing anyone in; `lastUsed`
  * marks the way this browser came in last time; `buying` is the plan someone's on their way to.
  */
 export function SignIn({
@@ -346,42 +246,42 @@ export function SignIn({
   // "Use a different email" sets aside this send; the next one shows its own inbox step.
   const [setAside, setSetAside] = useState<LinkState | null>(null)
   const sent = state.sent && state !== setAside ? state.sent : null
-  const panel = buying ? (
-    <BuyPanel plan={buying} icon={sent ? <Mail size={12} /> : <ArrowRight size={12} />} note={sent ? 'Open the link, then on to checkout' : 'Then checkout, with your email filled in'} />
-  ) : (
-    <AccountPanel icon={sent ? <Mail size={12} /> : <Lock size={12} />} note={sent ? 'Waiting for you to open the link…' : 'Hidden until you sign in'} />
-  )
+  const problem = state.error
+  const typed = state.email ?? email
   return (
-    <Split label={buying ? `What’s in ${buying.name}` : 'Your account, once you’re in'} panel={panel}>
+    <Split plan={buying}>
       <Stage id={sent ? 'sent' : 'start'}>
         {sent ? (
-          <Sent email={sent} next={next} onBack={() => setSetAside(state)} />
+          <Body>
+            <Sent email={sent} next={next} onBack={() => setSetAside(state)} />
+          </Body>
         ) : (
           <div>
-            <AuthHead title={title} lead={lead} />
-            {providers.length > 0 ? (
-              <>
-                <form action={signInWith} className="mt-9 grid gap-2.5">
-                  <input type="hidden" name="next" value={next} />
-                  {providers.map((p) => (
-                    <ProviderButton key={p} provider={p} last={lastUsed === p} />
-                  ))}
-                </form>
-                <Alert text={error} />
-                <div aria-hidden className="my-6 flex items-center gap-3 text-caption text-ink-3">
-                  <span className="h-px flex-1 bg-line" />
-                  or
-                  <span className="h-px flex-1 bg-line" />
-                </div>
-              </>
-            ) : (
-              <div className="h-9" />
-            )}
-            <form action={action} noValidate>
-              <input type="hidden" name="next" value={next} />
-              <div className="relative">
+            <Body>
+              <AuthHead title={title} lead={lead} />
+              {providers.length > 0 && (
+                <>
+                  <form action={signInWith} className="mt-7 grid gap-2.5">
+                    <input type="hidden" name="next" value={next} />
+                    {providers.map((p) => (
+                      <ProviderButton key={p} provider={p} last={lastUsed === p} />
+                    ))}
+                  </form>
+                  <Alert text={error} />
+                  <div aria-hidden className="my-5 flex items-center gap-3 text-[12px] text-ink-3">
+                    <span className="h-px flex-1 bg-line" />
+                    or
+                    <span className="h-px flex-1 bg-line" />
+                  </div>
+                </>
+              )}
+              <form action={action} noValidate className={providers.length > 0 ? '' : 'mt-7'}>
+                <input type="hidden" name="next" value={next} />
+                <label htmlFor="email" className={LABEL}>
+                  Email
+                </label>
                 <input
-                  key={state.email}
+                  key={typed}
                   id="email"
                   name="email"
                   type="email"
@@ -390,32 +290,42 @@ export function SignIn({
                   autoCapitalize="none"
                   spellCheck={false}
                   required
-                  defaultValue={state.email ?? email}
-                  placeholder=" "
-                  aria-invalid={!!state.error}
-                  aria-describedby="email-hint"
-                  className={`${FIELD} pr-14 ${state.error ? FIELD_ERROR : FIELD_IDLE}`}
+                  defaultValue={typed}
+                  placeholder="you@company.com"
+                  aria-invalid={!!problem}
+                  aria-describedby="sign-in-hint"
+                  className={`${FIELD} ${problem ? FIELD_ERROR : FIELD_IDLE}`}
                 />
-                <label htmlFor="email" className={FLOAT}>
-                  Email
-                </label>
-                <Arrow busy={pending} />
-              </div>
-              {/* One line held for the hint or the error, so nothing below moves. */}
-              <div className="mt-2 flex min-h-[18px] items-center justify-between gap-3">
-                <p id="email-hint" aria-live="polite" className={`text-caption ${state.error ? 'text-danger' : 'text-ink-3'}`}>
-                  {state.error ?? 'We’ll email you a link to sign in.'}
+                {/* One line held for the hint or the error, so nothing below moves. */}
+                <p id="sign-in-hint" aria-live="polite" className={`mt-2 min-h-[18px] text-[12.5px] leading-[1.45] ${problem ? 'text-danger' : 'text-ink-3'}`}>
+                  {problem ?? 'We’ll email you a link.'}
                 </p>
-                {lastUsed === 'magic-link' && <LastUsed />}
-              </div>
-            </form>
-            <p className="mt-12 text-center text-caption text-ink-3">
-              By continuing you agree to the{' '}
-              <Link href="/terms" className={LINK}>
-                Terms
+                <button type="submit" disabled={pending} className={`${PRIMARY} relative mt-2 w-full`}>
+                  <Busy busy={pending}>
+                    Email me a sign-in link
+                    <ArrowRight size={14} />
+                  </Busy>
+                  {lastUsed === 'magic-link' && !pending && (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <LastUsed />
+                    </span>
+                  )}
+                </button>
+                <p className="mt-4 text-center text-[12px] text-ink-3">
+                  By continuing you agree to the{' '}
+                  <Link href="/terms" className={LINK}>
+                    Terms
+                  </Link>
+                  .
+                </p>
+              </form>
+            </Body>
+            <Foot>
+              New to Detent?
+              <Link href="/pro" className="ring-focus rounded-[4px] font-medium text-ink hover:underline">
+                See plans
               </Link>
-              .
-            </p>
+            </Foot>
           </div>
         )}
       </Stage>
@@ -447,13 +357,9 @@ export function Confirm({ plans }: { plans: Buying[] }) {
     Promise.resolve(read.current).then(setLink)
   }, [])
   const buying = link ? plans.find((p) => link.next === `/checkout/${p.id}`) : undefined
-  const panel = buying ? (
-    <BuyPanel plan={buying} icon={<ArrowRight size={12} />} note="Then checkout, with your email filled in" />
-  ) : (
-    <AccountPanel icon={<Lock size={12} />} note={link === null ? 'Hidden until you sign in' : 'Checking it’s you…'} />
-  )
   return (
-    <Split label={buying ? `What’s in ${buying.name}` : 'Your account, once you’re in'} panel={panel}>
+    <Split plan={buying}>
+      <Body>
       <Stage id={link === null ? 'expired' : 'confirm'}>
         {link === null ? (
           <div>
@@ -488,6 +394,7 @@ export function Confirm({ plans }: { plans: Buying[] }) {
           </div>
         )}
       </Stage>
+      </Body>
     </Split>
   )
 }
@@ -571,7 +478,8 @@ const never = () => () => {}
  * Making a key, in a sheet: name it, create it, then the key itself with a large Copy, shown this
  * once because only its hash is kept. From the bottom on a phone, in the middle on a laptop.
  */
-export function KeySheet({ count, max }: { count: number; max: number }) {
+/** `compact` makes the trigger a small button for a settings card's foot rather than a row. */
+export function KeySheet({ count, max, compact = false }: { count: number; max: number; compact?: boolean }) {
   const full = count >= max
   const [open, setOpen] = useState(false)
   const [state, action, pending] = useActionState<KeyState, FormData>(makeKey, {})
@@ -633,12 +541,21 @@ export function KeySheet({ count, max }: { count: number; max: number }) {
           setOpen(true)
         }}
         disabled={full}
-        className={`flex min-h-[56px] w-full items-center gap-3.5 px-4 text-left text-callout font-medium text-[var(--accent-ink)] transition-colors duration-150 hover:bg-[color-mix(in_oklch,var(--ink)_3%,transparent)] disabled:cursor-default disabled:font-normal disabled:text-ink-3 disabled:hover:bg-transparent ${ROW_FOCUS}`}
+        className={compact ? SMALL : `flex min-h-[56px] w-full items-center gap-3.5 px-4 text-left text-callout font-medium text-[var(--accent-ink)] transition-colors duration-150 hover:bg-[color-mix(in_oklch,var(--ink)_3%,transparent)] disabled:cursor-default disabled:font-normal disabled:text-ink-3 disabled:hover:bg-transparent ${ROW_FOCUS}`}
       >
-        <span className="grid size-[30px] shrink-0 place-items-center rounded-[8px] bg-[color-mix(in_oklch,var(--accent)_13%,transparent)]">
-          <Plus size={15} />
-        </span>
-        {full ? `You have ${max} keys. Remove one to make another.` : count ? 'Create another key' : 'Create your first key'}
+        {compact ? (
+          <>
+            <Plus size={13} />
+            Create key
+          </>
+        ) : (
+          <>
+            <span className="grid size-[30px] shrink-0 place-items-center rounded-[8px] bg-[color-mix(in_oklch,var(--accent)_13%,transparent)]">
+              <Plus size={15} />
+            </span>
+            {full ? `You have ${max} keys. Remove one to make another.` : count ? 'Create another key' : 'Create your first key'}
+          </>
+        )}
       </button>
       {mounted &&
         createPortal(
@@ -686,11 +603,11 @@ export function KeySheet({ count, max }: { count: number; max: number }) {
                         New API key
                       </h2>
                       <p className="mt-1.5 text-callout leading-[1.55] text-ink-3">Name it after where it’ll live, so you know which one to remove later.</p>
-                      <div className="relative mt-6">
-                        <input id={nameId} name="name" maxLength={40} autoComplete="off" spellCheck={false} placeholder=" " data-autofocus className={`${FIELD} ${error ? FIELD_ERROR : FIELD_IDLE}`} />
-                        <label htmlFor={nameId} className={FLOAT}>
-                          Name, like MacBook or CI
+                      <div className="mt-6">
+                        <label htmlFor={nameId} className={LABEL}>
+                          Name
                         </label>
+                        <input id={nameId} name="name" maxLength={40} autoComplete="off" spellCheck={false} placeholder="MacBook, or CI" data-autofocus className={`${FIELD} ${error ? FIELD_ERROR : FIELD_IDLE}`} />
                       </div>
                       <Alert text={error} />
                       <div className="mt-6 grid grid-cols-2 gap-2.5">

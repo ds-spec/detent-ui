@@ -12,11 +12,11 @@ import { safeNext } from './next'
 
 /*
  * Signing in, by Better Auth, in the same Turso database as the keys and purchases. The ways in are
- * an emailed link, which always works, and GitHub and Google once their OAuth apps are set
- * (GITHUB_CLIENT_ID and _SECRET, GOOGLE_CLIENT_ID and _SECRET). What a person can install still
- * follows their email, so only an email someone has proven counts: a link proves it, and GitHub or
- * Google count only when they say the address is verified. An account is only joined to one
- * that's already here when both sides have proven the same address.
+ * an emailed link, which always works, and GitHub once its OAuth app is set (GITHUB_CLIENT_ID and
+ * _SECRET). There are no passwords. What a person can install follows their email, so only an email
+ * someone has proven counts: a link proves it, and GitHub counts only when it says the address is
+ * verified. An account is only joined to one that's already here when both sides have proven the
+ * same address.
  *
  * The link opens /account/confirm rather than signing in on the spot, because mail scanners open
  * every link they see; pressing the button there is what spends it.
@@ -31,7 +31,7 @@ export const COOKIE_PREFIX = 'detent'
  * Readable by the page, unlike the session itself, and it opens nothing.
  */
 export const SIGNED_IN = 'detent.in'
-/** How this browser signed in last time (github, google or magic-link), so its button can say so. */
+/** How this browser signed in last time (github or magic-link), so its button can say so. */
 export const LAST_USED = 'detent.last_used'
 const LINK_MINUTES = 15
 const HOUR = 3_600_000
@@ -53,18 +53,17 @@ async function allowed(bucket: string, limit: number) {
   return true
 }
 
-async function deliver(email: string, url: string) {
-  const text = `Sign in to Detent:\n\n${url}\n\nThe link lasts ${LINK_MINUTES} minutes and works once. If you didn’t ask for it, you can ignore this email.`
+async function deliver(email: string, subject: string, text: string) {
   const key = process.env.RESEND_API_KEY
   if (!key) {
     if (!dev) throw new Error('RESEND_API_KEY isn’t set')
-    console.log(`\n[detent] Sign-in link for ${email}: ${url}\n`)
+    console.log(`\n[detent] ${subject} for ${email}:\n${text}\n`)
     return
   }
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
-    body: JSON.stringify({ from: process.env.DETENT_MAIL_FROM ?? 'Detent <hello@detentui.com>', to: email, subject: 'Sign in to Detent', text }),
+    body: JSON.stringify({ from: process.env.DETENT_MAIL_FROM ?? 'Detent <hello@detentui.com>', to: email, subject, text }),
   })
   if (!res.ok) throw new Error(`Resend answered ${res.status}`)
 }
@@ -74,10 +73,9 @@ export function socialProviders() {
   const env = process.env
   return {
     ...(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET ? { github: { clientId: env.GITHUB_CLIENT_ID, clientSecret: env.GITHUB_CLIENT_SECRET } } : {}),
-    ...(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET ? { google: { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET, prompt: 'select_account' as const } } : {}),
   }
 }
-export type Provider = 'github' | 'google'
+export type Provider = 'github'
 
 const create = (client: Client) =>
   betterAuth({
@@ -120,7 +118,8 @@ const create = (client: Client) =>
           // signing in, and `next` is where they were going, such as the checkout they started.
           const verify = new URL(url)
           const next = safeNext(verify.searchParams.get('callbackURL'))
-          await deliver(email, `${verify.origin}/account/confirm#${new URLSearchParams({ token, email, next })}`)
+          const link = `${verify.origin}/account/confirm#${new URLSearchParams({ token, email, next })}`
+          await deliver(email, 'Sign in to Detent', `Sign in to Detent:\n\n${link}\n\nThe link lasts ${LINK_MINUTES} minutes and works once. If you didn’t ask for it, you can ignore this email.`)
         },
       }),
       lastLoginMethod({ cookieName: LAST_USED, maxAge: 180 * 86_400 }),

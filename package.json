@@ -23,6 +23,7 @@
     "@better-auth/infra": "^0.4.26",
     "@libsql/client": "^0.18.0",
     "@libsql/kysely-libsql": "^0.4.1",
+    "@paper-design/shaders-react": "^0.0.82",
     "@tanstack/react-table": "^9.3.1",
     "@tanstack/react-virtual": "^3.14.22",
     "@tiptap/extension-mention": "^3.32.0",

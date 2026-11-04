@@ -7,7 +7,7 @@ import { createJiti } from 'jiti'
 const root = process.cwd()
 const client = path.join(root, 'dist/client')
 const jiti = createJiti(import.meta.url, { jsx: { runtime: 'automatic' }, alias: { '@/': path.join(root, 'src/') } })
-const ROUTES = ['', 'blocks', 'pro', 'templates', 'blocks/[slug]', 'components/[slug]', 'templates/[slug]']
+const ROUTES = ['', 'components', 'blocks', 'pro', 'templates', 'blocks/[slug]', 'components/[slug]', 'templates/[slug]']
 
 let count = 0
 for (const route of ROUTES) {

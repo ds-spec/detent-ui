@@ -28,47 +28,71 @@ export type PromptHandle = { type(text: string): void; attach(files: Attachment[
 /** A prompt to start from. `prompt` is what it sends; by default, the sentence. */
 export type Starter = { label: string; lead: string; rest?: string; prompt?: string }
 
+const icon = (d: ReactNode) => (
+  <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden className="shrink-0">
+    {d}
+  </svg>
+)
 const DEFAULT_MODES: Mode[] = [
-  { id: 'quick', name: 'Quick', badge: 'Fast', note: 'Short answers, right away', level: 1 },
-  { id: 'think', name: 'Think', badge: 'Deep', note: 'Reasons it through step by step', level: 3 },
-  { id: 'research', name: 'Research', badge: 'Cited', note: 'Searches and cites its sources', level: 4 },
+  { id: 'quick', name: 'Quick', badge: 'Fast', note: 'Short answers, right away', level: 1, icon: icon(<path d="M10.2 2.6 4.6 10h4.1l-.9 5.4 5.6-7.4H9.3z" />) },
+  { id: 'think', name: 'Think', badge: 'Deep', note: 'Reasons it through step by step', level: 3, icon: icon(<path d="M9 2.6c.45 3.3 2.1 4.95 5.4 5.4-3.3.45-4.95 2.1-5.4 5.4-.45-3.3-2.1-4.95-5.4-5.4 3.3-.45 4.95-2.1 5.4-5.4Z" />) },
+  {
+    id: 'research',
+    name: 'Research',
+    badge: 'Cited',
+    note: 'Searches and cites its sources',
+    level: 4,
+    icon: icon(
+      <>
+        <circle cx="9" cy="9" r="6.2" />
+        <path d="M2.8 9h12.4M9 2.8c1.7 1.8 2.5 3.9 2.5 6.2S10.7 13.4 9 15.2C7.3 13.4 6.5 11.3 6.5 9S7.3 4.6 9 2.8Z" />
+      </>,
+    ),
+  },
 ]
 
 /**
- * The material. Each step in dark is the same step in light: a soft ground, the field one step off it,
- * an edge one step past the field. Colours are `light-dark()` pairs, not `dark:` classes, so they read
- * the element's own colour scheme and a panel forced light on a dark page stays light. Set
- * `--prompt-send` on any ancestor to take your own accent. Spread it on the page behind the box.
+ * The material. Each step in dark is the same step in light: the card lifted off the page, the tray one
+ * step under it, an edge one step past both. Colours are `light-dark()` pairs, not `dark:` classes, so
+ * they read the element's own colour scheme and a panel forced light on a dark page stays light. Set
+ * `--prompt-send` on any ancestor to take your own colour for the key. Spread it on the page behind the box.
  */
 export const PROMPT_MATERIAL = {
-  '--c-ground': 'light-dark(#f4f4f2, #1a1a1a)',
-  '--c-field': 'light-dark(#fbfbfa, #222222)',
-  '--c-edge': 'light-dark(#e8e8e5, #2a2a2a)',
-  '--c-edge-on': 'light-dark(#dededa, #333333)',
-  '--c-key': 'light-dark(#e6e6e3, #2e2e2e)',
-  '--c-strip': 'light-dark(#f1f1ee, #1c1c1c)',
-  '--c-ink': 'light-dark(#1a1a1a, #f4f4f4)',
-  '--c-ink-2': 'light-dark(#5c5c5c, #adadad)',
-  '--c-ink-3': 'light-dark(#7c7c7c, #969696)',
-  '--c-hover': 'light-dark(#f0f0ee, #2b2b2b)',
-  '--c-badge': 'light-dark(#e2ecff, #152556)',
-  '--c-badge-ink': 'light-dark(#1a62d6, #5c9dff)',
-  '--c-send': 'var(--prompt-send, #0a8cff)',
+  '--c-ground': 'light-dark(#ffffff, #1a1a1e)',
+  '--c-field': 'light-dark(#ffffff, #26262a)',
+  '--c-edge': 'light-dark(#e9e9e7, #313136)',
+  '--c-edge-on': 'light-dark(#dcdcd9, #3c3c42)',
+  '--c-key': 'light-dark(#e6e6e3, #38383d)',
+  '--c-strip': 'light-dark(#f5f5f4, #1f1f23)',
+  '--c-well': 'light-dark(#f2f2f1, #1f1f23)',
+  '--c-lift': 'light-dark(#ffffff, #3a3a3f)',
+  '--c-ink': 'light-dark(#1a1a1a, #f5f5f7)',
+  '--c-ink-2': 'light-dark(#5c5c5c, #a1a1a6)',
+  '--c-ink-3': 'light-dark(#7c7c7c, #909096)',
+  '--c-hover': 'light-dark(#f2f2f0, #2e2e33)',
+  '--c-rim': 'light-dark(rgba(0,0,0,0.07), rgba(255,255,255,0.08))',
+  '--c-send': 'var(--prompt-send, light-dark(#1d1d1f, #f5f5f7))',
+  '--c-send-ink': 'light-dark(#ffffff, #1d1d1f)',
+  '--c-shadow': 'light-dark(rgba(20,20,18,0.07), rgba(0,0,0,0.45))',
 } as CSSProperties
 
 const LINE = 24
-const MIN_LINES = 3
+const MIN_LINES = 2
 const MAX_LINES = 8
 /** Sizes are in pixels on purpose: `.pro-app` rescales Tailwind's spacing, and these have to add up. */
-const FRAME = 16 + 30 + 15
-const GAP = 21
+const ROW = 34
+const PAD = 14
+const FRAME = 18 + ROW + PAD
+const GAP = 24
+/** Corners nest: a round key, the padding around it, and the card's corner. */
+const R = ROW / 2 + PAD
 const REST = LINE * MIN_LINES + GAP
 const SHELF = 44
 const HEAD = 26
 /** The plate is this tall and slides, so the field changes size with a transform and no layout. */
 const PLATE = 640
-/** The project strip under the field: thin, darker, one object with it. */
-const STRIP = 44
+/** The tray under the card: what it's filed under at rest, what it's doing while it answers. */
+const STRIP = 42
 /** The height a PromptBox takes at rest, for a host that reserves its room. Add `PROMPT_STRIP` if it has projects. */
 export const PROMPT_H = FRAME + REST + HEAD
 /** The height at rest of a PromptBox given no label. */
@@ -109,16 +133,17 @@ const fingers = () => matchMedia('(hover: none) and (pointer: coarse)').matches
 const thenable = (v: unknown): v is PromiseLike<unknown> => typeof (v as PromiseLike<unknown> | undefined)?.then === 'function'
 const blank = (t: EventTarget) => !(t as Element).closest('button,a,input,textarea,label,[role^="menuitem"]')
 
-type Part = 'head' | 'files' | 'words'
+type Part = 'head' | 'files' | 'words' | 'lift'
 type Size = Body & { t: number }
 
 /**
- * A prompt box. A tall quiet field, one blue key, and a row that says how it'll answer.
+ * A prompt box. A white card on a quiet tray, round keys, and one dark key that speaks or sends.
  * It keeps a fixed footprint and grows upward as you write, so nothing beneath it ever moves.
  *
- * Attach and mention are keys. The mode and, given `models`, the model are menus: press and slide to a
- * row, or tap. Given `projects`, a slim strip under the field offers them. While it answers, the mode's
- * place says what it's doing and for how long, in real seconds, and admits it when it's still waiting.
+ * The modes sit in a capsule, the chosen one lifted with its name. Given `models`, the model is a menu:
+ * press and slide to a row, or tap. Given `projects`, the tray under the card offers them. While it
+ * answers, the tray says what it's doing and for how long, in real seconds, and admits it when it's
+ * still waiting; with no projects it slides out from under the card for that, and the card rises.
  *
  * Send clears the box at once. Drop or paste files anywhere on it. Enter sends, Shift+Enter adds a line
  * (on a phone return does), Escape stops, and Cmd+Z straight after a send brings the words back. If a
@@ -194,7 +219,6 @@ export function PromptBox({
   const busy = working ?? pending
   const [focused, setFocused] = useState(false)
   const [drag, setDrag] = useState(false)
-  const [menu, setMenu] = useState(false)
   const [modelMenu, setModelMenu] = useState(false)
   const [projectMenu, setProjectMenu] = useState(false)
   const [model, setModel] = useState(firstModel ?? models?.[0]?.name)
@@ -236,6 +260,9 @@ export function PromptBox({
   const under = projects?.length ? STRIP : 0
   const base = FRAME + REST + (head ? HEAD : 0) + under
   const edge = `inset 0 0 0 1px var(${focused ? '--c-edge-on' : '--c-edge'})`
+  const tray = useRef<HTMLDivElement>(null)
+  // The tray shows while it answers or after a failed send; with projects it's always there and holds still.
+  const telling = busy || failed
 
   // The card is the sum of three parts, each a spring from its live value: one source of truth for
   // every height, so nothing chases anything, and a change mid-flight keeps its speed.
@@ -243,6 +270,7 @@ export function PromptBox({
     head: { x: head ? HEAD : 0, v: 0, t: head ? HEAD : 0 },
     files: { x: initialFiles.length ? SHELF : 0, v: 0, t: initialFiles.length ? SHELF : 0 },
     words: { x: REST, v: 0, t: REST },
+    lift: { x: 0, v: 0, t: 0 },
   })
   const loop = useRef({ raf: 0, then: 0, live: false })
   const grew = useRef(onGrow)
@@ -270,7 +298,14 @@ export function PromptBox({
       filesBox.current.style.clipPath = f > 0 ? `inset(0 0 ${f}px 0)` : ''
     }
     if (headBox.current) headBox.current.style.transform = `translate3d(0,${w + f + h}px,0)`
-    grew.current?.(total + underRef.current - baseRef.current)
+    // The card rises off the tray as it slides out, by transform like everything else.
+    const up = s.lift.x
+    if (card.current) card.current.style.transform = up ? `translate3d(0,${-up}px,0)` : ''
+    if (tray.current && !underRef.current) {
+      tray.current.style.opacity = `${clamp(up / 14, 0, 1)}`
+      tray.current.style.transform = `translate3d(0,${(STRIP - up) * 0.25}px,0)`
+    }
+    grew.current?.(total + up + underRef.current - baseRef.current)
   }, [])
   const wake = useCallback(() => {
     const l = loop.current
@@ -365,6 +400,9 @@ export function PromptBox({
     size('head', head ? HEAD : 0)
     size('files', files.length ? SHELF : 0)
   }, [head, files.length, size])
+  useLayoutEffect(() => {
+    size('lift', telling && !under ? STRIP : 0)
+  }, [telling, under, size])
   useLayoutEffect(() => {
     if (layer) paint()
     loop.current.live = true
@@ -472,26 +510,82 @@ export function PromptBox({
     el.setRangeText(words, el.selectionStart, el.selectionEnd, 'end')
     setText(el.value)
   }
-  // Mention: an @ at the caret, for whatever mention menu the product has.
-  const mention = () => {
-    const el = area.current
-    if (!el) return
-    el.focus()
-    const before = el.value.slice(0, el.selectionStart)
-    insert(`${before && !/\s$/.test(before) ? ' ' : ''}@`)
-  }
-
-  const current = modes.find((m) => m.id === mode) ?? modes[0]
   const chosen = models?.find((m) => m.name === model)
   const quiet = `${ROW_TEXT} text-[var(--c-ink-2)] transition-colors duration-150 hover:text-[var(--c-ink)]`
+  const plateAt = PLATE - (base - under) - (initialFiles.length ? SHELF : 0)
 
   return (
     <div className="@container relative" style={{ width, maxWidth: '100%', height: base, ...PROMPT_MATERIAL }}>
+      {/* The tray: under the card, its corners the card's own. It tells, and with projects it files. */}
+      <div
+        ref={tray}
+        aria-hidden={!under && !telling}
+        {...(!under && !telling ? { inert: true } : {})}
+        className="absolute inset-x-0 bottom-0 rounded-[var(--r)] bg-[var(--c-strip)] shadow-[inset_0_0_0_1px_var(--c-edge)] will-change-transform"
+        style={{ height: STRIP + 2 * R, opacity: under ? 1 : 0, '--r': `${R}px` } as CSSProperties}
+      >
+        <div className="absolute inset-x-0 bottom-0 flex items-center px-[8px]" style={{ height: STRIP }}>
+          <AnimatePresence initial={false} mode="popLayout">
+            {failed ? (
+              <Told key="failed" reduce={!!reduce}>
+                <span className="flex size-[18px] shrink-0 items-center justify-center text-[var(--danger)]">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" aria-hidden>
+                    <circle cx="8" cy="8" r="6.2" />
+                    <path d="M8 4.9v3.5M8 10.9v.1" />
+                  </svg>
+                </span>
+                <span data-error role="status" className="truncate text-[var(--c-ink)]">
+                  Not sent. Your message is back.
+                </span>
+              </Told>
+            ) : busy ? (
+              <Told key="busy" reduce={!!reduce}>
+                <span className="flex size-[18px] shrink-0 items-center justify-center text-[var(--c-ink-2)]">{chosen?.icon ?? <Seat />}</span>
+                <span role="status" className="flex min-w-0 flex-1 items-center gap-[6px]">
+                  <AnimatePresence initial={false} mode="popLayout">
+                    <motion.span key={status} className="truncate" initial={{ opacity: 0, y: reduce ? 0 : 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: reduce ? 0 : -4 }} transition={{ duration: 0.16, ease: ease.out }}>
+                      {status}
+                    </motion.span>
+                  </AnimatePresence>
+                  <Elapsed key={status} since={started} />
+                </span>
+                <Spin still={!!reduce} />
+              </Told>
+            ) : under ? (
+              <Told key="project" reduce={!!reduce}>
+                <Reach
+                  label={`Project: ${project ?? 'none'}`}
+                  items={[null, ...(projects ?? [])].map((n) => ({
+                    id: n ?? '',
+                    name: n ?? 'No project',
+                    on: n === project,
+                    run: () => {
+                      setProject(n)
+                      onProject?.(n)
+                    },
+                  }))}
+                  open={projectMenu}
+                  setOpen={setProjectMenu}
+                  layer={layer}
+                  className="-ml-[6px] h-[32px] min-w-0 max-w-full justify-start gap-[8px] rounded-[10px] px-[6px] text-[15px] tracking-[-0.006em] text-[var(--c-ink-2)] transition-colors duration-150 hover:text-[var(--c-ink)]"
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden className="shrink-0">
+                    <rect x="2.75" y="2.75" width="10.5" height="10.5" rx="2.6" />
+                    <path d="M5.6 6.1h4.8M5.6 8.9h2.8" />
+                  </svg>
+                  <span className="truncate">{project ?? 'Add to a project'}</span>
+                </Reach>
+              </Told>
+            ) : null}
+          </AnimatePresence>
+        </div>
+      </div>
+
       <div
         ref={hang}
         data-prompt-box
-        className="absolute inset-x-0 rounded-[25px]"
-        style={{ bottom: under, height: base - under + (initialFiles.length ? SHELF : 0) }}
+        className="absolute inset-x-0 will-change-transform"
+        style={{ bottom: under, height: base - under + (initialFiles.length ? SHELF : 0), borderRadius: R }}
         onKeyDown={(e) => {
           if (e.key === 'Escape' && busy) {
             e.preventDefault()
@@ -518,13 +612,16 @@ export function PromptBox({
           add(e.dataTransfer.files)
         }}
       >
-        {/* The field: a plate that slides up and a fixed foot, so its size changes by transform alone. */}
-        <div aria-hidden className={`pointer-events-none absolute inset-x-0 bottom-0 overflow-clip ${under ? '' : 'rounded-b-[25px]'}`} style={{ height: PLATE }}>
-          <div ref={plate} className="absolute inset-x-0 top-0 rounded-t-[25px] bg-[var(--c-field)] transition-shadow duration-150 will-change-transform" style={{ height: PLATE, transform: `translate3d(0,${PLATE - (base - under) - (initialFiles.length ? SHELF : 0)}px,0)`, boxShadow: edge }} />
-          <div className={`absolute inset-x-0 bottom-0 h-[40px] bg-[var(--c-field)] transition-shadow duration-150 will-change-transform ${under ? '' : 'rounded-b-[25px]'}`} style={{ clipPath: under ? 'inset(3px 0 1px 0)' : 'inset(3px 0 0 0)', boxShadow: edge }} />
+        {/* The card: a plate that slides up and a fixed foot, so its size changes by transform alone. Its
+            shadow is drawn from the clipped shape, so it follows the card at any height. */}
+        <div aria-hidden className="pointer-events-none absolute inset-0" style={{ filter: 'drop-shadow(0 1px 1px var(--c-shadow)) drop-shadow(0 6px 14px var(--c-shadow))' }}>
+          <div className="absolute inset-x-0 bottom-0 overflow-clip" style={{ height: PLATE, borderBottomLeftRadius: R, borderBottomRightRadius: R }}>
+            <div ref={plate} className="absolute inset-x-0 top-0 bg-[var(--c-field)] transition-shadow duration-150 will-change-transform" style={{ height: PLATE, transform: `translate3d(0,${plateAt}px,0)`, boxShadow: edge, borderTopLeftRadius: R, borderTopRightRadius: R }} />
+            <div className="absolute inset-x-0 bottom-0 h-[44px] bg-[var(--c-field)] transition-shadow duration-150" style={{ clipPath: 'inset(3px 0 0 0)', boxShadow: edge, borderBottomLeftRadius: R, borderBottomRightRadius: R }} />
+          </div>
         </div>
 
-        <div className="relative flex h-full cursor-text flex-col rounded-[inherit] px-[18px] pb-[15px] pt-[16px]" onMouseDown={(e) => blank(e.target) && e.preventDefault()} onClick={(e) => blank(e.target) && area.current?.focus()}>
+        <div className="relative flex h-full cursor-text flex-col rounded-[inherit]" style={{ padding: `18px ${PAD}px ${PAD}px` }} onMouseDown={(e) => blank(e.target) && e.preventDefault()} onClick={(e) => blank(e.target) && area.current?.focus()}>
           {/* What rides above the keys. Its bottom edge is the keys' top. */}
           <div className="shrink-0" style={{ clipPath: 'inset(-640px -24px 0 -24px)' }}>
             <div ref={headBox} className="relative shrink-0 overflow-clip text-[13px] leading-[18px] text-[var(--c-ink-3)]" style={{ height: head ? HEAD : 0 }}>
@@ -562,7 +659,6 @@ export function PromptBox({
                   setText(e.target.value)
                   last.current = null
                   setFailed(false)
-                  setMenu(false)
                   setModelMenu(false)
                   setProjectMenu(false)
                 }}
@@ -593,59 +689,21 @@ export function PromptBox({
                   e.preventDefault()
                   add(d.files)
                 }}
-                className={`block w-full resize-none bg-transparent ${TEXT} text-[var(--c-ink)] caret-[var(--c-send)] outline-none [scrollbar-gutter:stable] [scrollbar-width:none]`}
+                className={`block w-full resize-none bg-transparent ${TEXT} text-[var(--c-ink)] caret-[var(--c-ink)] outline-none [scrollbar-gutter:stable] [scrollbar-width:none]`}
                 style={{ lineHeight: `${LINE}px`, height: LINE * MIN_LINES, maskImage: 'linear-gradient(180deg, transparent, #000 var(--fade-t, 0px), #000 calc(100% - var(--fade-b, 0px)), transparent)' }}
               />
             </div>
           </div>
 
-          <div className="flex h-[30px] shrink-0 cursor-default items-center gap-[11px]">
+          <div className="flex shrink-0 cursor-default items-center gap-[8px]" style={{ height: ROW }}>
             <Key label="Attach files" onClick={() => picker.current?.click()}>
-              <path d="M9 3.5v11M3.5 9h11" />
+              <path d="m14.6 8.6-5.5 5.5a3.6 3.6 0 0 1-5.1-5.1l5.9-5.9a2.4 2.4 0 0 1 3.4 3.4l-5.9 5.9a1.2 1.2 0 0 1-1.7-1.7l5.4-5.4" />
             </Key>
             <input ref={picker} type="file" multiple hidden onChange={(e) => (e.target.files && add(e.target.files), (e.target.value = ''))} />
-            <span className="contents @max-[300px]:hidden">
-              <Key label="Mention" onClick={mention}>
-                <circle cx="9" cy="9" r="2.7" />
-                <path d="M11.7 9v1a1.8 1.8 0 0 0 3.6 0V9A6.3 6.3 0 1 0 12.4 14.3" />
-              </Key>
-            </span>
-            {/* The mode, or while it answers what it's doing, in the same place. */}
-            <div className="relative ml-[4px] h-full min-w-0 flex-1">
-              <div className={`flex h-full items-center transition-opacity duration-150 ${busy || failed ? 'pointer-events-none opacity-0' : ''}`} {...(busy || failed ? { inert: true } : {})}>
-                <Reach
-                  label={`Mode: ${current.name}`}
-                  items={modes.map((m) => ({ id: m.id, name: m.name, badge: m.badge, on: m.id === mode, run: () => setMode(m.id) }))}
-                  open={menu}
-                  setOpen={setMenu}
-                  layer={layer}
-                  className={`-ml-[4px] h-[30px] max-w-full gap-[8px] rounded-[9px] px-[4px] ${quiet}`}
-                >
-                  <Seat />
-                  <span className="truncate">{current.name}</span>
-                  {current.badge && <span className="shrink-0 rounded-[7px] bg-[var(--c-badge)] px-[6px] text-[14px] leading-[22px] text-[var(--c-badge-ink)]">{current.badge}</span>}
-                </Reach>
-              </div>
-              <div role="status" className={`pointer-events-none absolute inset-0 text-[15px] ${failed ? 'text-[var(--danger)]' : 'text-[var(--c-ink-2)]'}`}>
-                <AnimatePresence initial={false}>
-                  {failed ? (
-                    <Slot key="failed" reduce={!!reduce}>
-                      <span data-error className="truncate">
-                        Not sent. Your message is back.
-                      </span>
-                    </Slot>
-                  ) : busy ? (
-                    <Slot key={`busy-${status}`} reduce={!!reduce}>
-                      <span className="truncate">{status}</span>
-                      <Elapsed since={started} />
-                    </Slot>
-                  ) : null}
-                </AnimatePresence>
-              </div>
-            </div>
+            <Modes modes={modes} mode={mode} onMode={setMode} />
             {model &&
               (models?.length ? (
-                <span className="hidden shrink-0 items-center @min-[440px]:flex">
+                <span className="hidden shrink-0 items-center @min-[480px]:flex">
                   <Reach
                     label={`Model: ${model}`}
                     items={models.map((m) => ({
@@ -661,30 +719,21 @@ export function PromptBox({
                     open={modelMenu}
                     setOpen={setModelMenu}
                     layer={layer}
-                    className={`h-[30px] gap-[8px] rounded-[9px] px-[4px] ${quiet}`}
+                    className={`h-[34px] gap-[7px] rounded-full pl-[10px] pr-[12px] shadow-[inset_0_0_0_1px_var(--c-key)] hover:bg-[var(--c-hover)] ${quiet}`}
                   >
                     {chosen?.icon}
-                    <span>{chosen?.short ?? model}</span>
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <path d="m3 5 4 4 4-4" />
-                    </svg>
+                    <span className="text-[var(--c-ink)]">{chosen?.short ?? model}</span>
                   </Reach>
                 </span>
               ) : (
-                <span className={`hidden shrink-0 @min-[440px]:block ${ROW_TEXT} text-[var(--c-ink-2)]`}>{model}</span>
+                <span className={`hidden shrink-0 @min-[480px]:block ${ROW_TEXT} px-[6px] text-[var(--c-ink-2)]`}>{model}</span>
               ))}
-            {onVoice && (
-              <motion.button type="button" {...TAP} aria-label="Speak" onMouseDown={keep} onClick={onVoice} className={`ring-focus relative flex size-[30px] shrink-0 items-center justify-center rounded-full text-[var(--c-ink-2)] transition-colors duration-150 hover:text-[var(--c-ink)] ${HIT}`}>
-                <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                  <rect x="5.6" y="2" width="4.8" height="7.6" rx="2.4" />
-                  <path d="M3.4 7.6a4.6 4.6 0 0 0 9.2 0M8 12.2V14" />
-                </svg>
-              </motion.button>
-            )}
+            <span className="min-w-0 flex-1" />
             <SendKey
               ref={sendKey}
               canSend={canSend}
               busy={busy}
+              onVoice={onVoice}
               onSend={(byKey) => {
                 send()
                 // A press on an empty key still gets an answer: the caret, where the words go.
@@ -710,35 +759,6 @@ export function PromptBox({
           </AnimatePresence>
         </div>
       </div>
-
-      {/* The project strip: darker, the box's lower corners, and its hairline the field's bottom edge. */}
-      {under > 0 && (
-        <div className="absolute inset-x-0 bottom-0 flex items-center rounded-b-[25px] bg-[var(--c-strip)] px-[8px] shadow-[inset_0_0_0_1px_var(--c-edge)] will-change-transform" style={{ height: STRIP + 1 }}>
-          <Reach
-            label={`Project: ${project ?? 'none'}`}
-            items={[null, ...(projects ?? [])].map((n) => ({
-              id: n ?? '',
-              name: n ?? 'No project',
-              on: n === project,
-              run: () => {
-                setProject(n)
-                onProject?.(n)
-              },
-            }))}
-            open={projectMenu}
-            setOpen={setProjectMenu}
-            layer={layer}
-            className="h-[32px] w-full min-w-0 justify-start gap-[8px] rounded-[10px] pl-[8.5px] pr-[10px] text-[15px] tracking-[-0.006em] text-[var(--c-ink-2)] transition-colors duration-150 hover:bg-[var(--c-hover)]"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden className="shrink-0">
-              <rect x="2.75" y="2.75" width="10.5" height="10.5" rx="2.6" />
-              <path d="M5.6 6.1h4.8M5.6 8.9h2.8" />
-            </svg>
-            <span className="shrink-0 font-medium text-[var(--c-ink)]">Project</span>
-            <span className="truncate">{project ?? 'Choose project'}</span>
-          </Reach>
-        </div>
-      )}
     </div>
   )
 }
@@ -794,23 +814,116 @@ function Seat() {
   )
 }
 
-/** A quiet outlined square, 30px, corners nested in the row. */
+/** A round key with a hairline, its corner nested in the card's. */
 function Key({ label, onClick, children }: { label: string; onClick: () => void; children: ReactNode }) {
   return (
-    <motion.button type="button" {...TAP} aria-label={label} title={label} onMouseDown={keep} onClick={onClick} className={`ring-focus relative flex size-[30px] shrink-0 items-center justify-center rounded-[9px] text-[var(--c-ink-2)] shadow-[inset_0_0_0_1px_var(--c-key)] transition-colors duration-150 hover:bg-[var(--c-hover)] hover:text-[var(--c-ink)] ${HIT}`}>
-      <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <motion.button type="button" {...TAP} aria-label={label} title={label} onMouseDown={keep} onClick={onClick} className={`ring-focus relative flex shrink-0 items-center justify-center rounded-full text-[var(--c-ink-2)] shadow-[inset_0_0_0_1px_var(--c-key)] transition-colors duration-150 hover:bg-[var(--c-hover)] hover:text-[var(--c-ink)] ${HIT}`} style={{ width: ROW, height: ROW }}>
+      <svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         {children}
       </svg>
     </motion.button>
   )
 }
 
-/** One reading in the row's quiet slot. */
-function Slot({ reduce, children }: { reduce: boolean; children: ReactNode }) {
+/**
+ * The modes, in a well. The chosen one is lifted out of it and says its name; the rest are their marks.
+ * The well is as wide as its longest name at all times, so choosing never moves what sits beside it:
+ * only the lift travels, and the segments trade widths inside. Arrow keys move it.
+ */
+function Modes({ modes, mode, onMode }: { modes: Mode[]; mode: string; onMode: (id: string) => void }) {
+  const keys = useRef<(HTMLButtonElement | null)[]>([])
+  const names = useRef<HTMLSpanElement>(null)
+  // Until it's measured, a fair guess, so the first paint is already close.
+  const [nameW, setNameW] = useState(() => Math.max(...modes.map((m) => m.name.length)) * 8.6)
+  const at = Math.max(0, modes.findIndex((m) => m.id === mode))
+  useLayoutEffect(() => {
+    const n = names.current
+    if (!n) return
+    const read = () => setNameW(n.offsetWidth)
+    read()
+    const ro = new ResizeObserver(read)
+    ro.observe(n)
+    void document.fonts?.ready.then(read)
+    return () => ro.disconnect()
+  }, [modes])
+  const go = (i: number) => {
+    const n = (i + modes.length) % modes.length
+    onMode(modes[n].id)
+    keys.current[n]?.focus()
+  }
+  const KEY = ROW - 4
+  // The chosen one: its mark, a gap, the longest name, and room each side. With names hidden, just a wider mark.
+  const wide = nameW ? 10 + 16 + 6 + Math.ceil(nameW) + 12 : KEY + 12
+  const widthOf = (m: Mode, on: boolean) => (on ? wide : m.icon ? KEY : wide)
+  const left = 2 + modes.slice(0, at).reduce((sum, m) => sum + widthOf(m, false), 0)
+  const move = 'duration-300 ease-[cubic-bezier(0.2,0.9,0.25,1)] motion-reduce:transition-none'
   return (
-    <motion.span className="absolute inset-y-0 left-0 flex max-w-full items-center gap-[6px]" initial={{ opacity: 0, y: reduce ? 0 : 3 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: reduce ? 0 : -3 }} transition={{ duration: 0.16, ease: ease.out }}>
+    <div role="radiogroup" aria-label="Mode" className="relative flex min-w-0 shrink-0 items-center rounded-full bg-[var(--c-well)] p-[2px]" style={{ height: ROW }}>
+      {/* The longest name, unseen: the well's width comes from it. Hidden with the names on a narrow box. */}
+      <span aria-hidden className={`pointer-events-none invisible absolute grid whitespace-nowrap @max-[380px]:hidden ${ROW_TEXT}`}>
+        <span ref={names} className="col-start-1 row-start-1 grid">
+          {modes.map((m) => (
+            <span key={m.id} className="col-start-1 row-start-1">
+              {m.name}
+            </span>
+          ))}
+        </span>
+      </span>
+      <span aria-hidden className={`pointer-events-none absolute left-0 top-[2px] rounded-full bg-[var(--c-lift)] shadow-[0_0_0_1px_var(--c-rim),0_1px_2px_var(--c-shadow)] transition-transform ${move}`} style={{ width: wide, height: KEY, transform: `translate3d(${left}px,0,0)` }} />
+      {modes.map((m, i) => {
+        const on = i === at
+        const named = on || !m.icon
+        return (
+          <motion.button
+            key={m.id}
+            ref={(n) => {
+              keys.current[i] = n
+            }}
+            type="button"
+            role="radio"
+            aria-checked={on}
+            aria-label={m.name}
+            title={on ? m.note : m.name}
+            tabIndex={on ? 0 : -1}
+            {...TAP}
+            onMouseDown={keep}
+            onClick={() => onMode(m.id)}
+            onKeyDown={(e) => {
+              const step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0
+              if (!step) return
+              e.preventDefault()
+              go(i + step)
+            }}
+            className={`ring-focus relative flex h-full shrink-0 items-center justify-center gap-[6px] overflow-hidden whitespace-nowrap rounded-full ${ROW_TEXT} transition-[width,color] ${move} ${on ? 'text-[var(--c-ink)]' : 'text-[var(--c-ink-3)] hover:text-[var(--c-ink)]'} ${HIT}`}
+            style={{ width: widthOf(m, on) }}
+          >
+            {m.icon && <span className="flex shrink-0">{m.icon}</span>}
+            {named && <span className={`shrink-0 transition-opacity duration-200 ease-out @max-[380px]:hidden ${on || !m.icon ? 'opacity-100' : 'opacity-0'}`}>{m.name}</span>}
+          </motion.button>
+        )
+      })}
+    </div>
+  )
+}
+
+/** One reading in the tray. */
+function Told({ reduce, children, ref }: { reduce: boolean; children: ReactNode; ref?: Ref<HTMLDivElement> }) {
+  return (
+    <motion.div ref={ref} className="flex min-w-0 flex-1 items-center gap-[9px] pl-[6px] pr-[8px] text-[15px] tracking-[-0.006em] text-[var(--c-ink-2)]" initial={{ opacity: 0, y: reduce ? 0 : 4 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: ease.out, delay: 0.06 } }} exit={{ opacity: 0, transition: { duration: 0.1, ease: ease.out } }}>
       {children}
-    </motion.span>
+    </motion.div>
+  )
+}
+
+/** A thin ring with one open arc, under the key it answers to. Held still for reduced motion. */
+function Spin({ still }: { still: boolean }) {
+  return (
+    <span className="mr-[6px] flex size-[18px] shrink-0 items-center justify-center text-[var(--c-ink-2)]">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden className={still ? '' : 'animate-spin [animation-duration:900ms]'}>
+        <circle cx="8" cy="8" r="6" stroke="currentColor" strokeOpacity="0.2" strokeWidth="1.6" />
+        <path d="M8 2a6 6 0 0 1 6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      </svg>
+    </span>
   )
 }
 
@@ -1021,35 +1134,46 @@ function Reach({ items, open, setOpen, layer, className, label, children }: { it
 }
 
 /**
- * Send. One mark that turns into Stop: the shaft widens into the square and the head folds away, and
- * back from wherever it got to. Never `disabled`: that would drop keyboard focus onto the page the
+ * The one dark key. Empty, with `onVoice`, it's a voice key and shows a wave; words turn the wave into
+ * Send, and Send into Stop while it answers: the shaft widens into the square and the head folds away,
+ * and back from wherever it got to. Never `disabled`: that would drop keyboard focus onto the page the
  * moment the words left.
  */
-function SendKey({ canSend, busy, onSend, onStop, ref }: { canSend: boolean; busy: boolean; onSend: (byKey: boolean) => void; onStop: () => void; ref?: Ref<HTMLButtonElement> }) {
-  const lit = canSend || busy
+function SendKey({ canSend, busy, onSend, onStop, onVoice, ref }: { canSend: boolean; busy: boolean; onSend: (byKey: boolean) => void; onStop: () => void; onVoice?: () => void; ref?: Ref<HTMLButtonElement> }) {
+  const voice = !!onVoice && !canSend && !busy
+  const lit = canSend || busy || voice
   const armed = useRef(0)
   useLayoutEffect(() => {
     if (busy) armed.current = performance.now() + ARMS
   }, [busy])
   const glyph = 'transition-[opacity,transform] duration-150 ease-[cubic-bezier(0.2,0.9,0.25,1)] motion-reduce:transition-none'
+  const arrow = !voice
   return (
     <motion.button
       ref={ref}
       type="button"
       {...(lit ? TAP : {})}
       aria-disabled={!lit}
-      aria-label={busy ? 'Stop' : 'Send'}
+      aria-label={busy ? 'Stop' : voice ? 'Speak' : 'Send'}
       onMouseDown={keep}
       onPointerDown={() => lit && tap()}
       onClick={(e) => {
+        if (voice) return onVoice?.()
         if (!busy) return onSend(e.detail === 0)
         if (performance.now() >= armed.current) onStop()
       }}
-      className={`ring-focus relative flex size-[30px] shrink-0 items-center justify-center rounded-full bg-[var(--c-send)] text-white aria-disabled:cursor-default ${HIT}`}
+      className={`ring-focus relative flex shrink-0 items-center justify-center rounded-full transition-[background-color,color,box-shadow] duration-150 aria-disabled:cursor-default ${lit ? 'bg-[var(--c-send)] text-[var(--c-send-ink)] shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_1px_2px_var(--c-shadow)]' : 'bg-[var(--c-well)] text-[var(--c-ink-3)]'} ${HIT}`}
+      style={{ width: ROW, height: ROW, backgroundImage: lit ? 'linear-gradient(180deg, rgba(255,255,255,0.12), rgba(0,0,0,0.1))' : undefined }}
     >
-      <span aria-hidden className="relative block size-[16px]" style={{ scale: '0.85' }}>
-        <span className={`absolute left-[3px] top-[3px] size-[10px] rounded-[2.5px] bg-current ${glyph}`} style={{ transform: busy ? 'none' : 'translateY(0.25px) scale(0.2, 1.15)' }} />
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`absolute inset-0 ${glyph}`} style={{ opacity: busy ? 0 : 1, transform: busy ? 'translateY(3px) scale(0.6)' : undefined, transformOrigin: '8px 3.4px' }}>
+      <span aria-hidden className="relative block size-[16px]">
+        {/* The wave: five bars, the middle tallest, that fold into the shaft as words arrive. */}
+        <span className={`absolute inset-0 flex items-center justify-center gap-[2px] ${glyph}`} style={{ opacity: voice ? 1 : 0, transform: voice ? 'none' : 'scale(0.4, 0.6)' }}>
+          {[5, 9, 13, 9, 5].map((h, i) => (
+            <span key={i} className="block w-[1.6px] rounded-full bg-current" style={{ height: h }} />
+          ))}
+        </span>
+        <span className={`absolute left-[3px] top-[3px] size-[10px] rounded-[2.5px] bg-current ${glyph}`} style={{ opacity: arrow ? 1 : 0, transform: busy ? 'scale(0.85)' : 'translateY(0.25px) scale(0.17, 1)' }} />
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className={`absolute inset-0 ${glyph}`} style={{ opacity: arrow && !busy ? 1 : 0, transform: busy ? 'translateY(3px) scale(0.6)' : voice ? 'translateY(2px) scale(0.7)' : 'scale(0.85)', transformOrigin: '8px 3.4px' }}>
           <path d="M3.9 7.5 8 3.4l4.1 4.1" />
         </svg>
       </span>

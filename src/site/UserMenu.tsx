@@ -62,11 +62,11 @@ function useMe() {
   return me
 }
 
-/** Their picture from GitHub or Google, or their own orb. */
+/** Their picture from GitHub, or their own orb. */
 export function Avatar({ email, image, size }: { email: string; image: string | null; size: number }) {
   if (image)
     return (
-      // A picture from GitHub or Google at a size we choose; next/image would need their hosts listed for nothing gained.
+      // A picture from GitHub at a size we choose; next/image would need their hosts listed for nothing gained.
       // eslint-disable-next-line @next/next/no-img-element
       <img src={image} alt="" width={size} height={size} referrerPolicy="no-referrer" className="shrink-0 rounded-full object-cover shadow-[0_0_0_1px_var(--line)]" style={{ width: size, height: size }} />
     )

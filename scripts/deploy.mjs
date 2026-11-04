@@ -13,8 +13,8 @@ const root = process.cwd()
 const WORKER = 'detent'
 // DETENT_UNLOCK and DETENT_DEV_KEY open Pro for free, so they must never reach production.
 const SECRETS = ['DETENT_DB_URL', 'DETENT_DB_TOKEN', 'RESEND_API_KEY', 'DETENT_MAIL_FROM', 'DODO_WEBHOOK_SECRET', 'DETENT_PLAN_PRO', 'DETENT_PLAN_ALL', 'DETENT_PLAN_TEAM',
-  // Signing in: Better Auth's own secret, its dashboard's key, and the GitHub and Google OAuth apps. Each provider shows once both its values are set.
-  'BETTER_AUTH_SECRET', 'BETTER_AUTH_API_KEY', 'GITHUB_CLIENT_ID', 'GITHUB_CLIENT_SECRET', 'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET']
+  // Signing in: Better Auth's own secret, its dashboard's key, and the GitHub OAuth app. GitHub's button shows once both its values are set.
+  'BETTER_AUTH_SECRET', 'BETTER_AUTH_API_KEY', 'GITHUB_CLIENT_ID', 'GITHUB_CLIENT_SECRET']
 
 const fail = (message) => {
   console.error(message)

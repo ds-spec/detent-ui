@@ -12,8 +12,9 @@ import { Layer, fill, frameOf, inFrame, useDismiss, useHost, useReposition } fro
  * current choice. Keep holding and slide, let go to choose: one gesture, not two taps.
  *
  * The black plate is a second copy of the list clipped to a moving window, so the text turns white at
- * the plate's edge, part of a letter at a time. Choosing slides the new row up under the finger and
- * closes around it, so the pill becomes the row you picked with nothing swapped.
+ * the plate's edge, part of a letter at a time. Choosing closes the list in place, back onto the pill,
+ * and the pill, already the row you picked, comes up through it as it goes. Nothing slides, and the
+ * tick stays where it was until the list is gone.
  */
 
 const ROW = 36
@@ -74,6 +75,8 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
   const start = value
   const [shown, setShown] = useState(false)
   const [active, setActive] = useState(start)
+  // The choice the list opened on: its tick stays there while the list closes, so nothing jumps first.
+  const [from, setFrom] = useState(start)
   const [spot, setSpot] = useState({ x: 0, y: 0 })
   const [width, setWidth] = useState(0)
 
@@ -89,6 +92,9 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
   const pull = useMotionValue(0)
   const pillW = useMotionValue(0)
   const on = useMotionValue(1)
+  // The list while it's up; the pill shows through as it goes.
+  const fade = useMotionValue(0)
+  const pillO = useTransform(fade, (f) => 1 - f)
   const height = PAD * 2 + ROW * options.length
   const widthRef = useRef(0)
 
@@ -102,9 +108,6 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
   const window_ = useTransform(plate, (p) => `inset(${PAD + p}px ${PAD}px ${height - PAD - ROW - p}px ${PAD}px round 10px)`)
   const inverted = useTransform([open, on], ([o, v]: number[]) => clamp((o - 0.3) / 0.5, 0, 1) * v)
   const shadow = useTransform(open, (o) => `${EDGE} drop-shadow(0 18px 28px rgb(0 0 0 / ${0.2 * o}))`)
-  const updownX = useTransform(pillW, (w) => w - 24)
-  const updownY = useTransform(anchor, (a) => PAD + ROW * a)
-  const updownO = useTransform(open, [0, 0.3], [1, 0])
 
   const widths = () => probes.current.map((p) => (p?.offsetWidth ?? 0) + LEFT + RIGHT)
 
@@ -151,11 +154,13 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
     setSpot({ x: box.x, y: box.y })
     s.active = s.value
     setActive(s.value)
+    setFrom(s.value)
     plate.set(s.value * ROW)
+    fade.set(1)
     on.set(1)
     if (sheet.current) sheet.current.style.pointerEvents = ''
     setShown(true)
-    animate(anchor, s.value, instant || reduce ? NOW : OPEN)
+    anchor.set(s.value)
     animate(pull, 0, NOW)
     animate(open, 1, instant || reduce ? NOW : OPEN)
   }
@@ -166,8 +171,9 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
     // A press while it's closing belongs to the pill underneath, which catches it in flight.
     if (sheet.current) sheet.current.style.pointerEvents = 'none'
     animate(pull, 0, SHUT)
-    animate(anchor, s.value, instant || reduce ? NOW : SHUT)
+    // It closes onto the row it opened on, which is where the pill is: the list never slides.
     animate(pillW, widths()[s.value], instant || reduce ? NOW : SHUT)
+    animate(fade, 0, instant || reduce ? NOW : { duration: 0.18, ease: [0.2, 0.9, 0.25, 1] })
     animate(open, 0, instant || reduce ? NOW : SHUT).then(() => {
       if (live.current.mode === 'shut') setShown(false)
     })
@@ -275,14 +281,14 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
         style={{ height: ROW, paddingLeft: LEFT }}
       >
         {o}
-        {i === value && <Check />}
+        {i === from && <Check />}
       </div>
     ))
 
   return (
     <div className={`relative inline-block max-w-full align-middle ${INK} ${className}`} style={{ height: ROW }}>
       {name && <input type="hidden" name={name} value={options[value]} />}
-      <button
+      <motion.button
         ref={pill}
         type="button"
         aria-haspopup="listbox"
@@ -297,15 +303,15 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
         onTouchEnd={(e) => e.preventDefault()}
         onKeyDown={keys}
         onBlur={() => live.current.mode === 'tap' && hide(true)}
-        className={`ring-focus relative flex touch-none select-none items-center whitespace-nowrap bg-surface text-ink before:absolute before:-inset-y-1 before:inset-x-0 ${textClass} ${shown ? 'opacity-0' : ''}`}
+        className={`ring-focus relative flex touch-none select-none items-center whitespace-nowrap bg-surface text-ink before:absolute before:-inset-y-1 before:inset-x-0 ${textClass}`}
         // Inline, because a site's own button rules often set touch-action and would turn the slide into a scroll.
-        style={{ height: ROW, paddingLeft: LEFT, paddingRight: 10, filter: EDGE, borderRadius: radius, touchAction: 'none' }}
+        style={{ height: ROW, paddingLeft: LEFT, paddingRight: 10, filter: EDGE, borderRadius: radius, touchAction: 'none', opacity: pillO }}
       >
         <span style={{ paddingRight: RIGHT - 10 }}>{options[value]}</span>
         <span className="absolute right-[9px] text-ink-3">
           <Updown />
         </span>
-      </button>
+      </motion.button>
 
       <div aria-hidden className={`pointer-events-none invisible absolute left-0 top-0 ${textClass}`}>
         {options.map((o, i) => (
@@ -323,7 +329,7 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
 
       {shown && (
         <Layer>
-          <motion.div className={`pointer-events-none ${fill(contained).split(' ')[0]} z-50 ${INK}`} style={{ left: spot.x, top: spot.y, x, y, filter: shadow, width, height }}>
+          <motion.div className={`pointer-events-none ${fill(contained).split(' ')[0]} z-50 ${INK}`} style={{ left: spot.x, top: spot.y, x, y, filter: shadow, width, height, opacity: fade }}>
             <motion.div
               ref={sheet}
               role="listbox"
@@ -338,9 +344,6 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
               <motion.div aria-hidden className="pointer-events-none absolute inset-0 bg-ink text-surface" style={{ clipPath: window_, opacity: inverted, paddingTop: PAD }}>
                 {rows(true)}
               </motion.div>
-              <motion.span aria-hidden className="pointer-events-none absolute left-0 top-0 flex items-center text-ink-3" style={{ x: updownX, y: updownY, opacity: updownO, height: ROW }}>
-                <Updown />
-              </motion.span>
             </motion.div>
           </motion.div>
         </Layer>
