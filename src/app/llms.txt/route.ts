@@ -8,7 +8,7 @@
  */
 
 import { ENTRIES } from '@/catalog/meta'
-import { KITS, SITE, installCommand, isProComponent } from '@/catalog/pro'
+import { KITS, SITE, installCommand, isProBlock, isProComponent } from '@/catalog/pro'
 import { BLOCKS } from '@/catalog/blocks'
 import { TEMPLATES } from '@/catalog/templates'
 import { CONTACT } from '@/catalog/trust'
@@ -33,7 +33,7 @@ export function GET() {
     `- [Templates](${SITE}/templates.md): Full landing pages and applications ready to clone`,
     '',
     '## Docs & Guides',
-    `- [Get started](${SITE}/docs): Set up a project, install a first component, connect Pro, and hand it to a coding agent`,
+    `- [Get started](${SITE}/docs.md): Set up a project, install a first component, connect Pro, and hand it to a coding agent`,
     `- [Design System](${SITE}/system.md): Tokens, typography, layout principles, and styling rules`,
     '',
     '## Kits',
@@ -53,7 +53,7 @@ export function GET() {
     '',
     '## Blocks',
     ...BLOCKS.map(
-      (b) => `- [${b.name}](${SITE}/blocks/${b.id}.md): ${b.line} \`${installCommand(b.id, false)}\``,
+      (b) => `- [${b.name}](${SITE}/blocks/${b.id}.md): ${b.line} \`${installCommand(b.id, !isProBlock(b.id))}\``,
     ),
     '',
     '## Templates',
@@ -75,6 +75,7 @@ export function GET() {
     `- [Licence](${SITE}/licence.md): MIT and Pro license terms`,
     `- [Terms](${SITE}/terms.md): Terms of service`,
     `- [Refunds](${SITE}/refunds.md): 14-day refund policy`,
+    `- [Privacy](${SITE}/privacy.md): What we keep and how to have it removed`,
   ]
 
   return new Response(lines.join('\n') + '\n', {

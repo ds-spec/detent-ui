@@ -34,6 +34,8 @@ const CONTENT_PATHS = [
   '/licence',
   '/terms',
   '/refunds',
+  '/docs',
+  '/privacy',
 ]
 
 /** Returns true when the path is a public content route we have a renderer for. */

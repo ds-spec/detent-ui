@@ -12,7 +12,7 @@ import { ENTRIES, entry } from '@/catalog/meta'
 import { BLOCKS } from '@/catalog/blocks'
 import { TEMPLATES, TEMPLATE_COUNT } from '@/catalog/templates'
 import { RELEASES, CONTACT } from '@/catalog/trust'
-import { FREE_BLOCKS, PLANS, PRO_COMPONENTS, PRO_BLOCK_COUNT, SITE } from '@/catalog/pro'
+import { FREE_BLOCKS, PLANS, PRO_COMPONENTS, PRO_BLOCK_COUNT, SITE, installCommand, isProBlock, isProComponent } from '@/catalog/pro'
 import { NAME, DESCRIPTION, TAGLINE, FREE_COUNT } from '@/site/seo'
 import { abs, envelope, fmtDate, itemList, kvTable, today } from './format'
 
@@ -335,6 +335,144 @@ function renderRefunds(): string {
 
 // ─── Dynamic page renderers ───────────────────────────────────────────────────
 
+function renderDocs(): string {
+  const first = ENTRIES.find((e) => e.id === 'popup' && !isProComponent(e.id)) ?? ENTRIES.find((e) => !isProComponent(e.id))!
+  const free = ENTRIES.filter((e) => !isProComponent(e.id)).length
+  const body = [
+    `${NAME} installs with the shadcn CLI, so every piece lands in your project as source you own. ${free} components are free under MIT; the rest come with Pro.`,
+    '',
+    '## With your coding agent',
+    '',
+    'Paste this into Cursor, Claude Code or any agent. It reads the library and installs for you.',
+    '',
+    '```text',
+    `Read ${SITE}/llms.txt to learn the Detent component library. Then install the ${first.name} component into this project with the shadcn CLI, using the exact command listed there, and use it on the home page. If the project has no components.json yet, run shadcn init first.`,
+    '```',
+    '',
+    '## Install a component',
+    '',
+    '### 1. Set up shadcn',
+    '',
+    'Skip this if your project already has a components.json. You need React and Tailwind CSS v4; Next.js is what we test on.',
+    '',
+    '```bash',
+    'npx shadcn@latest init',
+    '```',
+    '',
+    `### 2. Add ${first.name}`,
+    '',
+    'Its source lands in components/detent, ready to change. The first install also brings the Detent theme, and anything a piece needs, like motion, comes with it.',
+    '',
+    '```bash',
+    installCommand(first.id, true),
+    '```',
+    '',
+    '### 3. Respect reduced motion',
+    '',
+    'Wrap your app once in `<MotionConfig reducedMotion="user">` from motion/react, in app/layout.tsx. Everything Detent animates then calms down for people who have asked their device for less motion.',
+    '',
+    '## Install Pro',
+    '',
+    `Pro installs the same way, from a private registry that knows your key. Pro is $${PLANS[0].price}, once, with every update for life: ${abs('/pro')}`,
+    '',
+    '### 1. Make a key',
+    '',
+    `After you buy, make one on your account page (${abs('/account')}). One per machine, and one for CI.`,
+    '',
+    '### 2. Add the registry to components.json',
+    '',
+    '```json',
+    '{',
+    '  "registries": {',
+    '    "@detent-pro": {',
+    `      "url": "${SITE}/r/pro/{name}.json",`,
+    '      "headers": { "Authorization": "Bearer ${DETENT_PRO_KEY}" }',
+    '    }',
+    '  }',
+    '}',
+    '```',
+    '',
+    '### 3. Add your key to .env.local',
+    '',
+    '```bash',
+    'DETENT_PRO_KEY=dtnt_your-key',
+    '```',
+    '',
+    '### 4. Install anything',
+    '',
+    '```bash',
+    installCommand('lens', false),
+    '```',
+    '',
+    '## If something goes wrong',
+    '',
+    itemList([
+      { label: 'pnpm stops with ERR_PNPM_IGNORED_BUILDS', desc: 'pnpm is holding back Next.js build scripts in a new project. Run pnpm approve-builds, then install again.' },
+      { label: 'A Pro install answers 401 or 403', desc: 'Check DETENT_PRO_KEY is in .env.local, the registry block is in components.json, and the key is still listed on your account page.' },
+      { label: 'Colours or type look unstyled', desc: 'The theme stylesheet is not loaded. The first install imports it into your global CSS; if you moved that file, import it again.' },
+      { label: 'A coding agent installs the wrong thing', desc: `Point it at ${SITE}/llms.txt first. It lists every component with its exact install command.` },
+    ]),
+    '',
+    `Still stuck? Write to ${CONTACT}.`,
+  ].join('\n')
+
+  return envelope({
+    title: `Get started — ${NAME}`,
+    summary: 'Install your first Detent component with the shadcn CLI, set up reduced motion, and connect Pro. Or hand it all to your coding agent.',
+    path: '/docs',
+    body,
+    related: [
+      { label: 'Components', href: abs('/components') },
+      { label: 'Blocks', href: abs('/blocks') },
+      { label: 'Design system', href: abs('/system') },
+      { label: 'Pro', href: abs('/pro') },
+    ],
+  })
+}
+
+function renderPrivacy(): string {
+  const body = [
+    'You can browse Detent and install every free component without an account. We only keep what we need to sign you in, deliver what you bought and answer you when you write.',
+    '',
+    '## What we keep',
+    '',
+    '- Your email address, when you create an account. If you sign in with GitHub, your name and avatar from GitHub too.',
+    '- Sign-in records: your session, and how you last signed in.',
+    '- Your purchases: which plan, when, the payment reference from Dodo Payments, and whether it was refunded. We never see or store your card details.',
+    '- Your licence keys, and checks of a key when it installs Pro components.',
+    '- What you send us by email, so we can reply.',
+    '',
+    '## What we don’t do',
+    '',
+    '- No advertising, and no ad or tracking cookies.',
+    '- No analytics that follow you around: visitor counts come from Cloudflare Web Analytics, which uses no cookies and doesn’t identify you.',
+    '- We don’t sell or rent your data to anyone.',
+    '- Live demos run in your browser or against a scripted demo. We don’t keep what you type into them.',
+    '',
+    '## Who helps us run it',
+    '',
+    '- Dodo Payments: payment, as merchant of record.',
+    '- Cloudflare: hosting, request logs and aggregate visit counts.',
+    '- Turso: the database for accounts, purchases and keys.',
+    '- Resend: sign-in and purchase emails.',
+    '- GitHub: only if you choose to sign in with it.',
+    '',
+    '## Cookies, retention and your choices',
+    '',
+    'Cookies only keep you signed in. Your account stays until you ask us to delete it; purchase records are kept as long as tax rules require. Request logs are kept only briefly by our host.',
+    '',
+    `Write to ${CONTACT} from the address on your account for a copy of what we hold, a correction, or deletion. We answer within 30 days. Deleting your account also stops your licence keys from working.`,
+  ].join('\n')
+
+  return envelope({
+    title: `${NAME} — Privacy`,
+    summary: 'What Detent keeps about you, why, who helps run it, and how to have it removed. No ads, no tracking, nothing sold.',
+    path: '/privacy',
+    body,
+    related: [{ label: 'Terms', href: abs('/terms') }, { label: 'Refunds', href: abs('/refunds') }],
+  })
+}
+
 function renderComponent(slug: string): string | null {
   const e = entry(slug)
   if (!e) return null
@@ -358,8 +496,8 @@ function renderComponent(slug: string): string | null {
     `npx shadcn add ${SITE}/r/${e.id}`,
     '```',
   ]
-    .filter(Boolean)
     .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
 
   return envelope({
     title: `${e.name} — ${NAME}`,
@@ -376,6 +514,7 @@ function renderComponent(slug: string): string | null {
 function renderBlock(slug: string): string | null {
   const b = BLOCKS.find((b) => b.id === slug)
   if (!b) return null
+  const free = !isProBlock(b.id)
 
   const body = [
     `## About`,
@@ -390,14 +529,14 @@ function renderBlock(slug: string): string | null {
       ? ['## Keyboard shortcuts', '', kvTable(b.keys, ['Keys', 'Action'])].join('\n')
       : '',
     '',
-    `## Install (Pro required)`,
+    free ? '## Install' : '## Install (Pro required)',
     '',
     '```bash',
-    `npx shadcn add @detent-pro/${b.id}`,
+    installCommand(b.id, free),
     '```',
   ]
-    .filter(Boolean)
     .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
 
   return envelope({
     title: `${b.name} — ${NAME}`,
@@ -458,11 +597,13 @@ const STATIC_ROUTES: Record<string, { render: () => string | null; desc: string;
   '/components':  { render: renderComponents, desc: `All ${ENTRIES.length} components, by category`,    isStatic: true },
   '/blocks':      { render: renderBlocks,     desc: `All ${BLOCKS.length} whole-screen blocks`,         isStatic: true },
   '/templates':   { render: renderTemplates,  desc: `Every template`,                isStatic: true },
+  '/docs':        { render: renderDocs,       desc: 'Get started: install a component, connect Pro, use a coding agent', isStatic: true },
   '/system':      { render: renderSystem,     desc: 'Design tokens, typography and theme',             isStatic: true },
   '/changelog':   { render: renderChangelog,  desc: 'Every update, newest first',                      isStatic: false },
   '/licence':     { render: renderLicence,    desc: 'Licence terms and key conditions',                isStatic: true },
   '/terms':       { render: renderTerms,      desc: 'Terms of service',                                isStatic: true },
   '/refunds':     { render: renderRefunds,    desc: 'Refund policy: 14 days, no questions asked',      isStatic: true },
+  '/privacy':     { render: renderPrivacy,    desc: 'What we keep, who helps run it, and how to remove it', isStatic: true },
 }
 
 /**
@@ -508,7 +649,7 @@ export function listMarkdownRoutes(): MarkdownRoute[] {
   const routes: MarkdownRoute[] = []
 
   // Static pages — in content priority order
-  const staticOrder = ['/', '/pro', '/components', '/blocks', '/templates', '/system', '/changelog', '/licence', '/terms', '/refunds']
+  const staticOrder = ['/', '/pro', '/docs', '/components', '/blocks', '/templates', '/system', '/changelog', '/licence', '/terms', '/refunds', '/privacy']
   for (const path of staticOrder) {
     const r = STATIC_ROUTES[path]
     if (r) routes.push({ path, desc: r.desc, inFull: true, isStatic: r.isStatic })
