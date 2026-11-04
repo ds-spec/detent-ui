@@ -44,7 +44,7 @@ export function DeviceStage({ title, chrome, mode, setMode, pro, theme, onReplay
   // A device is shown at its real size: the stage grows to hold it and the page scrolls past it, the way you'd hold a phone up to look at it.
   const d = device === 'desktop' ? null : DEVICES[device]
   return (
-    <div data-desk className="relative mt-5 flex flex-col rounded-[20px] bg-[var(--mount)] transition-[height] duration-300 max-sm:-mx-3" style={{ height: d ? d.h + d.bezel * 2 + 44 + 72 : 'clamp(600px, calc(100dvh - 240px), 880px)' }}>
+    <div data-desk className="relative mt-5 flex flex-col rounded-[20px] bg-[var(--mount)] transition-[height] duration-300 max-sm:-mx-3" style={{ height: d ? d.h + d.bezel * 2 + 44 + 72 : 'clamp(680px, calc(100dvh - 140px), 1000px)' }}>
       <div className="flex h-[44px] shrink-0 items-center justify-between px-[5px] pt-[5px]">
         <ModesLine mode={mode} setMode={setMode} pro={pro} />
         <span className="flex items-center gap-1.5">
@@ -130,7 +130,7 @@ function Screen({ device, title, chrome, children }: { device: Device; title: st
   // Only the width can make a device smaller: the stage is as tall as the device.
   const scale = outer && room.w ? Math.min(1, (room.w - 48) / outer.w) : 1
   return (
-    <div ref={box} className="absolute inset-0 flex items-center justify-center p-4 sm:p-6">
+    <div ref={box} className={`absolute inset-0 flex items-center justify-center ${d ? 'p-4 sm:p-6' : 'p-3 sm:p-4'}`}>
       <AnimatePresence mode="popLayout" initial={false}>
         {d && outer ? (
           <motion.div key={device} className="shrink-0" style={{ width: outer.w * scale, height: outer.h * scale }} initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.12 } }} transition={{ type: 'spring', stiffness: 360, damping: 34 }}>

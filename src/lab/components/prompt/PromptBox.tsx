@@ -70,7 +70,7 @@ const LINE = 24
 const MIN_LINES = 2
 const MAX_LINES = 8
 const ROW = 34
-const PAD = 14
+const PAD = 10
 const FRAME = 18 + ROW + PAD
 const GAP = 24
 const R = ROW / 2 + PAD
@@ -83,8 +83,8 @@ export const PROMPT_H = FRAME + REST + HEAD
 export const PROMPT_H_BARE = FRAME + REST
 export const PROMPT_STRIP = STRIP
 
-const TEXT = 'text-[17px]! tracking-[-0.011em]'
-const ROW_TEXT = 'text-[16px] tracking-[-0.006em]'
+const TEXT = 'text-[length:var(--p-text,17px)]! tracking-[-0.011em]'
+const ROW_TEXT = 'text-[length:var(--p-row,16px)] tracking-[-0.006em]'
 const HIT = "pointer-coarse:before:absolute pointer-coarse:before:left-1/2 pointer-coarse:before:top-1/2 pointer-coarse:before:size-[44px] pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']"
 const TAP = { whileTap: press, transition: { scale: { duration: 0.1, ease: ease.out } } }
 const keep = (e: ReactMouseEvent) => e.preventDefault()
@@ -132,6 +132,8 @@ export function PromptBox({
   onProject,
   onVoice,
   onGrow,
+  sendable = true,
+  compact = false,
   ref,
 }: {
   onSend?: (message: Message) => Promise<unknown> | void
@@ -153,8 +155,11 @@ export function PromptBox({
   onProject?: (name: string | null) => void
   onVoice?: () => void
   onGrow?: (by: number) => void
+  sendable?: boolean
+  compact?: boolean
   ref?: Ref<PromptHandle>
 }) {
+  const r = compact ? 20 : R
   const [text, setText] = useState('')
   const [files, setFiles] = useState<Attachment[]>(initialFiles)
   const [mode, setMode] = useState(initialMode ?? modes[1]?.id ?? modes[0].id)
@@ -441,13 +446,13 @@ export function PromptBox({
   const plateAt = PLATE - (base - under) - (initialFiles.length ? SHELF : 0)
 
   return (
-    <div className="@container relative" style={{ width, maxWidth: '100%', height: base, ...PROMPT_MATERIAL }}>
+    <div className="@container relative" style={{ width, maxWidth: '100%', height: base, ...PROMPT_MATERIAL, ...(compact ? { '--p-text': '15px', '--p-row': '14px' } : {}) } as CSSProperties}>
       <div
         ref={tray}
         aria-hidden={!under && !telling}
         {...(!under && !telling ? { inert: true } : {})}
         className="absolute inset-x-0 bottom-0 rounded-[var(--r)] bg-[var(--c-strip)] shadow-[inset_0_0_0_1px_var(--c-edge)] will-change-transform"
-        style={{ height: STRIP + 2 * R, opacity: under ? 1 : 0, '--r': `${R}px` } as CSSProperties}
+        style={{ height: STRIP + 2 * r, opacity: under ? 1 : 0, '--r': `${r}px` } as CSSProperties}
       >
         <div className="absolute inset-x-0 bottom-0 flex items-center px-[8px]" style={{ height: STRIP }}>
           <AnimatePresence initial={false} mode="popLayout">
@@ -510,7 +515,7 @@ export function PromptBox({
         ref={hang}
         data-prompt-box
         className="absolute inset-x-0 will-change-transform"
-        style={{ bottom: under, height: base - under + (initialFiles.length ? SHELF : 0), borderRadius: R }}
+        style={{ bottom: under, height: base - under + (initialFiles.length ? SHELF : 0), borderRadius: r }}
         onKeyDown={(e) => {
           if (e.key === 'Escape' && busy) {
             e.preventDefault()
@@ -537,9 +542,9 @@ export function PromptBox({
         }}
       >
         <div aria-hidden className="pointer-events-none absolute inset-0" style={{ filter: 'drop-shadow(0 1px 1px var(--c-shadow)) drop-shadow(0 6px 14px var(--c-shadow))' }}>
-          <div className="absolute inset-x-0 bottom-0 overflow-clip" style={{ height: PLATE, borderBottomLeftRadius: R, borderBottomRightRadius: R }}>
-            <div ref={plate} className="absolute inset-x-0 top-0 bg-[var(--c-field)] transition-shadow duration-150 will-change-transform" style={{ height: PLATE, transform: `translate3d(0,${plateAt}px,0)`, boxShadow: edge, borderTopLeftRadius: R, borderTopRightRadius: R }} />
-            <div className="absolute inset-x-0 bottom-0 h-[44px] bg-[var(--c-field)] transition-shadow duration-150" style={{ clipPath: 'inset(3px 0 0 0)', boxShadow: edge, borderBottomLeftRadius: R, borderBottomRightRadius: R }} />
+          <div className="absolute inset-x-0 bottom-0 overflow-clip" style={{ height: PLATE, borderBottomLeftRadius: r, borderBottomRightRadius: r }}>
+            <div ref={plate} className="absolute inset-x-0 top-0 bg-[var(--c-field)] transition-shadow duration-150 will-change-transform" style={{ height: PLATE, transform: `translate3d(0,${plateAt}px,0)`, boxShadow: edge, borderTopLeftRadius: r, borderTopRightRadius: r }} />
+            <div className="absolute inset-x-0 bottom-0 h-[44px] bg-[var(--c-field)] transition-shadow duration-150" style={{ clipPath: 'inset(3px 0 0 0)', boxShadow: edge, borderBottomLeftRadius: r, borderBottomRightRadius: r }} />
           </div>
         </div>
 
@@ -591,7 +596,7 @@ export function PromptBox({
                   } else if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing && e.keyCode !== 229) {
                     if (fingers() && !e.metaKey && !e.ctrlKey) return
                     e.preventDefault()
-                    send()
+                    if (sendable) send()
                   } else if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key.toLowerCase() === 'z' && !text && last.current) {
                     e.preventDefault()
                     const back = last.current
@@ -649,10 +654,11 @@ export function PromptBox({
             <span className="min-w-0 flex-1" />
             <SendKey
               ref={sendKey}
-              canSend={canSend}
+              canSend={canSend && sendable}
               busy={busy}
               onVoice={onVoice}
               onSend={(byKey) => {
+                if (!sendable) return
                 send()
                 if (byKey || !canSend) area.current?.focus()
               }}
@@ -735,12 +741,12 @@ function Key({ label, onClick, children }: { label: string; onClick: () => void;
 function Modes({ modes, mode, onMode }: { modes: Mode[]; mode: string; onMode: (id: string) => void }) {
   const keys = useRef<(HTMLButtonElement | null)[]>([])
   const names = useRef<HTMLSpanElement>(null)
-  const [nameW, setNameW] = useState(() => Math.max(...modes.map((m) => m.name.length)) * 8.6)
+  const [nameWs, setNameWs] = useState(() => modes.map((m) => m.name.length * 8.6))
   const at = Math.max(0, modes.findIndex((m) => m.id === mode))
   useLayoutEffect(() => {
     const n = names.current
     if (!n) return
-    const read = () => setNameW(n.offsetWidth)
+    const read = () => setNameWs([...n.children].map((c) => (c as HTMLElement).offsetWidth))
     read()
     const ro = new ResizeObserver(read)
     ro.observe(n)
@@ -753,18 +759,17 @@ function Modes({ modes, mode, onMode }: { modes: Mode[]; mode: string; onMode: (
     keys.current[n]?.focus()
   }
   const KEY = ROW - 4
-  const wide = nameW ? 10 + 16 + 6 + Math.ceil(nameW) + 12 : KEY + 12
-  const widthOf = (m: Mode, on: boolean) => (on ? wide : m.icon ? KEY : wide)
-  const left = 2 + modes.slice(0, at).reduce((sum, m) => sum + widthOf(m, false), 0)
+  const wideOf = (i: number) => (nameWs[i] ? 10 + 16 + 6 + Math.ceil(nameWs[i]) + 12 : KEY + 12)
+  const wide = wideOf(at)
+  const widthOf = (m: Mode, on: boolean, i: number) => (on || !m.icon ? wideOf(i) : KEY)
+  const left = 2 + modes.slice(0, at).reduce((sum, m, i) => sum + widthOf(m, false, i), 0)
   const move = 'duration-300 ease-[cubic-bezier(0.2,0.9,0.25,1)] motion-reduce:transition-none'
   return (
     <div role="radiogroup" aria-label="Mode" className="relative flex min-w-0 shrink-0 items-center rounded-full bg-[var(--c-well)] p-[2px]" style={{ height: ROW }}>
       <span aria-hidden className={`pointer-events-none invisible absolute grid whitespace-nowrap @max-[380px]:hidden ${ROW_TEXT}`}>
-        <span ref={names} className="col-start-1 row-start-1 grid">
+        <span ref={names} className="col-start-1 row-start-1 flex">
           {modes.map((m) => (
-            <span key={m.id} className="col-start-1 row-start-1">
-              {m.name}
-            </span>
+            <span key={m.id}>{m.name}</span>
           ))}
         </span>
       </span>
@@ -794,7 +799,7 @@ function Modes({ modes, mode, onMode }: { modes: Mode[]; mode: string; onMode: (
               go(i + step)
             }}
             className={`ring-focus relative flex h-full shrink-0 items-center justify-center gap-[6px] overflow-hidden whitespace-nowrap rounded-full ${ROW_TEXT} transition-[width,color] ${move} ${on ? 'text-[var(--c-ink)]' : 'text-[var(--c-ink-3)] hover:text-[var(--c-ink)]'} ${HIT}`}
-            style={{ width: widthOf(m, on) }}
+            style={{ width: widthOf(m, on, i) }}
           >
             {m.icon && <span className="flex shrink-0">{m.icon}</span>}
             {named && <span className={`shrink-0 transition-opacity duration-200 ease-out @max-[380px]:hidden ${on || !m.icon ? 'opacity-100' : 'opacity-0'}`}>{m.name}</span>}

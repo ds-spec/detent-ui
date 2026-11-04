@@ -110,9 +110,9 @@ export function Shell({ list, bar, children, bare = false }: { list: ReactNode; 
 const INDEX_KEY = 'detent.index'
 const indexShown = () => {
   try {
-    return localStorage.getItem(INDEX_KEY) !== 'hidden'
+    return localStorage.getItem(INDEX_KEY) === 'shown'
   } catch {
-    return true
+    return false
   }
 }
 const onIndexChange = (on: () => void) => {
@@ -141,7 +141,7 @@ function Bare({ rail, children }: { rail: { groups: RailGroup[]; current: string
   const label = rail.label ?? 'Components'
   // The index down the side only has room from a laptop up, and stays hidden once you've hidden it.
   const [wide, setWide] = useState(false)
-  const shown = useSyncExternalStore(onIndexChange, indexShown, () => true)
+  const shown = useSyncExternalStore(onIndexChange, indexShown, () => false)
   useEffect(() => {
     const m = matchMedia('(min-width: 1024px)')
     const on = () => setWide(m.matches)
