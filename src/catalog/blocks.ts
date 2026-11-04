@@ -586,6 +586,7 @@ export const BLOCKS: Block[] = [
       { name: 'onRotateKey', type: '(id: string) => void', note: 'Called with a key’s id when a person rotates it.' },
       { name: 'onInvite', type: '(email: string) => void', note: 'Called with the address a person invites.' },
       { name: 'onDeleteWorkspace', type: '(deleted: boolean) => void', note: 'Called when a person holds to delete, and with false if they undo it.' },
+      { name: 'onNavigate', type: '(page: string) => void', note: 'Called with a sidebar item that isn’t on this page, like General or Billing, so it can open your own page. Without it, those items are quiet labels.' },
     ],
   },
   {
