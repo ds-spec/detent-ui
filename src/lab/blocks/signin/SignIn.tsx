@@ -157,7 +157,7 @@ export function SignIn({ autoplay = true, accent, product = 'Detent', providers 
     <Names.Provider value={names}>
       <div className={`pro-app @container relative flex h-full w-full overflow-hidden bg-surface text-ink ${className}`} style={accentVars(accent)} onPointerDownCapture={director.onPointerDownCapture} onPointerUpCapture={director.onPointerUpCapture} onKeyDownCapture={director.onKeyDownCapture}>
         <div className="relative min-w-0 flex-1">
-          <div className="absolute left-5 top-5 flex items-center gap-2 @4xl:left-3 @4xl:top-3">
+          <div className="absolute left-5 top-5 flex items-center gap-2.5 @4xl:left-8 @4xl:top-8">
             <Mark />
             <span className="text-headline">{product}</span>
           </div>
@@ -179,7 +179,7 @@ export function SignIn({ autoplay = true, accent, product = 'Detent', providers 
             </motion.div>
           </AnimatePresence>
 
-          <p className="absolute inset-x-0 bottom-5 text-center text-caption text-ink-3">
+          <p className="absolute inset-x-0 bottom-5 text-center text-caption text-ink-3 @4xl:bottom-8">
             By continuing you agree to the <span className="text-[var(--accent-ink)] underline decoration-[color-mix(in_oklch,var(--accent)_35%,transparent)] underline-offset-2">Terms</span> and{' '}
             <span className="text-[var(--accent-ink)] underline decoration-[color-mix(in_oklch,var(--accent)_35%,transparent)] underline-offset-2">Privacy Policy</span>.
           </p>

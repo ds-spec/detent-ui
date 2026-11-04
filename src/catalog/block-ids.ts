@@ -12,7 +12,6 @@ export const BLOCK_IDS = [
   'cta',
   'calendar',
   'data-table',
-  'analytics',
   'agent-chat',
   'task-to-merge',
   'voice-mode',
@@ -20,7 +19,6 @@ export const BLOCK_IDS = [
   'support-inbox',
   'onboarding',
   'sign-in',
-  'billing',
   'settings',
   'code-review',
 ] as const
