@@ -15,6 +15,7 @@ const NAV = [
   { href: FIRST_COMPONENT, section: '/components', label: 'Components' },
   { href: FIRST_BLOCK, section: '/blocks', label: 'Blocks' },
   { href: '/templates', section: '/templates', label: 'Templates' },
+  { href: '/docs', section: '/docs', label: 'Docs' },
   ...(AI_SDK ? [{ href: '/ai-sdk', section: '/ai-sdk', label: 'AI SDK' }] : []),
   { href: '/pro', section: '/pro', label: 'Pricing' },
 ]
