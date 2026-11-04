@@ -70,7 +70,7 @@ export default function ProPage() {
             <Compare />
           </div>
           <p className="mt-8 text-[15px] leading-[1.6] text-ink-3">
-            <span className="text-ink">This is the start.</span> New components and templates are on the way, included in your plan when they land.
+            <span className="text-ink">This is the start.</span> New components, blocks and templates are on the way, included in your plan when they land.
           </p>
         </section>
 

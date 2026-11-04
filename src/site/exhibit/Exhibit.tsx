@@ -72,7 +72,14 @@ function peek(id: string, onReady: () => void) {
   return (
     <div className="absolute inset-0" style={{ background: wellOf(FAMILY_TONE[x.category] ?? 'blue') }}>
       <Mini pad={14} max={0.55} onReady={onReady}>
-        <Demo />
+        {/* A demo that fills its parent has no size of its own here, so it gets its stage size to fill. */}
+        {x.bleed && SIZE[id] ? (
+          <div className="relative" style={{ width: SIZE[id][0], height: SIZE[id][1] }}>
+            <Demo />
+          </div>
+        ) : (
+          <Demo />
+        )}
       </Mini>
     </div>
   )

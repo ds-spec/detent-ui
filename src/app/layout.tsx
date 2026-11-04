@@ -46,8 +46,9 @@ export const viewport: Viewport = {
 }
 
 // Runs before first paint, so the page never flashes the wrong theme. Light unless dark was chosen,
-// or the system's was and the system is dark.
-const theme = `try{var s=localStorage.getItem('theme');var d=s==='dark'||(s==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=d?'dark':'light'}catch(e){document.documentElement.dataset.theme='light'}`
+// or the system's was and the system is dark. And marks <html data-in> when the signed-in hint is
+// there, so the header shows the person's menu, not Sign in, from the first frame.
+const theme = `try{var s=localStorage.getItem('theme');var d=s==='dark'||(s==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=d?'dark':'light'}catch(e){document.documentElement.dataset.theme='light'}if(/(?:^|;\\s*)detent\\.in=1/.test(document.cookie))document.documentElement.dataset.in=''`
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (

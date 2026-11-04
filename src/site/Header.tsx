@@ -9,6 +9,7 @@ import { ArrowRight, Search } from '@/lab/icons'
 import { Mark, ThemeButton } from './parts'
 import { BTN, useSideNew } from './shell/side'
 import { useSite } from './Providers'
+import { UserMenu } from './UserMenu'
 
 const NAV = [
   { href: FIRST_COMPONENT, section: '/components', label: 'Components' },
@@ -103,10 +104,25 @@ export function Header() {
             <Search size={15} />
           </button>
           <ThemeButton />
+          {/* Signed out: the way in and the way to start. Signed in: who it is, and their menu. Which shows is
+              decided before first paint (<html data-in>), so the bar never flashes the other. */}
+          <div className="when-out contents">
+          <Link
+            href="/account"
+            aria-current={here('/account', path) ? 'page' : undefined}
+            className={`ring-focus hidden h-9 items-center px-3 text-[13px] transition-[color,transform] duration-150 hover:text-ink active:scale-[0.97] sm:flex ${side ? 'rounded-[9px]' : 'rounded-full'} ${here('/account', path) ? 'text-ink' : 'text-ink-2'}`}
+            style={{ transitionTimingFunction: UI }}
+          >
+            Sign in
+          </Link>
           <Link href={FIRST_COMPONENT} className={side ? `ring-focus group/go hidden h-9 items-center gap-1.5 rounded-[9px] ${BTN.accent} pl-4 pr-3.5 text-[13px] font-medium transition-[opacity,transform] duration-150 active:scale-[0.97] sm:flex` : "ring-focus group/go hidden h-9 items-center gap-1.5 rounded-full bg-ink pl-4 pr-3.5 text-[13px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97] sm:flex"}>
             Get started
             <ArrowRight size={13} className="transition-transform duration-150 group-hover/go:translate-x-0.5" />
           </Link>
+          </div>
+          <div className="when-in">
+            <UserMenu />
+          </div>
           <button type="button" aria-label={menu ? 'Close menu' : 'Menu'} aria-expanded={menu} onClick={() => setMenu((m) => !m)} className={side ? `ring-focus grid size-9 place-items-center rounded-[9px] text-ink-2 transition-transform duration-150 hover:bg-[var(--line)] active:scale-[0.97] lg:hidden` : "ring-focus grid size-9 place-items-center rounded-full text-ink-2 transition-transform duration-150 hover:bg-[var(--line)] active:scale-[0.97] lg:hidden"}>
             <span aria-hidden className="relative block h-3 w-4">
               <motion.span className="absolute left-0 top-0 h-[1.5px] w-4 rounded-full bg-current" initial={false} animate={menu ? { y: 5.25, rotate: 45 } : { y: 0, rotate: 0 }} transition={{ type: 'spring', stiffness: 520, damping: 34 }} />
@@ -199,10 +215,16 @@ function Menu({ path, onClose }: { path: string; onClose: () => void }) {
           {n.label}
         </Link>
       ))}
+      {/* Signed out, and below a tablet, the way in and the way to start; signed in, the menu in the bar has them. */}
+      <div className="when-out">
+      <Link href="/account" onClick={onClose} aria-current={here('/account', path) ? 'page' : undefined} className={`ring-focus flex h-12 items-center rounded-[14px] px-3.5 text-[17px] tracking-[-0.01em] hover:bg-[var(--line)] active:bg-[var(--line)] sm:hidden ${here('/account', path) ? 'text-ink' : 'text-ink-2'}`}>
+        Sign in
+      </Link>
       <Link href={FIRST_COMPONENT} onClick={onClose} className={side ? `ring-focus mt-1 flex h-11 items-center justify-center gap-1.5 rounded-[11px] ${BTN.accent} text-[14px] font-medium transition-transform duration-150 active:scale-[0.97] sm:hidden` : "ring-focus mt-1 flex h-11 items-center justify-center gap-1.5 rounded-full bg-ink text-[14px] font-medium text-surface transition-transform duration-150 active:scale-[0.97] sm:hidden"}>
         Get started
         <ArrowRight size={13} />
       </Link>
+      </div>
     </motion.nav>
   )
 }

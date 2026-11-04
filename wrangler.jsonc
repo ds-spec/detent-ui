@@ -3,6 +3,9 @@
   "name": "detent",
   "account_id": "e899bae6a5bc4e8bdb660ca2496cd339",
   "workers_dev": true,
+  "routes": [
+    { "pattern": "detentui.com", "custom_domain": true }
+  ],
   "observability": { "enabled": true },
   "compatibility_date": "2026-10-30",
   "compatibility_flags": [

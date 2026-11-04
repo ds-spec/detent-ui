@@ -132,6 +132,11 @@ export function Wordmark() {
       cv.width = Math.round(w * dpr)
       cv.height = Math.round(h * dpr)
       cv.style.height = `${h}px`
+      // Not laid out yet, or hidden: nothing to draw, and a 0-wide canvas can't be read. The resize brings it back.
+      if (!w || !h) {
+        shape = new Uint8ClampedArray()
+        return
+      }
       const k = w / VIEW.w
       const off = document.createElement('canvas')
       off.width = w

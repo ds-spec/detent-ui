@@ -19,7 +19,7 @@ const WORDS: SpokenWord[] = (() => {
 })()
 const DURATION = Math.ceil(WORDS[WORDS.length - 1].at + 0.8)
 
-/** An agent answers by voice: the note plays, speeds up, skips back to catch a number, and plays out. */
+/** An agent answers by voice: the note plays, speeds up, and plays out to the end. */
 export function VoiceNoteDemo() {
   const note = useRef<VoiceNoteHandle>(null)
   const handlers = useLoop(async (beat) => {
@@ -30,12 +30,9 @@ export function VoiceNoteDemo() {
       note.current?.play()
       await beat(3800)
       note.current?.speed(1.5)
-      await beat(2600)
-      // Back a few seconds, to hear the card number again.
-      note.current?.seek(3.4)
-      await beat(5200)
+      // The rest of the note at 1.5×; it stops itself at the end and rests there before the next run.
+      await beat(((DURATION - 3.8) / 1.5) * 1000 + 2400)
       note.current?.pause()
-      await beat(2200)
     }
   }, [], (gone) => (gone ? note.current?.pause() : undefined))
   return (

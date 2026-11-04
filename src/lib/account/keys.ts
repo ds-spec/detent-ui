@@ -26,6 +26,20 @@ export async function planFor(email: string): Promise<Plan | null> {
   return best(rows.map((row) => row.plan))
 }
 
+/** The best plan an email has bought, and since when, for the account page. */
+export async function purchaseFor(email: string): Promise<{ plan: Plan; since: number } | null> {
+  const { rows } = await (await db()).execute({ sql: 'select plan, min(created_at) as since from purchase where refunded = 0 and email = ? group by plan', args: [email] })
+  const plan = best(rows.map((row) => row.plan))
+  const row = rows.find((r) => r.plan === plan)
+  return plan && row ? { plan, since: Number(row.since) } : null
+}
+
+/** The verified email of the account with this id, or null. */
+export async function emailOfAccount(id: string) {
+  const { rows } = await (await db()).execute({ sql: 'select email from auth_user where id = ? and "emailVerified" = 1', args: [id] })
+  return rows.length ? String(rows[0].email).toLowerCase() : null
+}
+
 export async function listKeys(email: string): Promise<Key[]> {
   const { rows } = await (await db()).execute({ sql: 'select id, name, hint, created_at, used_at from key where email = ? order by created_at desc', args: [email] })
   return rows.map((row) => ({ id: String(row.id), name: String(row.name), hint: String(row.hint), createdAt: Number(row.created_at), usedAt: row.used_at === null ? null : Number(row.used_at) }))

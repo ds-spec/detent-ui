@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { allBuying } from '@/site/account/buying'
 import { Confirm } from '@/site/account/Forms'
 import { Footer } from '@/site/Footer'
 import { Header } from '@/site/Header'
@@ -10,9 +11,8 @@ export default function ConfirmPage() {
   return (
     <>
       <Header />
-      <main className="mx-auto min-h-[60vh] max-w-[560px] px-5 pt-20 sm:px-6 sm:pt-28">
-        <h1 className="text-[clamp(32px,4vw,44px)] font-normal leading-[1.08] tracking-[-0.045em] text-ink">Almost in.</h1>
-        <Confirm />
+      <main className="px-5 sm:px-6">
+        <Confirm plans={allBuying()} />
       </main>
       <Footer />
     </>

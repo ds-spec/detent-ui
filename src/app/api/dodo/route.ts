@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { planOfProduct } from '@/catalog/licence'
-import { recordPurchase } from '@/lib/account/keys'
+import { emailOfAccount, recordPurchase } from '@/lib/account/keys'
 import { normalEmail } from '@/lib/account/session'
 
 /*
@@ -27,7 +27,7 @@ function signed(body: string, headers: Headers, secret: string) {
 
 type Event = {
   type?: string
-  data?: { payment_id?: string; is_partial?: boolean; customer?: { email?: string | null } | null; product_cart?: { product_id: string }[] | null }
+  data?: { payment_id?: string; is_partial?: boolean; customer?: { email?: string | null } | null; product_cart?: { product_id: string }[] | null; metadata?: Record<string, unknown> | null }
 }
 
 export async function POST(req: Request) {
@@ -36,7 +36,10 @@ export async function POST(req: Request) {
   if (!secret || !signed(body, req.headers, secret)) return Response.json({ error: 'Bad signature.' }, { status: 401 })
   const { type, data } = JSON.parse(body) as Event
   const id = data?.payment_id
-  const email = normalEmail(data?.customer?.email) ?? ''
+  // Bought from /checkout, the order carries the account it was for: Pro goes on that account's
+  // email, whatever was typed at the store. Bought from a bare link, it goes by the receipt's email.
+  const account = typeof data?.metadata?.detent_user === 'string' ? await emailOfAccount(data.metadata.detent_user) : null
+  const email = account ?? normalEmail(data?.customer?.email) ?? ''
 
   if (type === 'payment.succeeded') {
     if (!id || !email) return Response.json({ error: 'No payment or email.' }, { status: 422 })

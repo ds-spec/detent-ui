@@ -579,6 +579,16 @@ body {
   .sheen { animation: none; color: var(--ink-3); }
 }
 
+/* Signed in or out, known before first paint from the detent.in hint (the root layout's script), so
+   the header never shows one and then the other. */
+html[data-in] .when-out { display: none !important; }
+html:not([data-in]) .when-in { display: none !important; }
+
+/* Grouped rows (the account page): each after the first is ruled off from the one above, the rule
+   starting where the words do, as in Apple's lists. --rule-inset sets where. */
+.rows > * + * { position: relative; }
+.rows > * + *::before { content: ''; position: absolute; top: 0; right: 0; left: var(--rule-inset, 60px); height: 1px; background: var(--line); pointer-events: none; }
+
 /* The stage every demo sits on: the page colour with a faint dot grid. */
 .stage-dots {
   background-color: var(--bg);

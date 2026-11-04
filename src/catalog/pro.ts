@@ -84,6 +84,21 @@ export const CHECKOUT = {
   all: comeBack(process.env.NEXT_PUBLIC_CHECKOUT_ALL ?? '#checkout'),
 }
 
+/**
+ * A plan's checkout for someone signed in: their account's email filled in and locked, so the
+ * purchase can only land on this account, and the account's id along with it. Null when the
+ * store's link isn't set.
+ */
+export function checkoutFor(plan: 'pro' | 'all', account: { id: string; email: string }) {
+  const link = CHECKOUT[plan]
+  if (!/^https?:\/\//.test(link)) return null
+  const url = new URL(link)
+  url.searchParams.set('email', account.email)
+  url.searchParams.set('disableEmail', 'true')
+  url.searchParams.set('metadata_detent_user', account.id)
+  return url.toString()
+}
+
 export type Plan = {
   id: 'pro' | 'all'
   name: string
@@ -107,7 +122,7 @@ export const PLANS: Plan[] = [
     seats: 'one person',
     line: 'Everything you build the product with.',
     cta: 'Get Pro',
-    href: CHECKOUT.pro,
+    href: '/checkout/pro',
     features: [`${PRO_COMPONENTS.length} Pro components`, `${PRO_BLOCK_COUNT} blocks: whole screens, already working`, 'Installs with the shadcn CLI', 'Source in your project, yours to change', 'Every update, for life', 'Unlimited projects'],
   },
   {
@@ -117,7 +132,7 @@ export const PLANS: Plan[] = [
     seats: 'one person',
     line: 'Everything in Pro, and a whole app to start from.',
     cta: 'Get everything',
-    href: CHECKOUT.all,
+    href: '/checkout/all',
     best: true,
     features: ['Everything in Pro', 'The Detent app template', 'Every new template as it ships', 'Real routes, data and AI wired in', 'Every update, for life', 'Unlimited projects'],
   },
