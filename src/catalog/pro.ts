@@ -1,11 +1,6 @@
-/**
- * What's in Detent Pro, what it costs, and where to buy it. Plain data, safe for the server.
- * Change a price, a plan's list or a checkout link here and every page follows.
- */
 import { BLOCK_IDS } from './block-ids'
 import { UNLISTED } from './unlisted'
 
-/** The free components that are Pro: the big stateful surfaces that take weeks to get right. */
 const PRO_CODE = [
   'answer',
   'ask',
@@ -36,22 +31,18 @@ const PRO_CODE = [
   'dotlight',
 ]
 
-/** The Pro components in the catalog. Unlisted ones stay Pro, so their source stays locked. */
 export const PRO_COMPONENTS = PRO_CODE.filter((id) => !UNLISTED.has(id))
 
 export const isProComponent = (id: string) => PRO_CODE.includes(id)
 
-/** The blocks anyone can install: sections every library gives away, so the free tier has whole screens to try. The rest are what the licence buys. */
 export const FREE_BLOCKS: string[] = ['faq', 'testimonials', 'sign-in', 'cta', 'integrations']
 
 export const isProBlock = (id: string) => (BLOCK_IDS as readonly string[]).includes(id) && !FREE_BLOCKS.includes(id)
 
 export const PRO_BLOCK_COUNT = BLOCK_IDS.length - FREE_BLOCKS.length
 
-/** Anything whose source is Pro: a Pro component, a Pro block, any template. */
 export const isLockedSource = (slug: string, blocks: string[]) => isProComponent(slug) || (blocks.includes(slug) && !FREE_BLOCKS.includes(slug)) || slug.startsWith('template-')
 
-/** Sets anyone can install in one go. */
 export const KITS: Record<string, { name: string; line: string; items: string[] }> = {
   'agent-kit': {
     name: 'Agent kit',
@@ -64,11 +55,6 @@ import { SITE } from './site'
 
 export { SITE, installCommand } from './site'
 
-/**
- * Sends a buyer back to their account once they've paid. A Dodo payment link only redirects when it
- * carries `redirect_url`; Dodo then adds `payment_id`, `status` and `email` to it. Added here rather
- * than in the env, so test and live links, on any domain, all come home.
- */
 const comeBack = (link: string) => {
   if (!/^https?:\/\//.test(link)) return link
   const url = new URL(link)
@@ -76,20 +62,13 @@ const comeBack = (link: string) => {
   return url.toString()
 }
 
-/**
- * Where each plan is bought: the store's checkout links. Dodo reports each order to /api/dodo.
- */
 export const CHECKOUT = {
   pro: comeBack(process.env.NEXT_PUBLIC_CHECKOUT_PRO ?? '#checkout'),
   all: comeBack(process.env.NEXT_PUBLIC_CHECKOUT_ALL ?? '#checkout'),
+  upgrade: comeBack(process.env.NEXT_PUBLIC_CHECKOUT_UPGRADE ?? '#checkout'),
 }
 
-/**
- * A plan's checkout for someone signed in: their account's email filled in and locked, so the
- * purchase can only land on this account, and the account's id along with it. Null when the
- * store's link isn't set.
- */
-export function checkoutFor(plan: 'pro' | 'all', account: { id: string; email: string }) {
+export function checkoutFor(plan: keyof typeof CHECKOUT, account: { id: string; email: string }) {
   const link = CHECKOUT[plan]
   if (!/^https?:\/\//.test(link)) return null
   const url = new URL(link)
@@ -103,14 +82,11 @@ export type Plan = {
   id: 'pro' | 'all'
   name: string
   price: number
-  /** Who it covers, said after the price. */
   seats: string
-  /** Who it's for, in a line. */
   line: string
   cta: string
   href: string
   features: string[]
-  /** The plan to show first and loudest. */
   best?: boolean
 }
 
@@ -138,5 +114,6 @@ export const PLANS: Plan[] = [
   },
 ]
 
-/** One payment, said once, the same way everywhere. */
+export const UPGRADE = { href: '/checkout/upgrade', price: PLANS[1].price - PLANS[0].price, cta: 'Unlock Templates' }
+
 export const TERMS = 'One payment · Every update for life · Unlimited projects'

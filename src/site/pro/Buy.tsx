@@ -5,7 +5,7 @@ import type { ComponentType, ReactNode } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { BLOCKS } from '@/catalog/blocks'
-import { PLANS, PRO_BLOCK_COUNT, PRO_COMPONENTS } from '@/catalog/pro'
+import { PLANS, PRO_BLOCK_COUNT, PRO_COMPONENTS, UPGRADE } from '@/catalog/pro'
 import type { Plan } from '@/catalog/pro'
 import { TEMPLATES, TEMPLATE_COUNT } from '@/catalog/templates'
 import { REFUND_DAYS } from '@/catalog/trust'
@@ -13,16 +13,10 @@ import { ArrowRight, ArrowUpRight, Check, Code, Refresh, Undo } from '@/lab/icon
 import { RollingText } from '@/lab/ui/RollingText'
 import { BLOCK_VIEWS, TEMPLATE_VIEWS } from '@pro'
 import { Backdrop, Window } from '../blocks/Studio'
+import { useOwned } from '../Owned'
 import { BTN, useSideNew } from '../shell/side'
 import { DitherIcon } from '../Dither'
 import { Fit } from '../Fit'
-
-/*
- * Buying Pro the way a good shop sells one thing in a few configurations: the thing itself
- * running big on the left, two plain questions on the right, and the price that answers them.
- * Everything on the page that names a price reads the same choice, so the headline, the summary
- * and the button at the foot always agree.
- */
 
 const UI = [0.2, 0, 0, 1] as const
 
@@ -32,7 +26,9 @@ type Choice = { edition: Edition; setEdition: (e: Edition) => void }
 const Ctx = createContext<Choice | null>(null)
 
 export function BuyProvider({ children }: { children: ReactNode }) {
-  const [edition, setEdition] = useState<Edition>('pro')
+  const [picked, setEdition] = useState<Edition | null>(null)
+  const owned = useOwned()
+  const edition = picked ?? (owned === 'pro' ? 'all' : 'pro')
   return <Ctx.Provider value={{ edition, setEdition }}>{children}</Ctx.Provider>
 }
 
@@ -41,14 +37,13 @@ const plan = (id: Plan['id']) => PLANS.find((p) => p.id === id)!
 export function useChoice() {
   const c = useContext(Ctx)
   if (!c) throw new Error('The parts of the buy panel sit inside BuyProvider')
-  return { ...c, plan: plan(c.edition) }
+  const owned = useOwned()
+  const base = plan(c.edition)
+  const upgrade = owned === 'pro' && c.edition === 'all'
+  const shown = upgrade ? { ...base, price: UPGRADE.price, cta: UPGRADE.cta, href: UPGRADE.href } : base
+  const buyable = owned !== 'all' && !(owned === 'pro' && c.edition === 'pro')
+  return { ...c, plan: shown, buyable, upgrade }
 }
-
-/*
- * The stage: what you'd be buying, running. Pro shows three of its whole screens in turn; with
- * the templates it shows the app instead. Each is laid out at a desktop size and scaled
- * to the stage, so it reads like the real thing rather than a phone-width squeeze.
- */
 
 type Shot = { id: string; name: string; line: string; count: string; href: string; title: string; chrome: 'browser' | 'titled'; view: ComponentType }
 
@@ -65,7 +60,6 @@ const TEMPLATE_SHOTS: Shot[] = ['detent'].flatMap((id) => {
   return [{ id, name: t.name, line: t.kind, count: 'The whole app', href: `/templates/${id}`, title: t.window, chrome: 'browser', view: View }]
 })
 
-/** How long each screen stays on the stage before the next. */
 const DWELL = 9000
 
 export function Stage() {
@@ -78,7 +72,6 @@ export function Stage() {
   )
 }
 
-/** The stage drawn wide under the hero: the screen runs bigger and the box's foot crops it, like a window seen through it. */
 export function WideStage() {
   const { edition } = useChoice()
   const all = edition === 'all'
@@ -101,7 +94,6 @@ function Shots({ shots, tone, wide = false }: { shots: Shot[]; tone: 'amber' | '
 
   return (
     <motion.div initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1, transition: { duration: 0.28, ease: UI } }} onPointerEnter={() => setHeld(true)} onPointerLeave={() => setHeld(false)}>
-      {/* Tall on a phone, where the screen is laid out at the phone's own width to stay readable; as tall as the panel beside it on a laptop. */}
       <div className={`relative isolate overflow-hidden ${wide ? 'aspect-[4/5] rounded-[24px] sm:aspect-auto sm:h-[clamp(380px,62vh,660px)] sm:rounded-[36px]' : 'aspect-[4/5] rounded-[22px] sm:aspect-[16/10] sm:rounded-[28px] lg:aspect-auto lg:h-[clamp(300px,58vh,620px)]'}`}>
         <Backdrop tone={tone} />
         <AnimatePresence initial={false} mode="popLayout">
@@ -126,7 +118,6 @@ function Shots({ shots, tone, wide = false }: { shots: Shot[]; tone: 'amber' | '
         </AnimatePresence>
       </div>
 
-      {/* What's on the stage, how many more like it, and the way to it. */}
       <div className="mt-3 flex h-9 items-center gap-3 px-1">
         <p className="min-w-0 flex-1 truncate text-[14px] text-ink">
           {s.name}
@@ -148,14 +139,14 @@ function Shots({ shots, tone, wide = false }: { shots: Shot[]; tone: 'amber' | '
   )
 }
 
-/** The two questions, each answered with a tile, and the summary that adds them up. */
 export function Choose() {
-  const { edition, setEdition } = useChoice()
+  const { edition, setEdition, upgrade } = useChoice()
+  const owned = useOwned()
   return (
     <div className="flex min-w-0 flex-col gap-6">
       <Question title="Edition." quiet="What you’re building.">
-        <Tile name="edition" on={edition === 'pro'} onPick={() => setEdition('pro')} title="Pro" price={`$${plan('pro').price}`} line={`${PRO_COMPONENTS.length} Pro components and ${PRO_BLOCK_COUNT} whole screens, already working.`} />
-        <Tile name="edition" on={edition === 'all'} onPick={() => setEdition('all')} title="Pro + Templates" price={`$${plan('all').price}`} line={`Everything in Pro, plus ${TEMPLATE_COUNT}, with every new one.`} />
+        <Tile name="edition" on={edition === 'pro'} onPick={() => setEdition('pro')} title="Pro" price={owned === 'pro' ? 'Yours' : `$${plan('pro').price}`} line={`${PRO_COMPONENTS.length} Pro components and ${PRO_BLOCK_COUNT} whole screens, already working.`} />
+        <Tile name="edition" on={edition === 'all'} onPick={() => setEdition('all')} title="Pro + Templates" price={upgrade || owned === 'pro' ? `+$${UPGRADE.price}` : `$${plan('all').price}`} line={`Everything in Pro, plus ${TEMPLATE_COUNT}, with every new one.`} />
       </Question>
       <Summary />
     </div>
@@ -174,8 +165,6 @@ function Question({ title, quiet, row = false, note, children }: { title: string
   )
 }
 
-/** One answer: a real radio under the tile, so arrows move between answers and the tile shows the focus. */
-/** A `short` tile sits half-width beside another, so on a phone its price goes under the name. */
 function Tile({ name, on, disabled = false, short = false, onPick, title, price, line, note }: { name: string; on: boolean; disabled?: boolean; short?: boolean; onPick: () => void; title: string; price: string; line?: string; note?: string }) {
   return (
     <label
@@ -203,7 +192,7 @@ const PROMISES = [
 
 function Summary() {
   const side = useSideNew()
-  const { plan } = useChoice()
+  const { plan, buyable } = useChoice()
   return (
     <div className="rounded-[22px] bg-surface-2 p-5 sm:p-6">
       <div className="flex items-end justify-between gap-4">
@@ -221,10 +210,10 @@ function Summary() {
           <span className="text-[14px] text-ink-3">once</span>
         </p>
       </div>
-      <a href={plan.href} className={side ? `ring-focus group/buy mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-[12px] ${BTN.accent} text-[15px] font-medium transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] active:scale-[0.98]` : "ring-focus group/buy mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-[15px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.98]"}>
+      {buyable && <a href={plan.href} className={side ? `ring-focus group/buy mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-[12px] ${BTN.accent} text-[15px] font-medium transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] active:scale-[0.98]` : "ring-focus group/buy mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-[15px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.98]"}>
         {plan.cta}
         <ArrowRight size={15} className="transition-transform duration-150 group-hover/buy:translate-x-0.5" />
-      </a>
+      </a>}
       <ul className="mt-5 grid gap-2.5 text-[13px] text-ink-2">
         {PROMISES.map(([icon, text]) => (
           <li key={text} className="flex items-center gap-2">
@@ -237,11 +226,11 @@ function Summary() {
   )
 }
 
-/** The way in at the foot of the page: the button is the price, for whatever was chosen above. */
 export function BigBuy() {
   const side = useSideNew()
-  const { plan } = useChoice()
+  const { plan, buyable } = useChoice()
   const [hot, setHot] = useState(false)
+  if (!buyable) return null
   return (
     <a
       href={plan.href}
@@ -256,7 +245,6 @@ export function BigBuy() {
         <RollingText text={`$${plan.price}`} proportional />
       </span>
       <span className={side ? `grid size-[60px] shrink-0 place-items-center rounded-[12px] bg-surface text-ink transition-transform duration-200 [transition-timing-function:cubic-bezier(0.2,0,0,1)] sm:size-[72px]` : "grid size-[60px] shrink-0 place-items-center rounded-full bg-surface text-ink transition-transform duration-200 [transition-timing-function:cubic-bezier(0.2,0,0,1)] sm:size-[72px]"}>
-        {/* Pointed at, the arrow doesn't move: it reprints, pixel by pixel, in the accent. */}
         <DitherIcon color={hot ? 'var(--accent)' : 'var(--ink)'} size={24}>
           <ArrowRight size={24} />
         </DitherIcon>
@@ -265,11 +253,6 @@ export function BigBuy() {
   )
 }
 
-/*
- * The hero, centred: what Pro saves you and what it costs, both rolling with the choice; under it
- * one bar that is the whole checkout (edition, licence, price, button), so the page asks two small
- * questions in one line instead of a column of form.
- */
 export function HeroHead() {
   const { plan } = useChoice()
   return (
@@ -292,7 +275,7 @@ export function HeroHead() {
 
 export function BuyBar() {
   const side = useSideNew()
-  const { edition, setEdition, plan } = useChoice()
+  const { edition, setEdition, plan, buyable } = useChoice()
   const what = edition === 'all' ? `${PRO_COMPONENTS.length} Pro components, ${PRO_BLOCK_COUNT} screens and ${TEMPLATE_COUNT}` : `${PRO_COMPONENTS.length} Pro components and ${PRO_BLOCK_COUNT} whole screens`
   return (
     <div className="flex w-full flex-col items-center">
@@ -313,13 +296,12 @@ export function BuyBar() {
             </span>
             <span className="text-[13px] text-ink-3">once</span>
           </p>
-          <a href={plan.href} className={side ? `ring-focus group/buy flex h-11 shrink-0 items-center gap-2 rounded-[11px] ${BTN.accent} pl-5 pr-4 text-[15px] font-medium transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] active:scale-[0.97]` : "ring-focus group/buy flex h-11 shrink-0 items-center gap-2 rounded-full bg-ink pl-5 pr-4 text-[15px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.97]"}>
+          {buyable && <a href={plan.href} className={side ? `ring-focus group/buy flex h-11 shrink-0 items-center gap-2 rounded-[11px] ${BTN.accent} pl-5 pr-4 text-[15px] font-medium transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] active:scale-[0.97]` : "ring-focus group/buy flex h-11 shrink-0 items-center gap-2 rounded-full bg-ink pl-5 pr-4 text-[15px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.97]"}>
             {plan.cta}
             <ArrowRight size={15} className="transition-transform duration-150 group-hover/buy:translate-x-0.5" />
-          </a>
+          </a>}
         </div>
       </div>
-      {/* What the choice gets you, then the promises, in one quiet line. */}
       <p className="mt-4 max-w-[920px] text-balance px-4 text-center text-[13px] leading-[1.7] text-ink-3">
         <span className="text-ink-2">
           {what}, for {plan.seats}.
@@ -330,7 +312,6 @@ export function BuyBar() {
   )
 }
 
-/** Two answers in a track; the chosen one sits on a plate that slides between them. */
 function Seg({ label, value, onPick, options }: { label: string; value: string; onPick: (v: string) => void; options: [string, string, boolean][] }) {
   const side = useSideNew()
   return (

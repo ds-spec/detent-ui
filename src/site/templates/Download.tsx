@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { PLANS } from '@/catalog/pro'
+import { PLANS, UPGRADE } from '@/catalog/pro'
 import { Check } from '@/lab/icons'
 
 type Owner = 'all' | 'pro' | null
@@ -71,13 +71,22 @@ export function DownloadStarter({ id, name }: { id: string; name: string }) {
         </form>
       ) : (
         <>
-          <p className="mt-3 text-footnote text-ink-2">
-            {owner === 'pro' ? 'Your plan is Pro. This comes with ' : 'Comes with '}
-            <Link href="/pro" className="ring-focus rounded-[4px] font-medium text-ink underline-offset-2 hover:underline">
-              {plan.name}
-            </Link>{' '}
-            · ${plan.price}
-          </p>
+          {owner === 'pro' ? (
+            <>
+              <p className="mt-3 text-footnote leading-[1.55] text-ink-2">You already have Pro. Add every template, today’s and every new one, for ${UPGRADE.price}: just the difference.</p>
+              <a href={UPGRADE.href} className="ring-focus mt-3 flex h-9 w-full items-center justify-center rounded-[10px] bg-ink text-footnote font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]">
+                {UPGRADE.cta} · ${UPGRADE.price}
+              </a>
+            </>
+          ) : (
+            <p className="mt-3 text-footnote text-ink-2">
+              Comes with{' '}
+              <Link href="/pro" className="ring-focus rounded-[4px] font-medium text-ink underline-offset-2 hover:underline">
+                {plan.name}
+              </Link>{' '}
+              · ${plan.price}
+            </p>
+          )}
           {open ? (
             <form
               className="mt-3 flex flex-col gap-2"

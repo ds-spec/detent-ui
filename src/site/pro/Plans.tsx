@@ -2,12 +2,8 @@ import { Check, Code, Refresh, Undo } from '@/lab/icons'
 import { PLANS } from '@/catalog/pro'
 import type { Plan } from '@/catalog/pro'
 import { REFUND_DAYS } from '@/catalog/trust'
+import { PlanButton } from '../Owned'
 
-/**
- * The plans, side by side: Pro is a plain card; Pro + Templates, the one with everything, is the
- * same card inverted. Each says who it's for, its one price, the way in, and what's in it.
- * Underneath, the promises every plan shares, said once.
- */
 export function Plans({ compact = false }: { compact?: boolean }) {
   return (
     <div>
@@ -37,7 +33,6 @@ export function Plans({ compact = false }: { compact?: boolean }) {
 
 function PlanCard({ plan, compact }: { plan: Plan; compact: boolean }) {
   const ink = plan.best
-  // The last two lines of every plan are the promises below the cards; each card says what's its own.
   const features = plan.features.filter((f) => f !== 'Every update, for life' && f !== 'Unlimited projects')
   return (
     <div className={`relative flex flex-col rounded-[28px] p-7 sm:p-8 ${ink ? 'bg-ink text-surface shadow-modal' : 'bg-surface text-ink shadow-[var(--card-edge)]'}`}>
@@ -50,9 +45,7 @@ function PlanCard({ plan, compact }: { plan: Plan; compact: boolean }) {
         <span className="tnum text-[56px] font-normal leading-none tracking-[-0.055em]">${plan.price}</span>
         <span className={`text-[13.5px] ${ink ? 'text-surface/60' : 'text-ink-3'}`}>once, for {plan.seats}</span>
       </p>
-      <a href={plan.href} className={`ring-focus mt-8 flex h-11 items-center justify-center rounded-full text-[14px] font-medium transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.98] ${ink ? 'bg-surface text-ink' : 'bg-ink text-surface'}`}>
-        {plan.cta}
-      </a>
+      <PlanButton plan={plan} className={`ring-focus mt-8 flex h-11 items-center justify-center rounded-full text-[14px] font-medium transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.98] ${ink ? 'bg-surface text-ink' : 'bg-ink text-surface'}`} />
       {!compact && (
         <ul className={`mt-8 flex flex-col gap-3 pt-7 text-[14px] ${ink ? 'text-surface/85 shadow-[inset_0_1px_0_rgb(255_255_255/0.14)]' : 'text-ink-2 shadow-[inset_0_1px_0_var(--line)]'}`}>
           {features.map((f) => (

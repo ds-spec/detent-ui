@@ -6,43 +6,28 @@ import Link from 'next/link'
 import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react'
 import type { MotionValue } from 'motion/react'
 import { DEMOS } from '@/catalog/demos'
-import { PLANS, installCommand, isProComponent } from '@/catalog/pro'
+import { PLANS, UPGRADE, installCommand, isProComponent } from '@/catalog/pro'
 import { FIRST_COMPONENT } from '@/catalog/site'
 import { Announcement } from '@/lab/components/announce/Announcement'
 import { ArrowRight, ArrowUpRight, Chart, Note, Play, Prompt } from '@/lab/icons'
 import { Fit } from '@/site/Fit'
 import { CopyCommand } from '@/site/parts'
+import { ForPlan } from '@/site/Owned'
 import { BRIDGE, CARDS, GRAIN, LAYER, useWide } from './lights'
 import type { Card } from './lights'
 import { BTN, useSideNew } from '../shell/side'
 import { DitherWord } from '../Dither'
 import type { LibItem } from './library'
 
-/*
- * The home page's first sheet. The sentence sits in the middle: what's new above it, one quiet
- * line and the two ways in below. Under it, the four lights: each part on a mount, its colour in a
- * window behind a thin bezel. Point at one and it opens, the part running in it at its real size;
- * left alone, the row opens one after another. The full stop at the end of the sentence takes the
- * colour of whichever light is open, so the sentence and the lights move together.
- *
- * From the sheet's foot hangs a bridge to the next sheet, joined to both by concave curves, which
- * carries the install command for the open light.
- */
-
-// The first plate's part is certain to show, so its code starts downloading before the page wakes.
 if (typeof window !== 'undefined') void import('@/lab/demos/inputs')
 
 const UI = [0.2, 0, 0, 1] as const
 const OPEN = { type: 'spring', stiffness: 280, damping: 34 } as const
 const DWELL = 6500
-/** The sheets' hairline, drawn round the bridge's curves. */
 const EDGE = 'light-dark(rgb(0 0 0 / 0.07), rgb(255 255 255 / 0.08))'
-/** The radius of the curves that join the bridge to the sheets. */
 const JOIN = 22
-/** How much wider the open plate is than a closed one, and the air between plates. */
 const GROW = 1.8
 const GAP = 8
-/** A closed plate's width on a laptop. The plates' widths and places are all multiples of it, in CSS, so the server's HTML is right at any width. */
 const UNIT = `var(--plate)`
 const widthOf = (open: number) => `calc(${UNIT} * ${(1 + GROW * open).toFixed(4)})`
 const ICON: Record<string, ReactNode> = { prompt: <Prompt size={15} />, models: <Note size={15} />, voicenote: <Play size={15} />, metric: <Chart size={15} /> }
@@ -64,7 +49,6 @@ export function HomeHero({ lib }: { lib: LibItem[] }) {
               <br />
               <span className="text-quiet">
                 Yours{' '}
-                {/* The word that answers the line, printed in the open card's light. */}
                 <DitherWord color={dot ?? 'currentColor'}>won’t</DitherWord>.
               </span>
             </h1>
@@ -76,9 +60,18 @@ export function HomeHero({ lib }: { lib: LibItem[] }) {
                 Browse components
                 <ArrowRight size={14} className="transition-transform duration-150 group-hover/go:translate-x-0.5" />
               </Link>
-              <Link href="/pro" className={side ? `ring-focus flex h-11 items-center whitespace-nowrap rounded-[11px] ${BTN.plate} px-5 text-[14px] font-medium transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4` : "ring-focus flex h-11 items-center whitespace-nowrap rounded-full bg-surface px-5 text-[14px] font-medium text-ink shadow-raised transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4"}>
-                Get Pro<span className="hidden sm:inline">&nbsp;· ${PLANS[0].price}</span>
-              </Link>
+              <ForPlan
+                none={
+                  <Link href="/pro" className={side ? `ring-focus flex h-11 items-center whitespace-nowrap rounded-[11px] ${BTN.plate} px-5 text-[14px] font-medium transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4` : "ring-focus flex h-11 items-center whitespace-nowrap rounded-full bg-surface px-5 text-[14px] font-medium text-ink shadow-raised transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4"}>
+                    Get Pro<span className="hidden sm:inline">&nbsp;· ${PLANS[0].price}</span>
+                  </Link>
+                }
+                pro={
+                  <a href={UPGRADE.href} className={side ? `ring-focus flex h-11 items-center whitespace-nowrap rounded-[11px] ${BTN.plate} px-5 text-[14px] font-medium transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4` : "ring-focus flex h-11 items-center whitespace-nowrap rounded-full bg-surface px-5 text-[14px] font-medium text-ink shadow-raised transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4"}>
+                    {UPGRADE.cta}<span className="hidden sm:inline">&nbsp;· ${UPGRADE.price}</span>
+                  </a>
+                }
+              />
             </div>
           </div>
           <Plates lib={lib} onOpen={setOpen} className="rise mt-12 lg:mt-14 lg:h-[clamp(480px,calc(100svh-300px),620px)]" />
@@ -89,12 +82,6 @@ export function HomeHero({ lib }: { lib: LibItem[] }) {
   )
 }
 
-/**
- * The bridge between the first sheet and the next: the leaf's colour where it leaves, the paper's
- * where it lands, with concave curves at all four corners so it grows out of one and into the
- * other. It holds the install command for the open light, in a slot of fixed width, so a longer or
- * shorter command never moves it.
- */
 function Bridge({ id }: { id: string }) {
   const free = !isProComponent(id)
   const corner = (x: 'left' | 'right', y: 'top' | 'bottom') => ({
@@ -102,11 +89,9 @@ function Bridge({ id }: { id: string }) {
     [y]: 0,
     width: JOIN,
     height: JOIN,
-    // Each curve carries the sheets' own hairline, so the edge runs round the bridge instead of stopping at it.
     background: `radial-gradient(circle at ${x === 'left' ? '0%' : '100%'} ${y === 'top' ? '100%' : '0%'}, transparent ${JOIN - 1}px, ${EDGE} ${JOIN - 0.5}px, ${EDGE} ${JOIN}px, ${y === 'top' ? 'var(--leaf)' : 'var(--paper)'} ${JOIN + 0.5}px)`,
   })
   return (
-    // One pixel taller than the gap, so it covers the next sheet's top edge across its width.
     <div className="absolute left-1/2 top-full z-10 flex -translate-x-1/2 items-center px-3" style={{ height: BRIDGE + 1, background: 'linear-gradient(var(--leaf), var(--paper))' }}>
       <span aria-hidden className="absolute" style={corner('left', 'top')} />
       <span aria-hidden className="absolute" style={corner('right', 'top')} />
@@ -123,13 +108,11 @@ function Bridge({ id }: { id: string }) {
   )
 }
 
-/** The row of four plates. `onOpen` hears which part is open; `className` places the row. */
 function Plates({ lib, onOpen, className = '' }: { lib: LibItem[]; onOpen?: (id: string) => void; className?: string }) {
   const reduce = useReducedMotion()
   const wide = useWide()
   const [open, setOpen] = useState(0)
   const [held, setHeld] = useState(false)
-  // How open each plate is, 0 to 1. Everything that moves as a plate opens is worked out from these.
   const a = useMotionValue(1)
   const b = useMotionValue(0)
   const c = useMotionValue(0)
@@ -139,7 +122,6 @@ function Plates({ lib, onOpen, className = '' }: { lib: LibItem[]; onOpen?: (id:
     const going = grow.map((v, k) => animate(v, k === open ? 1 : 0, reduce ? { duration: 0 } : OPEN))
     return () => going.forEach((g) => g.stop())
   }, [grow, open, reduce])
-  // The first part is there from the start; the rest mount one at a time once the page has settled.
   const [seen, setSeen] = useState<number[]>([0])
   const intent = useRef(0)
   useEffect(() => {
@@ -188,12 +170,6 @@ function Plates({ lib, onOpen, className = '' }: { lib: LibItem[]; onOpen?: (id:
   )
 }
 
-/**
- * Opening a plate moves its neighbours, and a browser counts anything that changes place in layout
- * as a shift, however gently. So on a laptop each plate stands at the row's left edge and is carried
- * to its place by a transform; only its width is laid out, which moves nothing inside it that starts
- * at its left edge, and what's centred or right-aligned inside is carried by a transform too.
- */
 function Plate({ c, k, grow, item, on, mounted, wide, onAim, onPick }: { c: Card; k: number; grow: MotionValue<number>[]; item?: LibItem; on: boolean; mounted: boolean; wide: boolean; onAim: () => void; onPick: () => void }) {
   const reduce = useReducedMotion()
   const Demo = DEMOS[c.id]
@@ -203,23 +179,18 @@ function Plate({ c, k, grow, item, on, mounted, wide, onAim, onPick }: { c: Card
     const before = v.slice(0, k).reduce((n, x) => n + 1 + GROW * x, 0)
     return `translateX(calc(${UNIT} * ${before.toFixed(4)} + ${k * GAP}px))`
   })
-  // The icon stays at the mount's right, and the colour and the part stay centred in the window.
   const icon = useTransform(grow[k], (v) => `translateX(calc(${widthOf(v).slice(5, -1)} - 54px))`)
   const centre = useTransform(grow[k], (v) => `translateX(calc((${widthOf(v).slice(5, -1)} - 12px - ${LAYER}px) / 2))`)
-  // The colour layer is fixed-width on a laptop so nothing repaints as a plate opens; full width on a phone. Set in CSS, so the server's HTML already matches the screen.
   const layer = 'left-0 w-full lg:w-[var(--layer)]'
   const layerVar = { '--layer': `${LAYER}px` } as CSSProperties
   const carried = 'max-lg:![transform:none]'
 
   return (
-    // On a phone the plates stack and their height comes from CSS, so the server's HTML is already
-    // the right size at any width and nothing below moves once the page wakes up.
     <motion.div
       className={`relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-[24px] p-1.5 max-lg:!w-full max-lg:![transform:none] max-lg:transition-[height] max-lg:duration-500 max-lg:[transition-timing-function:cubic-bezier(0.2,0,0,1)] motion-reduce:transition-none lg:absolute lg:left-0 lg:top-0 lg:h-full ${on ? 'max-lg:h-[520px]' : 'max-lg:h-[168px]'}`}
       style={{ background: 'var(--mount)', boxShadow: 'inset 0 0 0 1px var(--line)', contain: 'layout paint', width, transform: across }}
       onPointerEnter={onAim}
     >
-      {/* The mount: its name, its family under it, and its icon in a framed square. */}
       <div className="relative flex h-[52px] shrink-0 items-center gap-3 px-2.5">
         <div className="min-w-0 flex-1 lg:pr-10">
           <p className="truncate text-[14px] leading-5 text-ink">{name}</p>
@@ -230,7 +201,6 @@ function Plate({ c, k, grow, item, on, mounted, wide, onAim, onPick }: { c: Card
         </motion.span>
       </div>
 
-      {/* The window of colour, set into the mount behind a thin bezel. */}
       <div className="relative isolate min-h-0 flex-1 overflow-hidden rounded-[19px]" style={{ boxShadow: '0 0 0 4px var(--bezel), 0 0 0 5px var(--line)' }}>
         <motion.div aria-hidden className={`pointer-events-none absolute inset-y-0 -z-10 ${layer} ${carried}`} style={{ ...layerVar, background: c.paint, transform: centre }}>
           <div className={`absolute -inset-[20%] ${on && !reduce ? 'plates-drift' : ''}`} style={{ background: `radial-gradient(32% 26% at 64% 30%, ${c.sheen}, transparent 70%)`, opacity: on ? 0.55 : 0.3, transition: 'opacity 300ms cubic-bezier(0.2,0,0,1)' }} />

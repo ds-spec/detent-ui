@@ -1,18 +1,22 @@
 import { checkoutFor } from '@/catalog/pro'
 import { getAuth } from '@/lib/account/auth'
+import { planFor } from '@/lib/account/keys'
 
-/*
- * Every Buy button lands here. Pro belongs to an account, so a buyer signs in first (which makes
- * their account), comes back here, and goes on to the store with that account's email filled in and
- * locked. When Dodo reports the payment, /api/dodo puts Pro on the account, and the store sends
- * them back to /account to make their key.
- */
+const PLANS = ['pro', 'all', 'upgrade'] as const
+type Asked = (typeof PLANS)[number]
+
 export async function GET(req: Request, { params }: { params: Promise<{ plan: string }> }) {
-  const plan = (await params).plan
-  if (plan !== 'pro' && plan !== 'all') return Response.redirect(new URL('/pro', req.url), 303)
+  const asked = (await params).plan as Asked
+  const to = (path: string) => Response.redirect(new URL(path, req.url), 303)
+  if (!PLANS.includes(asked)) return to('/pro')
   const session = await (await getAuth()).api.getSession({ headers: req.headers })
   const user = session?.user.emailVerified ? session.user : null
-  if (!user) return Response.redirect(new URL(`/account?next=/checkout/${plan}`, req.url), 303)
-  const store = checkoutFor(plan, { id: user.id, email: user.email.toLowerCase() })
-  return Response.redirect(store ?? new URL('/pro', req.url), 303)
+  if (!user) return to(`/account?next=/checkout/${asked}`)
+  const email = user.email.toLowerCase()
+  const owned = await planFor(email)
+  if (owned === 'all') return to('/account')
+  const plan = owned === 'pro' ? (asked === 'pro' ? null : 'upgrade') : asked === 'upgrade' ? null : asked
+  if (!plan) return to(owned === 'pro' ? '/account' : '/pro')
+  const store = checkoutFor(plan, { id: user.id, email })
+  return store ? Response.redirect(store, 303) : to('/pro')
 }

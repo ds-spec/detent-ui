@@ -4,19 +4,14 @@ import { useState } from 'react'
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { PLANS } from '@/catalog/pro'
+import { PLANS, UPGRADE } from '@/catalog/pro'
 import { FIRST_BLOCK, FIRST_COMPONENT } from '@/catalog/site'
 import * as I from '@/lab/icons'
 import { Mark, ThemeButton } from '../parts'
 import { useSite } from '../Providers'
+import { ForPlan } from '../Owned'
 import { usePeek } from '../exhibit/Rail'
 import type { RailGroup } from '../exhibit/Rail'
-
-/*
- * Sidebar study. One quiet column: the library's places, the ways out (each with its arrow), then
- * every family as a short heading with its pieces under it, each with its own small glyph of what
- * it does. Headings are ink, pieces are grey until they're the one on show.
- */
 
 const PLACES = [
   { href: FIRST_COMPONENT, section: '/components', label: 'Components', icon: <I.Layers size={14} /> },
@@ -29,14 +24,12 @@ const OUT = [
   { href: 'https://x.com', label: 'Follow on X', icon: <I.Bell size={14} /> },
 ]
 
-/** A small glyph for each piece, each its own: what it does, at a glance. */
 const GLYPH: Record<string, ReactNode> = {
   trace: <I.Bolt size={13} />, diff: <I.Fork size={13} />, rewrite: <I.Pencil size={13} />, prompt: <I.Prompt size={13} />, models: <I.Spark size={13} />, extract: <I.FilePage size={13} />, voicenote: <I.Mic size={13} />,
   filter: <I.Sliders size={13} />, radar: <I.Orbit size={13} />, scatter: <I.Grip size={13} />, histogram: <I.Table size={13} />, funnel: <I.ChevronDown size={13} />, bridge: <I.Card size={13} />, askchart: <I.Bubble size={13} />,
   chart: <I.Chart size={13} />, lens: <I.Eye size={13} />, trend: <I.ArrowUpRight size={13} />, rings: <I.Check size={13} />, metric: <I.Note size={13} />, forecast: <I.Bag size={13} />,
   dates: <I.Calendar size={13} />, upload: <I.Upload size={13} />, rewind: <I.RotateLeft size={13} />, popup: <I.More size={13} />, region: <I.Plane size={13} />, find: <I.Search size={13} />,
   carousel: <I.Picture size={13} />, halo: <I.Sun size={13} />, announce: <I.Bell size={13} />, slices: <I.FlipH size={13} />, threads: <I.Link size={13} />,
-  // Blocks.
   'live-features': <I.Spark size={13} />, pricing: <I.Card size={13} />, integrations: <I.Plug size={13} />, testimonials: <I.Bubble size={13} />, faq: <I.ChevronDown size={13} />, cta: <I.ArrowRight size={13} />,
   calendar: <I.Calendar size={13} />, 'data-table': <I.Table size={13} />, analytics: <I.Chart size={13} />, 'agent-chat': <I.Prompt size={13} />, 'task-to-merge': <I.Fork size={13} />, 'voice-mode': <I.Mic size={13} />,
   evals: <I.Check size={13} />, 'support-inbox': <I.Mail size={13} />, settings: <I.Sliders size={13} />, 'code-review': <I.Code size={13} />,
@@ -45,7 +38,7 @@ const GLYPH: Record<string, ReactNode> = {
 
 const row = 'ring-focus flex h-[30px] items-center gap-2.5 rounded-[7px] px-2 text-[13.5px] transition-colors duration-100'
 
-export function SideNext({ groups, current, onPick, preview, label = 'Components' }: { groups: RailGroup[]; current: string; onPick: (id: string) => void; preview?: Parameters<typeof usePeek>[1]; /** What the list holds, for its filter. */ label?: string }) {
+export function SideNext({ groups, current, onPick, preview, label = 'Components' }: { groups: RailGroup[]; current: string; onPick: (id: string) => void; preview?: Parameters<typeof usePeek>[1]; label?: string }) {
   const path = usePathname()
   const { openSearch } = useSite()
   const [q, setQ] = useState('')
@@ -110,12 +103,24 @@ export function SideNext({ groups, current, onPick, preview, label = 'Components
       </div>
 
       {card}
-      <Link href="/pro" className="ring-focus group/pro mt-1 flex items-center gap-2 rounded-[10px] px-2.5 py-2 text-[12.5px] text-ink-2 transition-colors hover:bg-[var(--shell-hover)] hover:text-ink">
-        <span className="rounded-[5px] bg-[var(--accent)] px-1.5 text-[10.5px] font-medium leading-[18px] text-white">Pro</span>
-        Pricing
-        <span className="ml-auto text-ink-3">from ${PLANS[0].price}</span>
-        <I.ArrowRight size={12} className="text-ink-3" />
-      </Link>
+      <ForPlan
+        none={
+          <Link href="/pro" className="ring-focus group/pro mt-1 flex items-center gap-2 rounded-[10px] px-2.5 py-2 text-[12.5px] text-ink-2 transition-colors hover:bg-[var(--shell-hover)] hover:text-ink">
+            <span className="rounded-[5px] bg-[var(--accent)] px-1.5 text-[10.5px] font-medium leading-[18px] text-white">Pro</span>
+            Pricing
+            <span className="ml-auto text-ink-3">from ${PLANS[0].price}</span>
+            <I.ArrowRight size={12} className="text-ink-3" />
+          </Link>
+        }
+        pro={
+          <a href={UPGRADE.href} className="ring-focus group/pro mt-1 flex items-center gap-2 rounded-[10px] px-2.5 py-2 text-[12.5px] text-ink-2 transition-colors hover:bg-[var(--shell-hover)] hover:text-ink">
+            <span className="rounded-[5px] bg-[var(--accent)] px-1.5 text-[10.5px] font-medium leading-[18px] text-white">New</span>
+            Templates
+            <span className="ml-auto text-ink-3">+${UPGRADE.price}</span>
+            <I.ArrowRight size={12} className="text-ink-3" />
+          </a>
+        }
+      />
     </div>
   )
 }
