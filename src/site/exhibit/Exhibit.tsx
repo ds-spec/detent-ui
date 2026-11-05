@@ -48,6 +48,8 @@ const glide = { type: 'spring', stiffness: 360, damping: 40 } as const
 /** Components that explain themselves on the stage. The rest stand on their own. */
 /** Air around a demo on the stage. */
 const STAGE_PAD = 48
+const SCALED = new Set(['prompt'])
+
 /** Demos that bleed to the stage's edges and hold their own height: nothing scales them, so a phone's stage is as tall as they are. */
 const HOLDS_HEIGHT = new Set(['checklist', 'readalong', 'secret', 'halo', 'slices', 'dotlight'])
 
@@ -302,7 +304,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
                     <Demo />
                   </div>
                 ) : (
-                  <Fit pad={STAGE_PAD} max={e.zoom ?? 1.25} min={0.62} onPhone={onDemoHeight} stage>
+                  <Fit pad={STAGE_PAD} max={e.zoom ?? 1.25} min={0.62} onPhone={SCALED.has(e.id) ? undefined : onDemoHeight} scale={SCALED.has(e.id)} stage>
                     <Demo />
                   </Fit>
                 )}
