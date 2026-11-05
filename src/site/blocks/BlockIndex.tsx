@@ -15,17 +15,8 @@ import { useNear } from '../near'
 import { useSite } from '../Providers'
 import { Backdrop, Window } from './Studio'
 
-/**
- * Every block by name, grouped by what it is, and the one on the reading line running beside
- * them in its own window, at the size the window gives it. Nothing changes until you scroll or
- * press a name; the scroll has detents, so each name settles on the line. Press it again, or its
- * Open, to go to its page; what's running is named above the window, so the way in is always in
- * view. All but five blocks are Pro. Below 1024px each name carries its block underneath it instead.
- */
-
 const GROUPS = BLOCK_GROUPS
 const ALL = BLOCK_ORDER
-/** At the stage's width an app's own sidebar may fold away, and the unified window's lights would sit on its content: so every window here has a title bar. */
 const bar = (b: Block) => (b.chrome === 'browser' ? 'browser' : 'titled')
 
 export function BlockIndex() {
@@ -97,7 +88,6 @@ export function BlockIndex() {
         ))}
       </ol>
 
-      {/* The stage: the block in its window, and what it is under it. */}
       <div className="sticky top-24 hidden h-[calc(100dvh-128px)] min-h-[620px] flex-col gap-3 lg:flex">
         <Caption b={b} />
         <div className="relative min-h-0 flex-1 overflow-hidden rounded-[28px] p-6">
@@ -117,11 +107,6 @@ export function BlockIndex() {
   )
 }
 
-/**
- * Holds a window back until the block inside it has arrived (each block is its own chunk), then
- * fades it in whole, so an empty frame and its shadow never land first with the app popping in
- * after. It never waits longer than a moment.
- */
 function Reveal({ children }: { children: ReactNode }) {
   const box = useRef<HTMLDivElement>(null)
   const [ready, setReady] = useState(false)
@@ -152,7 +137,6 @@ function Reveal({ children }: { children: ReactNode }) {
   )
 }
 
-/** Over the stage: the block's name, its kind and what it does, and the way to its page. */
 function Caption({ b }: { b: Block }) {
   return (
     <div className="flex h-[84px] shrink-0 items-center gap-6 rounded-[24px] bg-surface px-6 shadow-[inset_0_0_0_1px_var(--line)]">
@@ -178,7 +162,6 @@ function Caption({ b }: { b: Block }) {
   )
 }
 
-/** Below 1024px: the name, then its block in a window under it, running once it's near. */
 function Inline({ b }: { b: Block }) {
   const box = useRef<HTMLDivElement>(null)
   const near = useNear(box, '240px 0px', '480px 0px')

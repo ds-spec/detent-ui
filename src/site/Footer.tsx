@@ -9,7 +9,6 @@ import { Mark } from './parts'
 
 type Item = { href: string; label: string; count?: number; out?: boolean }
 
-/** Four short columns: what's here, what it costs, the small print, and where else to find it. The library's links carry their counts. */
 const COLUMNS: { title: string; items: Item[] }[] = [
   {
     title: 'Library',
@@ -48,11 +47,6 @@ const COLUMNS: { title: string; items: Item[] }[] = [
 
 const link = 'ring-focus group/f -mx-1 flex h-8 w-fit items-center gap-1.5 rounded-[6px] px-1 text-[14px] text-ink-2 transition-colors duration-150 hover:text-ink'
 
-/**
- * The page ends quietly: the mark and a small index of the site in two sizes, a hairline with the
- * year and the theme, then the name, monumental but barely there, sinking off the bottom of the
- * page until a hand brings it up.
- */
 export function Footer() {
   return (
     <footer className="mt-40 overflow-hidden">

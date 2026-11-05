@@ -20,7 +20,6 @@ import { useShell } from './shell'
 const ease = [0.2, 0.9, 0.25, 1] as const
 const lift = { type: 'spring', stiffness: 380, damping: 40 } as const
 
-/** The light that follows the pointer across a card: two CSS variables, set directly, no re-render per move. */
 const light = (ev: PointerEvent<HTMLElement>) => {
   const r = ev.currentTarget.getBoundingClientRect()
   ev.currentTarget.style.setProperty('--mx', `${ev.clientX - r.left}px`)
@@ -37,7 +36,6 @@ function Light({ group, size = 560 }: { group: 'stage' | 'card'; size?: number }
   )
 }
 
-/** One component: alone on a large stage, a caption underneath, and how it's made below the fold. */
 export function View({ id }: { id: string }) {
   const { present, setPresent, inspect, setInspect, dir } = useShell()
   const stageRef = useRef<HTMLElement>(null)
@@ -46,7 +44,6 @@ export function View({ id }: { id: string }) {
   const prev = ENTRIES[(i - 1 + ENTRIES.length) % ENTRIES.length]
   const next = ENTRIES[(i + 1) % ENTRIES.length]
   const Demo = DEMOS[e.id]
-  // The stage's controls: what it shows, which theme it's in, and a replay.
   const [mode, setMode] = useState<'preview' | 'code'>('preview')
   const page = useTheme()
   const [stage, setStage] = useState<'light' | 'dark' | null>(null)
@@ -55,7 +52,6 @@ export function View({ id }: { id: string }) {
 
   return (
     <article>
-      {/* The stage's place in the page is held while it presents, so nothing underneath moves. */}
       <div className="relative h-[clamp(440px,calc(100dvh-16rem),680px)] lg:h-[max(520px,calc(100dvh-12.5rem))]">
         <AnimatePresence>
           {present && (
@@ -72,7 +68,6 @@ export function View({ id }: { id: string }) {
           )}
         </AnimatePresence>
 
-        {/* Presenting lifts this same stage out of the page to fill the screen; the component keeps running through it. */}
         <motion.section
           ref={stageRef}
           layout
@@ -85,7 +80,6 @@ export function View({ id }: { id: string }) {
         >
           <Light group="stage" />
 
-          {/* The component arrives from the direction you're moving through the index. */}
           <AnimatePresence mode="popLayout" initial={false} custom={dir}>
             <motion.div
               key={`${e.id}-${run}`}
@@ -123,7 +117,6 @@ export function View({ id }: { id: string }) {
 
           <InspectLayer on={inspect && mode === 'preview'} stage={stageRef} />
 
-          {/* Presenting, the controls stay out of the picture until you reach for them. */}
           <div className={`absolute inset-x-0 top-0 z-10 flex h-[68px] items-center justify-between px-4 transition-opacity duration-300 ${present ? 'opacity-0 focus-within:opacity-100 hover:opacity-100' : ''}`}>
             <motion.div layout="position" transition={{ layout: lift }}>
               <Modes mode={mode} setMode={setMode} />
@@ -163,7 +156,6 @@ export function View({ id }: { id: string }) {
   )
 }
 
-/** The name and what it is, under the stage like a caption. The name drops into place, the way the home headline's last word does. */
 function Caption({ e }: { e: Entry }) {
   return (
     <div className="flex min-h-[112px] flex-col gap-4 pt-5 sm:flex-row sm:items-start sm:justify-between sm:gap-10">
@@ -178,7 +170,6 @@ function Caption({ e }: { e: Entry }) {
           </h1>
         </motion.div>
       </AnimatePresence>
-      {/* A fixed column, so a longer command never re-wraps the line beside it. */}
       <div className="flex shrink-0 sm:w-[360px] sm:justify-end">
         <CopyCommand command={installCommand(e.id, !isProComponent(e.id))} />
       </div>
@@ -186,7 +177,6 @@ function Caption({ e }: { e: Entry }) {
   )
 }
 
-/** How it's made, and the keys it answers to. */
 function Notes({ e }: { e: Entry }) {
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -224,7 +214,6 @@ function Notes({ e }: { e: Entry }) {
   )
 }
 
-/** The previous or next component, as a soft card with the same light as the stage. */
 function Step({ to, side }: { to: Entry; side: 'prev' | 'next' }) {
   const next = side === 'next'
   return (
@@ -245,7 +234,6 @@ function Step({ to, side }: { to: Entry; side: 'prev' | 'next' }) {
   )
 }
 
-/** A quiet round button for the stage's corner: no fill until you point at it. */
 function Ghost({ label, on, onClick, children }: { label: string; on?: boolean; onClick: () => void; children: ReactNode }) {
   return (
     <motion.button
@@ -262,7 +250,6 @@ function Ghost({ label, on, onClick, children }: { label: string; on?: boolean; 
   )
 }
 
-/** Preview or source; a white plate glides between them. */
 function Modes({ mode, setMode }: { mode: 'preview' | 'code'; setMode: (m: 'preview' | 'code') => void }) {
   const id = useId()
   return (

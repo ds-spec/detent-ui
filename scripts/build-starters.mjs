@@ -1,8 +1,3 @@
-// Writes each template's starter project to .detent/starters/<id>/ and its zip beside it, from the
-// Pro registry (run build-pro-registry.mjs first). The site makes the same zips on request; this
-// is for checking them: install and build one before a release.
-//   node scripts/build-starters.mjs            every template
-//   node scripts/build-starters.mjs detent     one
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { createJiti } from 'jiti'

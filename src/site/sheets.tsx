@@ -2,13 +2,6 @@ import type { ReactNode } from 'react'
 import { Footer } from './Footer'
 import { Header } from './Header'
 
-/*
- * The site's inner pages: plain pages, the header, sections one after another, and the footer.
- * (Sheets on a ground are the home page's alone.) A section is a band of the page with room above
- * it; a quieter one starts on a hairline.
- */
-
-/** A page: the header, the sections, the footer. */
 export function SitePage({ children }: { children: ReactNode }) {
   return (
     <>
@@ -19,7 +12,6 @@ export function SitePage({ children }: { children: ReactNode }) {
   )
 }
 
-/** One band of a page. `tone="quiet"` starts it on a hairline; `inner` adds to its padding. */
 export function Band({ children, tone = 'plain', id, label, inner = '' }: { children: ReactNode; tone?: 'plain' | 'quiet'; id?: string; label?: string; inner?: string }) {
   return (
     <section id={id} aria-label={label} className="scroll-mt-20">
@@ -30,10 +22,6 @@ export function Band({ children, tone = 'plain', id, label, inner = '' }: { chil
   )
 }
 
-/**
- * A band's heading: centred, in two tones, the first line in ink and the second quieter, with an
- * optional tag above it and a line of copy under it. A page's own heading is set larger.
- */
 export function BandHead({ as = 'h2', title, quiet, line, tag, children }: { as?: 'h1' | 'h2'; title: ReactNode; quiet: ReactNode; line?: ReactNode; tag?: ReactNode; children?: ReactNode }) {
   const H = as
   const size = as === 'h1' ? 'text-[clamp(42px,5vw,72px)] leading-[1.01]' : 'text-[clamp(38px,4.2vw,62px)] leading-[1.02]'
@@ -55,5 +43,4 @@ export function BandHead({ as = 'h2', title, quiet, line, tag, children }: { as?
   )
 }
 
-/** A small card on a page: a raised surface with soft corners, for a fact, a question or what's coming. */
 export const card = 'rounded-[22px] bg-surface p-6 shadow-[var(--card-edge)]'

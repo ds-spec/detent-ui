@@ -17,7 +17,6 @@ export async function generateMetadata({ params }: PageProps<'/blocks/[slug]'>):
 
 export default function BlockPage({ params }: PageProps<'/blocks/[slug]'>) {
   return (
-    // The layout draws the frame and the block from the URL; the page adds what only the server knows.
     <Suspense fallback={null}>
       <Shown params={params} />
     </Suspense>

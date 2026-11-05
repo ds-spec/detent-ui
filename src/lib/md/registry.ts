@@ -1,13 +1,3 @@
-/**
- * Renderer registry: maps every public route to a function that returns its markdown content.
- *
- * Adding a new page = one entry here. llms.txt, llms-full.txt, and /api/md/_catalog pick it up
- * automatically.
- *
- * Each renderer returns the full markdown string (body + envelope). If the route doesn't exist
- * (e.g. an unknown slug), return null — the handler will send a 404.
- */
-
 import { ENTRIES, entry } from '@/catalog/meta'
 import { BLOCKS } from '@/catalog/blocks'
 import { TEMPLATES, TEMPLATE_COUNT } from '@/catalog/templates'
@@ -16,22 +6,14 @@ import { FREE_BLOCKS, PLANS, PRO_COMPONENTS, PRO_BLOCK_COUNT, SITE, installComma
 import { NAME, DESCRIPTION, TAGLINE, FREE_COUNT } from '@/site/seo'
 import { abs, envelope, fmtDate, itemList, kvTable, today } from './format'
 
-// ─── Type ────────────────────────────────────────────────────────────────────
-
 export type MarkdownRoute = {
-  /** The HTML path, e.g. "/pricing" or "/components/answer". */
   path: string
-  /** One-line description for llms.txt. */
   desc: string
-  /** Whether to include in llms-full.txt. */
   inFull: boolean
-  /** Whether this is a static, long-lived page (affects cache headers). */
   isStatic: boolean
 }
 
 export type Renderer = () => string | null
-
-// ─── Static page renderers ────────────────────────────────────────────────────
 
 function renderHome(): string {
   const body = [
@@ -333,8 +315,6 @@ function renderRefunds(): string {
   })
 }
 
-// ─── Dynamic page renderers ───────────────────────────────────────────────────
-
 function renderDocs(): string {
   const first = ENTRIES.find((e) => e.id === 'popup' && !isProComponent(e.id)) ?? ENTRIES.find((e) => !isProComponent(e.id))!
   const free = ENTRIES.filter((e) => !isProComponent(e.id)).length
@@ -591,12 +571,6 @@ function renderTemplate(slug: string): string | null {
   })
 }
 
-// ─── Registry ─────────────────────────────────────────────────────────────────
-
-/**
- * Exact-match map: route path → renderer function.
- * All static pages are registered here.
- */
 const STATIC_ROUTES: Record<string, { render: () => string | null; desc: string; isStatic: boolean }> = {
   '/':            { render: renderHome,       desc: `${NAME} — premium React components`,              isStatic: true },
   '/pro':         { render: renderPro,        desc: `Pro components, blocks and templates`,              isStatic: true },
@@ -612,30 +586,22 @@ const STATIC_ROUTES: Record<string, { render: () => string | null; desc: string;
   '/privacy':     { render: renderPrivacy,    desc: 'What we keep, who helps run it, and how to remove it', isStatic: true },
 }
 
-/**
- * Look up and render the markdown for a given canonical path.
- * Returns null if no renderer is found or the entity doesn't exist.
- */
 export function renderMarkdown(canonicalPath: string): { content: string | null; isStatic: boolean } {
-  // Exact match (static pages)
   if (canonicalPath in STATIC_ROUTES) {
     const { render, isStatic } = STATIC_ROUTES[canonicalPath]
     return { content: render(), isStatic }
   }
 
-  // Dynamic: /components/<id>
   const componentMatch = canonicalPath.match(/^\/components\/([^/]+)$/)
   if (componentMatch) {
     return { content: renderComponent(componentMatch[1]), isStatic: true }
   }
 
-  // Dynamic: /blocks/<slug>
   const blockMatch = canonicalPath.match(/^\/blocks\/([^/]+)$/)
   if (blockMatch) {
     return { content: renderBlock(blockMatch[1]), isStatic: true }
   }
 
-  // Dynamic: /templates/<slug>
   const templateMatch = canonicalPath.match(/^\/templates\/([^/]+)$/)
   if (templateMatch) {
     return { content: renderTemplate(templateMatch[1]), isStatic: true }
@@ -644,24 +610,15 @@ export function renderMarkdown(canonicalPath: string): { content: string | null;
   return { content: null, isStatic: false }
 }
 
-// ─── Route catalog (feeds llms.txt, llms-full.txt, /api/md/_catalog) ──────────
-
-/**
- * Every addressable markdown route. This is the single source of truth.
- * Add a new renderer to STATIC_ROUTES and it appears here automatically.
- * Dynamic routes are expanded from the catalog data.
- */
 export function listMarkdownRoutes(): MarkdownRoute[] {
   const routes: MarkdownRoute[] = []
 
-  // Static pages — in content priority order
   const staticOrder = ['/', '/pro', '/docs', '/components', '/blocks', '/templates', '/system', '/changelog', '/licence', '/terms', '/refunds', '/privacy']
   for (const path of staticOrder) {
     const r = STATIC_ROUTES[path]
     if (r) routes.push({ path, desc: r.desc, inFull: true, isStatic: r.isStatic })
   }
 
-  // Dynamic: top 30 free components in llms-full, rest linked only
   const FREE_LIMIT = 30
   const freeEntries = ENTRIES.filter((e) => !e.id.startsWith('_'))
   freeEntries.forEach((e, i) => {
@@ -673,7 +630,6 @@ export function listMarkdownRoutes(): MarkdownRoute[] {
     })
   })
 
-  // Dynamic: top 20 blocks in llms-full
   const BLOCK_LIMIT = 20
   BLOCKS.forEach((b, i) => {
     routes.push({
@@ -684,7 +640,6 @@ export function listMarkdownRoutes(): MarkdownRoute[] {
     })
   })
 
-  // Dynamic: all templates
   TEMPLATES.forEach((t) => {
     routes.push({
       path: `/templates/${t.id}`,
@@ -697,10 +652,6 @@ export function listMarkdownRoutes(): MarkdownRoute[] {
   return routes
 }
 
-/**
- * Dev check: every public route in the app must have a renderer or be explicitly skipped.
- * Import and call this in a test or CI script.
- */
 export const SKIPPED_ROUTES: Record<string, string> = {
   '/preview': 'Unlisted preview pages — noindex, not for crawlers',
   '/preview-fit': 'Unlisted preview pages — noindex, not for crawlers',

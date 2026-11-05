@@ -6,13 +6,6 @@ import { PRO_COMPONENTS } from '@/catalog/pro'
 import { TEMPLATES } from '@/catalog/templates'
 import { FREE_BLOCK_VIEWS } from '@/lab/blocks/registry'
 
-/*
- * What `@pro` resolves to when Detent Pro isn't checked out at src/pro. Every Pro component,
- * block and template is here under its own id, the free blocks as themselves and the rest each standing in as a quiet note, so the site
- * builds and every page renders from the public source alone. Same exports as src/pro/index.ts.
- */
-
-/** Where a Pro preview plays when the Pro source is there. */
 function Locked() {
   return (
     <div className="flex size-full min-h-40 flex-col items-center justify-center gap-1 p-6 text-center">
@@ -26,13 +19,10 @@ const each = <T,>(ids: string[], view: T) => Object.fromEntries(ids.map((id) => 
 
 export const PRO_DEMOS: Record<string, ComponentType> = each(PRO_COMPONENTS, Locked)
 
-/** Nothing to download: the stand-in is already here. */
 export const preloadProDemo = (id: string) => void id
 
-/** No spotlights: the gallery falls back to each component's demo, which is locked. */
 export const SPOTS: Record<string, ComponentType> = {}
 
-/** The free blocks are public source, so they play here too. */
 export const BLOCK_VIEWS: Record<string, ComponentType<{ autoplay?: boolean }>> = { ...each(BLOCKS.map((b) => b.id), Locked), ...FREE_BLOCK_VIEWS }
 
 export const TEMPLATE_VIEWS: Record<string, ComponentType> = each(TEMPLATES.map((t) => t.id), Locked)

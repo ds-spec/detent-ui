@@ -1,8 +1,3 @@
-/**
- * Every block's id, and nothing else. Small on purpose: what only needs to count or name the
- * blocks (the plans, the shell) reads this instead of the whole block catalogue. blocks.ts types
- * each block's id against this list, so the two can't drift apart.
- */
 export const BLOCK_IDS = [
   'live-features',
   'pricing',

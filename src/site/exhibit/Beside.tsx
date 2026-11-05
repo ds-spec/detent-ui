@@ -6,11 +6,6 @@ import { ArrowUpRight } from '@/lab/icons'
 import { LivePlate } from '../LivePlate'
 import { wellOf } from '../wells'
 
-/**
- * At the foot of a free component's page, the Pro piece it usually sits beside, running and yours
- * to try. One plate, loaded only as it comes near. It says what it is and where to find it; the
- * piece does the rest.
- */
 export function Beside({ id }: { id: string }) {
   const e = entry(id)
   if (!e) return null

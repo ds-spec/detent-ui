@@ -2,10 +2,6 @@ import { getAuth } from '@/lib/account/auth'
 import { purchaseFor } from '@/lib/account/keys'
 import { normalEmail } from '@/lib/account/session'
 
-/*
- * Who's signed in, for the header's menu: a name, the email, a picture when GitHub or Google gave
- * one, and the plan. Only ever to the person themselves, and never cached on the way.
- */
 const PRIVATE = { 'cache-control': 'private, no-store' }
 
 export async function GET(req: Request) {

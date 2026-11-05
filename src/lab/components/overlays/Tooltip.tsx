@@ -8,20 +8,10 @@ import { Layer, fill, frameOf, inFrame, originOf, place, useHost } from '../../l
 import type { Side } from '../../lib/layer'
 import { keyLabel } from '../../ui/Kbd'
 
-/*
- * Tooltips that behave like one tooltip. In a group, such as a toolbar, the first waits a
- * moment before it shows, so passing over a button doesn't flash anything. Once one is up, the
- * rest show at once, and it's the same bubble that travels: it glides from button to button,
- * stretching to fit each label, with the new words sliding in from the side you moved toward.
- * Pressing a button or Escape puts it away. Keyboard focus shows it straight away; on touch a
- * tap shows it, and a tap anywhere else puts it away.
- */
-
 type Tip = { id: string; label: string; shortcut?: string[]; side: Side; el: HTMLElement }
 type Group = { enter(t: Tip): void; focus(t: Tip): void; leave(): void; hide(): void; register(id: string, get: () => Tip | null): () => void; shown: string | null; bubble: string }
 const GroupContext = createContext<Group | null>(null)
 
-/** For demos and tests: show the group's n-th tooltip as if pointed at, or hide it. */
 export type TooltipGroupHandle = { show(n: number): void; hide(): void }
 
 const WARM = 450
@@ -32,9 +22,7 @@ export function TooltipGroup({
   delay = 500,
   ref,
 }: {
-  /** Anything with tooltips in it: a toolbar, a sidebar, a row of icons. */
   children: ReactNode
-  /** How long the first tooltip waits before showing, in ms. The rest show at once. */
   delay?: number
   ref?: Ref<TooltipGroupHandle>
 }) {
@@ -98,7 +86,6 @@ export function TooltipGroup({
     bubble,
   }
 
-  // Place the bubble over its button once the new label has been measured.
   useLayoutEffect(() => {
     if (!shown || !tip || !measure.current || !tip.el.isConnected) return
     const f = frameOf(frame)
@@ -137,7 +124,6 @@ export function TooltipGroup({
       {children}
       <Layer>
         <div className={`${fill(contained)} pointer-events-none z-[60]`}>
-          {/* The next label at its natural width, so the bubble can stretch to it. */}
           {tip && (
             <span ref={measure} aria-hidden className="invisible absolute left-0 top-0 flex items-center gap-1.5 whitespace-nowrap text-caption font-medium">
               <Label tip={tip} />
@@ -211,23 +197,15 @@ function Label({ tip }: { tip: Tip }) {
   )
 }
 
-/**
- * A tooltip for one control. Inside a `TooltipGroup` it shares the group's travelling bubble;
- * on its own it brings a group of one.
- */
 export function Tooltip({
   label,
   shortcut,
   side = 'top',
   children,
 }: {
-  /** What the control does, in a word or two. */
   label: string
-  /** Its keyboard shortcut, one key per entry, like ['⌘', 'B']. */
   shortcut?: string[]
-  /** Which side it prefers. It flips when there's no room. */
   side?: Side
-  /** The control. It gets `aria-describedby` while the tooltip shows. */
   children: ReactElement<Record<string, unknown>>
 }) {
   const group = useContext(GroupContext)

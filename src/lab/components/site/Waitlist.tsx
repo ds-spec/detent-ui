@@ -11,7 +11,6 @@ import { ArrowRight } from '../../icons'
 import { Avatar } from '../../ui/Avatar'
 
 type State = 'idle' | 'loading' | 'done'
-/** For demos and tests: type, submit and start over, without taking focus. */
 export type WaitlistHandle = { type(email: string): void; submit(): void; reset(): void }
 
 const PEOPLE = [
@@ -20,10 +19,6 @@ const PEOPLE = [
   { name: 'Aiko Tanaka', hue: 150 },
 ]
 
-/**
- * Waitlist signup. The button folds into a spinner, then the whole field turns into your
- * place in line: the number counts up to your spot and your avatar joins the others.
- */
 export function Waitlist({
   joined = 1283,
   onJoin,
@@ -32,15 +27,10 @@ export function Waitlist({
   done = 'We’ll email you the moment your invite is ready.',
   ref,
 }: {
-  /** How many people are already waiting. The count rolls up to it, plus one, when someone joins. */
   joined?: number
-  /** Called with the email. Return a promise to keep the button busy until it settles. */
   onJoin?: (email: string) => Promise<void> | void
-  /** Shown in the field while it's empty. */
   placeholder?: string
-  /** The button's words. */
   action?: string
-  /** The line under the field once someone's in. */
   done?: string
   ref?: Ref<WaitlistHandle>
 }) {
@@ -131,7 +121,6 @@ export function Waitlist({
                   onBlur={() => setFocused(false)}
                   className="h-10 min-w-0 flex-1 bg-transparent px-3.5 text-callout text-ink outline-none placeholder:text-ink-3 disabled:opacity-60"
                 />
-                {/* Right to left only so its start is the right edge: folding into the spinner keeps that edge still, and nothing shifts. */}
                 <motion.button
                   layout
                   dir="rtl"
@@ -143,7 +132,6 @@ export function Waitlist({
                   className="sink ring-focus flex h-10 shrink-0 items-center justify-center gap-1.5 overflow-hidden bg-ink text-callout font-medium text-surface transition-colors duration-150 hover:bg-[color-mix(in_oklch,var(--ink),var(--surface)_14%)]"
                   style={{ borderRadius: 20, width: state === 'loading' ? 40 : 'auto', paddingInline: state === 'loading' ? 0 : 16 }}
                 >
-                  {/* The label goes at once: the button folds over it, and a copy left to fade would only be clipped away. */}
                   {state !== 'loading' && (
                     <span dir="ltr" className="flex items-center gap-1.5 whitespace-nowrap">
                       {action}

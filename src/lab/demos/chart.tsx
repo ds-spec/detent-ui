@@ -10,7 +10,6 @@ const REVENUE = [41.2, 41.9, 41.4, 42.6, 43.1, 42.2, 40.8, 40.1, 39.2, 38.4, 38.
 const DATA: Reading[] = REVENUE.map((v, i) => ({ label: new Date(2026, 8, 1 + i).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), value: v * 1000 }))
 const money = (n: number) => `$${n.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
 
-/** Moves the starting point around the month, reading along the line from each. Touch it to choose your own. */
 export function ChartDemo() {
   const b = useBench()
   const chart = useRef<BaselineHandle>(null)

@@ -12,7 +12,6 @@ const SLIDES: Slide[] = [
   { id: 'peaks', title: 'Peaks', src: '/media/search/snow-peaks.webp', alt: 'Snow on mountain peaks' },
 ]
 
-/** Plays on its own, each title filling with ink as its slide runs. Pointing at it holds it. */
 export function CarouselDemo() {
   const b = useBench()
   return (

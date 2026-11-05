@@ -10,7 +10,6 @@ import { SliceText } from '../components/slices/SliceText'
 
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
-/** A plain ground for a piece to sit on: nothing behind it. */
 function Light({ children }: { children: React.ReactNode }) {
   return <div className="flex size-full items-center justify-center p-5 lg:min-w-[620px] [&>*]:mx-auto">{children}</div>
 }

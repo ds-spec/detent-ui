@@ -11,7 +11,6 @@ const SECONDS = 0.72
 function Key({ value, lead, tail, shown }: { value: string; lead: number; tail: number; shown: number }) {
   const reduce = useReducedMotion()
   const code = useRef<HTMLElement>(null)
-  // A narrow field folds the hidden middle shorter, so the end of the key is never cut off.
   const [skip, setSkip] = useState(0)
   useLayoutEffect(() => {
     const field = code.current?.parentElement
@@ -45,11 +44,6 @@ function Key({ value, lead, tail, shown }: { value: string; lead: number; tail: 
   )
 }
 
-/**
- * An API key you read by holding on. Press and the key turns over one character at a time, left to
- * right, for as long as you hold; let go and it folds away at once. There's no "show" state to
- * leave on while someone looks over your shoulder, and copying never needs it revealed.
- */
 export function SecretField({
   name,
   scope,
@@ -60,21 +54,13 @@ export function SecretField({
   copiedLabel = 'Copied',
   onCopy,
 }: {
-  /** What the key is for. */
   name: string
-  /** A short note on the right, like its access level. */
   scope?: string
-  /** The key. */
   value: string
-  /** The quiet line under it, like when it was last used. */
   used?: string
-  /** Characters always shown at the start. */
   lead?: number
-  /** Characters always shown at the end. */
   tail?: number
-  /** The line shown after copying. */
   copiedLabel?: string
-  /** Called after the key is copied. */
   onCopy?: () => void
 }) {
   const [shown, setShown] = useState(0)

@@ -1,9 +1,3 @@
-/**
- * Coverage checker for markdown routes.
- * Fails if any public route in the application lacks a markdown renderer
- * and is not explicitly in the SKIPPED_ROUTES list.
- */
-
 import { readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { assertAllRoutesCovered, listMarkdownRoutes, SKIPPED_ROUTES } from '../src/lib/md/registry'

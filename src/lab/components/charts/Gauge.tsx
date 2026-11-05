@@ -14,11 +14,6 @@ const STATES = {
 
 const round = (n: number) => Math.round(n * 100) / 100
 
-/**
- * A reading against a limit, on an arc of ticks that light up to it one after another. The lit
- * ticks take the colour of how close it is: fine, within a fifth of the limit, or past it, and say
- * so in words underneath. The limit itself is a longer tick.
- */
 export function Gauge({ value, max, limit, label, format = (v) => v.toFixed(2), unit = '' }: { value: number; max: number; limit: number; label: string; format?: (n: number) => string; unit?: string }) {
   const reduce = useReducedMotion()
   const N = 37
@@ -34,7 +29,6 @@ export function Gauge({ value, max, limit, label, format = (v) => v.toFixed(2), 
         <svg width={S} height={cy + 6} className="block overflow-visible" role="img" aria-label={`${label}: ${format(value)}${unit}, limit ${format(limit)}${unit}, ${state.label.toLowerCase()}`}>
           {Array.from({ length: N }, (_, i) => {
             const angle = Math.PI - (i / (N - 1)) * Math.PI
-            // Rounded, so the server and the browser draw the same arc.
             const x = round(S / 2 + Math.cos(angle) * R)
             const y = round(cy - Math.sin(angle) * R)
             const on = i < lit

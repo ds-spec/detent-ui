@@ -19,16 +19,6 @@ import { TemplateCard } from '../templates/TemplateCard'
 import { wellOf } from '../wells'
 import type { Tone } from '../home/lights'
 
-/*
- * The library, laid out the way Skiper lays out its own: each family a section with its name and
- * one quiet line, then its pieces three to a row. Each card is a dark-edged
- * tray with the piece running inside it, and its name in a caption inside the tray. Pro pieces
- * carry a small Pro mark in the corner of the preview. Narrowing it down is one switch at the top,
- * All, Free or Pro, beside what Pro costs.
- * What's ours: every preview is the real piece, live, not a video, and each family keeps its own
- * light in its wells.
- */
-
 export type Shelf = 'components' | 'blocks' | 'templates'
 
 const SHELVES: { id: Shelf; name: string; href: string }[] = [
@@ -69,7 +59,6 @@ export function Library({ shelf }: { shelf: Shelf }) {
 
   return (
     <main className="mx-auto max-w-[1360px] px-4 pb-40 pt-28 sm:px-8 sm:pt-32">
-      {/* The shelves, as words: the one you're on in ink, the others quiet. */}
       <nav aria-label="Library" className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
         {SHELVES.map((s) => {
           const on = s.id === shelf
@@ -141,10 +130,6 @@ export function Library({ shelf }: { shelf: Shelf }) {
   )
 }
 
-/**
- * One piece, as Skiper shows one: a tray, the piece running in a well set into it, and a caption
- * inside the tray with the name. Pro carries a small mark in the corner.
- */
 function Tile({ card, shelf }: { card: Card; shelf: Shelf }) {
   const box = useRef<HTMLAnchorElement>(null)
   const near = useNear(box, '300px 0px', '600px 0px')
@@ -167,11 +152,6 @@ function Tile({ card, shelf }: { card: Card; shelf: Shelf }) {
   )
 }
 
-/**
- * Under a piece's own page, the way on, as Dribbble does under a shot: three more from the same
- * family on the same live cards as the library, and the way to all of them. The family's next ones
- * come first, wrapping round, so moving through a family is a walk rather than a shuffle.
- */
 export function MoreLike({ shelf, id }: { shelf: 'components' | 'blocks'; id: string }) {
   const cards = shelf === 'components' ? COMPONENT_CARDS : BLOCK_CARDS
   const me = cards.find((c) => c.id === id)
@@ -179,7 +159,6 @@ export function MoreLike({ shelf, id }: { shelf: 'components' | 'blocks'; id: st
   const family = cards.filter((c) => c.group === me.group)
   const at = family.indexOf(me)
   const after = [...family.slice(at + 1), ...family.slice(0, at)]
-  // A small family is topped up from the ones after it in the library.
   const rest = [...cards.slice(cards.indexOf(me) + 1), ...cards.slice(0, cards.indexOf(me))].filter((c) => c.group !== me.group)
   const shown = [...after, ...rest].slice(0, 3)
   return (
@@ -210,7 +189,6 @@ function ComponentPiece({ id }: { id: string }) {
   if (!Demo || !e) return null
   return (
     <Mini pad={28} max={0.9}>
-      {/* A demo that fills its parent has no size of its own here, so it gets its stage size to fill. */}
       {e.bleed && (TILE[id] ?? SIZE[id]) ? (
         <div className="relative" style={{ width: (TILE[id] ?? SIZE[id])[0], height: (TILE[id] ?? SIZE[id])[1] }}>
           <Demo />
@@ -222,10 +200,6 @@ function ComponentPiece({ id }: { id: string }) {
   )
 }
 
-/**
- * A whole screen, small: it runs at a laptop's width in a little window, scaled to fit where it's
- * shown. Blocks and templates are drawn this way on their cards and beside the strip.
- */
 const SCREEN: [number, number] = [1280, 860]
 function ScreenPiece({ onReady, children }: { onReady?: () => void; children: ReactNode }) {
   const frame = useRef<HTMLDivElement>(null)

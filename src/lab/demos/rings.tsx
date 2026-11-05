@@ -7,10 +7,6 @@ import { Segmented, useScript } from './chart-kit'
 
 type Month = 'oct' | 'sep'
 
-/**
- * Running totals for a month, one a day, that end on `end` by `today`. Weekends are quieter, and a
- * seed keeps every load the same.
- */
 function month(end: number, today: number, seed: number) {
   let r = seed
   const rnd = () => (r = (r * 9301 + 49297) % 233280) / 233280
@@ -20,7 +16,6 @@ function month(end: number, today: number, seed: number) {
   return daily.map((v) => (run += (v / total) * end))
 }
 
-/** Tokens used against each model's monthly allowance, day by day. October is under way; September is closed. */
 const MONTHS: Record<Month, { name: string; days: number; today: number; goals: Goal[] }> = {
   oct: {
     name: 'Oct',
@@ -44,15 +39,8 @@ const MONTHS: Record<Month, { name: string; days: number; today: number; goals: 
   },
 }
 
-/** The day before Haiku went over October's allowance. */
 const CROSS = MONTHS.oct.goals[1].series.findIndex((v) => v >= MONTHS.oct.goals[1].goal) - 1
 
-/**
- * A month's allowance by model, led by a sentence that says who's over. The bars fill, then the
- * scrubber walks from the first of the month to today and every bar climbs with it, Haiku pressing into
- * its allowance, holding, and breaking through amber. Then September, where it's Opus that went over. Hovering pauses; touching
- * hands it over.
- */
 export function RingsDemo() {
   const [key, setKey] = useState<Month>('oct')
   const [day, setDay] = useState<number | null>(null)
@@ -60,7 +48,6 @@ export function RingsDemo() {
   const m = MONTHS[key]
   const d = day ?? m.today
   const at = (g: Goal) => g.series[Math.min(d, g.series.length - 1)]
-  // The sentence waits for the bar: it says "over" when one breaks through, not the day it's due to.
   const [broke, setBroke] = useState<string[] | null>(null)
   const over = (broke ? m.goals.filter((g) => broke.includes(g.id)) : m.goals.filter((g) => at(g) > g.goal)).map((g) => g.label)
   const said = over.length ? `${over.join(' and ')} ${over.length > 1 ? 'are' : 'is'} over.` : 'Everything’s within its allowance.'
@@ -73,7 +60,6 @@ export function RingsDemo() {
     }
     goals.current?.point(null)
     await beat(600)
-    // Back to the first of the month, then a hand's walk up to the wall, into it, and through.
     goals.current?.sweep(0, 900)
     await beat(1300)
     goals.current?.sweep(CROSS, 2200)

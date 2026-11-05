@@ -1,14 +1,3 @@
-/**
- * /llms-full.txt — Every page concatenated into one markdown document.
- * AI agents can fetch the entire site's content in a single request.
- *
- * keep in sync with: /llms.txt, /ai.txt, /robots.txt, /api/md/_catalog
- *
- * Capped at ~500k chars; if content exceeds that, a warning is logged and the
- * tail is truncated. Dynamic collections (components, blocks) include only the
- * top N items.
- */
-
 import { listMarkdownRoutes } from '@/lib/md/registry'
 import { renderMarkdown } from '@/lib/md/registry'
 import { NAME, DESCRIPTION } from '@/site/seo'

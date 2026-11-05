@@ -14,15 +14,8 @@ import { track } from './track'
 import { BTN, useSideNew } from './shell/side'
 import { useSite } from './Providers'
 
-// The load click plays once a visit, not every time a page mounts the header.
 let seated = false
 
-/**
- * The mark: the Seated D. A slab and a half-disc on a 24-unit grid, machined to meet with a
- * two-unit gap: two parts that clicked into place. On the first load the half-disc slides home,
- * passes its seat by a hair and springs back (in CSS, so it plays at first paint). Pointing at
- * the brand clicks it again, with the site's click when sound is on. `still` leaves it at rest.
- */
 export function Mark({ size = 22, still = false }: { size?: number; still?: boolean }) {
   const { tick } = useSite()
   const box = useRef<SVGSVGElement>(null)
@@ -35,7 +28,6 @@ export function Mark({ size = 22, still = false }: { size?: number; still?: bool
     let stop = () => {}
     const click = () => {
       stop()
-      // Out a little, then a stiff, light spring brings it home past its seat and back.
       const out = animate(x, 2.2, { duration: 0.11, ease: [0.3, 0, 0.6, 1] })
       stop = () => out.stop()
       out.then(() => {
@@ -102,7 +94,6 @@ export function ThemeButton() {
     try {
       localStorage.setItem('theme', next)
     } catch {
-      /* storage unavailable */
     }
   }
   return (
@@ -116,14 +107,12 @@ export function ThemeButton() {
   )
 }
 
-/** An install command you copy with one click; a sweep of colour confirms it. The package manager is a native menu, so it behaves on every keyboard and phone. */
-export function CopyCommand({ command: given, fill = false, onCopy }: { command: string; /** Take the full width of its slot, so a font swap can never move its edges. */ fill?: boolean; onCopy?: () => void }) {
+export function CopyCommand({ command: given, fill = false, onCopy }: { command: string; fill?: boolean; onCopy?: () => void }) {
   const [copied, setCopied] = useState(0)
   const timer = useRef(0)
   const [manager, setManager] = useManager()
   const side = useSideNew()
   const command = withManager(given, manager)
-  // Reads as one line: the picker is the command's first word, and what you're adding stays in full.
   const [first, ...words] = command.split(' ')
   const managed = isManaged(given)
   const firsts = MANAGERS.map((m) => withManager(given, m).split(' ')[0])
@@ -135,7 +124,6 @@ export function CopyCommand({ command: given, fill = false, onCopy }: { command:
     try {
       await navigator.clipboard.writeText(command)
     } catch {
-      /* Clipboard blocked: the command is still there to select. */
     }
     setCopied((n) => n + 1)
     track('copy_install', { item: name, manager })

@@ -123,12 +123,9 @@ function View() {
   )
 }
 
-
-/** A travel guide: the dock opens search, grows into share, reshapes into notes and settings, then folds back. Touch it to take over. */
 export function DockDemo() {
   const b = useBench()
   const dock = useRef<DockHandle>(null)
-  // Two notes wait on the dock until it's opened.
   const [unread, setUnread] = useState(2)
   const tools: DockTool[] = [
     { id: 'search', label: 'Search', icon: <Search size={17} />, panel: <Find />, height: 244, shortcut: '/' },
@@ -152,10 +149,8 @@ export function DockDemo() {
   return (
     <div className="h-[600px] w-[760px] max-w-full overflow-hidden rounded-[40px] bg-[color-mix(in_oklch,var(--ink)_3%,var(--surface))]" {...handlers}>
       <MorphingDock ref={dock} tools={tools} recede={b.get('recede', true)} onChange={b.on('onChange')}>
-        {/* A photo essay, the kind of page a dock should stay out of the way of. */}
         <div className="mx-auto w-[480px] max-w-full pt-12">
           <div className="h-[230px] overflow-hidden rounded-[6px]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/media/search/dunes.webp" alt="" className="size-full object-cover" />
           </div>
           <p className="mt-3 flex justify-between text-[11px] uppercase tracking-[0.14em] text-ink-3">

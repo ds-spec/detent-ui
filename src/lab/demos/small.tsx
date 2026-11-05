@@ -1,10 +1,5 @@
 'use client'
 
-/**
- * Demos for the small pieces. Each plays its one moment on a loop; hovering pauses it, and
- * pressing or typing inside hands it over for good.
- */
-
 import { useEffect, useRef, useState } from 'react'
 import { AgentToasts } from '../components/small/AgentToasts'
 import type { AgentEvent } from '../components/small/AgentToasts'
@@ -34,8 +29,6 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useBench } from './bench'
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
-
-/* ───────────────────────────── Regenerate ───────────────────────────── */
 
 const DRAFTS = [
   'Refunds for damaged items no longer need a return. Annual plans now get 45 days, and anything over $500 needs a second approval.',
@@ -77,8 +70,6 @@ function VersionsRun({ n, onDone }: { n: number; onDone: () => void }) {
   )
 }
 
-/* ───────────────────────────── Context ring ───────────────────────────── */
-
 const LIMIT = 200_000
 const SAID = [
   { me: true, text: 'Pull every refund from Q3' },
@@ -103,7 +94,6 @@ export function ContextDemo() {
     { id: 'files', label: 'Files', tokens: 18_000 },
     { id: 'chat', label: 'Conversation', tokens: chat },
   ]
-  // Compacting folds everything but the latest exchange into one summary.
   const compact = () => {
     setFolded(Math.max(0, shown - 2))
     setChat(9_000)
@@ -130,10 +120,8 @@ export function ContextDemo() {
   const lines = SAID.slice(folded, shown)
   return (
     <div className="flex w-[360px] max-w-full flex-col" {...handlers}>
-      {/* The chat: it hangs from the composer, and compacting folds its start into one summary. */}
       <div className="relative h-[260px] overflow-hidden">
         <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-10 bg-gradient-to-b from-bg to-transparent" />
-        {/* Hung from the bottom by transform and stacked by transform: lines arriving or folding away move nothing in the layout. */}
         <div ref={thread} className="absolute inset-x-0 top-full flex -translate-y-full flex-col pb-4">
           <AnimatePresence initial={false}>
             {folded > 0 && (
@@ -180,8 +168,6 @@ export function ContextDemo() {
   )
 }
 
-/* ───────────────────────────── Run button ───────────────────────────── */
-
 const STEPS = ['Planning the change', 'Editing 3 files', 'Running the tests', 'Opening a pull request']
 
 export function RunDemo() {
@@ -194,7 +180,6 @@ export function RunDemo() {
     stateRef.current = state
   }, [state])
 
-  // The run itself: while running, progress and the clock move on.
   useEffect(() => {
     if (state !== 'running') return
     const t = window.setInterval(() => {
@@ -221,7 +206,6 @@ export function RunDemo() {
       setState('stopped')
       await beat(1900)
       setState('running')
-      // Check only after the resume has landed; checking straight away still sees "stopped".
       do await beat(300)
       while (stateRef.current === 'running')
       await beat(2600)
@@ -231,7 +215,6 @@ export function RunDemo() {
   const at = Math.min(STEPS.length - 1, Math.floor(progress * STEPS.length))
   const live = state === 'running' || state === 'stopped'
   return (
-    // The button where it lives: on an agent's task, whose steps light up in step with it.
     <div className="w-[440px] max-w-full rounded-[24px] bg-surface p-6 shadow-float" {...handlers}>
       <p className="text-caption text-ink-3">Agent task · acme/storefront</p>
       <p className="mt-1 text-title text-ink">Move checkout to the new pricing API</p>
@@ -255,15 +238,12 @@ export function RunDemo() {
           )
         })}
       </ol>
-      {/* Anchored at the left of its slot: the button extends rightward as the run proceeds, and its left edge never moves. */}
       <div className="mt-6 flex h-[60px] items-center">
         <RunButton state={state} progress={progress} step={STEPS[at]} index={at + 1} total={STEPS.length} seconds={seconds} onRun={b.on('onRun', run)} onStop={b.on('onStop', () => setState('stopped'))} onResume={b.on('onResume', () => setState('running'))} label={b.get('label', 'Run agent')} />
       </div>
     </div>
   )
 }
-
-/* ───────────────────────────── Hold to talk ───────────────────────────── */
 
 export function HoldDemo() {
   const b = useBench()
@@ -277,7 +257,6 @@ export function HoldDemo() {
       await beat(1700)
       h.current?.hold()
       await beat(1100)
-      // A slide that changes its mind, then one that goes through with it.
       for (const x of [-24, -52, -78]) {
         h.current?.slide(x)
         await beat(140)
@@ -304,8 +283,6 @@ export function HoldDemo() {
   )
 }
 
-/* ───────────────────────────── Agent toasts ───────────────────────────── */
-
 const FLOW: [AgentEvent, Partial<AgentEvent>][] = [
   [
     { id: 'search', title: 'Searching the help center', detail: 'support-bot', status: 'running' },
@@ -328,11 +305,6 @@ const TICKETS = [
   { id: '2287', who: 'Sam Whitfield', hue: 300, subject: 'Copy of the October invoice' },
 ]
 
-/**
- * The toasts where they live: the corner of a support inbox. The agent reports what it's doing
- * in the stack, and the ticket it's working on says the same thing in its row, so the two read
- * as one system. Once there's a pile, it fans open for a look, then settles back.
- */
 export function ToastsDemo() {
   const b = useBench()
   const [events, setEvents] = useState<AgentEvent[]>([])
@@ -379,7 +351,6 @@ export function ToastsDemo() {
                 <span className="block truncate text-caption text-ink-3">{t.subject}</span>
               </span>
               <span className="tnum hidden w-12 text-right font-mono text-caption text-ink-3 @min-[420px]:block">#{t.id}</span>
-              {/* The row says what the toast says, in the same place every time. */}
               <span className="grid w-[104px] justify-items-end text-caption font-medium">
                 {(['open', 'running', 'done'] as const).map((s) => (
                   <span
@@ -403,9 +374,6 @@ export function ToastsDemo() {
   )
 }
 
-/* ───────────────────────────── Thinking ───────────────────────────── */
-
-/** Each step and how long it runs: thinking doesn't keep an even beat. */
 const THOUGHTS: [string, number][] = [
   ['Reading the question', 900],
   ['Searching 3 sources', 2300],
@@ -443,8 +411,6 @@ function ThinkingRun({ onDone }: { onDone: () => void }) {
     </div>
   )
 }
-
-/* ───────────────────────────── Typing bubble ───────────────────────────── */
 
 const TALK: Line[] = [
   { id: 'a', from: 'me', text: 'Can you check order #4821?' },
@@ -496,14 +462,8 @@ export function TypingDemo() {
   )
 }
 
-/* ───────────────────────────── Prompt chips ───────────────────────────── */
-
 const IDEAS = ['Summarize this thread', 'Draft a reply', 'Find action items']
 
-/**
- * The chips where they're useful: an assistant that has just read a busy thread. A suggestion
- * flies into the box, sends, and lands in the conversation as what you asked; then the next.
- */
 export function ChipsDemo() {
   const b = useBench()
   const c = useRef<ChipsHandle>(null)
@@ -526,7 +486,6 @@ export function ChipsDemo() {
         <span className="text-footnote font-medium text-ink"># launch-planning</span>
         <span className="text-caption text-ink-3">48 new messages</span>
       </div>
-      {/* What you asked lands here; until then, the assistant says what it has read. */}
       <div className="relative mt-3 h-[60px]">
         <AnimatePresence mode="popLayout" initial={false}>
           {asked ? (
@@ -553,16 +512,12 @@ export function ChipsDemo() {
   )
 }
 
-/* ───────────────────────────── Retry ───────────────────────────── */
-
-/** The retry where it happens: an assistant's reply that hit a rate limit, counting down in its place, and the answer once it gets through. */
 export function RetryDemo() {
   const b = useBench()
   const r = useRef<RetryHandle>(null)
   const [answered, setAnswered] = useState(false)
   const handlers = useLoop(async (beat) => {
     for (;;) {
-      // The first automatic try fails; partway through the longer wait, the demo presses Retry now.
       await beat(5000 + 1600 + 3200)
       r.current?.now()
       await beat(4200)
@@ -587,15 +542,12 @@ export function RetryDemo() {
           }}
         />
       </div>
-      {/* Held in place from the start, so the card never grows when the answer lands. */}
       <p className={`mt-4 h-[44px] px-1 text-footnote leading-[22px] text-ink-2 transition-opacity duration-500 ${answered ? '' : 'opacity-0'}`} aria-hidden={!answered}>
         Three things: damaged items refund without a return, annual plans get 45 days, and refunds over $500 need a second approval.
       </p>
     </div>
   )
 }
-
-/* ───────────────────────────── File chips ───────────────────────────── */
 
 const FILES: Omit<Upload, 'progress' | 'status'>[] = [
   { id: 'shot', name: 'hero-shot.png', size: 2_412_000, preview: 'linear-gradient(180deg, #c7d3e6 0%, #e9ddcc 52%, #8e9c7c 53%, #6a7a5c 100%)' },
@@ -610,14 +562,12 @@ export function FilesDemo() {
   const b = useBench()
   const [files, setFiles] = useState<Attached[]>([])
 
-  // The uploads themselves: each moves at its own pace; the moodboard fails once on the way.
   useEffect(() => {
     const t = window.setInterval(() => {
       setFiles((all) =>
         all.map((f) => {
           if (f.status !== 'uploading') return f
           const next = Math.min(1, f.progress + (0.025 + 0.4 / Math.max(6, f.size / 1e5)) * (0.6 + Math.random() * 0.8))
-          // Pure, so it behaves the same however often React runs it.
           if (f.id === 'mood' && next > 0.5 && !f.retried) return { ...f, progress: next, status: 'error' }
           return { ...f, progress: next, status: next >= 1 ? 'done' : 'uploading' }
         }),

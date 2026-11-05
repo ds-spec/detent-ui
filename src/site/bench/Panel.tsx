@@ -13,12 +13,6 @@ import { useBenchState } from './state'
 import { BTN, useSideNew } from '../shell/side'
 import type { Call } from './state'
 
-/**
- * A component's props beside it, live. Every prop is listed from the source: its name, its type,
- * what it does. The ones the demo lets you change are controls, and changing one changes the
- * component as you watch. Callbacks light up as they fire, and each call lands in the log at
- * the foot with what it was called with. Under it all, the usage writes itself from what's set.
- */
 export function PropsPanel({ id, api }: { id: string; api: Api }) {
   const bench = useBenchState()
   const knobs = KNOBS[id] ?? {}
@@ -26,7 +20,6 @@ export function PropsPanel({ id, api }: { id: string; api: Api }) {
   const value = (p: PropDoc) => (bench && p.name in bench.values ? bench.values[p.name] : knobs[p.name]?.value)
   const events = props.filter(isEvent)
   const live = Object.keys(knobs).length > 0
-  // The columns, shared by the head and every row so they line up: prop, what it does, default, and a control when the demo has one.
   const side = useSideNew()
   if (side) return <PropsDocs api={api} props={props} knobs={knobs} value={value} live={live} bench={bench} events={events} />
   const cols = live ? 'md:grid-cols-[minmax(150px,200px)_minmax(0,1fr)_minmax(110px,160px)_190px]' : 'md:grid-cols-[minmax(150px,200px)_minmax(0,1fr)_minmax(110px,180px)]'
@@ -79,7 +72,6 @@ export function PropsPanel({ id, api }: { id: string; api: Api }) {
 
 const isEvent = (p: PropDoc) => /^on[A-Z]/.test(p.name) && p.type.includes('=>')
 
-/** One prop: its name and whether it's needed; what it does with its type under it; its default; and, if the demo has one, the control. */
 function Row({ p, cols, live, knob, value, set, changed, pulse }: { p: PropDoc; cols: string; live: boolean; knob?: Knob; value: unknown; set: (v: unknown) => void; changed: boolean; pulse?: number }) {
   return (
     <div role="row" className={`grid grid-cols-1 gap-x-6 gap-y-2 px-6 py-4 shadow-[inset_0_-1px_0_var(--line)] last:shadow-none md:items-start ${cols}`}>
@@ -139,7 +131,6 @@ function Control({ k, value, set, name }: { k: Knob; value: unknown; set: (v: un
   )
 }
 
-/** A callback's light: quiet while it listens, and a pulse each time it fires. */
 function Fired({ pulse }: { pulse?: number }) {
   const on = pulse !== undefined
   return (
@@ -153,9 +144,7 @@ function Fired({ pulse }: { pulse?: number }) {
   )
 }
 
-/** Every call a callback gets, newest on top, each in a slot of its own so nothing below it jumps. */
 function Events({ calls }: { calls: Call[] }) {
-  // The clock starts after the first paint, so the server and the first render agree.
   const [now, setNow] = useState(0)
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000)
@@ -200,12 +189,9 @@ function Events({ calls }: { calls: Call[] }) {
   )
 }
 
-/** How a value is written as a JSX prop. */
 const attr = (name: string, v: unknown) => (typeof v === 'string' ? `${name}="${v.replace(/"/g, '\\"')}"` : v === true ? name : `${name}={${String(v)}}`)
-/** How a value is written in source, to compare with the default read from it. */
 const literal = (v: unknown) => (typeof v === 'string' ? `'${v}'` : String(v))
 
-/** The usage, written from what's set: every required prop, and any control that's away from the component's own default. Lines you changed are marked. */
 function Usage({ api, props, knobs, value, flat = false }: { api: Api; props: PropDoc[]; knobs: Record<string, Knob>; value: (p: PropDoc) => unknown; flat?: boolean }) {
   const [copied, setCopied] = useState(false)
   const lines: { text: string; changed?: boolean }[] = []
@@ -258,13 +244,7 @@ function Usage({ api, props, knobs, value, flat = false }: { api: Api; props: Pr
   )
 }
 
-/**
- * The props as a page of docs. No table: each prop is a short entry, its name with its type beside
- * it as a soft chip, what it does under that, and its default at the far end. Controls sit at the
- * end of the entry when the demo has one. Hairlines between, nothing boxed.
- */
 function PropsDocs({ api, props, knobs, value, live, bench }: { api: Api; props: PropDoc[]; knobs: Record<string, Knob>; value: (p: PropDoc) => unknown; live: boolean; bench: ReturnType<typeof useBenchState>; events: PropDoc[] }) {
-  // Callbacks last, after what it shows.
   const shown = [...props.filter((p) => !isEvent(p)), ...props.filter(isEvent)]
   return (
     <>

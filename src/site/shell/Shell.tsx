@@ -17,17 +17,6 @@ import { SideNext } from './SideNext'
 import { BTN, useSideNew } from './side'
 import { PanelIcon, STRIP_GAP, STRIP_W, Strip } from './Strip'
 
-/*
- * The library's own pages, as an app. The sidebar is the frame: the mark, the way to each part
- * of the site, and the list of what's in this part, always open. The page sits beside it in a
- * panel set into the frame, with a bar along its top for where you are and what you can do, and
- * only the panel scrolls. Below a laptop the frame folds away: the site's header comes back and
- * the page fills the screen.
- *
- * Everything you browse lives in here. The two ways out are deliberate: the mark goes home, and
- * the Pro card at the foot goes to pricing.
- */
-
 const NAV = [
   { href: FIRST_COMPONENT, section: '/components', label: 'Components', icon: <Layers size={16} /> },
   { href: FIRST_BLOCK, section: '/blocks', label: 'Blocks', icon: <Table size={16} /> },
@@ -37,7 +26,6 @@ const NAV = [
   { href: '/changelog', section: '/changelog', label: 'Changelog', icon: <Clock size={16} /> },
 ]
 
-/** The scrolling panel, for anything that needs to scroll the page. */
 export const scroller = () => document.querySelector<HTMLElement>('[data-scroller]')
 
 export function Shell({ list, bar, children, bare = false }: { list: ReactNode; bar: ReactNode; children: ReactNode; /** The page has the whole window: no sidebar, and the list waits in a drawer behind one button. */ bare?: boolean }) {
@@ -52,8 +40,6 @@ export function Shell({ list, bar, children, bare = false }: { list: ReactNode; 
         <Header />
       </div>
 
-      {/* The frame: who, where, and what's here. */}
-      {/* Its mark sits at the height of the site header's, so the step in from the home page doesn't jump. */}
       {side && rail?.groups ? (
         <aside className="hidden h-dvh min-h-0 flex-col pb-3 pl-3 pt-4 lg:flex">
           <SideNext groups={rail.groups} current={rail.current ?? ''} onPick={rail.onPick ?? (() => {})} preview={rail.preview} label={rail.label} />
@@ -104,7 +90,6 @@ export function Shell({ list, bar, children, bare = false }: { list: ReactNode; 
       </aside>
       )}
 
-      {/* The page, in its panel. */}
       <div className="min-w-0 lg:h-dvh lg:py-2 lg:pr-2">
         <div data-scroller className="relative lg:h-full lg:overflow-y-auto lg:rounded-[18px] lg:[scrollbar-width:thin]" style={{ background: 'var(--panel)', boxShadow: 'var(--panel-edge)' }}>
           <div className={`sticky top-0 z-30 hidden h-[52px] items-center gap-3 px-6 ${side && rail?.groups ? '' : 'lg:flex'}`} style={{ background: 'color-mix(in oklch, var(--panel) 88%, transparent)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', boxShadow: 'inset 0 -1px 0 var(--line)' }}>
@@ -119,7 +104,6 @@ export function Shell({ list, bar, children, bare = false }: { list: ReactNode; 
   )
 }
 
-/** Whether the index is shown, kept in the browser so a hidden index stays hidden from page to page. */
 const INDEX_KEY = 'detent.index.v2'
 const indexShown = () => {
   try {
@@ -143,16 +127,9 @@ const showIndex = (v: boolean) => {
   window.dispatchEvent(new Event(INDEX_KEY))
 }
 
-/**
- * The page beside the index: every piece numbered on a ruler in a panel down the left, to point
- * at for a live look or click, and to hide with one press. Along the top, one quiet bar: the mark and the way
- * back to the library's shelf on the left, search and theme on the right. At the foot, more from
- * the same family. Below a laptop the site's header comes back and the strip steps aside.
- */
 function Bare({ rail, children }: { rail: { groups: RailGroup[]; current: string; onPick: (id: string) => void; preview?: (id: string, onReady: () => void) => ReactNode; label?: string }; children: ReactNode }) {
   const { openSearch } = useSite()
   const label = rail.label ?? 'Components'
-  // The index down the side only has room from a laptop up, and stays hidden once you've hidden it.
   const [wide, setWide] = useState(false)
   const shown = useSyncExternalStore(onIndexChange, indexShown, () => false)
   useEffect(() => {
@@ -170,7 +147,6 @@ function Bare({ rail, children }: { rail: { groups: RailGroup[]; current: string
       </div>
       <Strip groups={rail.groups} current={rail.current} onPick={rail.onPick} preview={rail.preview} label={label} open={shown} onHide={() => showIndex(false)} />
       <div data-scroller className="relative lg:h-full lg:overflow-y-auto lg:rounded-[18px] lg:[scrollbar-width:thin]" style={{ background: 'var(--panel)', boxShadow: 'var(--panel-edge)' }}>
-        {/* Solid graphite, the panel's own colour, with a hairline under it: the previews' colours never tint it as they pass. */}
         <div className="sticky top-0 z-30 hidden h-14 items-center gap-1 px-4 lg:flex" style={{ background: 'var(--panel)', boxShadow: 'inset 0 -1px 0 var(--line)' }}>
           {!shown && (
             <button type="button" onClick={() => showIndex(true)} aria-label="Show the index" title="Show the index" className={`${tool} mr-1`}>
@@ -209,7 +185,6 @@ function Bare({ rail, children }: { rail: { groups: RailGroup[]; current: string
   )
 }
 
-/** A trail of where you are, for the panel's bar: each step but the last is quiet. */
 export function Trail({ steps }: { steps: ReactNode[] }) {
   return (
     <nav aria-label="You are here" className="flex min-w-0 items-center gap-2 text-[13.5px]">
@@ -227,16 +202,9 @@ export function Trail({ steps }: { steps: ReactNode[] }) {
   )
 }
 
-/**
- * The shell for a page drawn on the server. Each name in the list goes where `links` says: to
- * another page, or with a #hash to a section of this one, and then the list follows the page as
- * it scrolls, marking the section at the top.
- */
 export function LinkShell({ label, groups, links, current = '', trail, children }: { label: string; groups: RailGroup[]; links: Record<string, string>; current?: string; trail: ReactNode[]; children: ReactNode }) {
   const router = useRouter()
   const [at, setAt] = useState(current)
-  // While a picked section is scrolling into place, the pick stands: near the end of a page the
-  // section can't reach the top, and the list mustn't overrule what was asked for.
   const held = useRef(false)
   const settle = useRef(0)
   const hold = (ms: number) => {
@@ -251,14 +219,12 @@ export function LinkShell({ label, groups, links, current = '', trail, children 
     if (!spots.length || !box) return
     const on = () => {
       if (held.current) return hold(160)
-      // Under the panel's bar, with a little room: the last section whose top has passed it.
       const line = box.getBoundingClientRect().top + 160
       let here = spots[0][0]
       for (const [id, href] of spots) {
         const el = document.querySelector(href)
         if (el && el.getBoundingClientRect().top <= line) here = id
       }
-      // At the very end the last section can't reach the top, so the end of the page is its.
       if (box.scrollTop > 0 && box.scrollTop + box.clientHeight >= box.scrollHeight - 2) here = spots[spots.length - 1][0]
       setAt(here)
     }
@@ -276,7 +242,6 @@ export function LinkShell({ label, groups, links, current = '', trail, children 
     if (!href.startsWith('#')) return router.push(href)
     const still = matchMedia('(prefers-reduced-motion: reduce)').matches
     setAt(id)
-    // Held until the scroll has been still for a moment; if nothing needs to scroll, it lets go soon.
     hold(600)
     document.querySelector(href)?.scrollIntoView({ block: 'start', behavior: still ? 'auto' : 'smooth' })
   }

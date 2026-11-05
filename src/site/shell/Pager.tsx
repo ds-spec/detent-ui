@@ -10,9 +10,7 @@ type Stop = { name: string; href: string }
 const pill = 'ring-focus flex h-11 min-w-0 max-w-[260px] flex-1 items-center gap-2 rounded-full bg-surface px-4 text-[13px] font-medium text-ink shadow-[var(--card-edge),0_8px_24px_rgb(0_0_0/0.12)] active:scale-[.97]'
 const plate = `ring-focus flex h-11 min-w-0 max-w-[260px] flex-1 items-center gap-2 rounded-[12px] px-4 text-[13px] font-medium active:scale-[.97] ${BTN.plate}`
 
-/** Previous and next under the thumb, on a phone, where there are no arrow keys and no list down the side. */
-export function Pager({ prev, next, onPick }: { prev: Stop; next: Stop; /** Moves there itself, so the page can animate the way it's going. */ onPick?: (href: string) => void }) {
-  // Out of the way while you read or use what's under it, back when you turn round or reach the end.
+export function Pager({ prev, next, onPick }: { prev: Stop; next: Stop; onPick?: (href: string) => void }) {
   const [away, setAway] = useState(false)
   const side = useSideNew()
   useEffect(() => {

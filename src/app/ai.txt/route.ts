@@ -1,10 +1,3 @@
-/**
- * /ai.txt — AI usage policy following the ai-visibility.org.uk ai-txt spec v1.1.1
- * Generated from code so it never goes stale.
- *
- * keep in sync with: /llms.txt, /llms-full.txt, /robots.txt
- */
-
 import { NAME, DESCRIPTION } from '@/site/seo'
 import { SITE } from '@/catalog/pro'
 import { CONTACT } from '@/catalog/trust'

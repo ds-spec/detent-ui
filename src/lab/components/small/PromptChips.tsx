@@ -7,27 +7,17 @@ import { ArrowUp, Orbit } from '../../icons'
 import { tap } from '../../lib/feel'
 import { ease, press } from '../../lib/motion'
 
-/** For demos and tests: pick a suggestion and send, without touching focus. */
 export type ChipsHandle = { pick(i: number): void; send(): void }
 
-/**
- * Suggestions that fly into the box. Pick one and its words travel from the chip into the
- * field, landing where you'd have typed them, while the other suggestions step aside. Send
- * lifts the words away and the suggestions come back. The box never changes size.
- */
 export function PromptChips({ suggestions, onSend, width = 380, ref }: {
-  /** The prompts to offer, a chip each. */
   suggestions: string[]
-  /** Called with a chip's prompt when a person sends it. */
   onSend?: (text: string) => void
-  /** The box's width, in pixels. */
   width?: number
   ref?: Ref<ChipsHandle>
 }) {
   const [text, setText] = useState('')
   const [picked, setPicked] = useState<number | null>(null)
   const [sent, setSent] = useState<{ id: number; text: string } | null>(null)
-  // Each send starts a fresh flight, so a suggestion coming back doesn't fly out of the field.
   const [gen, setGen] = useState(0)
   const input = useRef<HTMLInputElement>(null)
 
@@ -52,7 +42,6 @@ export function PromptChips({ suggestions, onSend, width = 380, ref }: {
   return (
     <LayoutGroup>
       <div style={{ width, maxWidth: '100%' }}>
-        {/* At least two rows tall, so short sets keep their place; longer suggestions grow the area rather than spill over what sits above it. */}
         <div className="mb-3.5 flex min-h-[92px] flex-wrap content-end justify-center gap-2">
           <AnimatePresence initial={false} mode="popLayout">
             {suggestions.map((s, i) =>
@@ -86,7 +75,6 @@ export function PromptChips({ suggestions, onSend, width = 380, ref }: {
 
         <div className="relative flex h-16 items-center gap-2 rounded-[32px] bg-surface pl-6 pr-2.5 shadow-float">
           <div className="relative h-6 min-w-0 flex-1">
-            {/* The chosen words travel here from their chip; the field takes over once they land. */}
             {picked !== null ? (
               <motion.span layoutId={`chip-${gen}-${suggestions[picked]}`} className="absolute left-0 top-0 block whitespace-nowrap text-body leading-6 text-ink" transition={{ type: 'spring', stiffness: 360, damping: 32 }}>
                 {text}

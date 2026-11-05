@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { NEVER, Rewind } from '../components/rewind/Rewind'
 import type { RewindCell, RewindHistory, RewindStep } from '../components/rewind/Rewind'
 
-// A real little writing session, with its wrong turns, so the demo has something worth going back to.
 function session(): RewindHistory {
   const living = (t: RewindCell[]) => t.filter((m) => m.died === NEVER)
   let id = 0
@@ -69,10 +68,8 @@ function session(): RewindHistory {
 }
 
 export function RewindDemo() {
-  // The session is dated from now, so it's built once we're in the browser.
   const [history, setHistory] = useState<RewindHistory | null>(null)
   useEffect(() => setHistory(session()), [])
-  // It goes back to where the most lost words can be seen at once.
   const intro = history?.steps.findLastIndex((s) => s.text.includes('Nobody reads it'))
   return (
     <div className="grid size-full grid-cols-[minmax(0,1fr)] place-items-center p-6 text-ink">

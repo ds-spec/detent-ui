@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 
-/** Where the pointed-at part is on the stage (screen px), its zoom, and its padding (design px). */
 type Box = { x: number; y: number; w: number; h: number; r: number; scale: number; pad: [number, number, number, number] }
 type Spec = { size: string; rows: [string, string][] }
 
@@ -36,7 +35,6 @@ const clear = (c: string) => c === 'rgba(0, 0, 0, 0)' || c === 'transparent'
 const hasText = (el: Element) => [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent!.trim())
 const shorthand = ([t, r, b, l]: number[]) => (t === b && r === l ? (t === r ? `${t}` : `${t} ${r}`) : `${t} ${r} ${b} ${l}`)
 
-/** The part a person means when they point: a text leaf, an icon, or the nearest thing with a surface. */
 function pick(hit: Element | null, root: Element): Element | null {
   if (!hit || !root.contains(hit) || hit === root) return null
   const svg = hit.closest('svg')
@@ -49,7 +47,6 @@ function pick(hit: Element | null, root: Element): Element | null {
   return null
 }
 
-/** How much the stage has zoomed this part: its box on screen over its own layout width. */
 function scaleOf(el: Element) {
   let n: Element | null = el
   while (n && !(n instanceof HTMLElement)) n = n.parentElement
@@ -67,11 +64,6 @@ function measure(el: Element, stage: DOMRect): Box {
   return { x: r.left - stage.left, y: r.top - stage.top, w: r.width, h: r.height, r: radius * scale, scale, pad }
 }
 
-/**
- * Names a part in the system's own words: its type token, colour tokens, material and radius,
- * read live from the page. A probe inside the stage resolves the tokens, so they follow the
- * stage's theme.
- */
 function describe(el: Element, host: HTMLElement, box: Box): Spec {
   const cs = getComputedStyle(el)
   const probe = document.createElement('span')
@@ -89,14 +81,12 @@ function describe(el: Element, host: HTMLElement, box: Box): Spec {
     const lh = cs.lineHeight === 'normal' ? null : round(parseFloat(cs.lineHeight))
     const weight = WEIGHT[cs.fontWeight] ?? cs.fontWeight
     if (hasText(el)) {
-      // The type tokens are compiled into their classes, so read each one off a probe wearing it.
       const metrics = TYPE.map(([t, name]) => {
         probe.className = `text-${t}`
         const p = getComputedStyle(probe)
         return { name, fs: round(parseFloat(p.fontSize)), lh: round(parseFloat(p.lineHeight)), w: p.fontWeight }
       })
       probe.className = ''
-      // Body and Headline share a size; the line height and weight tell them apart.
       const token = metrics.find((m) => m.fs === fs && m.lh === lh && m.w === cs.fontWeight) ?? metrics.find((m) => m.fs === fs && m.lh === lh && m.w === '400')
       const sized = metrics.find((m) => m.fs === fs)
       const name = token?.name ?? sized?.name
@@ -113,7 +103,6 @@ function describe(el: Element, host: HTMLElement, box: Box): Spec {
   }
   if (el.classList.contains('sink')) rows.push(['Press', 'Sinks in'])
 
-  // Radius, and whether it's concentric with the surface it sits in.
   const r = round(box.r / box.scale)
   if (r > 0) {
     const full = r >= round(box.h / box.scale / 2) - 0.5
@@ -135,11 +124,6 @@ function describe(el: Element, host: HTMLElement, box: Box): Spec {
   return { size: `${Math.round(box.w / box.scale)} × ${Math.round(box.h / box.scale)}`, rows }
 }
 
-/**
- * Inspect: point at any part of the live component and see what it's made of. Hairlines frame
- * the part and shade its padding; a card names its tokens. The component keeps running, and
- * pointing at it pauses the demo, so the part holds still while you read.
- */
 export function InspectLayer({ on, stage }: { on: boolean; stage: RefObject<HTMLElement | null> }) {
   const [box, setBox] = useState<Box | null>(null)
   const [spec, setSpec] = useState<Spec | null>(null)
@@ -172,7 +156,6 @@ export function InspectLayer({ on, stage }: { on: boolean; stage: RefObject<HTML
       }
       const b = measure(el, sr)
       const fr = (root.querySelector('[data-fit]') ?? root).getBoundingClientRect()
-      // Re-render only when something visible changed, not on every frame.
       const key = [b.x, b.y, b.w, b.h, b.r, fr.left, fr.width].map(Math.round).join() + el.tagName
       if (el !== current.current) {
         current.current = el
@@ -202,7 +185,6 @@ export function InspectLayer({ on, stage }: { on: boolean; stage: RefObject<HTML
     }
   }, [on, stage])
 
-  // The card sits in the margin beside the component, level with the part, with a leader line to it.
   const card = box && spec ? place(box, frame, size, 26 + Math.max(1, spec.rows.length) * 22) : null
 
   return (
@@ -233,7 +215,6 @@ export function InspectLayer({ on, stage }: { on: boolean; stage: RefObject<HTML
             exit={{ opacity: 0, transition: { duration: 0.12 } }}
             transition={{ ...SPRING, opacity: { duration: 0.15 } }}
           >
-            {/* Padding, shaded; then the part's own outline on top. */}
             <Pads box={box} />
             <span className="absolute inset-0" style={{ borderRadius: box.r, boxShadow: 'inset 0 0 0 1px var(--accent)' }} />
             <span
@@ -286,7 +267,6 @@ export function InspectLayer({ on, stage }: { on: boolean; stage: RefObject<HTML
   )
 }
 
-/** The four padding bands of the part, with their sizes where there's room to print them. */
 function Pads({ box }: { box: Box }) {
   const [t, r, b, l] = box.pad.map((v) => v * box.scale)
   const band = 'absolute flex items-center justify-center bg-[color-mix(in_oklch,var(--accent)_12%,transparent)] font-mono text-caption leading-none text-accent'
@@ -306,10 +286,8 @@ function place(box: Box, frame: { x: number; w: number } | null, stage: { w: num
   const mid = box.y + box.h / 2
   const clampY = (y: number) => Math.min(stage.h - h - 12, Math.max(12, y))
   const y = clampY(mid - h / 2)
-  // Level with the part, the leader runs from its edge to the card across the margin.
   const lead = (from: number, to: number) => (Math.abs(to - from) > 8 && mid > y + 6 && mid < y + h - 6 ? { x: Math.min(from, to), y: mid, w: Math.abs(to - from) } : null)
   const f = frame ?? { x: box.x, w: box.w }
-  // The card takes the wider margin, and narrows to fit it rather than covering the component.
   const right = stage.w - 12 - (f.x + f.w + gap)
   const left = f.x - gap - 12
   if (Math.max(right, left) >= CARD_MIN) {
@@ -322,7 +300,6 @@ function place(box: Box, frame: { x: number; w: number } | null, stage: { w: num
     const x = f.x - gap - w
     return { x, y, w, lead: lead(x + w, box.x) }
   }
-  // A component as wide as the stage: under the part if that fits, otherwise over it.
   const below = box.y + box.h + 40
   const w = CARD_W
   return { x: Math.min(stage.w - w - 12, Math.max(12, box.x)), y: clampY(below + h <= stage.h - 12 ? below : box.y - h - 40), w, lead: null }

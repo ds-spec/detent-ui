@@ -1,14 +1,6 @@
 import type { RegistryItem } from './registry'
 import { TEMPLATES } from './templates'
 
-/*
- * A template as a whole project, for people starting fresh: a Next.js app that runs the moment
- * it's unzipped and installed, built from the same registry item `npx shadcn add` installs, so
- * the zip and the registry can never drift apart. It's made on request from the Pro registry,
- * which the server already holds, so it needs no files on disk.
- */
-
-/** The versions a starter pins: what the templates are built and tested against. */
 const VERSIONS: Record<string, string> = {
   next: '16.4.2',
   react: '19.3.0',
@@ -25,14 +17,12 @@ const VERSIONS: Record<string, string> = {
   '@types/node': '^20',
 }
 
-/** Where each template opens, and what it asks for in .env. */
 const HOME: Record<string, { path: string; ai: string }> = {
   detent: { path: '/chat', ai: 'the agent' },
 }
 
 const json = (v: unknown) => `${JSON.stringify(v, null, 2)}\n`
 
-/** Every file of a template's starter project, path → contents. */
 export function starterFiles(id: string, item: RegistryItem, theme: RegistryItem): Record<string, string> {
   const t = TEMPLATES.find((x) => x.id === id)
   const home = HOME[id]
@@ -121,8 +111,6 @@ Everything here is yours to change. Docs: https://detentui.com/templates/${id}
   return files
 }
 
-/* ── A zip, stored (not compressed), so it needs no library ─────────── */
-
 const CRC = new Uint32Array(256).map((_, n) => {
   let c = n
   for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1
@@ -134,13 +122,11 @@ const crc32 = (b: Uint8Array) => {
   return (c ^ 0xffffffff) >>> 0
 }
 
-/** The files as a .zip, every one under `root/`. */
 export function zip(files: Record<string, string>, root: string): Uint8Array<ArrayBuffer> {
   const enc = new TextEncoder()
   const local: Uint8Array[] = []
   const central: Uint8Array[] = []
   let at = 0
-  // 1 January 2026, as DOS time and date.
   const time = 0
   const date = ((2026 - 1980) << 9) | (1 << 5) | 1
   for (const [path, text] of Object.entries(files).sort(([a], [b]) => a.localeCompare(b))) {
@@ -150,8 +136,8 @@ export function zip(files: Record<string, string>, root: string): Uint8Array<Arr
     const head = new DataView(new ArrayBuffer(30))
     head.setUint32(0, 0x04034b50, true)
     head.setUint16(4, 20, true)
-    head.setUint16(6, 0x0800, true) // names are UTF-8
-    head.setUint16(8, 0, true) // stored
+    head.setUint16(6, 0x0800, true)
+    head.setUint16(8, 0, true)
     head.setUint16(10, time, true)
     head.setUint16(12, date, true)
     head.setUint32(14, crc, true)

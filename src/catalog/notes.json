@@ -1,0 +1,804 @@
+{
+  "agent-chat": {
+    "api": "Your AI SDK route: anything that returns `toUIMessageStreamResponse()`.",
+    "assistant": "Who's working, on the approval card and at the top of the run.",
+    "tools": "The tools on your route, by name, and how each one reads.",
+    "starters": "Offered while the thread is empty. The demo asks the first.",
+    "followUps": "Offered under a finished answer; ones already asked drop out."
+  },
+  "analytics": {
+    "product": "The product's name, in the sidebar, the chart and the feed.",
+    "range": "The range it opens on.",
+    "onRangeChange": "Called when a person changes the range.",
+    "onApprove": "Called with the request a person approves.",
+    "onDeny": "Called with the request a person denies.",
+    "onFixGap": "Called when a person fixes a knowledge gap: drafts the doc or adds the rule it needs.",
+    "sidebar": "Draw the product's sidebar. Turn it off to drop the screen into your own layout.",
+    "onNavigate": "Called with a sidebar page a person presses; without it the sidebar is a picture."
+  },
+  "announce": {
+    "children": "What it says.",
+    "tag": "The word in the tag, which rolls to `action` when you reach for it.",
+    "dismissible": "Show a close button. Pair it with `onDismiss` to remember the choice.",
+    "linkAs": "Your router's link, if it has one."
+  },
+  "answer": {
+    "phase": "Where the answer is: thinking, streaming the reply, or done.",
+    "thoughts": "What it's thinking, a line at a time. The newest shows while it thinks.",
+    "summary": "One line that replaces the live thought once thinking ends.",
+    "tools": "Each search or read it ran, with what it found and how long it took.",
+    "text": "Markdown-lite: paragraphs, \"- \" and \"1. \" lists, a **bold** line as a heading, **bold**, `code`, [n] citations.",
+    "sources": "What it read. Citations in the text point at these by id.",
+    "stats": "Shown beside the actions when done, e.g. \"6.1s · 4 sources\".",
+    "followUps": "Questions to ask next, offered once the answer is done.",
+    "onFollowUp": "Called with the follow-up a person picks.",
+    "onRegenerate": "Called when a person asks for another answer.",
+    "width": "The answer's width. It's fixed, so the text wraps once and never re-flows as it streams.",
+    "compact": "Kept for older callers: sources always sit inline now, so there's no grid to leave out.",
+    "tone": "How loud the AI colour is while it works: the full spectrum, or the same motion in ink. Leave it out and it's loud the first time, then quiet for a while."
+  },
+  "approval": {
+    "agent": "Who's asking, on every card.",
+    "requests": "Waiting for a decision, oldest first. The first is shown; the rest peek out above it.",
+    "onDecide": "Called with the request's id, the decision, and whether to remember it for next time.",
+    "idle": "What the dock says when nothing needs you.",
+    "autoFocus": "Move focus to Approve whenever a new request arrives.",
+    "width": "The dock's width, say to match a composer it stands in for. Its height never changes."
+  },
+  "ask": {
+    "docs": "Every page it can find and cite.",
+    "answer": "Answers a question, as one string or a stream of text. Close each claim with a doc id in brackets. Abort when the signal does.",
+    "search": "Finds pages for a query, best first. Defaults to matching words in titles, paths and keywords.",
+    "suggested": "Ids from `docs` of the pages shown before anything is typed, not questions. Defaults to the first four.",
+    "isQuestion": "Whether a query is a question worth answering.",
+    "onOpen": "Called when a page is opened, by click or Enter.",
+    "onClose": "Called on Escape with nothing typed.",
+    "placeholder": "The field's placeholder.",
+    "height": "The body's fixed height in px, between the field and the keys.",
+    "delay": "How long typing pauses, in ms, before a question mark asks."
+  },
+  "askchart": {
+    "ask": "Answers a question, given the steps so far, so follow-ups can build on them.",
+    "initial": "A first question and its answer to start from.",
+    "onAnswer": "Called with each new answer."
+  },
+  "billing": {
+    "plans": "The plans to offer, cheapest first. Defaults to Free, Team and Scale.",
+    "current": "The id of the plan the workspace is on.",
+    "currency": "An ISO 4217 code: every price, total and invoice is written in it.",
+    "assistant": "What the AI is called in the default plans and the usage meter.",
+    "onPlanChange": "Called once a person confirms a plan change and pays."
+  },
+  "bridge": {
+    "periods": "One bridge per period; the switch moves between them.",
+    "title": "What's being bridged, above the headline.",
+    "format": "How a value is written.",
+    "onPoint": "Called with the step under the pointer, or null.",
+    "muted": "Silence the soft tick as the value catches a step."
+  },
+  "buttons": {
+    "variant": "Primary for the one main action, secondary, ghost for quiet ones, danger for destructive ones.",
+    "size": "Small, medium or large.",
+    "icon": "A square button holding only an icon. Give it an aria-label.",
+    "loading": "Show a spinner in place of the label. The button keeps its width.",
+    "done": "Shown for a moment in place of the label once the action has finished, e.g. a check.",
+    "children": "The label."
+  },
+  "calendar": {
+    "assistant": "What the assistant is called.",
+    "product": "The product's name beside its mark.",
+    "events": "This week's events. Standups and anything else marked weekly show every week.",
+    "people": "The people you can ask for time with.",
+    "busy": "When those people are busy this week.",
+    "onBook": "Called with the event a person books from a suggestion.",
+    "onEventChange": "Called with an event a person adds, renames or moves.",
+    "onAsk": "Called with what a person asks the assistant."
+  },
+  "carousel": {
+    "slides": "The slides, each with a title for the pager.",
+    "autoplay": "How long each slide stays, in ms. 0 leaves it to the person.",
+    "aspect": "The frame's shape.",
+    "label": "Names it for screen readers.",
+    "onChange": "Called with the slide it moved to."
+  },
+  "phrase": {
+    "parts": "The sentence, in order: plain text, a choice ({ id, options }) or a number ({ id, label, min, max, step }).",
+    "value": "The current values by id, for a controlled phrase.",
+    "defaultValue": "The values it starts with. Without it, each choice starts on its first option and each number on its min.",
+    "onChange": "Called with every value whenever one changes.",
+    "says": "Writes the line under the sentence from the current values. Leave it out for no line.",
+    "title": "The small heading on the card.",
+    "aside": "Quiet text at the right of the heading.",
+    "className": "Classes for the card."
+  },
+  "chart": {
+    "data": "The readings, oldest first.",
+    "start": "Which reading it starts from.",
+    "format": "Formats an amount for the sentence.",
+    "label": "Names the chart for screen readers.",
+    "look": "Grain ink, or flat fills.",
+    "onStart": "Called with the reading a person chose to start from."
+  },
+  "checklist": {
+    "steps": "The steps, in order.",
+    "done": "Ids already finished.",
+    "then": "The grey line under the count.",
+    "finished": "The headline once every step is done.",
+    "finishedLine": "The grey line under it.",
+    "finishedAction": "A last button, shown once everything's done.",
+    "onFinish": "Called when the last step finishes."
+  },
+  "chips": {
+    "suggestions": "The prompts to offer, a chip each.",
+    "onSend": "Called with a chip's prompt when a person sends it.",
+    "width": "The box's width, in pixels."
+  },
+  "code": {
+    "length": "How many digits the code has.",
+    "onVerify": "Resolve true when the code is right.",
+    "onVerified": "Called once a code has been accepted.",
+    "resendAfter": "Seconds before a new code can be asked for.",
+    "onResend": "Called when a person asks for a new code."
+  },
+  "code-review": {
+    "assistant": "What the agent is called: it opened the pull request and answers in the thread.",
+    "onApply": "Called when a person applies the suggested change.",
+    "onMerge": "Called when a person merges, once it's approved and every check has passed."
+  },
+  "combobox": {
+    "defaultValue": "What's picked to start with.",
+    "label": "The field's name, read to screen readers.",
+    "creatable": "Offer to make what was typed when nothing matches it exactly.",
+    "width": "The field's width, in pixels."
+  },
+  "command": {
+    "open": "Whether the menu is open.",
+    "onOpenChange": "Called when it should open or close: ⌘K, Escape, or a press outside.",
+    "commands": "What can be run, grouped, each with its keys and what it does.",
+    "placeholder": "Shown in the search field.",
+    "inline": "Show the menu in place on the page instead of over it.",
+    "listHeight": "The list's height. It's fixed, so filtering never resizes the menu."
+  },
+  "composer": {
+    "people": "Who can be mentioned."
+  },
+  "confirm": {
+    "trigger": "What opens it.",
+    "title": "The question.",
+    "description": "What will happen, plainly.",
+    "confirmLabel": "The destructive action's label.",
+    "doneLabel": "Shown once it's done.",
+    "require": "A name to type before the action unlocks, for things that can't be brought back.",
+    "onConfirm": "The action. The button spins until it settles."
+  },
+  "context": {
+    "parts": "What fills the context window, e.g. the instructions, files and the conversation, in tokens. The last is the one compacting shrinks.",
+    "limit": "The window's size, in tokens.",
+    "onCompact": "Called when a person compacts the conversation to make room.",
+    "warnAt": "How full, from 0 to 1, before it's in the redline and suggests compacting."
+  },
+  "context-menu": {
+    "items": "What's in the menu.",
+    "label": "Accessible name for the menu.",
+    "children": "The area that has the menu."
+  },
+  "cta": {
+    "product": "The product's name, on its line through the queue and in the sentence under the heading.",
+    "title": "The heading, set in two tones.",
+    "action": "The button's words.",
+    "note": "The small line under the field.",
+    "tickets": "The tickets in the queue. Each says who, what they asked, and how it ended.",
+    "onSubmit": "Called with the email a person starts with. Return a promise to keep the button busy until it settles."
+  },
+  "data-table": {
+    "product": "The product's name, in the sidebar, the ask bar and the summaries.",
+    "conversations": "The rows.",
+    "pageSize": "Rows on a page. The body is always this many rows tall.",
+    "onOpen": "Called with a conversation a person opens.",
+    "onAction": "Called when a person runs a bulk action on the selected rows.",
+    "sidebar": "Draw the product's sidebar. Turn it off to drop the screen into your own layout.",
+    "onNavigate": "Called with a sidebar page a person presses; without it the sidebar is a picture."
+  },
+  "dialog": {
+    "trigger": "What opens it. A press on it opens the dialog.",
+    "open": "Open or closed, when you control it. Leave out to let the dialog manage itself.",
+    "onOpenChange": "Called when it opens or closes.",
+    "title": "The heading, read out when it opens.",
+    "description": "A line under the heading.",
+    "icon": "Above the heading: an icon tile, a few avatars, a logo.",
+    "children": "The body.",
+    "footer": "Actions along the bottom, right-aligned.",
+    "hint": "A quiet note at the bottom left, e.g. a keyboard shortcut.",
+    "onSubmit": "Called on ⌘↵ (Ctrl+Enter) anywhere inside.",
+    "size": "Its width: 360, 440 or 560 pixels, never wider than the screen.",
+    "dismissable": "Whether a click outside closes it. Escape always does.",
+    "initialFocus": "What gets focus when it opens; the first focusable thing otherwise."
+  },
+  "diff": {
+    "title": "What the change is, in the header.",
+    "file": "The file's path.",
+    "hunks": "The change, a hunk at a time: where it is, and its lines as context, added or removed.",
+    "onApply": "Called with each hunk's verdict when a person applies the review.",
+    "size": "The review's frame; it never changes while you work.",
+    "shown": "How many lines the agent has written so far, across all hunks. Leave out when complete."
+  },
+  "dock": {
+    "tools": "The tools, left to right, each with the panel it opens.",
+    "children": "The page the dock floats over. It recedes while a panel is open. The dock fills its parent and lays the page in absolutely, so give the parent a height.",
+    "width": "Every panel's width in px.",
+    "recede": "Blur and set back the page while a panel is open.",
+    "onChange": "Called with the open tool's id, or null when the dock closes."
+  },
+  "donut": {
+    "periods": "One set of slices per period, oldest first; the switch moves between them."
+  },
+  "dotlight": {
+    "text": "The word. Short: it's fitted to the width.",
+    "line": "A tagline under it. It arrives last.",
+    "family": "The light around it.",
+    "tones": "The word's own fall, top to bottom, as #rrggbb. Defaults to the family's.",
+    "dot": "The final dot, in css pixels.",
+    "as": "What it is to a screen reader and a search engine.",
+    "className": "Goes on the outer box: a height, a radius."
+  },
+  "dropdown": {
+    "trigger": "The button that opens it. It gets the menu's ARIA wiring.",
+    "items": "What's in the menu: items, checks, submenus, separators and labels.",
+    "label": "Accessible name for the menu.",
+    "side": "Which side of the button it prefers.",
+    "align": "How it lines up with the button along that side."
+  },
+  "evals": {
+    "cases": "The suite: each case's input, what's expected, and both versions' results.",
+    "baseline": "The version in production.",
+    "candidate": "The version being tested.",
+    "name": "What's being evaluated, in the header.",
+    "threshold": "The score a case needs to pass, drawn across the chart.",
+    "onReview": "Called when a person accepts or blocks a regression.",
+    "onShip": "Called when a person ships the candidate."
+  },
+  "extract": {
+    "label": "A small label: what it is and where it came from.",
+    "title": "The headline, as a two-tone pair: the facts, then the quieter rest.",
+    "page": "The page as you draw it, and the size it's drawn at; it's scaled to fit."
+  },
+  "faq": {
+    "product": "The product's name, wherever the default questions name it.",
+    "title": "The heading, set in two tones.",
+    "questions": "The questions. Topics come from them, in the order they first appear.",
+    "multiple": "Let more than one answer be open at once.",
+    "onAsk": "Called with what a person searched for when nothing answers it.",
+    "onContact": "Called when a person asks to talk to someone.",
+    "onFeedback": "Called when a person says whether an answer helped."
+  },
+  "feedback": {
+    "question": "What's asked before anyone rates.",
+    "labels": "What each of the five scores is called, lowest first.",
+    "reasons": "The reasons offered after a low (1–2), middling (3) or high (4–5) score.",
+    "onSend": "Called with the score, the reasons picked and the note, once it's sent."
+  },
+  "files": {
+    "files": "The attachments, each with its progress and status. Images with a `preview` show as tiles.",
+    "onRemove": "Called with a file's id when a person removes it.",
+    "onRetry": "Called with a file's id when a person retries a failed upload.",
+    "empty": "What the row says while it's empty."
+  },
+  "filter": {
+    "label": "A small label above the bar: what's being filtered.",
+    "read": "Reads what was typed into clauses. Your model goes here; abort when `signal` fires.",
+    "count": "How many results a set of filters leaves. Called once per option to give the range while it asks.",
+    "total": "How many there are with no filters.",
+    "readback": "The filters said back in plain words, for the line under them.",
+    "suggestions": "Questions to offer before anything is typed."
+  },
+  "find": {
+    "open": "Open from outside, for a phone or a button of your own.",
+    "shortcut": "Take ⌘F while the pointer or focus is inside."
+  },
+  "forecast": {
+    "start": "The first month on the chart.",
+    "past": "Cash at the end of each month that has happened, oldest first. The last one is now.",
+    "plan": "The plan's net change in cash for each month ahead: revenue less spend.",
+    "scenarios": "The what-ifs, in the order they were asked.",
+    "recognise": "The parts of a what-if your model understands, to light up as it's typed.",
+    "planLabel": "What the plan is, shown when there are no what-ifs: \"FY27 plan · updated 2 Oct\".",
+    "volatility": "How much a month's net burn can swing, as a share of the average, for the range.",
+    "defaultView": "Start on the line or on the range of likely outcomes.",
+    "onAsk": "Called with a what-if in plain words. Report what you're doing with `status`, and stop when `signal` aborts. Resolve with what it means, a question when it could mean more than one thing, or null when it can't be read.",
+    "onAdopt": "Called when the what-ifs that are on are held into the plan. Fold them into `plan` and clear them.",
+    "look": "`print` (the default) prints the forecast in grain ink; `plain` uses a flat fill.",
+    "suggestions": "What-ifs to offer before anything is asked, each in the words your model reads."
+  },
+  "funnel": {
+    "stages": "The steps, first to last, with how many people reached each.",
+    "goal": "What the last step counts, e.g. \"paying customers\".",
+    "per": "The period, e.g. \"a month\".",
+    "rest": "The headline before anything's moved.",
+    "height": "The shape's height in px. Go shorter when most people get through.",
+    "onChange": "Called with the rate tried at each step."
+  },
+  "halo": {
+    "children": "What sits in the clear middle.",
+    "palettes": "The colours to move between.",
+    "defaultPalette": "Which palette it opens on.",
+    "pressToChange": "Whether a press melts in the next palette.",
+    "onPaletteChange": "Called when the palette changes.",
+    "className": "Classes for the frame. Give it a height, or let its content set one."
+  },
+  "histogram": {
+    "values": "Every reading.",
+    "bins": "How many columns.",
+    "unit": "The unit after a value.",
+    "per": "Readings per dot. Chosen to fit if left out.",
+    "initialTarget": "Where the target pin starts. Defaults to the 95th percentile.",
+    "noun": "What a reading is, for the headline."
+  },
+  "hold": {
+    "onNote": "Called with each voice note once it's released: how long, and its waveform.",
+    "onCancel": "Called when a recording is thrown away.",
+    "placeholder": "What the bar says when it isn't recording.",
+    "cancelAt": "How far left, in pixels, a recording has to be slid before letting go throws it away."
+  },
+  "hovercard": {
+    "trigger": "The link or name it previews.",
+    "children": "What's in the card, when it's already known.",
+    "load": "Fetches what's in the card the first time it opens. A placeholder shows until it settles.",
+    "side": "Which side of the link it prefers.",
+    "align": "How it lines up with the link.",
+    "width": "Its width in pixels.",
+    "openDelay": "How long the pointer has to rest before it opens, in ms. Inside a group, only the first card waits.",
+    "closeDelay": "How long it lingers after the pointer leaves, in ms.",
+    "label": "Accessible name for the card."
+  },
+  "images": {
+    "images": "Every image it can find, with what a vision model sees in each.",
+    "search": "Scores every image for a query, and an image to find more like. May answer later, from a server.",
+    "onOpen": "Called when an image is opened, by click or Enter.",
+    "onQuery": "Called with the query and the image to find more like, whenever either changes.",
+    "onSeeAll": "Called from the foot to see every match, not just the best nine. Without it, the link is hidden.",
+    "placeholder": "The field's placeholder.",
+    "height": "The spread's height in px."
+  },
+  "inbox": {
+    "items": "The notifications, newest first.",
+    "onRead": "Called with an item's id when it's opened or marked read.",
+    "onReadAll": "Called when a person marks everything read.",
+    "onDismiss": "Called with an item's id when it's swiped or closed away.",
+    "onInvite": "Called with an invite's id and whether it was accepted.",
+    "align": "Which edge of the bell the inbox lines up with.",
+    "defaultOpen": "Start with the inbox open."
+  },
+  "integrations": {
+    "product": "The product's name, in the line under the glass and on the panel.",
+    "title": "The heading, set in two tones.",
+    "integrations": "The tools, dealt across three rows in turn. Eighteen to thirty sit best.",
+    "more": "The link under the line.",
+    "speed": "How fast the rows drift, in pixels a second.",
+    "onConnect": "Called when a person presses Connect. Return a promise to keep it busy until it settles."
+  },
+  "lens": {
+    "data": "The points, oldest first. Give them a `group` to compare like with like.",
+    "unit": "Follows the amount, e.g. \"sign-ups\".",
+    "format": "Formats an amount.",
+    "label": "Names the chart for screen readers.",
+    "onRead": "Called with the point being read."
+  },
+  "live-features": {
+    "product": "The product's name, in the eyebrow and wherever the tiles name it.",
+    "eyebrow": "The small line above the heading.",
+    "title": "The heading: the claim, then its turn, set in two tones.",
+    "features": "The words on the five tiles, in order. The tiles' live parts stay as they are."
+  },
+  "metric": {
+    "metric": "The metric shown, if you control it.",
+    "defaultMetric": "The metric shown first, if you don't.",
+    "period": "What the numbers cover, at the top right, e.g. \"October · as of Oct 28\".",
+    "width": "Its width. The height never changes as metrics switch.",
+    "footer": "Quiet actions under the basis line, e.g. \"Show the AWS lines\".",
+    "highlight": "A driver to point at from outside, by name, as a person pointing would. A scripted demo uses it."
+  },
+  "models": {
+    "models": "The models to choose from.",
+    "value": "The model and effort in use.",
+    "onChange": "Called when either changes.",
+    "efforts": "The effort levels, with what each does to time and cost.",
+    "defaultOpen": "Start with the menu open.",
+    "lift": "How far above the trigger the menu sits, in px, to clear a composer.",
+    "muted": "Silence the soft tick effort makes as it catches a notch."
+  },
+  "onboarding": {
+    "product": "The product being set up.",
+    "assistant": "What the first agent is called.",
+    "workspace": "The workspace being set up, named in the preview.",
+    "tools": "The tools on offer, each with the account it connects to.",
+    "teammates": "People suggested for an invite, e.g. from the GitHub org.",
+    "onConnect": "Called with a tool's id when a person connects it.",
+    "onInvite": "Called with the addresses a person invites.",
+    "onComplete": "Called when setup finishes, with what was connected, who was invited and the agent created."
+  },
+  "photobar": {
+    "src": "The image to finish.",
+    "alt": "What the image shows.",
+    "looks": "The looks on offer.",
+    "defaultLook": "Which look starts selected.",
+    "defaultStrength": "How strong it starts, 0 to 100.",
+    "onChange": "Called when the look or its strength changes.",
+    "className": "Classes for the frame. Give it a height."
+  },
+  "popover": {
+    "trigger": "The button that opens it. It gets the popover's ARIA wiring.",
+    "children": "What's inside.",
+    "side": "Which side of the button it prefers.",
+    "align": "How it lines up with the button along that side.",
+    "arrow": "Draw the arrow that points at the button.",
+    "label": "Accessible name for the panel.",
+    "className": "Classes for the panel: its width and padding, say."
+  },
+  "popup": {
+    "options": "The choices. Made for short lists: everything shows at once, with no scrolling.",
+    "value": "The chosen option, for a controlled popup.",
+    "label": "What it chooses, for screen readers.",
+    "name": "Set to submit the value with a form.",
+    "radius": "Corner radius of the closed pill, for one sitting inside something round.",
+    "textClass": "Type for the pill and the menu, for one sitting beside other text."
+  },
+  "presence": {
+    "people": "Who's here, each with a colour, a status and what they're doing.",
+    "max": "How many faces show before the rest become a count.",
+    "following": "The id of the person being followed, or null.",
+    "onFollow": "Called with a person's id to follow them, or null to stop.",
+    "open": "Hold the stack open, e.g. while a demo shows it off."
+  },
+  "pricing": {
+    "title": "The line above the sentence: the model, then what it isn't, set in two tones.",
+    "unit": "What you charge for, e.g. \"conversations\", \"seats\" or \"credits\".",
+    "period": "How often, e.g. \"a month\".",
+    "range": "The lowest and highest the number can go.",
+    "words": "The sentence, around its number, plan and price. Built from `unit` and `period` if left out.",
+    "tone": "Follow the page's theme, or stay black whatever it is.",
+    "hint": "Helps a person find their number.",
+    "plans": "The plans, cheapest first. Each prices itself from its base, what it includes and what it charges after.",
+    "promises": "Short promises under the plans.",
+    "compare": "Rows of the full comparison, one value per plan.",
+    "answers": "The questions people ask before they buy.",
+    "conversations": "Where the number starts, in conversations a month.",
+    "discount": "Taken off the base price when billed yearly.",
+    "onSelect": "Called with the plan a person picks, the billing and the volume they set.",
+    "onContact": "Called when a person asks to talk about a plan past the top of the range."
+  },
+  "prompt": {
+    "onSend": "Return a promise to show the working state until it settles; if it rejects, the words come back to the box.",
+    "onStop": "Called when a person stops what's working.",
+    "placeholder": "Shown while the box is empty.",
+    "hint": "The rest of the placeholder: \"or drop a file to start from it.\"",
+    "label": "A quiet line over the words, e.g. \"New chat\".",
+    "modes": "The modes to choose between.",
+    "initialMode": "The id of the mode it starts in.",
+    "initialFiles": "Files already attached when it opens.",
+    "suggestions": "Prompts to offer; the focused, empty box shows the first, and Tab takes it.",
+    "width": "The box's width. It grows in height only, as far as its own scroll.",
+    "busy": "Whether an answer is coming, when you track that yourself. Leave it out and the box follows the promise `onSend` returns.",
+    "status": "What it's doing while it answers: \"Reading the board update\". Only ever what you say.",
+    "model": "The model, named beside Send. With `models`, the one it starts on.",
+    "models": "Models to choose between, each with your own icon. Without them `model` is plain text, with no chevron pretending to be a menu.",
+    "onModel": "Called when a person picks a model.",
+    "projects": "Projects to file this under. Given, a slim strip under the field offers them.",
+    "onProject": "Called when a person picks a project, or null for none.",
+    "onVoice": "Shows a microphone key; called when it's pressed.",
+    "onGrow": "Called as the box grows above its resting height, with how far, so whatever sits above it can make room."
+  },
+  "radar": {
+    "axes": "The qualities, clockwise from the top.",
+    "series": "The things that can be compared, each with a value from 0 to 1 per axis.",
+    "initialPair": "The two compared first. Defaults to the first two series.",
+    "format": "How a value or a margin is written."
+  },
+  "readalong": {
+    "lines": "What's said, and when each sentence starts.",
+    "length": "The note's length in seconds.",
+    "src": "The audio file.",
+    "from": "Who it's from, and what about.",
+    "start": "Where it opens, in seconds."
+  },
+  "region": {
+    "regions": "The regions to choose from, ordered west to east so the Earth spins one way as you turn.",
+    "from": "Where your visitor is. Left out, a rough guess is made from their clock's time zone.",
+    "latency": "Round-trip time to a region in ms. Pass your own measurements; the default estimates from distance.",
+    "onChange": "Called with the region it settles on.",
+    "passOver": "For a drum sitting in a page people are scrolling. A wheel or a quick swipe passes over it to the page; tap above or below the middle to step it, rest a finger a moment and drag to spin it, and once a mouse has clicked it the wheel turns it.",
+    "className": "Classes for the outer layout."
+  },
+  "rename": {
+    "value": "The current name.",
+    "onRename": "Return a promise to show saving; reject it to roll back.",
+    "validate": "Return a message to block the name, or null to allow it.",
+    "keepExtension": "Edit the name but not its extension: the selection stops at the dot.",
+    "activate": "Start editing on one click or on a double click.",
+    "label": "What's being renamed, for screen readers.",
+    "className": "Added to the name as it's shown."
+  },
+  "retry": {
+    "attempt": "Tries again. Resolve true if it worked; false waits longer and tries again.",
+    "base": "Seconds before the first retry. Each failure doubles it.",
+    "title": "What went wrong, in a few words.",
+    "detail": "The line under it."
+  },
+  "reveal": {
+    "shots": "The images to reveal, each with its prompt and the point focus spreads from, as 0 to 1 across and down.",
+    "className": "Classes for the outer layout."
+  },
+  "rewind": {
+    "history": "A tape saved from `onHistory`, so rewinding survives a reload.",
+    "onHistory": "Called after each edit with the whole tape, ready to store.",
+    "pill": "Show the pill. Off, ⌘Z and the wheel still rewind.",
+    "lost": "The colour deleted words come back in.",
+    "ghost": "How faint text you haven't written yet is, 0 to 1.",
+    "intro": "Plays itself once when first seen: runs back to this step, holds, and comes home. For demos. A touch ends it.",
+    "rows": "Lines it opens at.",
+    "maxHeight": "Taller than this and it scrolls."
+  },
+  "rewrite": {
+    "text": "The paragraph to edit.",
+    "rewrite": "Writes the new version of the selected words, from a quick ask or your own words. Resolve with the replacement.",
+    "actions": "The quick asks the bar offers beside the field.",
+    "assistant": "What the assistant is called while it works.",
+    "onChange": "Called with the whole paragraph after a change is accepted."
+  },
+  "rings": {
+    "days": "How many days the period has.",
+    "today": "Which day is today, counting from 0. The scrubber stops here.",
+    "dayLabel": "How to name a day on the scrubber, e.g. (d) => `Oct ${d + 1}`.",
+    "onDayChange": "Called with the day being read, or null when it's back on today.",
+    "onOver": "Called with the goals past their wall, the moment one breaks through or falls back.",
+    "muted": "Silence the soft click as a bar breaks through."
+  },
+  "run": {
+    "state": "Idle, running, stopped or done.",
+    "progress": "0 to 1.",
+    "step": "What it's doing now, in a few words.",
+    "index": "Which step it's on, from 1, and how many there are.",
+    "total": "How many steps there are.",
+    "seconds": "How long it's been running.",
+    "onRun": "Called when a person starts the run.",
+    "onStop": "Called when a person stops it.",
+    "onResume": "Called when a person resumes a stopped run.",
+    "label": "The button's words before it runs."
+  },
+  "scaffold": {
+    "name": "The project's name. The command and the tree's root use it.",
+    "files": "Every path the command creates, in the order it prints them. The tree is sized for all of them before the first arrives.",
+    "icons": "An icon per path, for files that deserve their own mark.",
+    "command": "What types itself at the prompt."
+  },
+  "scatter": {
+    "noun": "What a point is, for the headline: \"requests\".",
+    "onSelect": "Called with the ids inside the lasso, or null when it's cleared."
+  },
+  "secret": {
+    "name": "What the key is for.",
+    "scope": "A short note on the right, like its access level.",
+    "value": "The key.",
+    "used": "The quiet line under it, like when it was last used.",
+    "lead": "Characters always shown at the start.",
+    "tail": "Characters always shown at the end.",
+    "copiedLabel": "The line shown after copying.",
+    "onCopy": "Called after the key is copied."
+  },
+  "select": {
+    "value": "The chosen option's value, or null for none.",
+    "onChange": "Called with an option's value when a person picks it.",
+    "options": "What to choose from: a label, and an optional icon, hint or disabled flag.",
+    "label": "Accessible name for the control.",
+    "placeholder": "Shown while nothing is chosen."
+  },
+  "settings": {
+    "workspace": "The workspace's name, in the danger zone.",
+    "assistant": "What the AI is called: the keys call it.",
+    "onCreateKey": "Called with a key once a person creates it. The secret itself never leaves the dialog.",
+    "onRotateKey": "Called with a key's id when a person rotates it.",
+    "onInvite": "Called with the address a person invites.",
+    "onDeleteWorkspace": "Called when a person holds to delete the workspace, and with false if they undo it."
+  },
+  "sidebar": {
+    "brand": "The product's mark and name, at the top.",
+    "footer": "Anything for the bottom: the signed-in person, say. It's given the rail state, to fit either.",
+    "min": "The narrowest it goes before folding to a rail."
+  },
+  "sign-in": {
+    "product": "The product being signed in to: the heading, the mark's label, the email and the consent sheet.",
+    "providers": "Which one-press providers to offer, in order. Email is always there.",
+    "workspaces": "The workspaces to choose from once you're signed in.",
+    "waiting": "What's waiting on the other side, beside the form and redacted until a person is in. An empty list gives the form the whole window.",
+    "onComplete": "Called with the workspace a person picks."
+  },
+  "signature": {
+    "value": "The name being signed.",
+    "onSign": "Called once it's sealed, with the name and when.",
+    "title": "What's being signed, in fine capitals at the top.",
+    "reference": "A reference beside the title, e.g. \"Nº 0482\".",
+    "detail": "A line saying what the signature agrees to.",
+    "fontFamily": "The script it signs in, as a CSS font family. Load the font yourself.",
+    "size": "The signature's size at its largest, in px. Long names shrink to fit the line.",
+    "pen": "Show the pencil that writes it."
+  },
+  "slices": {
+    "text": "The words. One line works best.",
+    "strips": "How many strips it's cut into.",
+    "fill": "Any CSS background for the letters. Leave it out to use the text colour.",
+    "reach": "How far the strips part under the pointer, in pixels.",
+    "interactive": "Whether it cuts apart under the pointer.",
+    "className": "Classes for the text: its size, weight and tracking."
+  },
+  "stepper": {
+    "value": "The number shown.",
+    "onChange": "Called with the next number, by a press, a hold or typing.",
+    "min": "The lowest it goes.",
+    "max": "The highest it goes.",
+    "step": "How much each press changes it.",
+    "label": "What's being counted, for screen readers."
+  },
+  "support-inbox": {
+    "assistant": "What the assistant is called: it sorts, drafts and signs its suggestions.",
+    "product": "The product's name at the top of the views.",
+    "conversations": "The conversations to work through, newest first.",
+    "onSend": "Called with the conversation and the reply a person sends.",
+    "onDone": "Called when a person marks a conversation done without replying."
+  },
+  "tabs": {
+    "tabs": "Each tab's id, its label, and what it shows.",
+    "defaultTab": "The id of the tab that's open first.",
+    "onChange": "Called with a tab's id when a person opens it.",
+    "id": "Keeps the sliding indicator to this set of tabs when there are several on a page."
+  },
+  "tags": {
+    "label": "The field's name, shown above it and read to screen readers.",
+    "initial": "The tags it starts with.",
+    "suggestions": "Offered under the field as you type; Tab or Enter takes the highlighted one.",
+    "max": "The most tags it holds. Past it, new ones are refused.",
+    "placeholder": "Shown in the field while it's empty.",
+    "onChange": "Called with the whole list whenever a tag is added or removed.",
+    "width": "The field's width, in pixels."
+  },
+  "task-to-merge": {
+    "assistant": "What the agent is called in its steps, messages and the composer.",
+    "onDecide": "Called when a person approves or denies the deploy.",
+    "onMerge": "Called when a person merges the pull request.",
+    "onSteer": "Called with each message a person sends to steer the run."
+  },
+  "testimonials": {
+    "product": "The product's name, on the after side of each number and in the default quotes.",
+    "title": "The heading, set in two tones.",
+    "stories": "The featured customers, in turn. In a quote, {braces} mark the phrase to highlight.",
+    "quotes": "The wall of short quotes under them."
+  },
+  "thinking": {
+    "steps": "What it's thought so far, a line each. The newest shows on the line; its first word picks the pattern.",
+    "done": "Thinking has finished: the line settles into how long it took.",
+    "expanded": "Open the steps from outside, e.g. in a demo."
+  },
+  "threads": {
+    "title": "The headline.",
+    "sub": "The line under it.",
+    "action": "The button's label.",
+    "sentLabel": "What the button says once pressed. Left out, it keeps its label.",
+    "onAction": "Called when the button is pressed.",
+    "className": "Classes for the section. It fills its parent, so give it a height here or there."
+  },
+  "glyph": {
+    "shape": "What to draw: `{ path }` for a 24×24 SVG icon path, with optional `view` and `scale`, or `{ text }` for a word, with optional `weight`. Change it and the characters re-form.",
+    "cell": "Character size in pixels. Left out, it sizes itself to the space.",
+    "ink": "Colour of the characters. Left out, it uses your text colour.",
+    "accent": "Colour where the pointer and ripples light it up. Left out, it uses `--accent`.",
+    "interactive": "Set to false for a still, decorative version that ignores the pointer.",
+    "label": "What it shows, for screen readers. Left out, it's hidden from them as decoration.",
+    "className": "Classes for the canvas. It fills its parent, so size the parent."
+  },
+  "toasts": {
+    "events": "What the agent did or is doing, newest last.",
+    "agent": "Who's working: the name seeds their orb and the hue colours it, unless you give an avatar of your own, 30px round.",
+    "onAction": "Called with an event's id when a person presses its action.",
+    "onDismiss": "Called with an event's id when it's closed.",
+    "max": "How many show in the stack before older ones tuck behind.",
+    "expanded": "Hold the stack open, e.g. while a demo shows it off."
+  },
+  "tooltip": {
+    "label": "What the control does, in a word or two.",
+    "shortcut": "Its keyboard shortcut, one key per entry, like ['⌘', 'B'].",
+    "side": "Which side it prefers. It flips when there's no room.",
+    "children": "The control. It gets `aria-describedby` while the tooltip shows."
+  },
+  "trace": {
+    "title": "What the run is doing, in the header.",
+    "runId": "The run's id, shown beside the title.",
+    "spans": "Every agent, model and tool call, with when each was busy and how it went.",
+    "startedAt": "performance.now() when the run began.",
+    "endedAt": "performance.now() when the run finished. Leave it out while it's running.",
+    "status": "How the run stands: running, waiting on a person, done or failed.",
+    "rows": "How many steps show before the rest scroll.",
+    "flush": "Fill its container as a pane, with no card around it.",
+    "nameWidth": "The least width of the step column, in px.",
+    "view": "Plain sentences for the people the agent works for, or step names for the people who built it.",
+    "waitingLabel": "What the time spent on a person is called.",
+    "onApprove": "Called with a span's id when a person approves the step it's waiting on.",
+    "onDeny": "Called with a span's id when a person denies it."
+  },
+  "tree": {
+    "nodes": "The folders and files. A node with children is a folder.",
+    "defaultOpen": "Paths of the folders open at first.",
+    "selected": "The selected path, to control it from outside. Leave it out and the tree keeps its own.",
+    "onSelect": "Called with a file's path when a person opens it.",
+    "label": "The tree's accessible name."
+  },
+  "trend": {
+    "history": "What happened, oldest first.",
+    "forecast": "What might, nearest first, as a low and a high for each day.",
+    "format": "Formats an amount for the sentence.",
+    "unit": "Follows the range, e.g. \"tokens a day\".",
+    "today": "Labels the point where the data stops.",
+    "odds": "Turns how far ahead it is, from 0 to 1, into words.",
+    "look": "Grain ink, or a flat fill.",
+    "onRead": "Called with the day ahead being read."
+  },
+  "typing": {
+    "lines": "The conversation, oldest first. A line marked typing shows the dots until its text arrives.",
+    "agent": "Who's answering: their name, for screen readers, and the hue of their orb, or an avatar of your own, 28px round.",
+    "readAt": "When your last message was read, shown beside Read, e.g. \"9:41\"."
+  },
+  "undo": {
+    "initial": "The files to list.",
+    "title": "The list's heading.",
+    "seconds": "How long a deleted batch can be undone. Every new delete restarts it.",
+    "onDelete": "Called once the undo window closes, with every file deleted in that batch. Delete them for real here.",
+    "onUndo": "Called with the files put back by Undo or ⌘Z."
+  },
+  "upload": {
+    "accept": "What it takes, in words, under the drop zone.",
+    "onFiles": "Called with the files a person drops or picks. Start the real upload here."
+  },
+  "versions": {
+    "initial": "The versions so far, oldest first. The newest is shown.",
+    "generate": "Makes version n. Resolve with its text; the shimmer holds the reply's place until then."
+  },
+  "video": {
+    "poster": "Shown until the first play.",
+    "title": "Named in the top corner while the controls show, and to screen readers.",
+    "chapters": "Where each chapter starts, in seconds. The timeline is cut at each one.",
+    "captions": "A WebVTT file's URL, or the cues themselves.",
+    "storyboard": "Thumbnails for the timeline's preview. Without them it shows the chapter and time alone.",
+    "muted": "Starts muted, as autoplay needs."
+  },
+  "voice": {
+    "state": "Listening or not.",
+    "level": "Loudness, 0 to 1, from the microphone (or anything else).",
+    "text": "The committed text: anything typed plus words recognition is sure of.",
+    "interim": "Words heard but not yet committed.",
+    "onTextChange": "Called as the text changes, by typing or by speech.",
+    "onStart": "Called when a person starts listening. Start recognition here.",
+    "onStop": "Called when listening should stop, by a press or by quiet.",
+    "onCancel": "Called when a person throws the recording away.",
+    "onSend": "Called with the text a person sends.",
+    "autoStop": "Stop on its own after this much quiet.",
+    "placeholder": "Shown while the field is empty."
+  },
+  "voice-mode": {
+    "assistant": "What the assistant is called: on the captions, the status and the controls.",
+    "call": "The call to play: what each side says, where the person interrupts, what lights up and what changes.",
+    "days": "The days shown beside the call, each with its events.",
+    "onEnd": "Called when the call ends, with how long it ran and what was changed during it.",
+    "onUndo": "Called with an action a person undoes."
+  },
+  "voicenote": {
+    "words": "The transcript, word by word, with when each is said.",
+    "duration": "How long the note is, in seconds.",
+    "src": "The audio itself. Leave it out to play on a clock.",
+    "peaks": "Loudness, 0 to 1, across the note. Worked out from the words' timing when left out.",
+    "defaultTranscript": "Whether the transcript starts open."
+  },
+  "waitlist": {
+    "joined": "How many people are already waiting. The count rolls up to it, plus one, when someone joins.",
+    "onJoin": "Called with the email. Return a promise to keep the button busy until it settles.",
+    "placeholder": "Shown in the field while it's empty.",
+    "action": "The button's words.",
+    "done": "The line under the field once someone's in."
+  }
+}

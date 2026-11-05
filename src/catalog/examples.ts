@@ -1,4 +1,3 @@
-/** A whole page for each chart and board: real data, every prop that matters, ready to paste and run. */
 export const EXAMPLES: Record<string, string> = {
   rings: `"use client"
 

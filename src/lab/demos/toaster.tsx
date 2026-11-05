@@ -9,13 +9,11 @@ import { spring } from '../lib/motion'
 import { Kbd } from '../ui/Kbd'
 import { hover, pressed } from '@/lab/lib/hand'
 
-// Its own toaster, so the page's toasts and the demo's never mix.
 const { toast, Toaster } = createToaster()
 
 const wait = <T,>(ms: number, v: T, fail = false) => new Promise<T>((r, x) => setTimeout(() => (fail ? x(new Error('no')) : r(v)), ms))
 const pause = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
-/** An upload that moves in uneven steps, the way real ones do, then lands. */
 async function upload() {
   const id = toast.loading('Uploading hero.mp4', { description: '24.6 MB', progress: 0 })
   for (const p of [0.08, 0.21, 0.34, 0.38, 0.55, 0.71, 0.86, 0.94, 1]) {
@@ -38,11 +36,6 @@ const TRIGGERS: { label: string; run: () => unknown }[] = [
 
 const SPOTS: ToastPosition[] = ['top-left', 'top-center', 'top-right', 'bottom-left', 'bottom-center', 'bottom-right']
 
-/**
- * A save that settles, an upload, a message with replies, a warning, the same toast three times
- * folding into one, the stack fanned out, Undo counting down, a deploy that fails, and the whole
- * stack moving to the top and back. Hovering pauses; touching hands it over.
- */
 export function ToasterDemo() {
   const touched = useRef(false)
   const held = useRef(false)
@@ -105,7 +98,6 @@ export function ToasterDemo() {
       </div>
       <LayerHost className="mt-4 h-[440px] rounded-card bg-surface shadow-raised ring-1 ring-[var(--line)]">
         <div className="flex h-full flex-col items-center justify-center gap-4">
-          {/* Where the toasts go: a small screen with six places to put them. */}
           <div role="radiogroup" aria-label="Position" className="relative grid h-[104px] w-[168px] grid-cols-3 grid-rows-2 rounded-[14px] bg-surface-2 p-2 ring-1 ring-[var(--line)]">
             {SPOTS.map((s) => {
               const [v, h] = s.split('-')

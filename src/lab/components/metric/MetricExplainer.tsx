@@ -48,7 +48,6 @@ export function MetricExplainer({
   width?: number
   footer?: ReactNode
   highlight?: string | null
-  /** Show the row of metric names to switch between. Off when the page around it does the choosing. */
   tabs?: boolean
 }) {
   const [own, setOwn] = useState(defaultMetric ?? metrics[0]?.id)

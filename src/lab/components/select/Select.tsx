@@ -11,20 +11,9 @@ export type Option = { value: string; label: string; icon?: ReactNode; hint?: st
 
 const ITEM = 36
 const PAD = 4
-/** More options than this and the menu drops below the trigger and scrolls. */
 const MAX_ALIGNED = 8
 const EDGE = 8
 
-/**
- * A select that opens the way a desktop pop-up does: the current choice lands exactly on top
- * of the button, so your eye never has to move. The highlight glides under the pointer but
- * jumps instantly for the keyboard. Picking flashes the item once before the menu closes,
- * and the new value slides in from the direction it sat in the list.
- *
- * Typing jumps to matching options. The trigger is as wide as its widest option, so
- * changing the value never moves anything around it.
- */
-/** For demos and tests: open the menu, move the highlight and pick, without touching focus. */
 export type SelectHandle = { open(): void; point(i: number): void; choose(i: number): void }
 
 export function Select({
@@ -35,15 +24,10 @@ export function Select({
   placeholder = 'Select…',
   ref,
 }: {
-  /** The chosen option's value, or null for none. */
   value: string | null
-  /** Called with an option's value when a person picks it. */
   onChange: (value: string) => void
-  /** What to choose from: a label, and an optional icon, hint or disabled flag. */
   options: Option[]
-  /** Accessible name for the control. */
   label: string
-  /** Shown while nothing is chosen. */
   placeholder?: string
   ref?: Ref<SelectHandle>
 }) {
@@ -59,7 +43,6 @@ export function Select({
   const probe = useRef<HTMLSpanElement>(null)
   const typed = useRef({ text: '', at: 0 })
   const closing = useRef(false)
-  // Driven from code: the menu opens and picks, but focus is never taken from the page.
   const quiet = useRef(false)
   const flash = useAnimationControls()
   const reduce = useReducedMotion()
@@ -69,12 +52,9 @@ export function Select({
   const current = index >= 0 ? options[index] : null
   const aligned = options.length <= MAX_ALIGNED
 
-  // The trigger takes the width of the widest option, measured from hidden copies, and again
-  // whenever they resize (web fonts arriving change every width).
   useLayoutEffect(() => {
     const el = probe.current
     if (!el) return
-    // offsetWidth rounds; one spare pixel keeps a fractional label from ellipsing.
     const read = () => setWidth(Math.max(...[...el.children].map((c) => (c as HTMLElement).offsetWidth)) + 1)
     read()
     document.fonts?.ready.then(read)
@@ -97,7 +77,6 @@ export function Select({
     if (!quiet.current) trigger.current?.focus()
   }
 
-  // Place the menu so the chosen row sits over the trigger, then nudge it back on screen.
   useLayoutEffect(() => {
     if (!open || !panel.current || !trigger.current) return
     const t = trigger.current
@@ -115,7 +94,6 @@ export function Select({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
-  // Focus once placed: a hidden element can't take focus.
   useEffect(() => {
     if (open && place && !quiet.current) panel.current?.focus({ preventScroll: true })
   }, [open, place])
@@ -137,7 +115,6 @@ export function Select({
     setActive(i)
     setDir(i >= index ? 1 : -1)
     if (o.value !== value) onChange(o.value)
-    // One blink, like a desktop menu confirming the pick. Purely visual: the value is already set.
     if (!reduce) flash.start({ opacity: [1, 0, 1], transition: { duration: 0.14, times: [0, 0.45, 1], ease: 'linear' } })
     window.setTimeout(hide, reduce ? 0 : 150)
   }
@@ -187,7 +164,6 @@ export function Select({
       keys[e.key]()
       return
     }
-    // Type to jump: letters typed within half a second build one query.
     if (e.key.length === 1 && !e.metaKey && !e.ctrlKey) {
       const now = Date.now()
       typed.current = { text: (now - typed.current.at < 500 ? typed.current.text : '') + e.key.toLowerCase(), at: now }
@@ -254,7 +230,6 @@ export function Select({
         <Chevrons size={14} className="text-ink-3" />
       </button>
 
-      {/* Hidden copies of every option, to size the trigger without guessing. */}
       <span ref={probe} aria-hidden className="pointer-events-none invisible absolute left-0 top-0 -z-50 flex flex-col text-callout">
         {[...options, { value: '', label: placeholder }].map((o, i) => (
           <span key={i} className="flex w-max items-center gap-2 whitespace-nowrap">
@@ -277,7 +252,6 @@ export function Select({
             className="glass absolute z-50 rounded-menu bg-surface p-1 shadow-modal outline-none"
             style={{
               top: place?.top ?? 0,
-              // Rows start 2px further in than the trigger's text; shifting left lines them up.
               left: -2,
               minWidth: (trigger.current?.offsetWidth ?? 0) + 4,
               visibility: place ? 'visible' : 'hidden',
@@ -288,7 +262,6 @@ export function Select({
             exit={{ opacity: 0, transition: { duration: 0.12, ease: ease.out } }}
           >
             <div ref={scroller} className="relative overflow-y-auto overscroll-contain [scrollbar-width:none]" style={{ maxHeight: MAX_ALIGNED * ITEM }}>
-              {/* One highlight: glides for the pointer, jumps for the keyboard, blinks on pick. */}
               <motion.div
                 aria-hidden
                 className="absolute inset-x-0 top-0"

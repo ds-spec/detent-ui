@@ -6,7 +6,6 @@ import type { ImageSearchHandle, SearchImage } from '../components/images/ImageS
 import { useLoop } from '@/lab/demos/loop'
 import { useBench } from '@/lab/demos/bench'
 
-/** Photos from Unsplash (Unsplash Licence), each with the tags a vision model might give it. */
 const P = (id: string, w: number, h: number, alt: string, tags: string) => ({ id, src: `/media/search/${id}.webp`, width: w, height: h, alt, tags: tags.split(', ') })
 export const PHOTOS: SearchImage[] = [
   P('sea-golden', 600, 400, 'The sea at golden hour under soft clouds', 'sea, ocean, water, waves, horizon, golden, golden hour, sunset, light, warm, clouds, sky, calm'),
@@ -34,7 +33,6 @@ export const PHOTOS: SearchImage[] = [
 const FIRST = 'golden light over water'
 const NOPE = ', no people'
 
-/** Describes a photo, narrows it, reads why the dunes and the lake ranked where they did, then finds more like the lighthouse. Touch it to take over. */
 export function ImagesDemo() {
   const b = useBench()
   const box = useRef<ImageSearchHandle>(null)

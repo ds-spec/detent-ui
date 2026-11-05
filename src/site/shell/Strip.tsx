@@ -5,16 +5,7 @@ import type { ReactNode } from 'react'
 import { usePeek } from '../exhibit/Rail'
 import type { RailGroup, RailItem } from '../exhibit/Rail'
 
-/*
- * The library's index, the way Skiper keeps its own: a panel of its own floating down the left,
- * every piece numbered against a ruler of fine ticks that runs the whole height. Each piece's tick
- * is a little longer than the ruler's; where a family starts it's longer again. The one on show is
- * in blue with a line run in from the edge to it; point at another and it takes the line too, and
- * the piece opens beside the panel, running live. It hides with one press and remembers.
- */
-
 export const STRIP_W = 248
-/** Room between the panel and the window's edge, and between the panel and the page. */
 export const STRIP_GAP = 8
 const ROW = 28
 
@@ -27,7 +18,6 @@ export function Strip({ groups, current, onPick, preview, label = 'Components', 
   const { aim, leave, card } = usePeek(all, preview)
   const [hover, setHover] = useState<string | null>(null)
 
-  // The one on show sits a third of the way down when the page opens, and stays in sight as you move.
   const list = useRef<HTMLDivElement>(null)
   const arrived = useRef(false)
   useLayoutEffect(() => {
@@ -63,7 +53,6 @@ export function Strip({ groups, current, onPick, preview, label = 'Components', 
         }}
         className="relative min-h-0 flex-1 overflow-y-auto pb-[30vh] [mask-image:linear-gradient(to_bottom,transparent,black_16px,black_calc(100%-80px),transparent)] [scrollbar-width:none]"
       >
-        {/* The ruler: fine ticks the whole way down, three to a row. */}
         <span aria-hidden className="pointer-events-none absolute left-0 top-0 w-[7px] bg-[repeating-linear-gradient(to_bottom,var(--line-strong)_0_1px,transparent_1px_9.333px)]" style={{ height: rows.length * ROW + 64, backgroundPositionY: ROW / 2 - 0.5 }} />
         {rows.map(({ item, n, first }) => {
           const here = item.id === current
@@ -93,13 +82,11 @@ export function Strip({ groups, current, onPick, preview, label = 'Components', 
         })}
       </div>
     </nav>
-    {/* Outside the panel, which clips and moves: the preview's place is the window's. */}
     {open && card}
     </>
   )
 }
 
-/** A panel beside a page: the shape of the button that hides or shows the index. */
 export function PanelIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>

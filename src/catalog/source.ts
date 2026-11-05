@@ -1,7 +1,6 @@
 import { asset } from '@/lib/asset'
 import { isProComponent } from './pro'
 
-/** The files that make up each component, as they ship. */
 export const FILES: Record<string, string[]> = {
   scaffold: ['components/scaffold/AgentScaffold.tsx', 'components/terminal/Terminal.tsx', 'components/tree/FileTree.tsx'],
   answer: ['../pro/components/answer/StreamingAnswer.tsx'],
@@ -93,7 +92,6 @@ export const FILES: Record<string, string[]> = {
   toasts: ['components/small/AgentToasts.tsx'],
   retry: ['components/small/RetryButton.tsx'],
   extract: ['../pro/components/extract/ExtractionReview.tsx'],
-  // Pro blocks live beside the lab, in src/pro.
   'agent-chat': ['../pro/blocks/chat/AgentChat.tsx', '../pro/blocks/chat/content.tsx', '../pro/ai/ai-sdk.ts', 'blocks/kit/props.tsx'],
   'task-to-merge': ['../pro/blocks/agent/AgentRun.tsx', '../pro/blocks/agent/content.ts', 'blocks/kit/props.tsx'],
   'support-inbox': ['../pro/blocks/inbox/Inbox.tsx', '../pro/blocks/inbox/content.ts', 'blocks/kit/props.tsx', 'ui/DetentMark.tsx'],
@@ -185,16 +183,12 @@ export const FILES: Record<string, string[]> = {
   'voice-mode': ['../pro/blocks/voice/VoiceMode.tsx', '../pro/blocks/voice/content.ts', 'components/small/Thinking.tsx', 'blocks/kit/props.tsx', 'ui/DetentMark.tsx'],
 }
 
-/** A file as the Code tab shows it. A teaser is Pro source: only its opening lines, nothing to copy. */
 export type SourceFile = { name: string; lines: number; code: string; html: string; teaser?: boolean }
 
-/** How much of a Pro file the public site shows: the imports and the opening comment. */
 export const TEASER = 18
 
-/** Pro source: a Pro component, any block whose files live in src/pro, any template. */
 export const locked = (id: string) => process.env.DETENT_UNLOCK !== '1' && (isProComponent(id) || id.startsWith('template-') || !!FILES[id]?.[0]?.startsWith('../pro/'))
 
-/** A component's files as highlighted at build time. Pro files are a teaser or only named. */
 export async function source(id: string): Promise<SourceFile[]> {
   return (FILES[id] && (await asset<SourceFile[]>(`source/${id}.json`))) || []
 }

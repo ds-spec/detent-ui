@@ -6,11 +6,9 @@ import { RANGES, Segmented, useScript } from './chart-kit'
 import type { Range } from './chart-kit'
 import { RollingText } from '@/lab/ui/RollingText'
 
-/** Response time percentiles for each range: p50, p90, p95, p99. */
 const LATENCY: Record<Range, number[]> = { '7d': [0.58, 0.94, 1.08, 1.86], '30d': [0.61, 1.02, 1.24, 2.14], '90d': [0.66, 1.21, 1.52, 2.61] }
 const seconds = (v: number) => v.toFixed(2)
 
-/** p95 latency against its limit: a week comfortably under, the month getting close, ninety days over. Hovering pauses; touching hands it over. */
 export function GaugeDemo() {
   const [range, setRange] = useState<Range>('30d')
   const [p50, p90, p95, p99] = LATENCY[range]

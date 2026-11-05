@@ -7,10 +7,8 @@ import { ease, spring } from '../../lib/motion'
 import { Layer, fill, frameOf, inFrame, originOf, place, useHost, useReposition } from '../../lib/layer'
 import type { Align, Side } from '../../lib/layer'
 
-/** For demos and tests: open and close it as a hover would. */
 export type HoverCardHandle = { open(): void; close(): void }
 
-/** Everything the card needs to show one trigger's preview. */
 type Spec = {
   id: string
   anchor: HTMLElement
@@ -24,11 +22,8 @@ type Spec = {
 }
 
 type Group = {
-  /** The pointer rests on a trigger: open after `delay`, or at once if a card is already up. */
   enter(spec: Spec, delay: number): void
-  /** The pointer left a trigger or the card: close after its delay, unless it comes back. */
   leave(): void
-  /** Open now, for focus or from a handle. */
   show(spec: Spec): void
   hide(): void
   active: string | null
@@ -36,15 +31,8 @@ type Group = {
 
 const GroupContext = createContext<Group | null>(null)
 
-/**
- * Hover cards that share one card. While a card is open, resting on another trigger in the group
- * doesn't close it and open another: the same card glides over to the new trigger and reshapes
- * to its preview, with no wait. For a moment after it closes, the next trigger opens at once too,
- * so reading along a line of mentions feels continuous. A lone HoverCard is a group of one.
- */
 export function HoverCardGroup({ children, skipDelay = 400 }: {
   children: ReactNode
-  /** How long after a card closes the next one still opens without waiting, in ms. */
   skipDelay?: number
 }) {
   const [spec, setSpec] = useState<Spec | null>(null)
@@ -86,7 +74,6 @@ export function HoverCardGroup({ children, skipDelay = 400 }: {
       const s = state.current
       clearTimeout(s.close)
       clearTimeout(s.open)
-      // Warm: a card is up, or only just closed. Go straight to this one.
       if (s.shown || performance.now() - s.closedAt < skipDelay) return show(next)
       s.open = window.setTimeout(() => show(next), delay)
     },
@@ -110,17 +97,14 @@ export function HoverCardGroup({ children, skipDelay = 400 }: {
   )
 }
 
-/** The one card a group shows, placed beside whichever trigger owns it. */
 function Card({ spec, shown, content, onEnter, onLeave, onEscape }: { spec: Spec | null; shown: boolean; content: ReactNode; onEnter: () => void; onLeave: () => void; onEscape: () => void }) {
   const [height, setHeight] = useState<number | null>(null)
   const inner = useRef<HTMLDivElement>(null)
   const card = useRef<HTMLDivElement>(null)
-  // Where the card sits, written straight from measuring: moving it never re-renders it.
   const x = useMotionValue(0)
   const y = useMotionValue(0)
   const origin = useMotionValue('0px 0px')
   const visibility = useMotionValue('hidden')
-  // Whether the card is already on screen somewhere: then a new trigger is a glide, not a jump.
   const placed = useRef(false)
   const { contained, frame } = useHost()
   const reduce = useReducedMotion()
@@ -194,7 +178,6 @@ function Card({ spec, shown, content, onEnter, onLeave, onEscape }: { spec: Spec
               transition={{ ...spring.smooth, opacity: { duration: 0.18 } }}
             >
               <div ref={inner} style={{ width }}>
-                {/* A new person, or their profile arriving: the card's contents cross over, softly. */}
                 <AnimatePresence initial={false} mode="popLayout">
                   <motion.div
                     key={`${spec.id}-${content ? 'real' : 'wait'}`}
@@ -216,35 +199,18 @@ function Card({ spec, shown, content, onEnter, onLeave, onEscape }: { spec: Spec
 }
 
 type Props = {
-  /** The link or name it previews. */
   trigger: ReactElement<Record<string, unknown>>
-  /** What's in the card, when it's already known. */
   children?: ReactNode
-  /** Fetches what's in the card the first time it opens. A placeholder shows until it settles. */
   load?: () => Promise<ReactNode>
-  /** Which side of the link it prefers. */
   side?: Side
-  /** How it lines up with the link. */
   align?: Align
-  /** Its width in pixels. */
   width?: number
-  /** How long the pointer has to rest before it opens, in ms. Inside a group, only the first card waits. */
   openDelay?: number
-  /** How long it lingers after the pointer leaves, in ms. */
   closeDelay?: number
-  /** Accessible name for the card. */
   label: string
   ref?: Ref<HoverCardHandle>
 }
 
-/**
- * A preview that opens when the pointer rests on a link: a person, a repo, a pull request. It
- * waits until you mean it, so passing over a link shows nothing. Moving from the link onto the
- * card keeps it open, and it lingers a beat after you leave so a shaky hand doesn't lose it.
- * When its content has to load, it opens at once with a placeholder in the same shape and grows
- * to fit what arrives. Keyboard focus opens it too. Put several in a HoverCardGroup and they
- * share one card that glides from trigger to trigger.
- */
 export function HoverCard(props: Props) {
   const group = useContext(GroupContext)
   return group ? (
@@ -285,7 +251,6 @@ function Trigger({ trigger, children, load, side = 'bottom', align = 'start', wi
   )
 }
 
-/** The shape of a profile while it loads: an avatar, a name, a line, and the row of numbers. */
 function Placeholder() {
   return (
     <div aria-label="Loading" className="p-4">

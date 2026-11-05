@@ -10,8 +10,6 @@ import { Morph } from '@/lab/ui/Morph'
 import { Glow } from '@/lab/ui/Intelligence'
 import { RollingText } from '@/lab/ui/RollingText'
 
-/* ───────────────────────────── Type ───────────────────────────── */
-
 const SCALE = [
   { name: 'Display', cls: 'text-display', spec: '40 / 44 · Regular · −4%', sample: '$48,213' },
   { name: 'Large', cls: 'text-large', spec: '28 / 32 · Regular · −3.2%', sample: 'Ship the Q3 refund rules' },
@@ -39,8 +37,6 @@ export function Type() {
   )
 }
 
-/* ───────────────────────────── Materials ───────────────────────────── */
-
 function Tile({ name, line, children }: { name: string; line: string; children: ReactNode }) {
   return (
     <div>
@@ -62,7 +58,6 @@ export function Materials() {
         <div className="flex h-24 w-44 items-center justify-center rounded-[22px] bg-surface text-callout font-medium text-ink shadow-float">Raised</div>
       </Tile>
       <Tile name="Floating" line="Menus and popovers. Glass: what's beneath stays faintly there.">
-        {/* Something busy underneath, so the glass has something to show. */}
         <div aria-hidden className="absolute inset-0 flex flex-col justify-center gap-2 px-6 opacity-80">
           {['Ship the Q3 refund rules', 'Update the limits in refunds.ts', 'Run the test suite', 'Open a pull request'].map((l) => (
             <p key={l} className="text-body font-medium text-ink-2">
@@ -97,7 +92,6 @@ export function Materials() {
   )
 }
 
-/** The fifth material: light that means the AI is alive. It breathes on while working and cools off when done. */
 function Intelligence() {
   const [on, setOn] = useState(true)
   useEffect(() => {
@@ -127,8 +121,6 @@ function Intelligence() {
     </div>
   )
 }
-
-/* ───────────────────────────── Motion ───────────────────────────── */
 
 export function Motion() {
   const [on, setOn] = useState(false)
@@ -182,8 +174,6 @@ export function Motion() {
     </div>
   )
 }
-
-/* ───────────────────────────── Shape ───────────────────────────── */
 
 export function Shape() {
   return (

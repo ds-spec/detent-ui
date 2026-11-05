@@ -13,7 +13,6 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   const { slug } = await params
   const t = template(slug)
   if (!t) return pageImage({ kicker: 'Template', title: 'Detent' })
-  // The app template carries Detent's own name, which the image already shows, so it goes by what it is.
   const own = t.name === 'Detent'
   return pageImage({ kicker: `${t.form === 'app' ? 'App' : 'Landing page'} template${own ? '' : ` · ${t.kind}`}`, title: own ? t.kind : t.name, tag: 'Pro' })
 }

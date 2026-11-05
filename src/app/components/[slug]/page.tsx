@@ -22,7 +22,6 @@ export async function generateMetadata({ params }: PageProps<'/components/[slug]
   return page({ title: `${e.name} — React component`, description: short(said.length <= 160 ? said : e.line), path: `/components/${e.id}` })
 }
 
-// The layout draws the stage and notes from the URL; the page adds the props, read from the source.
 export default function ComponentPage({ params }: PageProps<'/components/[slug]'>) {
   return (
     <Suspense fallback={null}>

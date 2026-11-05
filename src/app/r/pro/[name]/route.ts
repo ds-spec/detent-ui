@@ -1,14 +1,6 @@
 import { checkLicence } from '@/catalog/licence'
 import { hasProItems, proItemByName } from '@/catalog/pro-items'
 import { SITE } from '@/catalog/pro'
-
-/*
- * The Pro registry: what `npx shadcn add @detent-pro/<name>` fetches once a project has the
- * registry and a key from /account in components.json. Every item was built with the site
- * (scripts/build-pro-registry.mjs) and is served only to a key whose email has bought Pro; the
- * templates need a plan that includes them. Nothing here is a public file, and nothing is cached
- * on the way.
- */
 import { recordInstall } from '@/lib/account/keys'
 
 const SETUP = `${SITE}/pro#install`

@@ -8,12 +8,6 @@ import { PLANS } from '@/catalog/pro'
 import { RollingText } from '@/lab/ui/RollingText'
 import { useSite } from '../Providers'
 
-/*
- * What the days cost, at your rate. Set what a day of your time is worth on a ruler of ticks that
- * swell under the thumb and click as it passes each one, and the bill for building everything
- * yourself rolls to match, beside the one price. Underneath, how soon Pro pays for itself.
- */
-
 const MIN = 200
 const MAX = 1500
 const STEP = 50
@@ -23,7 +17,6 @@ const LABELS = [200, 500, 1000, 1500]
 const money = (n: number) => `$${n.toLocaleString('en-US')}`
 const pro = PLANS[0]
 
-/** How long Pro takes to pay for itself, at a rate of `day` a day of eight hours. */
 function payback(day: number) {
   const minutes = Math.ceil(pro.price / (day / 480))
   if (minutes < 60) return `${minutes} minutes`
@@ -71,7 +64,6 @@ export function Worth() {
           <span className="text-[17px] text-ink-3">a day</span>
         </p>
 
-        {/* The ruler: a tick for every $50, swelling under the thumb. */}
         <div
           ref={track}
           role="slider"
@@ -96,7 +88,6 @@ export function Worth() {
               return <span key={i} className="w-[2px] rounded-full transition-[height,background-color] duration-200" style={{ height: 10 + (major ? 6 : 0) + near * 16, background: i <= pos ? 'var(--ink)' : 'color-mix(in oklch, var(--ink) 22%, transparent)' }} />
             })}
           </div>
-          {/* The thumb, and its value above it. */}
           <motion.span aria-hidden className="pointer-events-none absolute top-0 flex -translate-x-1/2 flex-col items-center" initial={false} animate={{ left: `${(pos / (N - 1)) * 100}%` }} transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 600, damping: 40 }}>
             <span className="tnum rounded-full bg-ink px-2 text-[11.5px] leading-5 text-surface">{money(rate)}</span>
             <span className="mt-1 h-9 w-[2px] rounded-full bg-ink" />

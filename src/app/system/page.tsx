@@ -18,7 +18,6 @@ const SECTIONS = [
   { id: 'shape', title: 'Shape', line: 'Radii are concentric, spacing sits on a 4pt grid, and anything you can press is at least 32 points.', body: <Shape /> },
 ]
 
-/** The list down the side: the four things, and the list marks the one you're reading. */
 const RAIL = [{ id: 'page', name: 'On this page', items: SECTIONS.map((s) => ({ id: s.id, name: s.title })) }]
 const LINKS = Object.fromEntries(SECTIONS.map((s) => [s.id, `#${s.id}`]))
 

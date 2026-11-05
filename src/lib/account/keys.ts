@@ -5,19 +5,12 @@ import { REFUND_DAYS } from '@/catalog/trust'
 import { db } from './db'
 import { hash } from './session'
 
-/*
- * Keys and what they open. Anyone signed in can make a key; what it installs follows the email
- * behind it, so a key made before buying starts working the moment the purchase lands, and stops
- * if the purchase is refunded. Only a key's hash is kept, so it's shown once, when it's made.
- */
-
 export const MAX_KEYS = 5
 
 export type Key = { id: string; name: string; hint: string; createdAt: number; usedAt: number | null }
 const RANK: Plan[] = ['pro', 'all']
 const best = (plans: unknown[]) => plans.reduce<Plan | null>((top, plan) => (RANK.indexOf(plan as Plan) > (top ? RANK.indexOf(top) : -1) ? (plan as Plan) : top), null)
 
-/** The best plan an email has bought. */
 export async function planFor(email: string): Promise<Plan | null> {
   const client = await db()
   const { rows } = await client.execute({
@@ -27,7 +20,6 @@ export async function planFor(email: string): Promise<Plan | null> {
   return best(rows.map((row) => row.plan))
 }
 
-/** The best plan an email has bought, and since when, for the account page. */
 export async function purchaseFor(email: string): Promise<{ plan: Plan; since: number } | null> {
   const { rows } = await (await db()).execute({ sql: 'select plan, min(created_at) as since from purchase where refunded = 0 and email = ? group by plan', args: [email] })
   const plan = best(rows.map((row) => row.plan))
@@ -35,7 +27,6 @@ export async function purchaseFor(email: string): Promise<{ plan: Plan; since: n
   return plan && row ? { plan, since: Number(row.since) } : null
 }
 
-/** The verified email of the account with this id, or null. */
 export async function emailOfAccount(id: string) {
   const { rows } = await (await db()).execute({ sql: 'select email from auth_user where id = ? and "emailVerified" = 1', args: [id] })
   return rows.length ? String(rows[0].email).toLowerCase() : null
@@ -46,7 +37,6 @@ export async function listKeys(email: string): Promise<Key[]> {
   return rows.map((row) => ({ id: String(row.id), name: String(row.name), hint: String(row.hint), createdAt: Number(row.created_at), usedAt: row.used_at === null ? null : Number(row.used_at) }))
 }
 
-/** Makes a key and returns it, the only time it's readable. Null at the limit. */
 export async function createKey(email: string, name: string) {
   const client = await db()
   const { rows } = await client.execute({ sql: 'select count(*) as n from key where email = ?', args: [email] })
@@ -60,7 +50,6 @@ export async function removeKey(email: string, id: string) {
   await (await db()).execute({ sql: 'delete from key where id = ? and email = ?', args: [id, email] })
 }
 
-/** Whose key this is, noting when it was last used at most once an hour. */
 export async function keyEmail(secret: string) {
   const client = await db()
   const now = Date.now()
@@ -72,8 +61,6 @@ export async function keyEmail(secret: string) {
 
 export type Usage = { components: number; templates: number; until: number; open: boolean }
 
-/** Records an order from the store. The store can send the same one twice, and that's fine. */
-/** Keeps a refund once it's seen: the store may deliver or retry a paid event after it. */
 export async function recordInstall(email: string, item: string, kind: 'component' | 'template') {
   await (await db()).execute({ sql: 'insert or ignore into install (email, item, kind, at) values (?, ?, ?, ?)', args: [email, item, kind, Date.now()] })
 }

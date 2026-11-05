@@ -10,13 +10,8 @@ const LOOK: Record<string, { icon: ReactNode; color: string }> = {
   inputs: { icon: <Pencil size={14} />, color: 'var(--inputs)' },
 }
 
-/** Fired with a family id; the gallery filters to it and comes into view. */
 export const FAMILY_EVENT = 'detent:family'
 
-/**
- * A family named in a sentence, as a tinted tag. It reads as a word, and it's a way in:
- * pressing it filters the gallery to that family and brings it into view.
- */
 export function FamilyTag({ id, children }: { id: string; children: ReactNode }) {
   const { icon, color } = LOOK[id]
   return (

@@ -1,5 +1,3 @@
-// Works out at build time what Workers can't at run time: they have no filesystem, and shiki and the
-// TypeScript compiler are too heavy to ship. Writes public/_data and .detent/og-font.json.
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { createJiti } from 'jiti'
@@ -18,6 +16,7 @@ const { FILES } = await jiti.import('../src/catalog/source.ts')
 const { buildSource } = await jiti.import('../src/catalog/source-build.ts')
 const { isProBlock, isProComponent } = await jiti.import('../src/catalog/pro.ts')
 const { apiFromSource } = await jiti.import('../src/catalog/api.ts')
+const notes = JSON.parse(readFileSync(path.join(root, 'src/catalog/notes.json'), 'utf8'))
 const { freeNames, registryItem, registryTheme, registryIndex } = await jiti.import('../src/catalog/registry.ts')
 
 const source = {}
@@ -27,10 +26,8 @@ for (const id of Object.keys(FILES)) {
   const f = FILES[id][0]
   let code = null
   try { code = readFileSync(path.join(root, 'src/lab', f), 'utf8') } catch {}
-  api[id] = code === null ? null : apiFromSource(code, f)
+  api[id] = code === null ? null : apiFromSource(code, f, notes[id])
 }
-// How long each Pro piece is, for the line under its install command: the same count its locked
-// code card gives. Without Pro checked out there's nothing to count, so the last counts stand.
 const linesFile = path.join(root, 'src/catalog/lines.json')
 const lines = JSON.parse(readFileSync(linesFile, 'utf8'))
 for (const [id, files] of Object.entries(source)) {

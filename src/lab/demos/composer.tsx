@@ -23,7 +23,6 @@ const THREAD: Note[] = [
 ]
 const ME: Person = { id: 'you', name: 'You', hue: 270 }
 
-/** Writes a reply with a mention and live markdown, selects a few words to italicise them from the toolbar, then sends. Hovering pauses; touching hands it over. */
 export function ComposerDemo() {
   const box = useRef<ComposerHandle>(null)
   const held = useRef(false)

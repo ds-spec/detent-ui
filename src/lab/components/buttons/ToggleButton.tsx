@@ -6,12 +6,6 @@ import { Check, Plus } from '../../icons'
 import { tap } from '../../lib/feel'
 import { Morph } from '../../ui/Morph'
 
-/**
- * A button that stays pressed: Follow, Watch, Subscribe. Off, it's ink and asks; on, it settles
- * into a soft fill and says what you are. Point at it while it's on and it offers the way back,
- * in red, but not straight after you've pressed it: only once you've moved away and come back.
- * Every change of label reshapes the button to fit, on a spring, never a jump.
- */
 export function ToggleButton({
   pressed,
   onPressedChange,
@@ -20,21 +14,14 @@ export function ToggleButton({
   undo = 'Unfollow',
   icons = { off: <Plus size={15} />, on: <Check size={15} strokeWidth={2.4} /> },
 }: {
-  /** On or off. */
   pressed: boolean
-  /** Called with the next state when it's pressed. */
   onPressedChange: (next: boolean) => void
-  /** The label while it's off. */
   off?: string
-  /** The label while it's on. */
   on?: string
-  /** The label offered on hover while it's on. */
   undo?: string
-  /** An icon for each state; leave one out for none. */
   icons?: { off?: ReactNode; on?: ReactNode }
 }) {
   const [over, setOver] = useState(false)
-  // Just pressed: the pointer is still on it, so don't offer to undo until it has left once.
   const [fresh, setFresh] = useState(false)
   const view = !pressed ? 'off' : over && !fresh ? 'undo' : 'on'
   const face = (icon: ReactNode, text: string) => (

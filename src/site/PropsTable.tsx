@@ -4,11 +4,6 @@ export type Row = { name: string; type: string; default?: string; note?: string;
 
 const COLS = 'md:grid-cols-[minmax(150px,220px)_minmax(0,1fr)_minmax(110px,180px)]'
 
-/**
- * Props as a plain table, the same as a component's: the prop and whether it's needed, what it
- * does with its type under it, and its default. Columns are labelled, so nothing has to be
- * guessed; on a phone each row stacks. `title` heads a second table in the same card.
- */
 export function PropRows({ list, title }: { list: Row[]; title?: string }) {
   return (
     <div role="table" aria-label={title ?? 'Props'}>
@@ -38,7 +33,6 @@ export function PropRows({ list, title }: { list: Row[]; title?: string }) {
   )
 }
 
-/** The card around the tables: the title, how many there are, and a line on what they're for. */
 export function PropsSection({ blurb, count, title = 'Props', children, className = '' }: { blurb: string; count?: number; title?: string; children: ReactNode; className?: string }) {
   return (
     <section aria-labelledby="props" className={`overflow-hidden rounded-[26px] bg-surface shadow-[var(--card-edge)] ${className}`}>

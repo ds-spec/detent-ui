@@ -14,7 +14,6 @@ const MODELS: Model[] = [
   { id: 'max', name: 'Max', blurb: 'For hard problems', time: 11, cost: 0.06 },
 ]
 
-/** Pushes effort up to watch every model's figures roll, then settles on one. Touch it and it's yours. */
 export function ModelsDemo() {
   const b = useBench()
   const [value, setValue] = useState<ModelValue>({ model: 'pro', effort: 1 })
@@ -35,7 +34,6 @@ export function ModelsDemo() {
     }
   })
   return (
-    // A fixed frame: the picker sits in a composer, and its menu opens upward into space that's reserved.
     <div className="flex h-[430px] w-[460px] max-w-full max-sm:w-[400px] items-end" {...handlers}>
       <div className="w-full rounded-[22px] bg-surface p-2 shadow-float">
         <p className="px-2.5 pb-4 pt-2 text-body text-ink-3">Ask anything</p>

@@ -8,17 +8,6 @@ import { useIntent } from '@/site/intent'
 import { GRAIN } from './lights'
 import type { LibItem } from './library'
 
-/*
- * The library on the home page: eight parts, shown big. Two to a row, a wide one beside a narrow
- * one, the sides swapping each row, so it reads as a wall of prints rather than a grid of tiles.
- *
- * Each part is a card. Most of it is a well tinted with one of the four lights' colours, softened,
- * with the part running in the middle at its real size, there to be used. Along the foot: its family
- * and whether it's free, its name, one line, and the way to its page. Under the wall, the way to all
- * of them.
- */
-
-/** The eight, row by row: each pair is wide then narrow, or narrow then wide.  */
 const ROWS: [string, string][] = [
   ['region', 'popup'],
   ['upload', 'voicenote'],
@@ -26,11 +15,6 @@ const ROWS: [string, string][] = [
   ['glyph', 'threads'],
 ]
 
-/**
- * The wells take the four lights' colours, set so no two neighbours share one: the colour gathered
- * in one corner and the next one's wash opposite, on the well's own paper. In dark the same
- * colours sit deeper, as light in a dark room.
- */
 const HUES: [string, string][] = [
   ['#4a72ff', '#8a63ff'],
   ['#8a63ff', '#f2558a'],
@@ -88,7 +72,6 @@ function Plate({ e, n, wide }: { e: LibItem; n: number; wide: boolean }) {
       well={well(n)}
       className={`h-[520px] transition-shadow duration-200 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--card-lift)] sm:h-[600px] ${wide ? 'lg:col-span-7' : 'lg:col-span-5'}`}
       caption={
-        // The demo is the thing to touch; the caption and its arrow are the way to the part's page.
         <Link href={`/components/${e.id}`} prefetch={false} {...intent(`/components/${e.id}`)} aria-label={e.name} className="ring-focus group/cap flex shrink-0 items-end gap-4 rounded-[20px] px-3 pb-2 pt-4">
           <div className="min-w-0 flex-1">
             <p className="flex items-center gap-1.5 text-[13px] text-ink-3">
@@ -96,7 +79,6 @@ function Plate({ e, n, wide }: { e: LibItem; n: number; wide: boolean }) {
               <span className="size-[3px] rounded-full bg-current opacity-50" />
               <span className={pro ? 'text-ink' : ''}>{pro ? 'Pro' : 'Free'}</span>
             </p>
-            {/* The name. */}
             <p className="mt-2 text-[19px] leading-6 tracking-[-0.015em] text-ink sm:truncate">
               {e.name}
             </p>
@@ -110,7 +92,6 @@ function Plate({ e, n, wide }: { e: LibItem; n: number; wide: boolean }) {
   )
 }
 
-/** Under the wall, the way through to everything: one button. */
 function SeeAll() {
   return (
     <div className="mt-10 flex justify-center">

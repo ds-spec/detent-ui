@@ -11,13 +11,7 @@ import { ProBadge } from './ProBadge'
 import { SettingsCard, SettingsNav, SMALL_QUIET } from './Settings'
 import { Avatar, SignOutButton } from '@/site/UserMenu'
 
-/*
- * The signed-in account, the way Vercel sets its settings: who you are across the top, the sections
- * down the side, and each setting a card with its status and action in a band across its foot.
- */
-
 const day = (at: number) => new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(at)
-/** When, said the way a person would: just now, 2 hours ago, yesterday, then the date. */
 function ago(at: number) {
   const s = (Date.now() - at) / 1000
   const say = new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
@@ -29,7 +23,6 @@ function ago(at: number) {
 }
 const LINK = 'ring-focus rounded-[4px] text-[var(--accent-ink)] hover:underline'
 
-/** The three steps from a key to a component, here where the key is made. The whole guide is on /pro. */
 const USE: Step[] = [
   {
     title: 'Add the registry',
@@ -55,7 +48,6 @@ export function AccountView({ account, purchase, keys, usage = null, fromCheckou
   const name = account.name || account.email.split('@')[0]
   return (
     <div className="mx-auto max-w-[1040px] pb-20 pt-10 sm:pt-14">
-      {/* Who: the picture, the name, the address, and what they've bought. */}
       <header className="flex items-center gap-4">
         <span className="rounded-full p-[3px] shadow-[0_0_0_1px_var(--line)]">
           <Avatar email={account.email} image={account.image} size={56} />

@@ -1,14 +1,5 @@
 'use client'
 
-/**
- * Numbers set in a 5×7 dot matrix, the way a departure board or an old LED panel draws them.
- * Every slot shows its whole grid, with the dots a glyph doesn't use left faint, so the panel has
- * a fixed width and changing a digit only relights dots: nothing moves.
- *
- * `level` inks the lit dots from the bottom row up (0 to 1), so the number can be its own
- * progress bar. `over` turns that share of rows, counted from the top, warning amber.
- */
-
 const FONT: Record<string, string[]> = {
   '0': ['01110', '10001', '10011', '10101', '11001', '10001', '01110'],
   '1': ['00100', '01100', '00100', '00100', '00100', '00100', '01110'],
@@ -29,7 +20,6 @@ const FONT: Record<string, string[]> = {
 
 const COLS = 5
 const ROWS = 7
-/** Dots a glyph doesn't use, and lit dots the level hasn't reached yet. */
 const OFF = 'color-mix(in oklch, var(--ink) 5%, transparent)'
 const DIM = 'color-mix(in oklch, var(--ink) 26%, transparent)'
 
@@ -43,19 +33,12 @@ export function DotType({
   quick = false,
   className = '',
 }: {
-  /** Digits and % + - . only. Anything else is drawn as a blank slot. */
   text: string
-  /** How many glyphs wide the panel is. Shorter text is right-aligned and the rest stay blank. */
   slots?: number
-  /** The dot's diameter in px. */
   dot?: number
-  /** Space between dots in px. Glyphs are a dot and a half apart. */
   gap?: number
-  /** How much of each glyph is inked, from the bottom row up. */
   level?: number
-  /** How much of each glyph turns amber, from the top row down. */
   over?: number
-  /** Relight at once, for a value a hand is scrubbing; otherwise the dots light in a wave. */
   quick?: boolean
   className?: string
 }) {
@@ -81,7 +64,6 @@ export function DotType({
                 cx={g * (glyphW + space) + x * pitch + r}
                 cy={y * pitch + r}
                 r={r}
-                // Relights travel up from the bottom row and across the panel left to right.
                 style={{ fill, transition: quick ? 'fill 40ms linear' : 'fill 260ms cubic-bezier(0.2, 0.9, 0.25, 1)', transitionDelay: quick ? '0ms' : `${g * 50 + (ROWS - 1 - y) * 38}ms` }}
                 className="motion-reduce:[transition:none]"
               />

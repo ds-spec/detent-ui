@@ -4,7 +4,6 @@ import { useRef, useState } from 'react'
 import { Check, Copy } from '@/lab/icons'
 import { track } from '@/site/track'
 
-/** The prompt for a coding agent, with one button that copies it and says so. */
 export function CopyPrompt({ prompt }: { prompt: string }) {
   const [copied, setCopied] = useState(false)
   const timer = useRef(0)

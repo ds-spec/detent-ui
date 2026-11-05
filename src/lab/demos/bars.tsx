@@ -6,7 +6,6 @@ import type { BarHandle } from '../components/charts/BarChart'
 import { Big, Segmented, sum, useScript } from './chart-kit'
 
 const WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-/** Deploys per weekday, this week first, then the weeks before. */
 const WEEKS = [
   [38, 46, 41, 52, 44, 12, 9],
   [31, 39, 44, 40, 36, 10, 6],
@@ -14,7 +13,6 @@ const WEEKS = [
 ]
 type Week = 'this' | 'last'
 
-/** Deploys by weekday: reads each day against last week and the goal, then steps back a week and the capsules settle to it. Hovering pauses; touching hands it over. */
 export function BarsDemo() {
   const [week, setWeek] = useState<Week>('this')
   const bars = useRef<BarHandle>(null)

@@ -1,13 +1,3 @@
-/**
- * The single markdown handler. All .md suffix requests and Accept: text/markdown
- * negotiated requests are rewritten here by proxy.ts.
- *
- * GET  /api/md/<path>      → markdown of the page at /<path>
- * GET  /api/md/_catalog    → JSON catalog of all markdown routes
- * HEAD /api/md/<path>      → same headers, no body
- * OPTIONS                  → CORS preflight
- */
-
 import type { NextRequest } from 'next/server'
 import { listMarkdownRoutes, renderMarkdown } from '@/lib/md/registry'
 import { notFound, options, respond } from '@/lib/md/http'
@@ -37,7 +27,6 @@ function catalogResponse(): Response {
 
 function canonicalPath(segments: string[]): string {
   if (segments.length === 0) return '/'
-  // /api/md/index → /
   if (segments.length === 1 && segments[0] === 'index') return '/'
   return '/' + segments.join('/')
 }

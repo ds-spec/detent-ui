@@ -1,10 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react'
 
-/*
- * Apple's grouped lists, in the site's materials: a quiet heading, rows on one soft plate with a rule
- * between each that starts where the words do, and a footnote under the plate.
- */
-
 export function Section({ id, title, aside, footer, inset = 60, children }: { id?: string; title?: string; aside?: ReactNode; footer?: ReactNode; inset?: number; children: ReactNode }) {
   return (
     <section id={id} aria-labelledby={id && title ? `${id}-title` : undefined} className="mt-10 scroll-mt-24">
@@ -24,7 +19,6 @@ export function Section({ id, title, aside, footer, inset = 60, children }: { id
   )
 }
 
-/** A row: its tile, a title with a line under it, and whatever sits at its end. */
 export function Row({ tile, title, detail, end }: { tile?: ReactNode; title: ReactNode; detail?: ReactNode; end?: ReactNode }) {
   return (
     <div className="flex min-h-[60px] items-center gap-3.5 px-4 py-2.5">
@@ -44,7 +38,6 @@ const TONES = {
   ink: 'bg-[linear-gradient(180deg,#3a3a3e,#1c1c1f)]',
 }
 
-/** A settings tile: one white glyph on a colour lit from above, like the icons down the side of Settings. */
 export function Tile({ tone = 'accent', children }: { tone?: keyof typeof TONES; children: ReactNode }) {
   return <span className={`grid size-[30px] shrink-0 place-items-center rounded-[8px] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.22)] ${TONES[tone]}`}>{children}</span>
 }

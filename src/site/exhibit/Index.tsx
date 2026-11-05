@@ -12,17 +12,12 @@ import { Fit } from '../Fit'
 
 const ease = [0.2, 0.9, 0.25, 1] as const
 
-/**
- * Every component on one sheet, in large type, grouped by family. Point at a name and a small
- * live preview floats beside it; pick one and you're there. The one you're on carries a dash.
- */
 export function Index({ open, current, onPick, onClose }: { open: boolean; current: string; onPick: (id: string) => void; onClose: () => void }) {
   const router = useRouter()
   const [peek, setPeek] = useState<{ id: string; x: number; y: number } | null>(null)
   const timer = useRef(0)
   const sheet = useRef<HTMLDivElement>(null)
 
-  // Esc closes; the page behind holds still while it's open.
   useEffect(() => {
     if (!open) return
     const key = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
@@ -36,7 +31,6 @@ export function Index({ open, current, onPick, onClose }: { open: boolean; curre
     }
   }, [open, onClose])
 
-  // A preview mounts only once the pointer settles on a name, not as it sweeps past.
   const point = (id: string, el: HTMLElement) => {
     clearTimeout(timer.current)
     const r = el.getBoundingClientRect()
@@ -111,7 +105,6 @@ export function Index({ open, current, onPick, onClose }: { open: boolean; curre
             </div>
           </div>
 
-          {/* The live preview, beside the name you're pointing at. */}
           <AnimatePresence>
             {peek && Peek && (
               <motion.div

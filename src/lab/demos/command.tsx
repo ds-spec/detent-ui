@@ -12,7 +12,6 @@ import { hover, pressed } from '@/lab/lib/hand'
 const PEOPLE = ['Maya Chen', 'Jonas Weber', 'Aiko Tanaka', 'Sam Ortiz']
 const PROJECTS = ['northwind-web', 'support-bot', 'billing-api', 'design-system']
 
-/** Finds things on its own: types "dep" and deploys, finds a teammate, then walks the list with the keyboard. Hovering pauses; touching hands it over. */
 export function CommandDemo() {
   const b = useBench()
   const [last, setLast] = useState<string | null>(null)
@@ -81,7 +80,6 @@ export function CommandDemo() {
   return (
     <div className="w-[460px] max-w-full" {...hover(held)} {...pressed(() => (touched.current = true))} onKeyDownCapture={() => (touched.current = true)}>
       <CommandMenu ref={menu} inline open onOpenChange={b.on('onOpenChange')} commands={commands} listHeight={288} placeholder={b.get('placeholder', 'Search projects, people and actions…')} />
-      {/* The status line rolls through its slot, so the old and new lines never overlap. */}
       <div className="relative mt-4 h-6 overflow-hidden text-center text-footnote">
         <AnimatePresence initial={false}>
           <motion.p

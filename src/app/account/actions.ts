@@ -25,7 +25,6 @@ export async function askForLink(_: LinkState, form: FormData): Promise<LinkStat
   }
 }
 
-/** Off to GitHub; it sends the person back through /api/auth, signed in, to where they were going. */
 export async function signInWith(form: FormData) {
   const provider = String(form.get('provider')) as Provider
   if (!(provider in socialProviders())) redirect('/account')
@@ -50,7 +49,6 @@ export async function deleteKey(form: FormData) {
   revalidatePath('/account')
 }
 
-/** Signing out from the header's menu or the account page: the page stays where it is and refreshes itself. */
 export async function signOutHere() {
   await endSession()
 }

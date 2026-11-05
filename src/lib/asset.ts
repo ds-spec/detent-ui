@@ -1,7 +1,3 @@
-/**
- * Reads a JSON file written to public/_data at build time. A Worker has no filesystem and stays
- * small by not bundling these, so it asks its static assets; everywhere else they're on disk.
- */
 export async function asset<T>(file: string): Promise<T | null> {
   'use cache'
   try {

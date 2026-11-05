@@ -11,13 +11,6 @@ import { Fit } from '../Fit'
 import { wellOf } from '../wells'
 import type { Tone } from '../home/lights'
 
-/*
- * Why Pro is worth it, shown rather than said. Four hard parts of an AI app, each on one stage
- * that flips between what most apps ship (the stream as it comes out of useChat, tool calls as
- * JSON, a browser confirm) and the Detent part running. The first time the stage comes into
- * view it starts on "today" and flips on its own, so the difference lands before anyone clicks.
- */
-
 const UI = [0.2, 0, 0, 1] as const
 
 type Case = { id: string; tab: string; pain: string; tone: Tone; handled: string[]; today: () => ReactNode }
@@ -65,7 +58,6 @@ export function Gap() {
   const seen = useInView(box, { once: true, margin: '-30% 0px' })
   const timer = useRef(0)
 
-  // Each part starts on "today" and turns to Detent by itself after a beat; choosing a side stops that.
   const later = (ms: number) => {
     clearTimeout(timer.current)
     if (reduce) return setOn(true)
@@ -93,7 +85,6 @@ export function Gap() {
 
   return (
     <div ref={box} className="grid gap-3 lg:grid-cols-[340px_minmax(0,1fr)]">
-      {/* The four parts, each with the problem it solves. */}
       <div role="tablist" aria-label="Hard parts" className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] lg:flex-col lg:gap-1 lg:overflow-visible lg:pb-0">
         {CASES.map((x, k) => {
           const at = k === n
@@ -114,7 +105,6 @@ export function Gap() {
       </div>
 
       <div className="flex min-w-0 flex-col rounded-[28px] bg-surface p-2 shadow-[var(--card-edge)]">
-        {/* The stage: today, or with Detent. */}
         <div className="relative isolate h-[516px] overflow-hidden rounded-[22px] sm:h-[540px]" style={{ background: on ? wellOf(c.tone) : 'var(--surface-2)' }}>
           <div aria-hidden className="absolute inset-0 rounded-[22px] shadow-[inset_0_0_0_1px_var(--line)]" />
           <AnimatePresence initial={false} mode="popLayout">
@@ -137,7 +127,6 @@ export function Gap() {
                   <Fit pad={24} max={1} min={0.4}>
                     <Today />
                   </Fit>
-                  {/* The Detent part loads behind "today", so the flip never lands on an empty stage. */}
                   {Demo && (
                     <div aria-hidden className="hidden">
                       <Demo />
@@ -148,7 +137,6 @@ export function Gap() {
             </motion.div>
           </AnimatePresence>
 
-          {/* The switch, sat on the stage where the eye already is. */}
           <div className="absolute left-1/2 top-4 z-10 -translate-x-1/2">
             <div role="radiogroup" aria-label="Show" className="relative flex rounded-full bg-surface p-1 shadow-[var(--card-edge)]">
               {(
@@ -174,7 +162,6 @@ export function Gap() {
           </div>
         </div>
 
-        {/* What it took, and what it takes you. */}
         <div className="grid grid-cols-[minmax(0,1fr)] gap-x-8 gap-y-5 px-4 pb-3 pt-5 sm:px-5 md:grid-cols-[minmax(0,1fr)_auto]">
           <p className="text-[14px] leading-[1.6] text-ink-3 lg:hidden">{c.pain}</p>
           <ul className="flex flex-col gap-1.5 md:row-span-2">
@@ -196,11 +183,6 @@ export function Gap() {
     </div>
   )
 }
-
-/*
- * "Today": what each part looks like when it's left as it comes. Plain system type, mono for
- * anything machine-shaped, no colour. Honest rather than ugly on purpose: this is what ships.
- */
 
 const SYS = 'font-[system-ui,-apple-system,sans-serif]'
 const MONO = 'font-mono text-[12.5px] leading-[1.6]'

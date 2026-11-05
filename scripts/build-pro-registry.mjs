@@ -1,8 +1,3 @@
-// Builds the Pro registry when the site is built: every Pro component, block and template as a shadcn
-// registry item, written to .detent/pro-registry.json. The server bundles that file and serves an item
-// only to a licence (src/app/r/pro/[name]/route.ts), so Pro source is never a public file, and the
-// route needs no filesystem, which Cloudflare Workers don't have. Without Pro checked out, it writes
-// an empty registry and the site builds locked.
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { createJiti } from 'jiti'
@@ -29,8 +24,6 @@ for (const name of names) {
 const theme = await themeFor([...freeNames(), ...names])
 items.theme = { ...theme, description: 'The tokens and CSS every Detent Pro component, block and template is drawn with.' }
 
-// Most items share files (the motion engine, the kit, the charts' parts). Each is stored once, so the
-// Worker holds one copy; src/catalog/pro-items.ts puts an item back together when it's served.
 const uses = new Map()
 for (const item of Object.values(items)) for (const file of item.files ?? []) uses.set(file.content, (uses.get(file.content) ?? 0) + 1)
 const shared = []

@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { Check, Copy } from '@/lab/icons'
 import { useSideNew } from '../shell/side'
 
-/** A whole page that uses the component, to paste into a project as it is. */
 export function Example({ code, html }: { code: string; html: string }) {
   const [copied, setCopied] = useState(false)
   const copy = () => {

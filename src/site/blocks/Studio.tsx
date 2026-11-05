@@ -4,18 +4,11 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import type { ReactNode } from 'react'
 
-/* What a block is shown on: the colour wallpaper. The UI inside stays quiet; the showcase around it doesn't. */
 export { Wallpaper as Backdrop } from '@/site/blocks/Wallpaper'
 
 export type Chrome = 'app' | 'titled' | 'browser'
 
-/**
- * A Mac window around a block. An app window is unified: no title bar, the traffic lights sit in
- * the block's sidebar, and the sidebar is vibrant, so the wallpaper glows through it. Below
- * 768px, or for blocks without a sidebar, it's a slim titled window; a landing page gets
- * browser chrome with its address. On a phone-width frame the chrome drops away entirely.
- */
-export function Window({ title, width, chrome = 'app', compact = false, solid = true, children }: { title: string; width?: number | string; chrome?: Chrome; compact?: boolean; /** An opaque sidebar; false lets what's behind the window glow through it. */ solid?: boolean; children: ReactNode }) {
+export function Window({ title, width, chrome = 'app', compact = false, solid = true, children }: { title: string; width?: number | string; chrome?: Chrome; compact?: boolean; solid?: boolean; children: ReactNode }) {
   const box = useRef<HTMLDivElement>(null)
   const [w, setW] = useState(0)
   useLayoutEffect(() => {
@@ -30,7 +23,6 @@ export function Window({ title, width, chrome = 'app', compact = false, solid = 
   const unified = chrome === 'app' && !compact && w >= 768
   const bar = !compact && !unified
   return (
-    // The window settles onto the desk once, the way you'd set something down: up a little, then at rest.
     <motion.div
       ref={box}
       initial={reduce ? false : { opacity: 0, y: 14, scale: 0.99 }}

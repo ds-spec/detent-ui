@@ -10,34 +10,13 @@ import { SITE } from '@/catalog/site'
 import { db } from './db'
 import { safeNext } from './next'
 
-/*
- * Signing in, by Better Auth, in the same Turso database as the keys and purchases. The ways in are
- * an emailed link, which always works, and GitHub once its OAuth app is set (GITHUB_CLIENT_ID and
- * _SECRET). There are no passwords. What a person can install follows their email, so only an email
- * someone has proven counts: a link proves it, and GitHub counts only when it says the address is
- * verified. An account is only joined to one that's already here when both sides have proven the
- * same address.
- *
- * The link opens /account/confirm rather than signing in on the spot, because mail scanners open
- * every link they see; pressing the button there is what spends it.
- *
- * dash() connects Better Auth's dashboard. It reports sign-ins to dash.better-auth.com, so it's only
- * mounted once BETTER_AUTH_API_KEY is set.
- */
-
 export const COOKIE_PREFIX = 'detent'
-/**
- * Says only that this browser is signed in, for the header to show Account rather than Sign in.
- * Readable by the page, unlike the session itself, and it opens nothing.
- */
 export const SIGNED_IN = 'detent.in'
-/** How this browser signed in last time (github or magic-link), so its button can say so. */
 export const LAST_USED = 'detent.last_used'
 const LINK_MINUTES = 15
 const HOUR = 3_600_000
 const dev = process.env.NODE_ENV === 'development'
 
-/** Counts this try against a bucket, and says whether it's within the hour's limit. */
 async function allowed(bucket: string, limit: number) {
   const client = await db()
   const now = Date.now()
@@ -68,7 +47,6 @@ async function deliver(email: string, subject: string, text: string) {
   if (!res.ok) throw new Error(`Resend answered ${res.status}`)
 }
 
-/** The OAuth providers that are set up, in the order their buttons show. */
 export function socialProviders() {
   const env = process.env
   return {
@@ -80,7 +58,6 @@ export type Provider = 'github'
 const create = (client: Client) =>
   betterAuth({
     appName: 'Detent',
-    // Locally, whichever port the dev server is on; deployed, only the site's own address.
     baseURL: dev ? { allowedHosts: ['localhost:*', '127.0.0.1:*'], protocol: 'http', fallback: 'http://localhost:3000' } : SITE,
     secret: process.env.BETTER_AUTH_SECRET,
     database: { dialect: new LibsqlDialect({ client }), type: 'sqlite' },
@@ -88,13 +65,11 @@ const create = (client: Client) =>
     session: { modelName: 'auth_session', expiresIn: 30 * 86_400, updateAge: 86_400 },
     account: { modelName: 'auth_account', encryptOAuthTokens: true },
     verification: { modelName: 'auth_verification' },
-    // In the database, because each Worker isolate would otherwise count on its own.
     rateLimit: { enabled: true, storage: 'database', modelName: 'auth_rate_limit' },
     socialProviders: socialProviders(),
     advanced: {
       cookiePrefix: COOKIE_PREFIX,
       ipAddress: { ipAddressHeaders: ['cf-connecting-ip', 'x-forwarded-for'] },
-      // db() makes the tables. Checking them on every cold start costs a round trip per table, so only locally.
       database: { validateSchema: dev },
     },
     hooks: {
@@ -109,13 +84,10 @@ const create = (client: Client) =>
         expiresIn: LINK_MINUTES * 60,
         storeToken: 'hashed',
         async sendMagicLink({ email: typed, token, url }, ctx) {
-          // As typed, so one address in other capitals would otherwise count as a new one.
           const email = typed.trim().toLowerCase()
           const headers = ctx?.headers ?? ctx?.request?.headers
           const ip = headers?.get('cf-connecting-ip') ?? headers?.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
           if (!(await allowed(`email:${email}`, 5)) || !(await allowed(`ip:${ip}`, 20))) throw new APIError('TOO_MANY_REQUESTS', { message: 'That’s a lot of links. Try again in an hour.' })
-          // In the fragment, which never reaches a server log. The email is only there to show who's
-          // signing in, and `next` is where they were going, such as the checkout they started.
           const verify = new URL(url)
           const next = safeNext(verify.searchParams.get('callbackURL'))
           const link = `${verify.origin}/account/confirm#${new URLSearchParams({ token, email, next })}`
@@ -124,14 +96,12 @@ const create = (client: Client) =>
       }),
       lastLoginMethod({ cookieName: LAST_USED, maxAge: 180 * 86_400 }),
       ...(process.env.BETTER_AUTH_API_KEY ? [dash({ apiKey: process.env.BETTER_AUTH_API_KEY })] : []),
-      // Last, so cookies set while signing in or out from a Server Action reach the browser.
       nextCookies(),
     ],
   })
 
 let ready: Promise<ReturnType<typeof create>> | undefined
 
-/** Better Auth, made once its tables are there. */
 export function getAuth() {
   ready ??= db()
     .then(create)

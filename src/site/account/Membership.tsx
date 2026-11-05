@@ -10,11 +10,6 @@ import { Arriving } from './Forms'
 import { planLabel } from './ProBadge'
 import { SettingsCard, SMALL, SMALL_QUIET } from './Settings'
 
-/*
- * The plan, as the account's first setting: what you own and since when, what's in it, and what to
- * do next. Owned, on its way, or not bought yet.
- */
-
 const day = (at: number) => new Intl.DateTimeFormat('en', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(at)
 
 function Stat({ label, value }: { label: string; value: ReactNode }) {

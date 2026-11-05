@@ -17,7 +17,6 @@ const link = (href: string, text: string) => (
   </Link>
 )
 
-/** The terms of the site and of buying Pro, in plain words. */
 export default function Terms() {
   return (
     <LegalPage

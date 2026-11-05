@@ -12,11 +12,6 @@ export { SERIES, compact } from './parts'
 export type Part = { id: string; label: string; value: number; color?: string }
 export type WaffleHandle = { point(id: string | null): void }
 
-/**
- * Shares of a whole as a hundred cells, each part taking its share of them by the largest
- * remainder, so they always add up. Ten columns make a square; twenty, a strip that reads like a
- * bar. Pointing at a part, or any of its cells, lights only those.
- */
 export function Waffle({ parts, columns = 10, format = compact, ref }: { parts: Part[]; columns?: 10 | 20 | 25; format?: (n: number) => string; ref?: Ref<WaffleHandle> }) {
   const [at, setAt] = useState<string | null>(null)
   const reduce = useReducedMotion()
@@ -37,7 +32,6 @@ export function Waffle({ parts, columns = 10, format = compact, ref }: { parts: 
   return (
     <div className="@container" onPointerLeave={() => setAt(null)}>
       <div className={columns === 10 ? 'flex flex-col gap-4 @min-[420px]:flex-row @min-[420px]:items-center @min-[420px]:gap-7' : 'flex flex-col gap-4'}>
-        {/* Filled a column at a time, so each part is one block. */}
         <div className="grid w-full shrink-0 gap-[3px]" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${rows}, auto)`, gridAutoFlow: 'column', maxWidth: columns * 22 }} role="img" aria-label={shown.map((p, i) => `${p.label} ${cells[i]}%`).join(', ')}>
           {owners.map((o, i) => {
             const p = shown[o]

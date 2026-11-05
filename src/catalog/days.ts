@@ -1,11 +1,4 @@
-/**
- * Roughly how many working days it takes a good engineer to build each piece of Pro to this
- * standard: every state, the keyboard, both themes, every width, and nothing on the page ever
- * jumping. Estimates, and said so wherever they're shown; the Pro page adds them up. Its own tiny
- * file, so a page that names one piece never loads the block and template catalogues behind it.
- */
 export const DAYS: Record<string, number> = {
-  // Components
   answer: 10,
   ask: 8,
   askchart: 12,
@@ -32,7 +25,6 @@ export const DAYS: Record<string, number> = {
   find: 9,
   reveal: 10,
   dotlight: 9,
-  // Blocks
   'live-features': 8,
   pricing: 6,
   calendar: 12,
@@ -47,7 +39,6 @@ export const DAYS: Record<string, number> = {
   billing: 10,
   settings: 10,
   'code-review': 12,
-  // Templates
   detent: 24,
 }
 

@@ -11,18 +11,10 @@ import { Spinner } from '../../ui/Spinner'
 import { Dialog } from './Dialog'
 import type { DialogHandle } from './Dialog'
 
-/** For demos and tests: open it, type into it and confirm, without touching focus. */
 export type ConfirmHandle = DialogHandle & { type(text: string): void; confirm(): void }
 
 type Phase = 'idle' | 'busy' | 'done'
 
-/**
- * Asking before something that can't be undone. Focus starts on the safe choice, so Enter
- * never destroys anything by accident. For the worst actions it asks you to type the thing's
- * name: the button fills as each letter matches, and a wrong letter sends a small shake through
- * the field instead of a scolding. Confirming swaps the label for a spinner and then for what
- * happened, without the button changing size, and the dialog closes itself.
- */
 export function Confirm({
   trigger,
   title,
@@ -34,20 +26,13 @@ export function Confirm({
   onConfirm,
   ref,
 }: {
-  /** What opens it. */
   trigger?: ReactNode
-  /** The question. */
   title: ReactNode
-  /** What will happen, plainly. */
   description?: ReactNode
-  /** The destructive action's label. */
   confirmLabel?: string
-  /** Shown once it's done. */
   doneLabel?: string
   cancelLabel?: string
-  /** A name to type before the action unlocks, for things that can't be brought back. */
   require?: string
-  /** The action. The button spins until it settles. */
   onConfirm?: () => void | Promise<void>
   ref?: Ref<ConfirmHandle>
 }) {
@@ -61,7 +46,6 @@ export function Confirm({
   const reduce = useReducedMotion()
   const done = useRef(0)
 
-  // How much of the name is right so far, and whether the last letter went wrong.
   let matched = 0
   if (require) while (matched < text.length && matched < require.length && text[matched] === require[matched]) matched++
   const wrong = !!require && text.length > matched
@@ -73,7 +57,6 @@ export function Confirm({
   const change = (next: string) => {
     const before = text
     setText(next)
-    // A shake only for the letter that just went wrong, not for every one after it.
     let m = 0
     if (require) while (m < next.length && m < require.length && next[m] === require[m]) m++
     if (require && next.length > before.length && next.length > m && before.length <= m && !reduce) shake.start({ x: [0, -5, 4, -2, 0], transition: { duration: 0.28, ease: ease.out } })
@@ -123,9 +106,7 @@ export function Confirm({
             onClick={go}
             className={`ring-focus relative grid h-9 overflow-hidden rounded-control px-3.5 text-callout font-medium transition-[color,background-color,box-shadow] duration-200 ${ready ? 'bg-danger text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_1px_2px_rgb(0_0_0/0.16)]' : 'bg-[color-mix(in_oklch,var(--danger)_10%,transparent)] text-danger'}`}
           >
-            {/* The fill: how much of the name is typed right. */}
             {require && <motion.span aria-hidden className="absolute inset-y-0 left-0 bg-[color-mix(in_oklch,var(--danger)_16%,transparent)]" initial={false} animate={{ width: ready ? '100%' : `${fillTo * 100}%`, opacity: ready ? 0 : 1 }} transition={spring.smooth} />}
-            {/* Every label holds the same cell, so the button never changes width. */}
             {(['idle', 'busy', 'done'] as Phase[]).map((p) => (
               <span key={p} className={`relative col-start-1 row-start-1 flex items-center justify-center gap-1.5 transition-[opacity,transform] duration-200 ${p === phase ? '' : p === 'idle' ? '-translate-y-1 opacity-0' : 'translate-y-1 opacity-0'}`} aria-hidden={p !== phase}>
                 {p === 'idle' && confirmLabel}

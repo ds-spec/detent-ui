@@ -16,9 +16,6 @@ import { useAway } from './loop'
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
-/* ───────────────────────────── Verification code ───────────────────────────── */
-
-/** Gets the code wrong once (it shakes and clears from the end), then right (it fuses into Verified), and starts over. Hovering pauses; touching hands it over. */
 export function CodeDemo() {
   const b = useBench()
   const [run, setRun] = useState(0)
@@ -101,8 +98,6 @@ export function CodeDemo() {
   )
 }
 
-/* ───────────────────────────── Prompt box ───────────────────────────── */
-
 const REPLY: Record<string, string> = {
   quick: 'Lead with the 18%, give churn one line, and end on the hiring ask.',
   think: 'Revenue grew 18%. Churn rose in September, and the fix ships next week. Hiring is the one decision the board needs to make.',
@@ -110,10 +105,8 @@ const REPLY: Record<string, string> = {
 }
 
 const SUGGEST = ['Summarize the board update', 'What changed since Q2?', 'Draft the hiring ask']
-/** Real marks, as the makers publish them: Claude and Gemini via simple-icons, OpenAI from developers.openai.com. */
 const BOARD = { id: 'sample', name: 'Q3 board update.pdf', size: 1_153_434, type: 'application/pdf' }
 
-/** The demo writes its own prompts: a mode, a few words typed with a human rhythm, then Send. */
 const SCRIPT = [
   { mode: 'think', text: 'Summarize this in three lines' },
   { mode: 'research', text: 'How do other teams open theirs?' },
@@ -122,10 +115,6 @@ const SCRIPT = [
 
 type Turn = { id: number; q: string; files: Attachment[]; a: string | null; stopped?: boolean }
 
-/**
- * The thread hangs from the box, so a longer answer lifts it. It lays out once and glides there from
- * where it was, by transform, instead of jumping.
- */
 function useGlide(key: unknown) {
   const el = useRef<HTMLDivElement>(null)
   const last = useRef(0)
@@ -154,7 +143,6 @@ function useGlide(key: unknown) {
   return el
 }
 
-/** Types, sends, waits for the answer, and goes again. Hovering pauses it; touching it hands it over. */
 export function PromptDemo() {
   const b = useBench()
   const [turn, setTurn] = useState<Turn | null>(null)
@@ -168,7 +156,6 @@ export function PromptDemo() {
   const thread = useGlide(`${turn?.id}-${!!turn?.a}-${!!turn?.stopped}`)
   useAway(held, stage)
 
-  // Whatever sits above the box makes room by transform, so nothing lays out as it grows.
   const onGrow = (by: number) => {
     const y = `translate3d(0,${-by}px,0)`
     if (room.current) room.current.style.transform = y
@@ -239,7 +226,6 @@ export function PromptDemo() {
       onKeyDownCapture={() => (touched.current = true)}
     >
       <div className="relative w-[600px] max-w-full">
-        {/* The name, and once there's a conversation, the thread in its place. The box never moves for either. */}
         <div ref={title} className={`mb-[34px] flex items-center justify-center gap-3 text-[var(--c-ink)] transition-opacity duration-200 ${turn ? 'opacity-0' : ''}`}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
             <rect x="2.5" y="3" width="6.5" height="18" rx="1.2" />
@@ -274,7 +260,6 @@ export function PromptDemo() {
   )
 }
 
-/** An answer arriving a word at a time, each word landing where it will stay. */
 function Stream({ text }: { text: string }) {
   const words = text.split(' ')
   const [shown, setShown] = useState(0)

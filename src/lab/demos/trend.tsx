@@ -15,7 +15,6 @@ const FORECAST: Ahead[] = Array.from({ length: 14 }, (_, k) => {
   return { label: day(TOKENS.length + k), low: mid - d * 0.5, high: mid + d * 0.62 }
 })
 
-/** Walks out along the forecast, from what's likely to what's a long shot. Touch it to read any day. */
 export function TrendDemo() {
   const b = useBench()
   const chart = useRef<OutlookHandle>(null)

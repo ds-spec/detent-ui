@@ -20,15 +20,9 @@ import { BTN } from '@/site/shell/side'
 import { Light } from './Light'
 import { SMALL } from './Settings'
 
-/*
- * Signing in and the account, set the way Apple sets its own: one quiet surface per step, type that
- * does the work, two quiet fields and one button, white plates for the other ways in, and
- * nothing that moves without a reason.
- */
 const PRIMARY = 'ring-focus grid h-10 items-center rounded-[10px] bg-ink text-[14px] font-medium text-surface shadow-[inset_0_1px_0_rgb(255_255_255/0.14),0_1px_2px_rgb(0_0_0/0.18)] transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-60'
 const PLATE = `ring-focus relative grid h-10 w-full items-center rounded-[10px] ${BTN.plate} text-[14px] font-medium transition-[background-color,transform] duration-150 hover:bg-surface-2 active:scale-[0.98] disabled:opacity-70`
 const QUIET = 'ring-focus flex h-8 items-center gap-1.5 rounded-[8px] px-2.5 text-footnote text-ink-3 transition-colors duration-150 hover:bg-[color-mix(in_oklch,var(--ink)_7%,transparent)] hover:text-ink'
-/* The field, compact the way Vercel and Stripe set theirs: a hairline, a label above, 16px on phones so iOS doesn't zoom in. */
 const FIELD = 'block h-10 w-full rounded-[10px] px-3 text-[16px] text-ink outline-none transition-[box-shadow] duration-150 placeholder:text-ink-3 sm:text-[14px]'
 const FIELD_IDLE = 'bg-surface shadow-[inset_0_0_0_1px_var(--line-strong)] hover:shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--ink)_28%,transparent)] focus:shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--accent)_70%,transparent),0_0_0_3px_color-mix(in_oklch,var(--accent)_16%,transparent)]'
 const FIELD_ERROR = 'bg-surface shadow-field-error'
@@ -43,7 +37,6 @@ const Alert = ({ text }: { text?: string }) =>
     </p>
   ) : null
 
-/** A label and a spinner in one cell, so a button keeps its size while it works. */
 function Busy({ busy, children }: { busy: boolean; children: ReactNode }) {
   return (
     <>
@@ -55,7 +48,6 @@ function Busy({ busy, children }: { busy: boolean; children: ReactNode }) {
   )
 }
 
-/** The heading every signed-out step starts with: the mark, then a title the size Apple would set it. */
 export function AuthHead({ title, lead, mark = true }: { title: string; lead: ReactNode; mark?: boolean }) {
   return (
     <>
@@ -66,7 +58,6 @@ export function AuthHead({ title, lead, mark = true }: { title: string; lead: Re
   )
 }
 
-/** One step giving way to the next in the same place: out, then in, never side by side. */
 function Stage({ id, children }: { id: string; children: ReactNode }) {
   const reduce = useReducedMotion()
   return (
@@ -83,16 +74,8 @@ function Stage({ id, children }: { id: string; children: ReactNode }) {
   )
 }
 
-/* ───────────────────────── The card, over the light ───────────────────────── */
-
-/** The plan someone is on their way to buy. */
 export type Buying = { id: 'pro' | 'all'; name: string; price: number; line: string; features: string[] }
 
-/**
- * Every signed-out step sits on one white card floating over Detent's midnight light, the way
- * Stripe and Clerk set theirs: the light is the brand moment, and the card stays plain. On the way
- * to buy, a slim strip above the card says what comes after.
- */
 function Split({ plan, children }: { plan?: Buying; children: ReactNode }) {
   return (
     <div className="relative isolate -mx-5 grid min-h-[calc(100svh-72px)] place-items-center overflow-hidden px-4 pb-16 pt-10 sm:-mx-6 lg:mx-0 lg:mb-3 lg:rounded-[20px]">
@@ -113,24 +96,18 @@ function Split({ plan, children }: { plan?: Buying; children: ReactNode }) {
   )
 }
 
-/** The card's own padding, for what sits on it. */
 const Body = ({ children }: { children: ReactNode }) => <div className="px-6 pb-7 pt-7 sm:px-8 sm:pt-8">{children}</div>
 
-/** The grey band across the card's foot, for the one other way in. */
 const Foot = ({ children }: { children: ReactNode }) => (
   <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 bg-[color-mix(in_oklch,var(--ink)_3.5%,transparent)] px-6 py-3.5 text-[13px] text-ink-3 shadow-[inset_0_1px_0_var(--line)] sm:px-8">{children}</div>
 )
 
-/* ───────────────────────── The form ───────────────────────── */
-
 const NAMES: Record<Provider, string> = { github: 'GitHub' }
 
-/** How this browser signed in last time, on the way that was. */
 const LastUsed = () => <span className="rounded-full bg-[color-mix(in_oklch,var(--accent)_12%,transparent)] px-2 py-px text-[11px] font-medium leading-4 text-[var(--accent-ink)]">Last used</span>
 
 function ProviderButton({ provider, last }: { provider: Provider; last: boolean }) {
   const status = useFormStatus()
-  // Both buttons share the form, so only the one that was pressed shows it's on its way.
   const busy = status.pending && status.data?.get('provider') === provider
   return (
     <button type="submit" name="provider" value={provider} disabled={status.pending} className={PLATE}>
@@ -147,7 +124,6 @@ function ProviderButton({ provider, last }: { provider: Provider; last: boolean 
   )
 }
 
-/** Where the link landed, for the button that opens it there. */
 const INBOXES: [RegExp, string, string][] = [
   [/@(gmail|googlemail)\.com$/, 'Gmail', 'https://mail.google.com/mail/u/0/#inbox'],
   [/@(outlook|hotmail|live|msn)\.[a-z.]+$/, 'Outlook', 'https://outlook.live.com/mail/0/'],
@@ -159,7 +135,6 @@ const inboxOf = (email: string) => INBOXES.find(([re]) => re.test(email))
 
 const WAIT = 30
 
-/** The inbox step: where the link went, a way straight to that inbox, and a resend once a moment has passed. */
 function Sent({ email, next, onBack }: { email: string; next: Next; onBack: () => void }) {
   const [again, resend, sending] = useActionState<LinkState, FormData>(askForLink, {})
   const [from, setFrom] = useState(() => Date.now())
@@ -217,12 +192,6 @@ function Sent({ email, next, onBack }: { email: string; next: Next; onBack: () =
   )
 }
 
-/**
- * The way in: GitHub where it's set up, or an email and then a link in the inbox. No password to
- * make or lose. `email` fills the field ahead of time, as when a buyer arrives back
- * from checkout; `error` is why GitHub came back without signing anyone in; `lastUsed`
- * marks the way this browser came in last time; `buying` is the plan someone's on their way to.
- */
 export function SignIn({
   title,
   lead,
@@ -243,7 +212,6 @@ export function SignIn({
   buying?: Buying
 }) {
   const [state, action, pending] = useActionState<LinkState, FormData>(askForLink, {})
-  // "Use a different email" sets aside this send; the next one shows its own inbox step.
   const [setAside, setSetAside] = useState<LinkState | null>(null)
   const sent = state.sent && state !== setAside ? state.sent : null
   const problem = state.error
@@ -296,7 +264,6 @@ export function SignIn({
                   aria-describedby="sign-in-hint"
                   className={`${FIELD} ${problem ? FIELD_ERROR : FIELD_IDLE}`}
                 />
-                {/* One line held for the hint or the error, so nothing below moves. */}
                 <p id="sign-in-hint" aria-live="polite" className={`mt-2 min-h-[18px] text-[12.5px] leading-[1.45] ${problem ? 'text-danger' : 'text-ink-3'}`}>
                   {problem ?? 'We’ll email you a link.'}
                 </p>
@@ -339,16 +306,9 @@ export function SignIn({
 
 type Emailed = { token: string; email: string; next: Next }
 
-/**
- * The page a link opens. The token stays in the address's fragment, which never reaches a server
- * log, and is only spent when the button is pressed. A spent or expired link comes back here
- * from Better Auth with no fragment, and says so. `plans` lets the panel show the plan when the
- * link is on its way to a checkout.
- */
 export function Confirm({ plans }: { plans: Buying[] }) {
   const [link, setLink] = useState<Emailed | null | undefined>(undefined)
   const [pending, setPending] = useState(false)
-  // Read once and kept: the fragment is wiped from the address after, and React may run the effect twice.
   const read = useRef<Emailed | null | undefined>(undefined)
   useEffect(() => {
     if (read.current === undefined) {
@@ -357,7 +317,6 @@ export function Confirm({ plans }: { plans: Buying[] }) {
       read.current = token ? { token, email: fragment.get('email') ?? '', next: safeNext(fragment.get('next')) } : null
       if (token) window.history.replaceState(null, '', window.location.pathname)
     }
-    // After hydration, since the server never sees the fragment.
     Promise.resolve(read.current).then(setLink)
   }, [])
   const buying = link ? plans.find((p) => link.next === `/checkout/${p.id}`) : undefined
@@ -386,7 +345,6 @@ export function Confirm({ plans }: { plans: Buying[] }) {
                 )
               }
             />
-            {/* Better Auth's check, which signs in and sends the browser on to /account: a whole page load, so a plain link. */}
             <a
               href={link ? `/api/auth/magic-link/verify?${new URLSearchParams({ token: link.token, callbackURL: link.next, errorCallbackURL: '/account/confirm' })}` : undefined}
               onClick={() => setPending(true)}
@@ -403,9 +361,6 @@ export function Confirm({ plans }: { plans: Buying[] }) {
   )
 }
 
-/* ───────────────────────── The account ───────────────────────── */
-
-/** Copies, then says so for a moment. */
 export function CopyButton({ value, label = 'Copy' }: { value: string; label?: string }) {
   const [copied, setCopied] = useState(false)
   const copy = () =>
@@ -425,7 +380,6 @@ export function CopyButton({ value, label = 'Copy' }: { value: string; label?: s
   )
 }
 
-/** A file or a command to copy, the way a code sample sits in Apple's docs: its name, then its lines. */
 export function Snippet({ file, code }: { file?: string; code: string }) {
   const text = code.trimEnd()
   return (
@@ -453,7 +407,6 @@ function RemoveNow() {
   )
 }
 
-/** Removing a key asks once, in place: Cancel, or Remove in red. Anything installing with it stops working. */
 export function RemoveKey({ id, name }: { id: string; name: string }) {
   const [asking, setAsking] = useState(false)
   if (!asking)
@@ -478,16 +431,10 @@ const onClient = () => true
 const onServer = () => false
 const never = () => () => {}
 
-/**
- * Making a key, in a sheet: name it, create it, then the key itself with a large Copy, shown this
- * once because only its hash is kept. From the bottom on a phone, in the middle on a laptop.
- */
-/** `compact` makes the trigger a small button for a settings card's foot rather than a row. */
 export function KeySheet({ count, max, compact = false }: { count: number; max: number; compact?: boolean }) {
   const full = count >= max
   const [open, setOpen] = useState(false)
   const [state, action, pending] = useActionState<KeyState, FormData>(makeKey, {})
-  // What the last opening started from, so each opening shows only what it made.
   const [base, setBase] = useState<KeyState>(state)
   const made = state !== base ? state.secret : undefined
   const error = state !== base ? state.error : undefined
@@ -508,7 +455,6 @@ export function KeySheet({ count, max, compact = false }: { count: number; max: 
         setOpen(false)
         trigger.current?.focus()
       } else if (e.key === 'Tab' && panel.current) {
-        // Focus stays inside the sheet while it's up.
         const all = [...panel.current.querySelectorAll<HTMLElement>('button, input, a[href]')].filter((el) => !el.hasAttribute('disabled'))
         const [firstEl, lastEl] = [all[0], all[all.length - 1]]
         if (e.shiftKey && document.activeElement === firstEl) {
@@ -526,7 +472,6 @@ export function KeySheet({ count, max, compact = false }: { count: number; max: 
       document.removeEventListener('keydown', key)
     }
   }, [open])
-  // The sheet's first thing to do takes focus: the name, then the Copy.
   useEffect(() => {
     if (open) panel.current?.querySelector<HTMLElement>('[data-autofocus]')?.focus()
   }, [open, made])
@@ -634,7 +579,6 @@ export function KeySheet({ count, max, compact = false }: { count: number; max: 
   )
 }
 
-/** The sheet's Copy: the main thing to do once the key is made. */
 function CopyBig({ value }: { value: string }) {
   const [copied, setCopied] = useState(false)
   return (
@@ -657,7 +601,6 @@ function CopyBig({ value }: { value: string }) {
   )
 }
 
-/** Just paid, and the store's note hasn't landed: look again every few seconds for half a minute. */
 export function Arriving() {
   const router = useRouter()
   useEffect(() => {

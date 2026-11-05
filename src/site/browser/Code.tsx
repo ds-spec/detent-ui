@@ -10,17 +10,14 @@ import { BTN, useSideNew } from '../shell/side'
 import { ProTag } from '../blocks/ProTag'
 import { track } from '../track'
 
-// Fetched once per component, then kept for the session.
 const cache = new Map<string, Promise<SourceFile[]>>()
 const load = (id: string) => {
   if (!cache.has(id)) cache.set(id, fetch(`/source/${id}`).then((r) => r.json()))
   return cache.get(id)!
 }
 
-/** Fetches a component's source ahead of the Code tab, so the panel opens full. */
 export const warmSource = (id: string) => void load(id).catch(() => cache.delete(id))
 
-/** The component's real source, highlighted, with a tab per file and a copy button. */
 export function Code({ id }: { id: string }) {
   const side = useSideNew()
   const [files, setFiles] = useState<SourceFile[] | null>(null)
@@ -28,7 +25,6 @@ export function Code({ id }: { id: string }) {
   const [copied, setCopied] = useState(false)
   const t = useRef(0)
 
-  // A new component starts from nothing loaded and its first file.
   const [seen, setSeen] = useState(id)
   if (seen !== id) {
     setSeen(id)
@@ -51,7 +47,6 @@ export function Code({ id }: { id: string }) {
     try {
       await navigator.clipboard.writeText(file.code)
     } catch {
-      /* Clipboard blocked: the code is right there to select. */
     }
     track('copy_code', { item: id, file: file.name })
     setCopied(true)
@@ -98,10 +93,6 @@ export function Code({ id }: { id: string }) {
   )
 }
 
-/**
- * Pro source, on the public site: the file's real opening lines, fading out under a card that
- * says what's behind it and how to get it. Nothing here can be copied.
- */
 function Locked({ id, files }: { id: string; files: SourceFile[] }) {
   const side = useSideNew()
   const plan = PLANS.find((p) => p.id === (id.startsWith('template-') ? 'all' : 'pro'))!
@@ -120,7 +111,6 @@ function Locked({ id, files }: { id: string; files: SourceFile[] }) {
       </div>
       <div className="relative min-h-0 flex-1 overflow-hidden">
         <div className="code px-2 py-4 font-mono text-footnote leading-5 [mask-image:linear-gradient(to_bottom,#000_20%,transparent_78%)]" aria-hidden dangerouslySetInnerHTML={{ __html: files[0].html }} />
-        {/* Set high in the panel, where the faded code still shows, and clear of the dock floating at the screen's foot. */}
         <div className="absolute inset-x-0 top-0 flex justify-center px-6 pt-[clamp(32px,9vh,96px)]">
           <motion.div
             className="w-full max-w-[400px] rounded-[24px] bg-surface p-6 text-center shadow-modal"

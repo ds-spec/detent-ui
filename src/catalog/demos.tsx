@@ -11,7 +11,6 @@ const lazy = (id: string, load: Load) => {
   return dynamic(load, { ssr: false })
 }
 
-/** Each free demo is its own chunk, loaded only when something on screen asks for it. */
 const FREE: Record<string, ComponentType> = {
   bars: lazy('bars', () => import('@/lab/demos/bars').then((m) => m.BarsDemo)),
   rings: lazy('rings', () => import('@/lab/demos/rings').then((m) => m.RingsDemo)),
@@ -77,11 +76,8 @@ const FREE: Record<string, ComponentType> = {
   phrase: lazy('phrase', () => import('@/lab/demos/phrase').then((m) => m.PhraseDemo)),
 }
 
-/** Starts downloading a demo before anything renders it, so it's there the moment it's asked for. */
 export const preloadDemo = (id: string) => void (loads[id] ?? (() => preloadProDemo(id)))()
 
-/** Every demo by component id: the free ones above, and Pro's from Detent Pro (or a locked stand-in without it). */
 export const DEMOS: Record<string, ComponentType> = { ...FREE, ...PRO_DEMOS }
 
-/** Gallery spotlights: for big components, one moment shown large and alone. Everything else shows its full demo. */
 export { SPOTS }

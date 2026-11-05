@@ -1,9 +1,3 @@
-// Puts the site on Cloudflare from what's committed, never from the working folder: unlisted previews
-// and half-done work stay out, and so does .env.local. Pro has no deploy of its own; its committed
-// source is built into the same Worker, and without it the site would ship with Pro locked.
-//   npm run deploy            build and deploy
-//   npm run deploy:dry        build and check, upload nothing
-//   npm run deploy:secrets    send the server secrets in .env.local to the Worker
 import { execSync, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -11,9 +5,7 @@ import path from 'node:path'
 
 const root = process.cwd()
 const WORKER = 'detent'
-// DETENT_UNLOCK and DETENT_DEV_KEY open Pro for free, so they must never reach production.
 const SECRETS = ['DETENT_DB_URL', 'DETENT_DB_TOKEN', 'RESEND_API_KEY', 'DETENT_MAIL_FROM', 'DODO_WEBHOOK_SECRET', 'DETENT_PLAN_PRO', 'DETENT_PLAN_ALL', 'DETENT_PLAN_TEAM',
-  // Signing in: Better Auth's own secret, its dashboard's key, and the GitHub OAuth app. GitHub's button shows once both its values are set.
   'BETTER_AUTH_SECRET', 'BETTER_AUTH_API_KEY', 'GITHUB_CLIENT_ID', 'GITHUB_CLIENT_SECRET']
 
 const fail = (message) => {

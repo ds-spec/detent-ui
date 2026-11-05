@@ -9,28 +9,14 @@ import { tap } from '../../lib/feel'
 import { ease, spring, dur } from '../../lib/motion'
 
 export type Note = { id: string; seconds: number; bars: number[] }
-/** For demos and tests: hold, slide and let go without a real pointer. */
 export type HoldHandle = { hold(): void; slide(dx: number): void; release(): void }
 
 const BARS = 26
-/** Room for the slide hint, between the waveform and the knob. */
 const HINT = 112
-/** How far past the line the knob can be pulled, and how wide the catch at the line is, in px. */
 const GIVE = 28
 const CATCH = 16
 const clock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`
 
-/**
- * Hold to talk, in the message bar where it lives. Press and hold the mic and the bar becomes
- * the recording, in place: the clock runs, the waveform scrolls, and the mic grows under your
- * finger with a ring that breathes with your voice. Let go to send the note.
- *
- * Changing your mind is a gesture, not a button. Slide left and the knob follows you while
- * the hint fades, the red dot turns into a bin that grows as you near it, and the bar warms
- * towards red. The knob catches at the line and gives past it, like a real stop, with a click, a
- * red knob and an open lid; let go there and the recording drops in and the lid shuts. Slide back and it's all undone. Space holds,
- * Escape throws it away.
- */
 export function HoldToTalk({
   onNote,
   onCancel,
@@ -38,13 +24,9 @@ export function HoldToTalk({
   cancelAt = 120,
   ref,
 }: {
-  /** Called with each voice note once it's released: how long, and its waveform. */
   onNote?: (n: Note) => void
-  /** Called when a recording is thrown away. */
   onCancel?: () => void
-  /** What the bar says when it isn't recording. */
   placeholder?: string
-  /** How far left, in pixels, a recording has to be slid before letting go throws it away. */
   cancelAt?: number
   ref?: Ref<HoldHandle>
 }) {
@@ -54,7 +36,6 @@ export function HoldToTalk({
   const [loud, setLoud] = useState(0)
   const [notes, setNotes] = useState<Note[]>([])
   const [short, setShort] = useState(0)
-  // Binning: the lid stays open while the recording drops in, then shuts on it.
   const [shut, setShut] = useState(false)
   const start = useRef(0)
   const from = useRef(0)
@@ -73,7 +54,6 @@ export function HoldToTalk({
   const knobbed = useRef<HTMLSpanElement>(null)
   const waveAt = useRef(-HINT)
 
-  // Everything the slide moves is written straight from the dial, so a drag renders nothing.
   const paint = (x: number) => {
     const live = stage.current === 'holding'
     const to = notched(x, [-cancelAt], CATCH, 0.7)
@@ -124,7 +104,6 @@ export function HoldToTalk({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, cancelAt])
 
-  // While held: the clock runs and the voice moves the waveform and the ring.
   useEffect(() => {
     if (state !== 'holding') return
     const t = window.setInterval(() => {
@@ -154,7 +133,6 @@ export function HoldToTalk({
     wasArmed.current = false
     setArmed(false)
     if (cancel) {
-      // The recording drops into the bin, the lid shuts, and the bar comes back.
       setState('binning')
       onCancel?.()
       window.setTimeout(() => setShut(true), 440)
@@ -182,7 +160,6 @@ export function HoldToTalk({
     try {
       ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
     } catch {
-      /* not a real pointer */
     }
     tap()
     from.current = e.clientX
@@ -205,7 +182,6 @@ export function HoldToTalk({
 
   return (
     <div className="flex w-[380px] max-w-full flex-col max-[420px]:overflow-x-clip">
-      {/* Notes land here, two at most, the older one stepping back. */}
       <div className="flex h-[124px] flex-col items-end justify-end gap-2 pb-3">
         <AnimatePresence initial={false} mode="popLayout">
           {notes.map((n) => (
@@ -233,7 +209,6 @@ export function HoldToTalk({
         </AnimatePresence>
       </div>
 
-      {/* The bar: one size, whatever it's doing. The recording takes it over in place. */}
       <div
         ref={bar}
         className="relative h-[52px] rounded-full shadow-float transition-[background-color] duration-150"
@@ -243,7 +218,6 @@ export function HoldToTalk({
           {live ? (armed ? 'Let go to delete the recording' : 'Recording. Let go to send, or slide left to cancel') : ''}
         </span>
 
-        {/* Not recording: the bar's own words. */}
         <span className={`pointer-events-none absolute inset-y-0 left-5 flex items-center text-body text-ink-3 transition-opacity duration-200 ${state === 'idle' ? '' : 'opacity-0'}`}>
           <AnimatePresence mode="wait" initial={false}>
             <motion.span key={short} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.18, ease: ease.out }}>
@@ -252,7 +226,6 @@ export function HoldToTalk({
           </AnimatePresence>
         </span>
 
-        {/* Recording: the bin or the live dot, the clock, the waveform, and the hint. */}
         <div className={`pointer-events-none absolute inset-y-0 left-3 right-[62px] flex items-center gap-2.5 transition-opacity duration-200 ${state === 'idle' ? 'opacity-0' : ''}`}>
           <span className="relative flex size-8 shrink-0 items-center justify-center">
             <span ref={dot} className="absolute size-2.5 rounded-full bg-danger motion-safe:animate-pulse" style={{ opacity: 0 }} />
@@ -261,10 +234,7 @@ export function HoldToTalk({
           <span ref={time} className="tnum w-9 shrink-0 text-callout font-medium text-ink">
             {clock(seconds)}
           </span>
-          {/* Clipped at the timer while recording; let loose when it drops into the bin. */}
           <span className="relative h-7 min-w-0 flex-1" style={{ clipPath: state === 'binning' ? 'none' : 'inset(0)' }}>
-            {/* The waveform, and on cancel the same waveform falling into the bin. */}
-            {/* The newest bars stay just left of the hint and the knob: the whole waveform slides by transform as they move, so nothing re-lays out. */}
             <span ref={wave} className="absolute inset-0 block">
             <motion.span
               className="absolute inset-0 flex items-center justify-end gap-[2.5px] overflow-hidden"
@@ -273,7 +243,6 @@ export function HoldToTalk({
               style={{ transformOrigin: '0% 50%' }}
             >
               {level.map((v, i) => (
-                // Each bar is full height and scaled, never resized, so the voice never moves anything in the layout.
                 <span key={i} className="h-[25px] w-[3px] shrink-0 rounded-full transition-[scale] duration-75" style={{ scale: `1 ${(3 + v * 22) / 25}`, background: armed ? 'var(--danger)' : 'var(--ink-2)', opacity: 0.35 + (i / BARS) * 0.65 }} />
               ))}
             </motion.span>
@@ -281,7 +250,6 @@ export function HoldToTalk({
           </span>
         </div>
 
-        {/* The hint rides between the waveform and the knob, sliding with your finger and fading as you go. */}
         <span
           ref={hint}
           className="pointer-events-none absolute right-[66px] top-1/2 flex justify-end whitespace-nowrap text-footnote text-ink-3"
@@ -290,7 +258,6 @@ export function HoldToTalk({
           <span className={reduce ? '' : 'sheen'}>‹ Slide to cancel</span>
         </span>
 
-        {/* The knob: the mic, which grows under your finger and follows it left. */}
         <span ref={knobbed} className="absolute right-1.5 top-1.5 size-10 will-change-transform">
         <motion.button
           type="button"
@@ -304,12 +271,10 @@ export function HoldToTalk({
           onKeyUp={(e) => keys(e, true)}
           onContextMenu={(e) => e.preventDefault()}
           className="ring-focus relative flex size-10 select-none items-center justify-center rounded-full"
-          // Inline, because the site's touch rule for buttons otherwise wins and the page takes the gesture.
           style={{ touchAction: 'none' }}
           animate={{ scale: live ? 1.35 : 1 }}
           transition={spring.snappy}
         >
-          {/* A ring that breathes with the voice. */}
           <motion.span
             aria-hidden
             className="absolute inset-0 rounded-full"
@@ -328,7 +293,6 @@ export function HoldToTalk({
   )
 }
 
-/** A bin whose lid opens past the line and shuts on what's dropped in. It grows in as you slide. */
 function Bin({ open, hot, ref }: { open: boolean; hot: boolean; ref: Ref<SVGSVGElement> }) {
   return (
     <svg

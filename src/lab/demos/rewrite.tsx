@@ -19,7 +19,6 @@ const OWN = 'We refund it straight away. There’s nothing to send back.'
 
 const rewrite = (_: string, ask: string) => new Promise<string>((r) => setTimeout(() => r(VERSIONS[ask] ?? OWN), 1300))
 
-/** A policy draft: its slowest sentence is selected, asked to be shorter in plain words, reviewed and accepted. Touch it to select your own words. */
 export function RewriteDemo() {
   const [run, setRun] = useState(0)
   return <RewriteRun key={run} onDone={() => setRun((r) => r + 1)} />
@@ -61,7 +60,6 @@ function RewriteRun({ onDone }: { onDone: () => void }) {
         </span>
       </div>
       <h3 className="mt-5 text-[24px] font-medium leading-[30px] tracking-[-0.02em] text-ink">Refunds for damaged orders</h3>
-      {/* Held at the height of the longest moment, the tracked change, so the card never resizes. */}
       <div className="mt-4 h-[276px] @min-[480px]:h-[140px]">
         <Rewrite ref={ed} text={TEXT} rewrite={rewrite} assistant={b.get('assistant', 'Detent')} onChange={b.on('onChange')} />
       </div>

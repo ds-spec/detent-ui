@@ -1,12 +1,3 @@
-/**
- * /llms.txt — site map and component guide for AI agents and coding assistants.
- * Follows the llmstxt.org spec: name, description, core pages, machine-readable,
- * then preserves the component install guide for coding agents.
- * Generated from code so it never goes stale.
- *
- * keep in sync with: /llms-full.txt, /ai.txt, /robots.txt, /api/md/_catalog
- */
-
 import { ENTRIES } from '@/catalog/meta'
 import { KITS, SITE, installCommand, isProBlock, isProComponent } from '@/catalog/pro'
 import { BLOCKS } from '@/catalog/blocks'

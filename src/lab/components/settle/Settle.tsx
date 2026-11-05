@@ -11,45 +11,29 @@ import { Button } from '../../ui/Button'
 import { Bloom, DrawnCheck } from '../../ui/Outcome'
 import { RollingText } from '../../ui/RollingText'
 
-/** An amount the wheel clicks into, and what it's called there: "Minimum", "Statement balance". */
 export type SettleStop = { amount: number; label: string }
 
-/** What an amount means for the person paying it. `value` rolls when it changes ("$17.36"), `label` follows it ("interest"). */
 export type SettleReading = { tone: 'warn' | 'ok'; label: string; value?: string }
 
-/**
- * For demos, films and tests. `glide` turns the wheel to an amount on its own; `hold` puts it where a
- * hand dragging it would, and `release` lets go (stops catch it either way, silently). `reset` goes
- * back to the start, gliding when given a duration.
- */
 export type SettleHandle = { glide(to: number, ms?: number): Promise<void>; hold(at: number): void; release(): void; pay(): Promise<void>; reset(ms?: number): Promise<void> }
 
-// An open ring: 280° of track, with the gap at the bottom for the two ends' labels.
 const S = 312
 const C = S / 2
 const R = 114
-/** The groove; the paid band runs inside it, a little narrower, so the groove's edges show round it. */
 const W = 24
 const BAND = 20
 const SWEEP = 280
 const START = -SWEEP / 2
-/** The tick rim sits just outside the track: a tick every 2°, longer at a stop, swelling round the knob. */
 const RIM = R + W / 2 + 7
 const TICK = 5
 const STOP_TICK = 11
 const SWELL = 5
 const SWELL_SPAN = 16
 const KNOB = 32
-/** The halftone: a hex grid of dots in the groove, sized by what each amount would still cost you. */
 const DOT = 1.8
 const DOT_ROW = 4.4
 const DOT_STEP = (((DOT_ROW * Math.sqrt(3)) / 2 / R) * 180) / Math.PI
 
-/**
- * The detent. Within CAPTURE degrees a stop pulls the knob in and holds it there; the knob only
- * follows a GIVE share of your pull until you're RELEASE degrees away, then lets go all at once.
- * Coming back, it catches again at CAPTURE, so a stop never flickers in and out under your hand.
- */
 const CAPTURE = 4.5
 const RELEASE = 8
 const GIVE = 0.14
@@ -57,30 +41,20 @@ const GIVE = 0.14
 const rad = (deg: number) => (deg * Math.PI) / 180
 const r2 = (n: number) => Math.round(n * 100) / 100
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n))
-/** Where a point `arc` degrees along the track lands, at radius `r`. */
 const at = (arc: number, r: number) => {
   const a = rad(START + arc)
   return [r2(C + r * Math.sin(a)), r2(C - r * Math.cos(a))] as const
 }
-/** Past an end the knob gives a few degrees and no more, firmer the further you pull. */
 const rub = (x: number) => 7 * (1 - Math.exp(-x / 20))
 
 const [X0, Y0] = at(0, R)
 const [X1, Y1] = at(SWEEP, R)
 const TRACK = `M ${X0} ${Y0} A ${R} ${R} 0 1 1 ${X1} ${Y1}`
-/** The track's length in px. The fill is one dash of it, followed by a gap longer than the track, so it never repeats. */
 const LENGTH = R * rad(SWEEP)
 const TICKS = SWEEP / 2 + 1
 
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
-/**
- * Settle: how much to pay, chosen on a dial. What each amount would still cost you is printed in
- * the groove as a halftone, heavy at the minimum and thinning to nothing where it stops costing
- * anything. Turn the knob (or press anywhere on the dial) and a band of ink covers the dots: you
- * pay the cost off as you go. It clicks into the amounts that matter, like the minimum and the
- * statement balance, seats there against a little pull, and gives when you mean it.
- */
 export function Settle({
   min,
   max,
@@ -97,29 +71,17 @@ export function Settle({
   locale = 'en-US',
   ref,
 }: {
-  /** The least that can be paid; the wheel starts here. */
   min: number
-  /** The most that can be paid; the wheel ends here. */
   max: number
-  /** The amounts the wheel clicks into, lowest first. Stops at `min` and `max` name the ends. */
   stops: SettleStop[]
-  /** Where the wheel starts. Defaults to the first stop. */
   defaultValue?: number
-  /** Every new amount, as it changes. */
   onChange?: (amount: number) => void
-  /** Pay. While it runs the button spins; when it resolves, the card shows it's paid. */
   onPay?: (amount: number) => Promise<void> | void
-  /** What an amount means: the line in the middle of the dial. */
   describe: (amount: number) => SettleReading
-  /** What paying this amount would still cost, e.g. next month's interest. Drawn as the halftone in the groove; leave it out for none. */
   cost?: (amount: number) => number
-  /** The account being paid, e.g. "Juniper Card". */
   title: ReactNode
-  /** A quiet line under it, e.g. the due date. */
   subtitle?: ReactNode
-  /** Where the money comes from, e.g. "Checking ••4021". */
   source: ReactNode
-  /** ISO currency code for every amount. */
   currency?: string
   locale?: string
   ref?: Ref<SettleHandle>
@@ -131,7 +93,6 @@ export function Settle({
   const angleOf = (v: number) => (clamp(v, min, max) - min) * (SWEEP / span)
   const stopAt = stops.map((s) => angleOf(s.amount))
 
-  // The halftone, laid out once: alternate columns of four and three dots, each sized by its column's cost against the most it can be.
   const field = useMemo(() => {
     if (!cost) return []
     const top = Math.max(...Array.from({ length: 9 }, (_, i) => cost(min + (i / 8) * span)), 1e-9)
@@ -158,17 +119,14 @@ export function Settle({
   const [bloom, setBloom] = useState<number | null>(null)
   const [paidKey, setPaidKey] = useState<number | null>(null)
 
-  // The angle you're asking for, and the angle the knob shows after the detents have had their say.
   const raw = useRef(angleOf(first))
   const seat = useRef<number | null>(firstSeat >= 0 ? firstSeat : null)
   const amt = useRef(first)
   const held = useRef(false)
   const last = useRef(0)
-  // The phase, for handlers that run between renders; every change goes through here and setPhase together.
   const phaseRef = useRef<'idle' | 'paying' | 'paid'>('idle')
 
   const target = useMotionValue(angleOf(first))
-  // A slightly underdamped spring: the knob has weight while you drag, and drops into a stop with a tiny overshoot.
   const knob = useSpring(target, { stiffness: 900, damping: 34, mass: 0.5 })
   const fill = useTransform(knob, (a) => `${r2((clamp(a, 0, SWEEP) / SWEEP) * LENGTH)} ${r2(LENGTH + W * 2)}`)
   const kx = useTransform(knob, (a) => at(a, R)[0] - KNOB / 2)
@@ -182,7 +140,6 @@ export function Settle({
 
   const reading = describe(amount)
 
-  // The rim breathes round the knob: ticks near it grow and darken, the rest stay fine.
   const swell = (a: number) => {
     for (let i = 0; i < TICKS; i++) {
       const el = ticks.current[i]
@@ -210,7 +167,6 @@ export function Settle({
     seat.current = s
     setSeated(s)
     if (s === null) return
-    // The click: a sound and a tap of haptics for real hands only, and a small dip of the knob for everyone.
     if (user) {
       feedback.tick(false, pace.current)
       tap()
@@ -218,7 +174,6 @@ export function Settle({
     if (!reduce) click.start({ scale: [1, 0.88, 1], transition: { duration: 0.22, ease: ease.out } })
   }
 
-  /** Ask for an angle; the stops decide where the knob actually goes. */
   const turnTo = (a: number, user: boolean) => {
     const want = clamp(a, -60, SWEEP + 60)
     raw.current = want
@@ -245,7 +200,6 @@ export function Settle({
     report(s !== null ? stops[s].amount : clamp(Math.round(min + clamp(show, 0, SWEEP) * (span / SWEEP)), min, max))
   }
 
-  /** Let go: a held stop pulls the knob the rest of the way in, and a stretched end springs back. */
   const settle = () => {
     const s = seat.current
     const home = s !== null ? stopAt[s] : clamp(target.get(), 0, SWEEP)
@@ -253,7 +207,6 @@ export function Settle({
     target.set(home)
   }
 
-  /** Jump to an exact amount, as the keys do. */
   const setTo = (v: number, user: boolean) => {
     const next = clamp(Math.round(v * 100) / 100, min, max)
     const i = stops.findIndex((s) => s.amount === next)
@@ -264,7 +217,6 @@ export function Settle({
     report(next)
   }
 
-  // Crossing into "costs nothing" is the one moment worth a beat of colour.
   const tone = useRef(reading.tone)
   useEffect(() => {
     if (tone.current === 'warn' && reading.tone === 'ok' && phase === 'idle') setBloom((k) => (k ?? 0) + 1)
@@ -321,7 +273,6 @@ export function Settle({
     },
   }))
 
-  // Pointer angle in degrees from the top, clockwise; measured against the drawn size, so a zoomed stage still lines up.
   const pointer = (e: PointerEvent) => {
     const b = svg.current!.getBoundingClientRect()
     const k = b.width / S
@@ -342,7 +293,6 @@ export function Settle({
     held.current = true
     setDragging(true)
     last.current = p.deg
-    // Pressing the ring sends the knob there round the track; the gap splits at the bottom between the two ends.
     if (!onKnob) turnTo(clamp(p.deg - START, 0, SWEEP), true)
   }
   const move = (e: PointerEvent<HTMLDivElement>) => {
@@ -352,7 +302,6 @@ export function Settle({
     if (d > 180) d -= 360
     if (d < -180) d += 360
     last.current = p.deg
-    // How fast the hand turned it, as a share of a turn a second, is how loud the stops click.
     pace.current = (Math.abs(d) / Math.max(1, e.timeStamp - moved.current)) * 2.8
     moved.current = e.timeStamp
     turnTo(raw.current + d, true)
@@ -387,7 +336,6 @@ export function Settle({
     }
     if (next === null) return
     e.preventDefault()
-    // A stop in the way holds a key press too: the arrows stop on it before they carry on past.
     if (arrow) {
       const n = next
       const crossed = amounts.find((a) => (a > cur && a < n) || (a < cur && a > n))
@@ -400,7 +348,6 @@ export function Settle({
   const cents = parts.filter((p) => p.type === 'decimal' || p.type === 'fraction').map((p) => p.value).join('')
   const whole = parts.filter((p) => p.type !== 'decimal' && p.type !== 'fraction').map((p) => p.value).join('')
   const arc = angleOf(amount)
-  // While a hand (or a glide) turns the wheel the numbers follow it frame by frame; they roll only when they step.
   const live = dragging || gliding
   const caption = phase === 'paid' ? 'Paid today' : seated !== null ? stops[seated].label : 'Payment'
   const ends = [stops.find((s) => s.amount === min), stops.find((s) => s.amount === max)]
@@ -449,7 +396,6 @@ export function Settle({
               style={{ transition: 'stroke-opacity 200ms ease-out' }}
             />
           ))}
-          {/* The groove: a soft channel with a hairline at each edge, so it reads as cut into the card. */}
           <path d={TRACK} fill="none" stroke="color-mix(in oklch, var(--ink) 5%, transparent)" strokeWidth={W} strokeLinecap="round" />
           <path d={TRACK} fill="none" stroke="color-mix(in oklch, var(--ink) 9%, transparent)" strokeWidth={W} strokeLinecap="round" mask={`url(#${uid}-edge)`} />
           <defs>
@@ -464,7 +410,6 @@ export function Settle({
             ))}
           </g>
           <motion.path d={TRACK} fill="none" strokeWidth={BAND} strokeLinecap="round" stroke="color-mix(in oklch, var(--ink) 92%, var(--surface))" style={{ strokeDasharray: fill }} />
-          {/* A notch cut across the groove at each stop between the ends: light where the band has covered it, and green once it's the amount that stops costing anything. */}
           {stopAt.map((A, i) => {
             if (A <= 0.001 || A >= SWEEP - 0.001) return null
             const [x1, y1] = at(A, R - W / 2 + 3)
@@ -485,7 +430,6 @@ export function Settle({
               />
             )
           })}
-          {/* The ring's whole width takes presses, a little wider than it looks. */}
           <path d={TRACK} fill="none" stroke="transparent" strokeWidth={W + 18} strokeLinecap="round" pointerEvents={phase === 'idle' ? 'stroke' : 'none'} className="cursor-pointer" />
         </svg>
 
@@ -527,7 +471,6 @@ export function Settle({
           className={`ring-focus absolute left-0 top-0 rounded-full ${phase === 'idle' ? (dragging ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
           style={{ x: kx, y: ky, width: KNOB, height: KNOB }}
           initial={false}
-          // Lifted while it's turned, seated a little lower when it's resting in a stop.
           animate={{ scale: dragging ? 1.1 : seated !== null ? 0.94 : 1 }}
           transition={spring.snappy}
         >
@@ -544,7 +487,6 @@ export function Settle({
               }}
               transition={{ duration: 0.18 }}
             />
-            {/* The index mark: always pointing out at the rim, like the line on a machined knob. */}
             <motion.div className="absolute inset-0" style={{ rotate: turn }}>
               <span className="absolute left-1/2 top-[5px] h-2 w-[2px] -translate-x-1/2 rounded-full bg-[#a1a1aa]" />
             </motion.div>
@@ -583,15 +525,10 @@ export function Settle({
   )
 }
 
-/**
- * Figures that roll like an odometer when they step (a key press), and simply follow while the dial
- * is turning, because a roll that never catches up is unreadable.
- */
 function Num({ text, live, proportional = false }: { text: string; live: boolean; proportional?: boolean }) {
   return <RollingText text={text} still={live} proportional={proportional} />
 }
 
-/** One line of text that rolls when it's replaced; both lines sit centred in the same fixed slot. */
 function Slot({ text }: { text: string }) {
   return (
     <span className="relative block h-4 w-[180px] overflow-hidden text-caption text-ink-3">
@@ -611,7 +548,6 @@ function Slot({ text }: { text: string }) {
   )
 }
 
-/** The verdict under the amount. Its width springs to fit what it says; what it says crossfades in place. */
 function Chip({ reading, live }: { reading: SettleReading; live: boolean }) {
   const probe = useRef<HTMLSpanElement>(null)
   const w = useMotionValue<number | string>('auto')
@@ -666,7 +602,6 @@ function Chip({ reading, live }: { reading: SettleReading; live: boolean }) {
   )
 }
 
-/** The card being paid, small: graphite with a chip, catching a little light. */
 function CardFace() {
   return (
     <span

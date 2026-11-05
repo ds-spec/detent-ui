@@ -17,7 +17,6 @@ import { Kbd } from '../ui/Kbd'
 import { useBench } from './bench'
 import { useLoop } from './loop'
 
-/** One specimen: a white tile on the stage, its name in the corner, the button in the middle. */
 function Cell({ label, wide = false, children }: { label: string; wide?: boolean; children: ReactNode }) {
   return (
     <div className={`relative flex h-[128px] items-center justify-center rounded-[22px] bg-surface shadow-raised ${wide ? 'col-span-2' : ''}`}>
@@ -27,7 +26,6 @@ function Cell({ label, wide = false, children }: { label: string; wide?: boolean
   )
 }
 
-/** The demo's press: the button dips the way a real press settles it. */
 function Dip({ on, children }: { on: number; children: ReactNode }) {
   const c = useAnimationControls()
   useEffect(() => {
@@ -46,7 +44,6 @@ const MERGE = [
   { id: 'merge', label: 'Create a merge commit', icon: <Fork size={15} /> },
 ]
 
-/** Every kind of button, each doing its one job in turn. Hovering pauses; touching hands it over. */
 export function ButtonsDemo() {
   const b = useBench()
   const copy = useRef<CopyHandle>(null)
@@ -61,7 +58,6 @@ export function ButtonsDemo() {
 
   const deploy = async (beat?: (ms: number) => Promise<void>) => {
     const wait = beat ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)))
-    // Work doesn't move at an even pace: quick at first, a stall, then the rest.
     for (const p of [0, 0.08, 0.21, 0.34, 0.42, 0.44, 0.45, 0.58, 0.73, 0.86, 0.97, 1]) {
       setProgress(p)
       await wait(p > 0.42 && p < 0.5 ? 420 : 210)

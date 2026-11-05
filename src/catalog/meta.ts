@@ -1,11 +1,6 @@
 import { UNLISTED } from './unlisted'
 
-/**
- * Every component in the library: what it is, where it lives, what makes it, its keys.
- * Plain data, safe for the server; the live demos are looked up by id in ./demos.
- */
 export type Tag = 'New' | 'Live' | 'Keyboard'
-/** How a component feels in the hand: the second way to browse the library. */
 export type Feel = 'press' | 'drag' | 'type' | 'stream' | 'approve'
 
 export type IconName = 'Node' | 'Chart' | 'Pencil' | 'Bell' | 'Bolt' | 'Orbit' | 'Layers'
@@ -15,21 +10,14 @@ export type Category = { id: string; name: string; blurb: string; icon: IconName
 export type Entry = {
   id: string
   name: string
-  /** Three to five words for the page's title, where the sentence would be cut. */
   short?: string
   category: string
-  /** One sentence for the card. */
   line: string
   tags?: Tag[]
-  /** The demo fills its stage edge to edge instead of being fitted. */
   bleed?: boolean
-  /** Takes two columns in the grid. */
   wide?: boolean
-  /** Scale on the detail page. */
   zoom?: number
-  /** What makes it, for the detail page. */
   details: string[]
-  /** Keyboard support: [keys, what they do]. */
   keys?: [string, string][]
   feel: Feel[]
 }
@@ -53,7 +41,6 @@ const ALL_CATEGORIES: Category[] = [
 ]
 
 const ALL: Entry[] = [
-  /* ── Agents ── */
   {
     id: 'scaffold',
     name: 'Agent scaffold',
@@ -278,7 +265,6 @@ const ALL: Entry[] = [
     ],
   },
 
-  /* ── Inputs ── */
   {
     id: 'models',
     name: 'Model & effort',
@@ -625,7 +611,6 @@ const ALL: Entry[] = [
     details: ['Dragging files over the zone tips the folder open.', 'Dropped files fall in as sheets with their previews.', 'The list has a fixed height, so adding files never pushes the page.'],
   },
 
-  /* ── Feedback ── */
   {
     id: 'toaster',
     name: 'Toasts',
@@ -647,7 +632,6 @@ const ALL: Entry[] = [
       ['Esc', 'Dismiss'],
     ],
   },
-
 
   {
     id: 'inbox',
@@ -687,7 +671,6 @@ const ALL: Entry[] = [
     details: ['Five dots fill from the left as you hover.', 'Picking a score opens a card whose follow-up depends on that score.', 'It grows over the page and folds back without squashing any text.'],
   },
 
-  /* ── Essentials ── */
   {
     id: 'sidebar',
     name: 'App sidebar',
@@ -730,9 +713,6 @@ const ALL: Entry[] = [
     ],
     keys: [['↵', 'Sign']],
   },
-
-
-
 
   {
     id: 'command',
@@ -829,7 +809,6 @@ const ALL: Entry[] = [
     ],
   },
 
-  /* ── Small pieces ── */
   {
     id: 'versions',
     name: 'Regenerate',
@@ -988,7 +967,6 @@ const ALL: Entry[] = [
     zoom: 1.35,
     details: ['The button counts down inside a ring that drains with it, and tries again on its own at zero.', 'A failure doubles the next wait; the row says which try it’s on.', 'When it gets through, the row says Connected and the button settles into a check.'],
   },
-
 
   {
     id: 'kanban',
@@ -1236,7 +1214,6 @@ const ALL: Entry[] = [
     ],
   },
 
-
   {
     id: 'combobox',
     name: 'Combobox',
@@ -1284,7 +1261,6 @@ const ALL: Entry[] = [
     ],
   },
 
-  /* ── Overlays ── */
   {
     id: 'dock',
     name: 'Morphing dock',
@@ -1460,7 +1436,6 @@ const ALL: Entry[] = [
     keys: [['Esc', 'Close']],
   },
 
-  /* ── Marketing ── */
   {
     id: 'carousel',
     name: 'Carousel',
@@ -1667,7 +1642,6 @@ export { UNLISTED }
 
 export const ENTRIES: Entry[] = ALL.filter((e) => !UNLISTED.has(e.id))
 
-/** Only the families that still have something in them. */
 export const CATEGORIES: Category[] = ALL_CATEGORIES.filter((c) => ENTRIES.some((e) => e.category === c.id))
 
 export const entry = (id: string | null) => ENTRIES.find((e) => e.id === id) ?? null

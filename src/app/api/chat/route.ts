@@ -2,16 +2,6 @@ import { convertToModelMessages, jsonSchema, simulateReadableStream, stepCountIs
 import type { ModelMessage, UIMessage } from 'ai'
 import { MockLanguageModelV4 } from 'ai/test'
 
-/*
- * The site's live demo: a real AI SDK route, `streamText` and all, with a scripted model in place
- * of a paid one, so anyone can use the Agent chat block for free. Swap `model` for any model the
- * SDK supports (`openai('gpt-5')`, `anthropic('claude-sonnet-5-5')`…) and nothing else changes.
- *
- * The script knows one ticket: Lucía’s parcel, order #4471, lost by DHL. The model reads which
- * tool results it already has this turn and takes the next step. Refunds and replies to the
- * customer need a person’s yes; a no is answered as a no.
- */
-
 export const maxDuration = 30
 
 const usage = { inputTokens: { total: 120, noCache: 120, cacheRead: 0, cacheWrite: 0 }, outputTokens: { total: 80, text: 60, reasoning: 20 } }
@@ -28,17 +18,14 @@ const source = (id: string, url: string, title: string): Chunk => ({ type: 'sour
 
 const TRACKING = 'https://www.dhl.com/global-en/home/tracking.html?tracking-id=4471882031'
 const POLICY = 'https://help.example.com/refunds'
-/** The reply to Lucía says what actually happened: refunded, or not yet. */
 const REPLY = {
   refunded: 'Hola Lucía, siento mucho lo de tu paquete. DHL lo perdió el 18 de octubre, así que te he devuelto los 86,00 $ a tu tarjeta. Lo verás en 3 a 5 días hábiles.',
   open: 'Hola Lucía, siento mucho lo de tu paquete. DHL lo perdió el 18 de octubre en Madrid. Estamos viendo cómo solucionarlo y te escribo hoy mismo.',
 }
 
-/** What this turn is about, from the last thing the person wrote. */
 const intent = (text: string) =>
   /write|reply|message|spanish|tell her|let her know/i.test(text) ? 'reply' : /why|how come|what happened|where is/i.test(text) ? 'why' : /4471|order|parcel|package|arriv|refund|lost|lucía|lucia/i.test(text) ? 'refund' : 'other'
 
-/** The script: the next step for this turn, given the tools it has already heard back from. */
 function next(prompt: ModelMessage[]): { chunks: Chunk[]; reason: 'tool-calls' | 'stop' } {
   const at = prompt.findLastIndex((m) => m.role === 'user')
   const asked = prompt[at]
@@ -48,7 +35,6 @@ function next(prompt: ModelMessage[]): { chunks: Chunk[]; reason: 'tool-calls' |
     .flatMap((m) => (m.role === 'tool' ? m.content : []))
     .flatMap((c) => (c.type === 'tool-result' ? [{ name: c.toolName, denied: c.output.type === 'execution-denied' }] : []))
   const heard = (name: string) => results.find((r) => r.name === name)
-  // Anywhere in the conversation, not just this turn: did a refund go through?
   const refunded = prompt.some((m) => m.role === 'tool' && m.content.some((c) => c.type === 'tool-result' && c.toolName === 'refund' && c.output.type !== 'execution-denied'))
   const stop = (chunks: Chunk[]) => ({ chunks, reason: 'stop' as const })
   const tools = (chunks: Chunk[]) => ({ chunks, reason: 'tool-calls' as const })
@@ -162,7 +148,6 @@ const tools = {
 
 export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json()
-  // A demo, not a chat service: only the recent past is read.
   const result = streamText({ model, tools, messages: await convertToModelMessages(messages.slice(-24)), stopWhen: stepCountIs(5) })
   return result.toUIMessageStreamResponse({ sendReasoning: true, sendSources: true })
 }

@@ -7,10 +7,8 @@ import { tap } from '../../lib/feel'
 import { ease, press, dur } from '../../lib/motion'
 import { Kbd } from '../../ui/Kbd'
 
-/** For demos and tests: sign and seal as Enter would, or wipe the page. */
 export type SignatureHandle = { sign(): Promise<void>; clear(): void }
 
-/** Fountain-pen inks, each with a lighter twin for dark pages. */
 const INKS = [
   { id: 'black', label: 'Black', css: 'var(--ink)' },
   { id: 'blue-black', label: 'Blue-black', css: 'light-dark(#1f2b5e, #a8b6ee)' },
@@ -18,15 +16,9 @@ const INKS = [
 ]
 
 const LEFT = 8
-/** How fast the pen writes and lifts, in px a millisecond. */
 const WRITE = 0.24
 const LIFT = 1.1
 
-/**
- * A pencil, drawn: a white barrel with a flat side catching the light and a grey nib, leaning
- * the way a right hand holds it. Its tip sits on its origin. Lifted, it floats higher and its
- * shadow spreads; on the page, the shadow tightens under it.
- */
 function Pencil({ down }: { down: boolean }) {
   const id = useId()
   return (
@@ -58,11 +50,6 @@ function Pencil({ down }: { down: boolean }) {
   )
 }
 
-/**
- * The seal: a round rubber stamp, solid in the accent, with the words round its rim, an inner
- * ring and the signer's initials in the script, all knocked out of the ink. The ink is uneven the
- * way a real stamp's is: a fine speckle where the rubber didn't quite meet the page.
- */
 function Seal({ initials, rim, fontFamily }: { initials: string; rim: string; fontFamily: string }) {
   const id = useId()
   const r = 33.5
@@ -106,18 +93,6 @@ const initialsOf = (name: string) =>
     .map((w) => w[0]?.toUpperCase() ?? '')
     .join('')
 
-/**
- * A document you sign by typing. Type your name and a pencil signs it above the line, a letter
- * at a time: the ink arrives behind its tip at the pace of a hand, with a wet edge where it's
- * still landing, and the tip rides the strokes it draws. Type faster than it writes and it keeps
- * up; delete and the ink lifts back off. Sign, or press Enter, and it finishes with a flourish,
- * lifts away, and a seal is stamped at the end of the name, its rim dated.
- *
- * The page is quiet print: a reference and the date in fine capitals, and the line itself a run
- * of microtext, carrying the signer's name, that reads as a hairline until you look closely.
- * Three fountain-pen inks. The script is any font you give it; a flowing one, like WindSong,
- * reads as a real signature.
- */
 export function Signature({
   value,
   onChange,
@@ -130,22 +105,14 @@ export function Signature({
   pen = true,
   ref,
 }: {
-  /** The name being signed. */
   value: string
   onChange: (value: string) => void
-  /** Called once it's sealed, with the name and when. */
   onSign?: (name: string, at: Date) => void
-  /** What's being signed, in fine capitals at the top. */
   title?: string
-  /** A reference beside the title, e.g. "Nº 0482". */
   reference?: string
-  /** A line saying what the signature agrees to. */
   detail?: string
-  /** The script it signs in, as a CSS font family. Load the font yourself. */
   fontFamily?: string
-  /** The signature's size at its largest, in px. Long names shrink to fit the line. */
   size?: number
-  /** Show the pencil that writes it. */
   pen?: boolean
   ref?: Ref<SignatureHandle>
 }) {
@@ -156,24 +123,20 @@ export function Signature({
   const inputId = useId()
   const [inkId, setInk] = useState('blue-black')
   const ink = INKS.find((i) => i.id === inkId) ?? INKS[0]
-  // Where the ink has reached and where it's going, along the line, in px.
   const writing = useRef({ at: 0, to: 0, start: LEFT, columns: [] as number[][], base: 0 })
   const tipX = useMotionValue(LEFT)
   const tipY = useMotionValue(0)
   const [down, setDown] = useState(false)
   const [sealed, setSealed] = useState<Date | null>(null)
   const [w, setW] = useState(0)
-  // The line the name sits on and how wide the name is, for the flourish under it and the seal after it.
   const [line, setLine] = useState({ base: 0, width: 0 })
   const drawn = useMotionValue(0)
   const drawnVisible = useTransform(drawn, (v) => (v > 0.001 ? 1 : 0))
   const flourishing = useRef(false)
   const wake = useRef(() => {})
   const [today] = useState(() => new Date())
-  // The page gives under the stamp: a small thud as the seal lands.
   const thud = useAnimationControls()
 
-  // Draw the whole name, then read where its ink sits in every column, for the pen to follow.
   useEffect(() => {
     const c = canvas.current
     const box = paper.current
@@ -188,7 +151,6 @@ export function Signature({
       c.height = Math.round(h * dpr)
       const ctx = c.getContext('2d', { willReadFrequently: true })!
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      // Long names shrink to fit, leaving room for the seal at the end of the line.
       ctx.font = font(size)
       const room = w - LEFT - 100
       const fit = Math.min(size, size * (room / Math.max(1, ctx.measureText(value).width)))
@@ -198,7 +160,6 @@ export function Signature({
       ctx.clearRect(0, 0, w, h)
       ctx.fillStyle = getComputedStyle(box).color
       ctx.fillText(value, LEFT, base)
-      // The ink in each column, as the centres of its runs, so the pen can ride a stroke.
       const data = ctx.getImageData(0, 0, c.width, c.height).data
       const columns: number[][] = []
       for (let x = 0; x < w; x++) {
@@ -238,13 +199,11 @@ export function Signature({
     return () => ro.disconnect()
   }, [])
 
-  // The hand: each frame the ink moves toward where it's going, and the pen rides its edge.
   useEffect(() => {
     let raf = 0
     let last = performance.now()
     let inking = false
     let drawn = -1
-    // It runs only while the ink or the pen has somewhere to go; new ink wakes it.
     const frame = (now: number) => {
       raf = 0
       const dt = Math.min(48, now - last)
@@ -254,14 +213,12 @@ export function Signature({
       const moving = Math.abs(gap) > 0.5
       if (moving) s.at += reduce ? gap : Math.sign(gap) * Math.min(Math.abs(gap), (gap > 0 ? WRITE : LIFT) * dt)
       const c = canvas.current
-      // A soft wet edge where the ink is still arriving.
       if (c && s.at !== drawn) {
         c.style.maskImage = `linear-gradient(to right, #000 ${Math.max(0, s.at) - 9}px, transparent ${Math.max(0, s.at) + 1}px)`
         drawn = s.at
       }
       let settling = false
       if (!flourishing.current) {
-        // The pen's tip: at the ink's edge, on the stroke nearest where it was.
         const col = s.columns[Math.max(0, Math.min(s.columns.length - 1, Math.round(s.at)))] ?? []
         const was = tipY.get() || s.base - 14
         const y = col.length ? col.reduce((a, b) => (Math.abs(b - was) < Math.abs(a - was) ? b : a)) : was
@@ -291,7 +248,6 @@ export function Signature({
   const sign = async () => {
     const s = writing.current
     if (!value.trim() || sealed) return
-    // Wait for the hand to finish the last letter, then one flourish under the name.
     while (Math.abs(s.to - s.at) > 0.5) await new Promise((r) => setTimeout(r, 40))
     const path = flourish.current
     if (path) {
@@ -334,7 +290,6 @@ export function Signature({
 
   return (
     <motion.div animate={thud} className="@container relative w-[520px] max-w-full rounded-[24px] bg-surface p-6 pb-5 shadow-raised">
-      {/* Paper grain, just enough to feel. */}
       <svg aria-hidden className="pointer-events-none absolute inset-0 size-full rounded-[24px] opacity-[0.07] mix-blend-multiply dark:opacity-[0.05] dark:mix-blend-screen">
         <filter id={`${inputId}-grain`}>
           <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch" />
@@ -343,7 +298,6 @@ export function Signature({
         <rect width="100%" height="100%" filter={`url(#${inputId}-grain)`} />
       </svg>
 
-      {/* The document's head: what it is and its reference, the date, in fine capitals; then what it agrees to. */}
       <div className="relative flex items-center justify-between whitespace-nowrap font-mono text-[10.5px] uppercase tracking-[0.12em] text-ink-3">
         <span>
           {title}
@@ -353,7 +307,6 @@ export function Signature({
       </div>
       {detail && <p className="relative mt-3 max-w-[400px] text-callout leading-[21px] text-ink-2">{detail}</p>}
 
-      {/* Where the name is signed. */}
       <div ref={paper} className="relative mt-3 h-[108px]" style={{ color: ink.css }}>
         <canvas ref={canvas} role="img" aria-label={value ? `Signature: ${value}` : 'Not signed yet'} className="absolute inset-0 size-full" />
         <svg aria-hidden className="pointer-events-none absolute inset-0 size-full overflow-visible">
@@ -381,7 +334,6 @@ export function Signature({
         )}
       </div>
 
-      {/* The line: a run of microtext, carrying the name, that reads as a hairline until you look closely. */}
       <div aria-hidden className="relative flex items-center gap-2 text-ink-3">
         <span className="text-[13px] leading-none">×</span>
         <span className="flex-1 overflow-hidden whitespace-nowrap text-[5.2px] font-semibold leading-none tracking-[0.2em]">{micro.repeat(14)}</span>
@@ -407,7 +359,6 @@ export function Signature({
             className="mt-1 w-full bg-transparent text-callout text-ink outline-none placeholder:text-ink-3"
           />
         </div>
-        {/* Three inks, as dots. */}
         <div role="radiogroup" aria-label="Ink" className="flex items-center">
           {INKS.map((i) => (
             <button key={i.id} type="button" role="radio" aria-checked={inkId === i.id} aria-label={i.label} onPointerDown={tap} onClick={() => setInk(i.id)} className="ring-focus relative flex size-6 items-center justify-center rounded-full pointer-coarse:before:absolute pointer-coarse:before:-inset-1.5 pointer-coarse:before:content-['']">
@@ -417,7 +368,6 @@ export function Signature({
         </div>
       </div>
 
-      {/* The actions and the sealed line take turns: one rolls out before the other rolls in, so they never sit on top of each other. */}
       <div className="relative mt-4 flex h-12 items-center justify-end gap-1 overflow-hidden border-t border-line pt-3">
         <AnimatePresence initial={false} mode="wait">
           {sealed ? (

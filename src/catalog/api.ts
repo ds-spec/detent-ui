@@ -1,26 +1,11 @@
-/**
- * A component's props, read from its own source with the TypeScript compiler: every prop's
- * type as written, its default from the destructuring, and the doc comment above it. The
- * tables on the site are made from this, so they can't drift from the code.
- */
 import ts from 'typescript'
 
 export type PropDoc = { name: string; type: string; default?: string; note?: string; required: boolean }
-export type Api = { component: string; props: PropDoc[]; /** What a ref can do, when the component takes one. */ methods?: string[]; /** It also takes every prop of this element. */ extends?: string }
+export type Api = { component: string; props: PropDoc[]; methods?: string[]; extends?: string }
 
 const flat = (s: string) => s.replace(/\s+/g, ' ').replace(/\(\s/g, '(').replace(/\s\)/g, ')').replace(/;\s*}/g, ' }').trim()
 
-/** The doc comment on a node, as plain text. */
-function docOf(node: ts.Node): string | undefined {
-  const docs = ts.getJSDocCommentsAndTags(node).filter(ts.isJSDoc)
-  const text = docs
-    .map((d) => ts.getTextOfJSDocComment(d.comment) ?? '')
-    .join(' ')
-    .trim()
-  return text ? flat(text) : undefined
-}
-
-export function apiFromSource(code: string, file: string): Api | null {
+export function apiFromSource(code: string, file: string, notes: Record<string, string> = {}): Api | null {
   const sf = ts.createSourceFile(file, code, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
   const base = file
     .split('/')
@@ -40,7 +25,6 @@ export function apiFromSource(code: string, file: string): Api | null {
     if (ts.isVariableStatement(st) && isExported(st)) {
       for (const d of st.declarationList.declarations) {
         if (!ts.isIdentifier(d.name) || !/^[A-Z]/.test(d.name.text) || !d.initializer) continue
-        // forwardRef<Handle, Props>(function X({ ... }) {}) or memo(function X(...))
         const call = d.initializer
         if (ts.isCallExpression(call)) {
           const fn = call.arguments.find((a) => ts.isFunctionExpression(a) || ts.isArrowFunction(a)) as ts.FunctionExpression | ts.ArrowFunction | undefined
@@ -55,7 +39,6 @@ export function apiFromSource(code: string, file: string): Api | null {
   const main = found.find((f) => f.name === base) ?? found.find((f) => f.param)
   if (!main?.param) return null
 
-  // Defaults, from the destructuring.
   const defaults = new Map<string, string>()
   if (ts.isObjectBindingPattern(main.param.name)) {
     for (const el of main.param.name.elements) {
@@ -74,7 +57,7 @@ export function apiFromSource(code: string, file: string): Api | null {
         if (!ts.isPropertySignature(m) || !m.name || seen.has(m.name.getText(sf))) continue
         const name = m.name.getText(sf)
         seen.add(name)
-        props.push({ name, type: m.type ? flat(m.type.getText(sf)) : 'unknown', default: defaults.get(name), note: docOf(m), required: !m.questionToken })
+        props.push({ name, type: m.type ? flat(m.type.getText(sf)) : 'unknown', default: defaults.get(name), note: notes[name], required: !m.questionToken })
       }
       return
     }
@@ -83,14 +66,12 @@ export function apiFromSource(code: string, file: string): Api | null {
     if (ts.isTypeReferenceNode(node)) {
       const name = node.typeName.getText(sf)
       if (aliases.has(name)) return members(aliases.get(name))
-      // Omit<ComponentProps<typeof motion.button>, ...>: it passes through an element's own props.
       const el = node.getText(sf).match(/ComponentProps<(?:typeof )?(?:motion\.)?['"]?(\w+)/)
       if (el) extendsEl = el[1]
     }
   }
   members(main.type)
 
-  // A ref's handle: the things you can do to it from outside.
   let methods: string[] | undefined
   const ref = props.find((p) => p.name === 'ref')
   const handle = ref?.type.match(/Ref<(\w+)>/)?.[1] ?? code.match(/forwardRef<\s*(\w+)/)?.[1]

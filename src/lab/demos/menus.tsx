@@ -10,8 +10,6 @@ import { FileGlyph } from '../ui/FileGlyph'
 import { useBench } from './bench'
 import { hover, pressed } from '@/lab/lib/hand'
 
-/* ───────────────────────────── Select ───────────────────────────── */
-
 function StatusIcon({ kind }: { kind: 'backlog' | 'todo' | 'doing' | 'review' | 'done' }) {
   const c = { backlog: 'var(--ink-3)', todo: 'var(--ink-3)', doing: 'var(--warn)', review: '#7c66ff', done: 'var(--ok)' }[kind]
   return (
@@ -42,7 +40,6 @@ function Bars({ level }: { level: 0 | 1 | 2 | 3 }) {
   )
 }
 
-
 const STATUS: Option[] = [
   { value: 'backlog', label: 'Backlog', icon: <StatusIcon kind="backlog" /> },
   { value: 'todo', label: 'Todo', icon: <StatusIcon kind="todo" /> },
@@ -63,7 +60,6 @@ const PEOPLE: Option[] = [
   { value: 'sam', label: 'Sam Ortiz', icon: <Avatar name="Sam Ortiz" hue={70} size={18} />, disabled: true, hint: 'Away' },
 ]
 
-/** Triages the issue on its own: moves it to review, raises the priority, assigns it. Hovering pauses; touching hands it over. */
 export function SelectDemo() {
   const b = useBench()
   const [status, setStatus] = useState('doing')
@@ -134,8 +130,6 @@ export function SelectDemo() {
   )
 }
 
-/* ───────────────────────────── Inline rename ───────────────────────────── */
-
 const TITLE = 'Q3 board update'
 const DOCS = [
   { id: 'a', name: 'Board deck.pdf', meta: '1.1 MB · Edited 2h ago' },
@@ -144,7 +138,6 @@ const DOCS = [
 ]
 const save = () => new Promise((r) => setTimeout(r, 700))
 
-/** Renames on its own: a file (the extension stays put), a name that's refused and fixed, then the title. Hovering pauses; touching hands it over. */
 export function RenameDemo() {
   const b = useBench()
   const [title, setTitle] = useState(TITLE)

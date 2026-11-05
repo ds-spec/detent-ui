@@ -28,14 +28,8 @@ import { Switch } from '../ui/Switch'
 import { useBench } from './bench'
 import { hover, pressed } from '@/lab/lib/hand'
 
-/*
- * The overlays, each in a small app window that keeps them inside it. Every demo plays its
- * moment on a loop; hovering pauses it, and the first press or key hands it to you.
- */
-
 type Beat = (ms: number) => Promise<void>
 
-/** Runs a demo's script on a loop until someone touches it. Hovering holds it where it is. */
 function useScript(script: (beat: Beat) => Promise<void>) {
   const held = useRef(false)
   const touched = useRef(false)
@@ -64,8 +58,7 @@ function useScript(script: (beat: Beat) => Promise<void>) {
   }
 }
 
-/** A small app window: a title bar and a body, holding its own overlays. */
-function Window({ title, children, hands, wide = false, size }: { title: string; children: ReactNode; hands: ReturnType<typeof useScript>; wide?: boolean; /** Tailwind size classes, when neither default fits. */ size?: string }) {
+function Window({ title, children, hands, wide = false, size }: { title: string; children: ReactNode; hands: ReturnType<typeof useScript>; wide?: boolean; size?: string }) {
   return (
     <div {...hands}>
       <LayerHost className={`${size ?? (wide ? 'h-[400px] w-[580px] max-w-full' : 'h-[360px] w-[520px] max-w-full')} max-w-full rounded-[20px] bg-surface shadow-[0_0_0_1px_var(--line),0_1px_2px_rgb(0_0_0/0.04),0_12px_32px_-16px_rgb(0_0_0/0.14)]`}>
@@ -82,7 +75,6 @@ function Window({ title, children, hands, wide = false, size }: { title: string;
   )
 }
 
-/** A pointer for demos that need to show where a press happens. */
 function Pointer({ at, press }: { at: { x: number; y: number } | null; press: number }) {
   return (
     <AnimatePresence>
@@ -98,8 +90,6 @@ function Pointer({ at, press }: { at: { x: number; y: number } | null; press: nu
   )
 }
 
-/* ───────────────────────────── Dialog ───────────────────────────── */
-
 const ROLES = [
   { id: 'admin', name: 'Admin', line: 'Everything, including billing.' },
   { id: 'member', name: 'Member', line: 'Projects and runs, not billing.' },
@@ -112,11 +102,6 @@ const TEAM: [string, string, number][] = [
   ['Lena Ortiz', 'Member', 20],
 ]
 
-/**
- * Opens an invite and adds three people, each address settling into a chip as it's typed, the
- * dialog growing to fit; then opens a second dialog from inside it to pick their role, which
- * pushes the first back until it closes.
- */
 export function DialogDemo() {
   const b = useBench()
   const invite = useRef<DialogHandle>(null)
@@ -206,7 +191,6 @@ export function DialogDemo() {
             }
           >
             <span className="text-footnote text-ink-2">Email</span>
-            {/* Addresses settle into chips as they're finished; the field, and the dialog with it, grow to fit. */}
             <div className="mt-1.5 flex min-h-10 flex-wrap items-center gap-1.5 rounded-control bg-surface p-1.5 shadow-[0_0_0_1px_var(--line-strong)] focus-within:shadow-field">
               <AnimatePresence initial={false}>
                 {emails.map((m) => (
@@ -286,9 +270,6 @@ export function DialogDemo() {
   )
 }
 
-/* ───────────────────────────── Confirm ───────────────────────────── */
-
-/** Asks before deleting a project: types the name, slips on a letter, fixes it, and confirms. */
 export function ConfirmDemo() {
   const b = useBench()
   const confirm = useRef<ConfirmHandle>(null)
@@ -349,9 +330,6 @@ export function ConfirmDemo() {
   )
 }
 
-/* ───────────────────────────── Popover ───────────────────────────── */
-
-/** Opens a share panel from a button by the window's edge; the panel slides in to stay inside and its arrow keeps pointing at the button. */
 export function PopoverDemo() {
   const b = useBench()
   const share = useRef<PopoverHandle>(null)
@@ -427,8 +405,6 @@ export function PopoverDemo() {
   )
 }
 
-/* ───────────────────────────── Tooltip ───────────────────────────── */
-
 const TOOLS = [
   { label: 'Bold', keys: ['⌘', 'B'], glyph: <span className="text-[15px] font-bold">B</span> },
   { label: 'Italic', keys: ['⌘', 'I'], glyph: <span className="font-serif text-[16px] italic">I</span> },
@@ -438,14 +414,12 @@ const TOOLS = [
   { label: 'Ask AI', keys: ['⌘', 'J'], glyph: <Prompt size={16} /> },
 ]
 
-/** A pointer runs along a toolbar: the first tooltip waits, then one bubble glides from button to button. */
 export function TooltipDemo() {
   const b = useBench()
   const group = useRef<TooltipGroupHandle>(null)
   const box = useRef<HTMLDivElement>(null)
   const bar = useRef<HTMLDivElement>(null)
   const [at, setAt] = useState<{ x: number; y: number } | null>(null)
-  // Where a button's middle is, in the window's own pixels, whatever it's zoomed to.
   const point = (i: number) => {
     const btn = bar.current?.children[i] as HTMLElement | undefined
     const w = box.current
@@ -495,9 +469,6 @@ export function TooltipDemo() {
   )
 }
 
-/* ───────────────────────────── Dropdown ───────────────────────────── */
-
-/** Opens a file's menu, walks down it, opens "Move to" and picks a folder. */
 export function DropdownDemo() {
   const b = useBench()
   const menu = useRef<DropdownHandle>(null)
@@ -575,15 +546,12 @@ export function DropdownDemo() {
   )
 }
 
-/* ───────────────────────────── Context menu ───────────────────────────── */
-
 const NOTES = [
   { x: 36, y: 34, w: 132, text: 'Interview 5 users', hue: 85 },
   { x: 196, y: 58, w: 120, text: 'Pricing page v2', hue: 150 },
   { x: 92, y: 150, w: 140, text: 'Onboarding emails', hue: 250 },
 ]
 
-/** Right-clicks the board twice, once in the open and once by the corner, where the menu flips to stay inside. */
 export function ContextDemo() {
   const menu = useRef<ContextMenuHandle>(null)
   const [at, setAt] = useState<{ x: number; y: number } | null>(null)
@@ -636,8 +604,6 @@ export function ContextDemo() {
   )
 }
 
-/* ───────────────────────────── Hover card ───────────────────────────── */
-
 type Person = { name: string; handle: string; role: string; hue: number; bio: string; time: [string, string]; city: string; reviews: number; month: number; seed: number }
 
 const PEOPLE: Record<string, Person> = {
@@ -645,7 +611,6 @@ const PEOPLE: Record<string, Person> = {
   jonas: { name: 'Jonas Weber', handle: 'jonas', role: 'Design engineer', hue: 260, bio: 'Owns the empty states and most of the words on screen.', time: ['10:41', 'PM'], city: 'Berlin', reviews: 167, month: 12, seed: 11 },
 }
 
-/** Twelve weeks of reviews as a field of dots, a column a week, darker on busier days. */
 function Activity({ seed }: { seed: number }) {
   const rand = (i: number) => {
     const x = Math.sin(seed * 127.1 + i * 311.7) * 43758.5453
@@ -672,7 +637,6 @@ function Profile({ p }: { p: Person }) {
             @{p.handle} · {p.role}
           </p>
         </div>
-        {/* Their local time, the hour in ink and the rest in grey. */}
         <p className="tnum text-right text-footnote leading-5">
           <span className="text-ink">{p.time[0]}</span> <span className="text-ink-3">{p.time[1]}</span>
           <span className="block text-caption text-ink-3">{p.city}</span>
@@ -692,18 +656,12 @@ function Profile({ p }: { p: Person }) {
   )
 }
 
-/**
- * Two mentions in one comment, sharing a card. It rests on the first and the card opens in the
- * shape of a profile, then fills in; it moves to the second and the same card glides over and
- * becomes the next person, without waiting.
- */
 export function HoverCardDemo() {
   const b = useBench()
   const maya = useRef<HoverCardHandle>(null)
   const jonas = useRef<HoverCardHandle>(null)
   const [round, setRound] = useState(0)
   const hands = useScript(async (beat) => {
-    // A fresh group each time round, so each profile loads again.
     setRound((n) => n + 1)
     await beat(1200)
     maya.current?.open()

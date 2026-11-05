@@ -5,7 +5,6 @@ import { BLOCK_VIEWS } from '@pro'
 import { DEMOS } from '@/catalog/demos'
 import { Fit } from './Fit'
 
-/** A component or a block on its own, the whole window to itself: what full screen opens, in its own tab. */
 export function FullPiece({ kind, id }: { kind: 'components' | 'blocks'; id: string }) {
   if (kind === 'blocks') {
     const View = BLOCK_VIEWS[id] as ComponentType | undefined

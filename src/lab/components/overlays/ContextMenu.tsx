@@ -8,17 +8,10 @@ import type { Box } from '../../lib/layer'
 import { MenuPanel } from './Menu'
 import type { MenuControl, MenuItem } from './Menu'
 
-/** For demos and tests: open at a point in the area (its own pixels), then point at or choose items, without touching focus. */
 export type ContextMenuHandle = MenuControl & { openAt(x: number, y: number): void; close(): void }
 
 const HOLD = 480
 
-/**
- * The menu behind a right-click. It opens at the exact point you pressed and grows from it,
- * flipping up or left near an edge so it never leaves the screen. On touch, holding a finger
- * still for half a second opens it; on a keyboard, the menu key or Shift+F10 opens it at the
- * middle of the area. Same items as a dropdown: icons, shortcuts, checks and submenus.
- */
 export function ContextMenu({
   items,
   label,
@@ -26,11 +19,8 @@ export function ContextMenu({
   className = '',
   ref,
 }: {
-  /** What's in the menu. */
   items: MenuItem[]
-  /** Accessible name for the menu. */
   label: string
-  /** The area that has the menu. */
   children: ReactNode
   className?: string
   ref?: Ref<ContextMenuHandle>

@@ -11,18 +11,12 @@ export { Change, SERIES, compact } from './parts'
 export type BarSeries = { id: string; label: string; values: number[]; color?: string }
 export type BarHandle = { point(i: number | null): void }
 
-/**
- * Columns as capsules rising inside their own faint tracks. The first series fills; a second,
- * last period, is a small tick on each track, so the comparison never crowds the bars. A goal is
- * a line across them all.
- */
 export function BarChart({ categories, series, target, format = compact, height = 210, ref }: { categories: string[]; series: BarSeries[]; target?: { value: number; label: string }; format?: (n: number) => string; height?: number; ref?: Ref<BarHandle> }) {
   const [at, setAt] = useState<number | null>(null)
   const reduce = useReducedMotion()
   useImperativeHandle(ref, () => ({ point: setAt }))
   const [main, before] = series
   const color = main.color ?? SERIES[0]
-  // Each column is its track over a 24px label.
   const plot = height - 24
   const { top } = scale(Math.max(...series.flatMap((s) => s.values), target?.value ?? 0) * 1.05)
   const pct = (v: number) => (v / top) * 100

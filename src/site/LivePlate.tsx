@@ -8,16 +8,9 @@ import { Fit } from './Fit'
 import { PassOver } from './PassOver'
 import { useNear } from './near'
 
-/** Room for a plate's caption and its edge. */
 const CAPTION = 132
 
-/**
- * A live part on a card: most of it a tinted well with the part running in it, a caption along the
- * foot. The part is really there to use, and costs nothing until it's close: it mounts as the card
- * nears the screen and leaves again once it's well past, so a page full of them only ever runs the
- * ones in view. Fixed height, so mounting one never moves the page; on a phone it grows to its part.
- */
-export function LivePlate({ id, bleed = false, well, caption, className = '', pad = 44 }: { id: string; /** The part draws its own stage, edge to edge. */ bleed?: boolean; well: string; caption: ReactNode; className?: string; pad?: number }) {
+export function LivePlate({ id, bleed = false, well, caption, className = '', pad = 44 }: { id: string; bleed?: boolean; well: string; caption: ReactNode; className?: string; pad?: number }) {
   const reduce = useReducedMotion()
   const box = useRef<HTMLDivElement>(null)
   const near = useNear(box, '350px 0px', '600px 0px')

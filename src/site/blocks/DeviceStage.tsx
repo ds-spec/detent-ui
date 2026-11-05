@@ -12,7 +12,6 @@ import type { Chrome } from './Studio'
 
 export type Device = 'desktop' | 'phone'
 
-/** The two devices a block is tried on: the width it's laid out at, the height of the screen, and the frame round it. */
 const DEVICES = {
   phone: { w: 390, h: 844, bezel: 10, radius: 48 },
 } as const
@@ -33,15 +32,8 @@ const ICONS: Record<Device, ReactNode> = {
 }
 const NAMES: Record<Device, string> = { desktop: 'Desktop', phone: 'Phone' }
 
-/**
- * The stage a block or a template runs on, the same as a component's: Preview or Code on the left
- * of its edge, and on the right the device to try it on, then replay and full screen. Light or dark
- * follows the site's own switch, in the sidebar. On a desktop it runs in its window across the stage; on a tablet or a phone it's laid out
- * at that device's real size inside a plain frame, and the stage grows to hold it.
- */
-export function DeviceStage({ title, chrome, mode, setMode, pro, theme, onReplay, onFull, run, view, code, tools }: { title: string; chrome?: Chrome; mode: 'preview' | 'code'; setMode: (m: 'preview' | 'code') => void; pro: boolean; theme: 'light' | 'dark'; onReplay: () => void; onFull: () => void; run: number; view: ReactNode; code: ReactNode; /** More tools, at the end of the bar. */ tools?: ReactNode }) {
+export function DeviceStage({ title, chrome, mode, setMode, pro, theme, onReplay, onFull, run, view, code, tools }: { title: string; chrome?: Chrome; mode: 'preview' | 'code'; setMode: (m: 'preview' | 'code') => void; pro: boolean; theme: 'light' | 'dark'; onReplay: () => void; onFull: () => void; run: number; view: ReactNode; code: ReactNode; tools?: ReactNode }) {
   const [device, setDevice] = useState<Device>('desktop')
-  // A device is shown at its real size: the stage grows to hold it and the page scrolls past it, the way you'd hold a phone up to look at it.
   const d = device === 'desktop' ? null : DEVICES[device]
   return (
     <div data-desk className="relative mt-5 flex flex-col rounded-[20px] bg-[var(--mount)] transition-[height] duration-300 max-sm:-mx-3" style={{ height: d ? d.h + d.bezel * 2 + 44 + 72 : 'clamp(680px, calc(100dvh - 140px), 1000px)' }}>
@@ -49,7 +41,6 @@ export function DeviceStage({ title, chrome, mode, setMode, pro, theme, onReplay
         <ModesLine mode={mode} setMode={setMode} pro={pro} />
         <span className="flex items-center gap-1.5">
           <Devices device={device} setDevice={setDevice} />
-          {/* The device switch is for a laptop's screen; on a phone there's nothing to set it apart from. */}
           <span aria-hidden className="mx-1 hidden h-4 w-px bg-line-strong sm:block" />
           <Tool small label="Replay" onClick={onReplay}>
             <motion.span key={run} className="flex" initial={{ rotate: -180 }} animate={{ rotate: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 22 }}>
@@ -80,7 +71,6 @@ export function DeviceStage({ title, chrome, mode, setMode, pro, theme, onReplay
   )
 }
 
-/** Desktop or phone: the same sunk track and raised plate as Preview / Code, icons only. */
 function Devices({ device, setDevice }: { device: Device; setDevice: (d: Device) => void }) {
   const id = useId()
   return (
@@ -107,12 +97,6 @@ function Devices({ device, setDevice }: { device: Device; setDevice: (d: Device)
   )
 }
 
-/**
- * What the block runs in. On a desktop, its window across the stage. On a tablet or a phone, the
- * block is laid out at the device's own width and height, inside a plain dark frame with a hairline,
- * shown at its real size, so what you see is what that screen would show. A stage too narrow for
- * it scales it down to fit across.
- */
 function Screen({ device, title, chrome, children }: { device: Device; title: string; chrome?: Chrome; children: ReactNode }) {
   const box = useRef<HTMLDivElement>(null)
   const [room, setRoom] = useState({ w: 0, h: 0 })
@@ -127,7 +111,6 @@ function Screen({ device, title, chrome, children }: { device: Device; title: st
   }, [])
   const d = device === 'desktop' ? null : DEVICES[device]
   const outer = d ? { w: d.w + d.bezel * 2, h: d.h + d.bezel * 2 } : null
-  // Only the width can make a device smaller: the stage is as tall as the device.
   const scale = outer && room.w ? Math.min(1, (room.w - 48) / outer.w) : 1
   return (
     <div ref={box} className={`absolute inset-0 flex items-center justify-center ${d ? 'p-4 sm:p-6' : 'p-3 sm:p-4'}`}>

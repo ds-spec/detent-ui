@@ -13,7 +13,6 @@ const SPEND: Record<Range, number[]> = {
   '90d': [13900, 6100, 4900, 1240, 520, 310],
 }
 
-/** Spend by model: lights each model's cells, then the shares ripple to a week and to ninety days. Hovering pauses; touching hands it over. */
 export function WaffleDemo() {
   const [range, setRange] = useState<Range>('30d')
   const waffle = useRef<WaffleHandle>(null)

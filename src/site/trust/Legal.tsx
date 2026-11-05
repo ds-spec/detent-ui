@@ -4,7 +4,6 @@ import { Header } from '../Header'
 
 export type Section = { id: string; title: string; body: ReactNode }
 
-/** Paragraphs and lists set for reading: a comfortable measure, quiet grey, ink where it matters. */
 export const P = ({ children }: { children: ReactNode }) => <p className="mt-3 text-body leading-[1.65] text-ink-2 first:mt-0">{children}</p>
 export const Strong = ({ children }: { children: ReactNode }) => <strong className="font-medium text-ink">{children}</strong>
 export function List({ items, tone = 'plain' }: { items: ReactNode[]; tone?: 'plain' | 'yes' | 'no' }) {
@@ -20,10 +19,6 @@ export function List({ items, tone = 'plain' }: { items: ReactNode[]; tone?: 'pl
   )
 }
 
-/**
- * A page meant to be read through: what it is, when it last changed, and its parts in order,
- * with an index of them beside the text that stays in view.
- */
 export function LegalPage({ label, title, intro, updated, sections }: { label: string; title: string; intro: ReactNode; updated: string; sections: Section[] }) {
   return (
     <>

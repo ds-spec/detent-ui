@@ -3,13 +3,6 @@
 import { MeshGradient } from '@paper-design/shaders-react'
 import { useReducedMotion } from 'motion/react'
 
-/*
- * Midnight light, behind signing in: navy folding into electric blue, a periwinkle haze where the
- * light gathers, and a fine grain over all of it so it reads as a material rather than a wash.
- * Drawn with Paper Shaders' mesh gradient (Apache 2.0). It drifts slowly, and holds still for anyone
- * who asks for less motion. A gradient of the same colours sits underneath for the first frame and
- * for any browser without WebGL.
- */
 export function Light() {
   const still = useReducedMotion()
   return (

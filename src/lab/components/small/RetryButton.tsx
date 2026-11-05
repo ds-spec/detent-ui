@@ -11,23 +11,12 @@ import { RollingText } from '../../ui/RollingText'
 import { Spinner } from '../../ui/Spinner'
 
 type State = 'waiting' | 'trying' | 'ok'
-/** For demos and tests: retry now, or start over from the first wait. */
 export type RetryHandle = { now(): void; reset(): void }
 
-/**
- * Waiting out a rate limit without making anyone wait blind. The button counts down inside a
- * draining ring and tries again on its own at zero; a failure waits twice as long the next
- * time, and you can always press to try now. When it gets through, the row says so and the
- * button settles into a check. One measured size per state, so nothing around it shifts.
- */
 export function RetryButton({ attempt, base = 5, title = 'Rate limited', detail = 'Too many requests to Detent Pro', ref }: {
-  /** Tries again. Resolve true if it worked; false waits longer and tries again. */
   attempt: (n: number) => Promise<boolean>
-  /** Seconds before the first retry. Each failure doubles it. */
   base?: number
-  /** What went wrong, in a few words. */
   title?: string
-  /** The line under it. */
   detail?: string
   ref?: Ref<RetryHandle>
 }) {
@@ -38,8 +27,6 @@ export function RetryButton({ attempt, base = 5, title = 'Rate limited', detail 
   const wait = base * 2 ** tries
   const latest = useRef({ go: () => {} })
 
-  // One countdown per wait: the ring drains smoothly, the number steps down each second, and at
-  // zero it tries again by itself. Everything here happens in timer callbacks, never during render.
   useEffect(() => {
     if (state !== 'waiting') return
     ring.set(1)

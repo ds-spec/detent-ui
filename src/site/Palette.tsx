@@ -13,15 +13,6 @@ import { track } from './track'
 import { clamp } from '@/lab/lib/detent'
 import { Layer, useDismiss } from '@/lab/lib/layer'
 
-/*
- * The site's ⌘K. A soft shell, a sheet inside it and a quiet inset field, separated by tone alone. It
- * knows where you are: on a component's page it opens on Copy install, so ⌘K then Enter is the whole
- * job. As you type, a ghost finishes the word you probably mean and follows the row you're on. Tab
- * takes it, and if it was a place, the word stays exactly where it is and a plate grows behind it, and
- * you're searching inside it. Backspace hands you the word back. Rows that survive a keystroke glide,
- * and the bottom edge of the field wakes under your caret while you type.
- */
-
 const VISIBLE = 7
 const ROW = 34
 const LABEL = 26
@@ -53,8 +44,6 @@ function fuzzy(name: string, q: string) {
   const low = name.toLowerCase()
   const whole = low.indexOf(q)
   if (whole >= 0) return whole
-  // Otherwise each letter has to start a word or follow the last one, so "dh" finds Dot histogram
-  // and "dot" doesn't find Model & effort through a stray d, o and t.
   let at = 0
   let first = -1
   let prev = -2
@@ -121,7 +110,6 @@ export function Palette({ open, onOpenChange, sound, toggleSound }: { open: bool
           try {
             localStorage.setItem('theme', next)
           } catch {
-            /* storage unavailable */
           }
         },
       },
@@ -148,7 +136,6 @@ export function Palette({ open, onOpenChange, sound, toggleSound }: { open: bool
     const pool = place === 'Blocks' ? blocks : place === 'Components' ? comps : place === 'Actions' ? actions : [...comps, ...blocks, ...actions]
     if (!q) {
       if (place) return { items: pool.slice(0, VISIBLE) }
-      // Your best pieces lead, and then everything else, so the list is the whole library.
       const first = RECENT.flatMap((id) => comps.filter((c) => c.id === id))
       const rest = comps.filter((c) => !RECENT.includes(c.id))
       const all = [...first, ...rest].filter((c) => c.id !== here?.id).map((c) => ({ ...c, group: 'Go to' }))
@@ -164,7 +151,6 @@ export function Palette({ open, onOpenChange, sound, toggleSound }: { open: bool
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q, place, here, sound, manager])
 
-  // A row that has just been swapped out reads 0, which would sit the plate on the field, so use where rows start instead.
   const seat = (i: number) => {
     const el = rows.current[i]
     return el?.isConnected && el.offsetTop ? el.offsetTop : TRAY + (i ? i * ROW : 0)
@@ -184,7 +170,6 @@ export function Palette({ open, onOpenChange, sound, toggleSound }: { open: bool
     if (!open) return
     if (list.current) list.current.scrollTop = 0
     go(0, true)
-    // Typed fast, the rows can still be settling here; measure again once they're on screen.
     const f = requestAnimationFrame(() => y.set(seat(0)))
     return () => cancelAnimationFrame(f)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -200,7 +185,6 @@ export function Palette({ open, onOpenChange, sound, toggleSound }: { open: bool
   }, [open])
   useDismiss(open, [panel], close)
 
-  // The light in the field sits under the caret, and fades once your hands stop.
   useLayoutEffect(() => {
     if (!query) return void animate(glow, 0, { duration: 0.3 })
     const to = (mirror.current?.getBoundingClientRect().right ?? 0) - (field.current?.closest('label')?.getBoundingClientRect().left ?? 0)
@@ -228,14 +212,12 @@ export function Palette({ open, onOpenChange, sound, toggleSound }: { open: bool
     }
     if (e.key === 'Enter' && items[at]) pick(items[at])
     if (e.key === 'Tab' && items[at]) {
-      // Tab takes the ghost. If it was a place, you're now inside it.
       e.preventDefault()
       if (items[at].id.startsWith('place-')) items[at].run()
       else setQuery(items[at].name)
     }
     if (e.key === 'Backspace' && !query && place) {
       e.preventDefault()
-      // Backing out hands you the word again, one letter shorter, as if you'd just pressed delete.
       setQuery(place.slice(0, -1).toLowerCase())
       setPlace(null)
     }
@@ -243,10 +225,8 @@ export function Palette({ open, onOpenChange, sound, toggleSound }: { open: bool
 
   const count = items.length
   const best = items[at]?.name ?? ''
-  // The ghost only shows while what you typed really is the start of the word.
   const ghost = query && best.toLowerCase().startsWith(query.toLowerCase()) ? best.slice(query.length) : ''
   const labels = new Set(items.map((i) => i.group).filter(Boolean)).size
-  // A long list stops halfway through a row, so you can see there's more.
   const body = count ? (count > VISIBLE ? (VISIBLE + 0.5) * ROW + labels * LABEL + TRAY : count * ROW + labels * LABEL + TRAY * 2) : 72
 
   return (
@@ -296,7 +276,6 @@ export function Palette({ open, onOpenChange, sound, toggleSound }: { open: bool
                         <span ref={mirror} className="invisible">
                           {query}
                         </span>
-                        {/* Typing has no delay, so neither does the rest of the word: no fade to blink through. */}
                         <span style={{ color: FAINT }}>{ghost}</span>
                       </span>
                       <input

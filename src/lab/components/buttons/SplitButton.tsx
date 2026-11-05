@@ -11,16 +11,10 @@ import { DropdownMenu } from '../overlays/DropdownMenu'
 import type { DropdownHandle } from '../overlays/DropdownMenu'
 
 export type SplitOption = { id: string; label: string; icon?: ReactNode }
-/** For demos and tests: open the menu, or pick an option by its index, without touching focus. */
 export type SplitHandle = { open(): void; choose(index: number): void }
 
 const HOVER = 'hover:bg-[color-mix(in_oklch,var(--surface)_10%,transparent)]'
 
-/**
- * One action with other ways to do it: Merge, or squash, or rebase. The main half does the
- * current way; the chevron opens the others. Pick one and the label reshapes to it on a spring,
- * the button growing or shrinking from its left edge, so the next press does what it says.
- */
 export function SplitButton({
   options,
   value,
@@ -29,15 +23,10 @@ export function SplitButton({
   label = 'Other ways',
   ref,
 }: {
-  /** The ways to do it. */
   options: SplitOption[]
-  /** The current way, by id. */
   value: string
-  /** Called when another way is picked from the menu. */
   onValueChange: (id: string) => void
-  /** Called when the main half is pressed, with the current way. */
   onAction: (id: string) => void
-  /** Accessible name for the chevron and its menu. */
   label?: string
   ref?: Ref<SplitHandle>
 }) {

@@ -1,7 +1,6 @@
 import { TEMPLATES } from '@/catalog/templates'
 import type { RailGroup } from '../exhibit/Rail'
 
-/** The templates for the list down the side: apps first, then landing pages, each with what it is. */
 export const TEMPLATE_RAIL: RailGroup[] = (
   [
     ['app', 'Apps'],

@@ -8,35 +8,18 @@ import { ease, dur, spring } from '@/lab/lib/motion'
 
 export type DockTool = {
   id: string
-  /** What the tool is called, for screen readers and the panel's name. */
   label: string
   icon: ReactNode
-  /** What the dock becomes when this tool is open. */
   panel: ReactNode
-  /** The panel's height in px, not counting the dock row. */
   height: number
-  /** A count on the tool, like unread notes. It clears when you pass 0. */
   badge?: number
-  /** A single key that opens the tool from anywhere on the page, like "/" or "s". */
   shortcut?: string
 }
-/** For demos and tests: open a tool, or close the dock, without a pointer. */
 export type DockHandle = { open(id: string | null): void }
 
 const ROW = 52
 const MORPH = spring.move
 
-/**
- * A small floating toolbar at the foot of a page that becomes whatever its tools open. Press a
- * tool and the pill itself grows upward into that tool's panel while the page behind recedes;
- * press another and the panel reshapes into the next one without closing. The tools stay as the
- * panel's last row, a plate under the open one, so the way out is always where the way in was.
- *
- * One surface throughout: nothing pops over the dock, it stretches. Panels are laid out at their
- * full width from the start, so nothing inside reflows while the surface grows. Escape, a press
- * outside, or the open tool again shrinks it back into the pill. Closed, the tool under the pointer
- * names itself in a small pill above the dock; tools can carry a count and a one-key shortcut.
- */
 export function MorphingDock({
   tools,
   children,
@@ -45,15 +28,10 @@ export function MorphingDock({
   onChange,
   ref,
 }: {
-  /** The tools, left to right, each with the panel it opens. */
   tools: DockTool[]
-  /** The page the dock floats over. It recedes while a panel is open. The dock fills its parent and lays the page in absolutely, so give the parent a height. */
   children?: ReactNode
-  /** Every panel's width in px. */
   width?: number
-  /** Blur and set back the page while a panel is open. */
   recede?: boolean
-  /** Called with the open tool's id, or null when the dock closes. */
   onChange?: (id: string | null) => void
   ref?: Ref<DockHandle>
 }) {
@@ -75,7 +53,6 @@ export function MorphingDock({
   }
   useImperativeHandle(ref, () => ({ open: set }))
 
-  // Each tool's shortcut opens it from anywhere, unless someone is typing.
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       const el = e.target instanceof Element ? e.target : null
@@ -123,7 +100,6 @@ export function MorphingDock({
       </motion.div>
 
       <div className="pointer-events-none absolute inset-x-0 bottom-7 flex justify-center">
-        {/* Closed, the tool under the pointer names itself in a small pill above the dock, gliding from tool to tool. */}
         <AnimatePresence>
           {!tool && hover && (
             <motion.div
@@ -191,7 +167,6 @@ export function MorphingDock({
                 >
                   {on && <motion.span layoutId="dock-plate" className="absolute inset-0 rounded-full bg-surface-2" transition={reduce ? { duration: 0 } : MORPH} />}
                   <span className="relative">{t.icon}</span>
-                  {/* A count waiting on the tool, popping in and out. */}
                   <AnimatePresence>
                     {!!t.badge && !on && (
                       <motion.span

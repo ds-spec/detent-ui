@@ -11,7 +11,6 @@ const highlight = (code: string, f: string) =>
     defaultColor: false,
   })
 
-/** Reads and highlights a component's files, at build time. Pro source never leaves whole. */
 export async function buildSource(id: string): Promise<SourceFile[]> {
   const gated = locked(id)
   return Promise.all(

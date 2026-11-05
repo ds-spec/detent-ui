@@ -16,7 +16,6 @@ const mail = (
   </a>
 )
 
-/** The refund policy: short, because it is. */
 export default function Refunds() {
   return (
     <LegalPage

@@ -7,7 +7,6 @@ import { Switch } from '../ui/Switch'
 import { useBench } from './bench'
 import { hover, pressed } from '@/lab/lib/hand'
 
-/** A number with a quiet line of its last two weeks under it. */
 function Stat({ label, value, delta, points }: { label: string; value: string; delta: string; points: number[] }) {
   const max = Math.max(...points)
   const min = Math.min(...points)
@@ -38,7 +37,6 @@ const ACTIVITY = [
   { who: 'Sam Rivera', what: 'invited', target: '3 teammates', when: '3h' },
 ]
 
-/** Walks the tabs forward and back, so you see content arrive from the side you moved toward. Hovering pauses; touching hands it over. */
 export function TabsDemo() {
   const b = useBench()
   const tabs = useRef<TabsHandle>(null)
@@ -63,7 +61,6 @@ export function TabsDemo() {
     }
   }, [])
 
-  // Fixed-height frame with the card pinned to the top, so the tab bar never moves under the cursor.
   return (
     <div className="flex h-[300px] w-[380px] max-w-full items-start" {...hover(held)} {...pressed(() => (touched.current = true))} onKeyDownCapture={() => (touched.current = true)}>
       <DirectionTabs

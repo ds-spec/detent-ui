@@ -11,16 +11,9 @@ export type Line = { id: string; from: 'me' | 'agent'; text: string; typing?: bo
 
 const spring = { type: 'spring', stiffness: 420, damping: 34 } as const
 
-/**
- * Typing that keeps a person's rhythm: a burst, a pause to think, another burst. While a burst
- * runs, a soft wave passes through the dots; in a pause the wave dies down and they rest, then it
- * picks up again. The rhythm comes from the line's id, so each reply types a little differently
- * but the same reply always types the same way.
- */
 function Dots({ seed, still }: { seed: string; still: boolean }) {
   const dots = useRef<(HTMLSpanElement | null)[]>([])
   const s = useRef({ t: 0, phase: 0, amp: 0 })
-  // Burst and pause lengths, in ms, picked from the seed.
   const hash = [...seed].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7)
   const beats = [900 + (hash & 0x1ff), 340 + ((hash >> 9) & 0xff), 650 + ((hash >> 17) & 0x1ff), 520 + ((hash >> 3) & 0xff)]
   useAnimationFrame((_, delta) => {
@@ -37,7 +30,6 @@ function Dots({ seed, still }: { seed: string; still: boolean }) {
       }
       at -= beats[i]
     }
-    // The wave rises quickly into a burst and settles slowly out of it.
     st.amp += ((typing ? 1 : 0) - st.amp) * Math.min(1, delta / (typing ? 90 : 260))
     st.phase += (delta / 1000) * Math.PI * 2 * 1.6 * (0.35 + 0.65 * st.amp)
     dots.current.forEach((el, d) => {
@@ -63,25 +55,13 @@ function Dots({ seed, still }: { seed: string; still: boolean }) {
   )
 }
 
-/**
- * A conversation where the reply grows out of its own typing bubble. The dots keep a person's
- * rhythm, bursts and pauses rather than a loop; when the words are ready, the same bubble springs
- * open to the reply's measured size and the words arrive one after another inside it. Your
- * messages are ink; theirs are a soft fill beside their avatar. Your last message says when it
- * was read, the moment they start to answer.
- *
- * The thread hangs from the bottom and older lines rise and fade at the top, so it never jumps.
- */
 export function TypingBubble({
   lines,
   agent = { name: 'Detent', hue: 310 },
   readAt,
 }: {
-  /** The conversation, oldest first. A line marked typing shows the dots until its text arrives. */
   lines: Line[]
-  /** Who's answering: their name, for screen readers, and the hue of their orb, or an avatar of your own, 28px round. */
   agent?: { name: string; hue?: number; avatar?: ReactNode }
-  /** When your last message was read, shown beside Read, e.g. "9:41". */
   readAt?: string
 }) {
   const stack = useRef<HTMLDivElement>(null)
@@ -91,15 +71,12 @@ export function TypingBubble({
   const answering = lines.slice(lastMe + 1).some((l) => l.from === 'agent')
   return (
     <div className="relative h-[340px] w-[372px] max-w-full overflow-hidden" role="log" aria-live="polite">
-      {/* A plain fade at the top, not a mask, so moving lines don't recomposite under it. */}
       <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-14 bg-gradient-to-b from-surface to-transparent" />
       <div ref={stack} className="absolute inset-x-0 top-full flex -translate-y-full flex-col gap-1.5 pb-3">
         <AnimatePresence initial={false}>
           {lines.map((l, i) => {
             const mine = l.from === 'me'
-            // Their orb sits beside the last of their lines in a run, the way messages group.
             const tail = !mine && lines[i + 1]?.from !== 'agent'
-            // Space between runs is padding, not margin: the stack places rows by their height alone.
             const gap = i > 0 && lines[i - 1].from !== l.from
             return (
               <motion.div
@@ -114,7 +91,6 @@ export function TypingBubble({
                 {mine ? (
                   <div className="flex flex-col items-end">
                     <p className="max-w-[268px] rounded-[20px] rounded-br-[6px] bg-[light-dark(var(--ink),var(--surface-3))] px-3.5 py-2.5 text-body leading-5 text-[light-dark(var(--surface),var(--ink))]">{l.text}</p>
-                    {/* One line held under your last message, for when they've read it. */}
                     {i === lastMe && (
                       <span className="relative mt-1 h-4 pr-1 text-caption text-ink-3">
                         <AnimatePresence>

@@ -13,11 +13,8 @@ import type { PulseHandle } from '../components/FeedbackPulse'
 import { useBench } from './bench'
 import { hover, pressed } from '@/lab/lib/hand'
 
-/* ───────────────────────────── Tag input ───────────────────────────── */
-
 const TOPICS = ['Design systems', 'Motion', 'Typography', 'Accessibility', 'React', 'Prototyping', 'Colour', 'Interaction design', 'Research', 'Illustration', 'Branding', 'Animation']
 
-/** Tags a post before it's published: adds a suggested topic, tries a duplicate (it nudges the one you have), removes with two Backspaces, pastes a list, then creates a topic of its own. Hovering pauses; touching hands it over. */
 export function TagsDemo() {
   const b = useBench()
   const tags = useRef<TagsHandle>(null)
@@ -76,7 +73,6 @@ export function TagsDemo() {
       <p className="text-caption text-ink-3">Publish to the journal</p>
       <p className="mt-1 text-title text-ink">Designing for the half-second</p>
       <p className="mt-1 text-footnote text-ink-3">Draft · 6 min read</p>
-      {/* Held at two rows of tags, so the card never grows as they land. */}
       <div className="mt-6 h-[146px]">
         <TagInput ref={tags} width={412} initial={['Motion', 'Typography']} suggestions={TOPICS} label={b.get('label', 'Topics')} max={b.get('max', 8)} placeholder={b.get('placeholder', 'Add a topic…')} onChange={b.on('onChange')} />
       </div>
@@ -91,8 +87,6 @@ export function TagsDemo() {
   )
 }
 
-/* ───────────────────────────── Undo delete ───────────────────────────── */
-
 const FILES: Entry[] = [
   { id: 'f1', name: 'Q3 board update.pdf', meta: '1.1 MB · Edited 2h ago' },
   { id: 'f2', name: 'hero-shot.png', meta: '2.4 MB · Edited yesterday', preview: 'linear-gradient(180deg, #c7d3e6 0%, #e9ddcc 54%, #8e9c7c 55%, #6a7a5c 100%)' },
@@ -101,7 +95,6 @@ const FILES: Entry[] = [
   { id: 'f5', name: 'release-notes.md', meta: '4 KB · Edited Oct 9' },
 ]
 
-/** Deletes two files in a burst and takes them back, then lets one go for good. Hovering pauses it; touching hands it over. */
 export function UndoDemo() {
   const b = useBench()
   const list = useRef<UndoHandle>(null)
@@ -149,9 +142,6 @@ export function UndoDemo() {
   )
 }
 
-/* ───────────────────────────── Feedback ───────────────────────────── */
-
-/** Rates the page it sits under: the dots fill as it points, a 4 opens the card, two reasons, Send. Hovering pauses; touching hands it over. */
 export function FeedbackDemo() {
   const b = useBench()
   const pulse = useRef<PulseHandle>(null)
@@ -191,7 +181,6 @@ export function FeedbackDemo() {
 
   return (
     <div className="@container relative h-[420px] w-[420px] max-w-full max-sm:overflow-x-clip" {...hover(held)} {...pressed(() => (touched.current = true))} onKeyDownCapture={() => (touched.current = true)}>
-      {/* The end of a docs page, so the widget has something to be about. */}
       <div className="absolute inset-x-0 top-6 px-1" style={{ maskImage: 'linear-gradient(to bottom, #000 55%, transparent 92%)' }}>
         <p className="text-footnote text-ink-3">Docs / Billing</p>
         <p className="mt-1.5 text-title text-ink">How refunds work</p>
@@ -200,7 +189,6 @@ export function FeedbackDemo() {
         </p>
         <p className="mt-3 text-callout leading-[23px] text-ink-2">Annual plans can be refunded within 45 days. Anything above $500 needs a second approval from finance before it’s sent.</p>
       </div>
-      {/* Anchored to the bottom so the card grows upward over the page, like a real docs footer. */}
       <div className="absolute inset-x-0 bottom-6 flex justify-center">
         <FeedbackPulse ref={pulse} question={b.get('question', 'Was this helpful?')} onSend={b.on('onSend')} />
       </div>
@@ -208,9 +196,6 @@ export function FeedbackDemo() {
   )
 }
 
-/* ───────────────────────────── Upload ───────────────────────────── */
-
-/** Drags three files over the folder (its flap tips open), drops them, lets them upload, and starts again. Hovering pauses; touching hands it over. */
 export function UploadDemo() {
   const b = useBench()
   const up = useRef<UploadHandle>(null)

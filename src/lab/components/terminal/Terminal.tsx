@@ -11,7 +11,6 @@ type Tone = 'plain' | 'muted' | 'ok' | 'accent' | 'error'
 export type Step =
   | { type: 'cmd'; text: string }
   | { type: 'out'; text: ReactNode; tone?: Tone; wait?: number; run?: () => void }
-  /** A spinner that resolves into a check with how long it took. */
   | { type: 'task'; text: string; ms: number; start?: () => void; run?: () => void }
   | { type: 'pause'; ms: number }
 
@@ -24,15 +23,8 @@ const TONE: Record<Tone, string> = { plain: 'text-ink', muted: 'text-ink-3', ok:
 
 const sleep = (ms: number, signal: { live: boolean }) => new Promise<void>((r, x) => setTimeout(() => (signal.live ? r() : x(new Error('stopped'))), ms))
 
-/** Human typing: quick within words, a beat after spaces and punctuation, never perfectly even. */
 const keyDelay = (c: string) => (c === ' ' ? 90 : /[-/.@]/.test(c) ? 70 : 28) + Math.random() * 46
 
-/**
- * A terminal that plays a script. Commands are typed with a human rhythm, tasks spin on a
- * braille spinner and resolve into a check with their timing, and output streams in. It keeps
- * a fixed number of rows and scrolls like a real terminal, so it never changes size.
- * Steps can run a callback as they land, to drive other parts of the page.
- */
 export function Terminal({
   steps,
   rows = 4,
@@ -50,7 +42,6 @@ export function Terminal({
 }) {
   const [lines, setLines] = useState<Line[]>([])
   const [typing, setTyping] = useState(false)
-  // A prompt waits only before the first command and after the last step, never mid-run.
   const [idle, setIdle] = useState(true)
   const [frame, setFrame] = useState(0)
   const [fading, setFading] = useState(false)
@@ -61,7 +52,6 @@ export function Terminal({
   const restartRef = useRef(onRestart)
   restartRef.current = onRestart
 
-  // Spinner frames tick only while something is spinning.
   const spinning = lines.some((l) => l.kind === 'task' && !l.done)
   useEffect(() => {
     if (!spinning) return
@@ -122,7 +112,6 @@ export function Terminal({
     }
   }, [loop, restartAfter, reduce])
 
-  // Older lines slide up and out of a soft top edge, the way a terminal scrolls.
   const shift = Math.max(0, lines.length + (idle ? 1 : 0) - rows) * LINE
 
   return (
@@ -168,7 +157,6 @@ export function Terminal({
             </motion.div>
           ))}
         </AnimatePresence>
-        {/* The idle prompt, waiting for the next command. */}
         {idle && (
           <div className="flex h-5 items-center gap-2.5">
             <span className="text-ink-3">{prompt}</span>
@@ -180,11 +168,6 @@ export function Terminal({
   )
 }
 
-/**
- * The block caret, as tall as the prompt's glyphs and centred on them. Typing, it sits at the start
- * of the line taking no room and is carried to the end of what's typed by transform (one ch a
- * character, the type is monospace), so it moves on screen without moving in the layout.
- */
 function Caret({ at }: { at?: number }) {
   return (
     <span
@@ -195,10 +178,6 @@ function Caret({ at }: { at?: number }) {
   )
 }
 
-/**
- * A command to copy, the way docs should offer it. Copying sweeps a selection across the
- * command so you see exactly what you took, and the icon turns into a check.
- */
 export function CopyCommand({ command, prompt = '$' }: { command: string; prompt?: string }) {
   const [copied, setCopied] = useState(0)
   const timer = useRef(0)
@@ -207,14 +186,12 @@ export function CopyCommand({ command, prompt = '$' }: { command: string; prompt
     try {
       await navigator.clipboard.writeText(command)
     } catch {
-      /* Clipboard blocked: the sweep still shows what to copy by hand. */
     }
     setCopied((n) => n + 1)
     clearTimeout(timer.current)
     timer.current = window.setTimeout(() => setCopied(0), 1600)
   }
   return (
-    // Copy keeps to the end however wide the pill is laid out, its icon as far from the edge as the prompt.
     <div className="inline-flex h-10 items-center gap-2.5 rounded-full bg-surface pl-4 pr-2 font-mono text-footnote shadow-float">
       <span className="text-ink-3">{prompt}</span>
       <span className="relative text-ink">

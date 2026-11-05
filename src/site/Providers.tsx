@@ -7,14 +7,12 @@ import { MotionGlobalConfig } from 'motion/react'
 import { feedback } from '@/lab/lib/detent'
 import '@/lab/lib/feel'
 
-// The palette, and the catalogue it lists, are only fetched the first time someone asks for search.
 const Search = dynamic(() => import('./Search').then((m) => m.Search), { ssr: false })
 
 type Site = {
   openSearch: () => void
   sound: boolean
   toggleSound: () => void
-  /** A short mechanical click, if sound is on. */
   tick: () => void
 }
 
@@ -27,17 +25,13 @@ export function Providers({ children }: { children: ReactNode }) {
   const [sound, setSound] = useState(false)
 
   useEffect(() => {
-    // Dev only: lets automated checks jump animations to their end state.
     if (process.env.NODE_ENV !== 'production') Object.assign(window, { __motion: MotionGlobalConfig })
     try {
       setSound(localStorage.getItem('sound') === 'on')
     } catch {
-      /* storage unavailable */
     }
   }, [])
 
-  // Fetch the palette as soon as someone shows they might want it: a pointer or focus on a search
-  // button, or ⌘/Ctrl held down. Never on load, so its catalogue stays off ordinary page loads.
   useEffect(() => {
     const warm = () => {
       void import('./Search')
@@ -81,25 +75,21 @@ export function Providers({ children }: { children: ReactNode }) {
       try {
         localStorage.setItem('sound', next ? 'on' : 'off')
       } catch {
-        /* storage unavailable */
       }
       return next
     })
   }, [])
 
-  // The site's one sound setting is the library's off switch, so a piece never clicks with it off.
   useEffect(() => {
     feedback.set(sound)
     if (sound) feedback.warm()
   }, [sound])
 
-  // The same voice as every piece: off, it stays silent and doesn't buzz.
   const tick = useCallback(() => {
     feedback.wake()
     feedback.tick()
   }, [])
 
-  // Components announce real presses; with sound on, each one clicks.
   useEffect(() => {
     window.addEventListener('detent:tap', tick)
     return () => window.removeEventListener('detent:tap', tick)

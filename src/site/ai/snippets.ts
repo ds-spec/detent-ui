@@ -55,7 +55,6 @@ export function Assistant() {
   )
 }`
 
-/** The code the AI SDK page shows, highlighted at build time. */
 export const AI_FILES = [
   { name: 'app/support/page.tsx', note: 'The whole screen: the Agent chat block, pointed at your route.', code: BLOCK },
   { name: 'app/api/chat/route.ts', note: 'A plain AI SDK route. Tools that need a person say so with needsApproval.', code: ROUTE },

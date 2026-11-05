@@ -1,12 +1,3 @@
-/**
- * Which props each component's demo lets you change on the components page, and the value the
- * demo starts from. Booleans become switches, numbers steppers (within `range`), strings text
- * fields, and anything with `options` a segmented choice. Every other prop is still listed,
- * read from the source; callbacks light up when they fire.
- *
- * The demo reads each of these with `useBench().get(name, ownValue)`, so its own value here and
- * in the demo must match.
- */
 export type Knob = { value: boolean } | { value: number; range: [number, number]; step?: number } | { value: string | number; options: (string | number)[] } | { value: string }
 
 const SIDES = ['top', 'right', 'bottom', 'left']

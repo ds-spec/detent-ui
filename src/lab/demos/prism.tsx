@@ -3,7 +3,6 @@
 import { useBench } from './bench'
 import { Prism } from '../components/prism/Prism'
 
-/** A product's hero: the headline is the glass, and the cursor (or the sun, left alone) is the light. */
 export function PrismDemo() {
   const b = useBench()
   return (

@@ -22,18 +22,9 @@ export const metadata: Metadata = page({
   image: '/opengraph-image',
 })
 
-/*
- * Get started, built the way the best quickstarts are. Resend opens with a prompt you can hand to
- * a coding agent; shadcn asks where you're starting from and answers with numbered steps on a
- * line. So: the prompt first, three ways in, then the steps, each with the exact command or file,
- * then what to do when one fails and where to go next. Everything here comes from the registry
- * itself, so a command on this page is always the one that works.
- */
-
 const LINK = 'ring-focus rounded-[4px] text-[var(--accent-ink)] hover:underline'
 const HOST = SITE.replace(/^https?:\/\//, '')
 
-/** The free component the page installs as its example: Popup when it's free, else the first free one. */
 const FIRST = ENTRIES.find((e) => e.id === 'popup' && !isProComponent(e.id)) ?? ENTRIES.find((e) => !isProComponent(e.id))!
 
 const PROMPT = `Read ${SITE}/llms.txt to learn the Detent component library. Then install the ${FIRST.name} component into this project with the shadcn CLI, using the exact command listed there, and use it on the home page. If the project has no components.json yet, run shadcn init first.`
@@ -97,7 +88,6 @@ export default function Docs() {
               Detent installs with the shadcn CLI, so every piece lands in your project as source you own. {free} components are free under MIT; the rest come with Pro.
             </p>
 
-            {/* With your coding agent: one prompt, the way Resend opens its quickstarts. */}
             <section id="agent" aria-labelledby="agent-h" className="mt-12 scroll-mt-28 rounded-[16px] bg-[var(--mount)] p-2 shadow-[0_0_0_1px_var(--line)]">
               <div className="flex flex-wrap items-center justify-between gap-3 px-3 pb-3 pt-2">
                 <div>
@@ -111,7 +101,6 @@ export default function Docs() {
               <p className="rounded-[11px] bg-surface px-4 py-3.5 font-mono text-[13px] leading-[1.7] text-ink-2 shadow-[0_0_0_1px_var(--line)]">{PROMPT}</p>
             </section>
 
-            {/* Three ways in, as shadcn asks where you're starting from. */}
             <div className="mt-6 grid gap-2 sm:grid-cols-3">
               <Way href="#install" title="Start a new app" line="Set up shadcn, then add your first piece." />
               <Way href="#use" title="Add to your app" line="Already on shadcn? Two commands." />
@@ -202,7 +191,6 @@ export default function Docs() {
             </Section>
           </div>
 
-          {/* On this page, beside the steps on a laptop. */}
           <nav aria-label="On this page" className="hidden lg:block">
             <div className="sticky top-28">
               <p className="text-[13px] text-ink-2">On this page</p>
@@ -240,7 +228,6 @@ function Steps({ children }: { children: ReactNode }) {
   return <ol className="grid grid-cols-[minmax(0,1fr)]">{children}</ol>
 }
 
-/** One step: its number on the line that joins the steps, its title and line, then the command or file. */
 function Step({ n, id, title, line, last = false, children }: { n: number; id?: string; title: string; line: ReactNode; last?: boolean; children?: ReactNode }) {
   return (
     <li id={id} className={`relative min-w-0 scroll-mt-28 pl-12 ${last ? '' : 'pb-10'}`}>
@@ -267,7 +254,6 @@ function Way({ href, title, line }: { href: string; title: string; line: string 
   )
 }
 
-/** A problem and its fix, folded until you open it. */
 function Fix({ q, children }: { q: string; children: ReactNode }) {
   return (
     <details className="group/fix bg-surface shadow-[inset_0_-1px_0_var(--line)] last:shadow-none">

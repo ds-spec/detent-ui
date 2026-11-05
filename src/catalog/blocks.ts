@@ -1,33 +1,21 @@
-/**
- * Blocks: whole screens built from Detent components, playing live. Plain data, safe for the
- * server; the blocks themselves are looked up by id through `@pro`. Which are free is FREE_BLOCKS in pro.ts.
- */
 import { BLOCK_IDS } from './block-ids'
 import type { BlockId } from './block-ids'
 
 export type BlockKind = 'app' | 'flow' | 'section'
 
-/** One prop, as the block page documents it. */
 export type Prop = { name: string; type: string; default?: string; note: string }
 
 export type Block = {
   id: BlockId
   name: string
-  /** The component's export name, for the usage line. */
   component: string
   kind: BlockKind
-  /** The app's name in the window's title bar. */
   window: string
-  /** How the window around it looks: an app with a sidebar, a titled window, or a browser. */
   chrome?: 'app' | 'titled' | 'browser'
-  /** Three to six words for the page's title, under the name. */
   short: string
-  /** One sentence: what it is. */
   line: string
-  /** What makes it, for the detail page. */
   details: string[]
   keys?: [string, string][]
-  /** What it takes, beyond the props every block takes. */
   props: Prop[]
 }
 
@@ -37,7 +25,6 @@ export const KINDS: Record<BlockKind, string> = {
   section: 'Marketing section',
 }
 
-/** Every block takes these. */
 export const COMMON: Prop[] = [
   { name: 'accent', type: 'string', default: "'#3a5bf6'", note: 'The one accent colour. Selection, focus, links and the AI’s glow all derive from it.' },
   { name: 'autoplay', type: 'boolean', default: 'true', note: 'Plays the scripted demo. It hands over for good the moment someone touches the block.' },
@@ -558,14 +545,11 @@ export const BLOCKS: Block[] = [
   },
 ]
 
-/** What's being built next, shown honestly as coming. */
-// Each id is typed against BLOCK_IDS; this catches the other way round, an id left there after its block went.
 if (process.env.NODE_ENV !== 'production' && BLOCK_IDS.length !== BLOCKS.length) console.error(`block-ids.ts lists ${BLOCK_IDS.length} blocks, blocks.ts has ${BLOCKS.length}. Keep them in step.`)
 
 export const SOON: { name: string; kind: BlockKind; line: string }[] = []
 
 export const block = (id: string) => BLOCKS.find((b) => b.id === id)
 
-/** The blocks the way the site lists them: app screens, then flows, then marketing sections. */
 export const BLOCK_GROUPS = (['app', 'flow', 'section'] as const).map((k) => ({ k, items: BLOCKS.filter((b) => b.kind === k) }))
 export const BLOCK_ORDER = BLOCK_GROUPS.flatMap((g) => g.items)

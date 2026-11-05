@@ -18,7 +18,6 @@ export const metadata: Metadata = { title: 'Account', robots: { index: false, fo
 
 type Back = { bought?: string; status?: string; email?: string; error?: string; next?: string }
 
-/** Why GitHub came back without signing anyone in, said plainly. */
 const oauthError = (code?: string) =>
   !code
     ? undefined
@@ -30,9 +29,7 @@ async function Account({ query }: { query: Promise<Back> }) {
   const [account, back] = await Promise.all([currentAccount(), query])
   const providers = Object.keys(socialProviders()) as Provider[]
   const error = oauthError(back.error)
-  // On the way to buy: sign in (which makes the account) and then go on to the store.
   const next = safeNext(back.next)
-  // Back from checkout: Dodo says how the payment went and which address paid.
   const fromCheckout = back.bought === '1'
   if (fromCheckout && back.status === 'failed')
     return (
@@ -50,7 +47,6 @@ async function Account({ query }: { query: Promise<Back> }) {
     if (fromCheckout) return <SignIn title="Thank you. Now your key." lead="Your payment went through. Sign in with the address you paid with, and your key works right away." email={back.email} {...shared} />
     return <SignIn title="Sign in to Detent" lead="Get your keys for the Pro registry." {...shared} />
   }
-  // Already signed in on the way to buy: straight on to the store.
   if (next !== '/account') redirect(next)
 
   const [purchase, keys] = await Promise.all([purchaseFor(account.email), listKeys(account.email)])
@@ -58,7 +54,6 @@ async function Account({ query }: { query: Promise<Back> }) {
   return <AccountView account={account} purchase={purchase} keys={keys} usage={usage} fromCheckout={fromCheckout} max={MAX_KEYS} />
 }
 
-/** Sign in, and once in, the plan and the keys. Everything that knows who you are streams in behind Suspense. */
 export default function AccountPage({ searchParams }: PageProps<'/account'>) {
   return (
     <>

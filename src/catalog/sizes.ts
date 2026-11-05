@@ -1,8 +1,3 @@
-/**
- * Each demo's natural size in px, measured. The component stage and the gallery size themselves
- * from these, so a demo shows as large as it can from the first paint instead of being measured,
- * found too big and shrunk once it's on screen.
- */
 export const SIZE: Record<string, [number, number]> = {
   scaffold: [720, 328],
   answer: [720, 480],
@@ -68,7 +63,6 @@ export const SIZE: Record<string, [number, number]> = {
   secret: [620, 560],
   halo: [860, 560],
   slices: [860, 560],
-  // Bleeds on a laptop, so only its height counts there; the width sets its taller shape on a phone.
   region: [460, 620],
   find: [640, 560],
   reveal: [520, 740],
@@ -86,7 +80,6 @@ export const SIZE: Record<string, [number, number]> = {
   tooltip: [520, 360],
 }
 
-/** The gallery shows a smaller spot version of some components: their sizes, where they differ. */
 export const SPOT_SIZE: Record<string, [number, number]> = {
   answer: [420, 400],
   diff: [420, 312],

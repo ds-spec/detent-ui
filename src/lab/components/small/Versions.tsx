@@ -8,20 +8,10 @@ import { tap } from '../../lib/feel'
 import { ease, press } from '../../lib/motion'
 import { RollingText } from '../../ui/RollingText'
 
-/** For demos and tests: step and regenerate without touching focus. */
 export type VersionsHandle = { prev(): void; next(): void; regenerate(): void }
 
-/**
- * A reply and its versions. Regenerate spins once, a quiet shimmer keeps the reply's place,
- * and the new version slides in while the count rolls on. The arrows step back through
- * earlier versions, each arriving from the side you stepped toward. The reply's box springs to
- * each version's height, so nothing outside it moves, and the controls ride that height by
- * transform rather than being pushed. ← → step, R regenerates.
- */
 export function Versions({ initial, generate, ref }: {
-  /** The versions so far, oldest first. The newest is shown. */
   initial: string[]
-  /** Makes version n. Resolve with its text; the shimmer holds the reply's place until then. */
   generate: (n: number) => Promise<string>
   ref?: Ref<VersionsHandle>
 }) {
@@ -54,7 +44,6 @@ export function Versions({ initial, generate, ref }: {
   })
   useImperativeHandle(ref, () => ({ prev: () => latest.current.go(-1), next: () => latest.current.go(1), regenerate: () => latest.current.regenerate() }), [])
 
-  // The box follows the text's height on a spring.
   const inner = useRef<HTMLDivElement>(null)
   const h = useMotionValue(0)
   useLayoutEffect(() => {
@@ -98,7 +87,6 @@ export function Versions({ initial, generate, ref }: {
               aria-live="polite"
             >
               {busy ? (
-                // Three placeholder lines on the reply's own line height, so the box hardly moves.
                 <div aria-label="Writing a new version">
                   {[92, 100, 64].map((w, i) => (
                     <span key={i} className="flex h-[23px] items-center">
@@ -114,7 +102,6 @@ export function Versions({ initial, generate, ref }: {
         </div>
       </motion.div>
 
-      {/* The controls' room in the card. They sit at the top and are carried down by the reply's height. */}
       <div className="h-14" />
       <motion.div className="absolute inset-x-5 top-5 mt-4 flex items-center gap-0.5" style={{ y: h }}>
         <Icon label="Previous version" disabled={busy || at === 0} onClick={() => go(-1)}>

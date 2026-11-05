@@ -8,17 +8,8 @@ import { Search } from '@/lab/icons'
 import { Kbd } from '@/lab/ui/Kbd'
 import { useSite } from './Providers'
 
-/* ───────────────────────────── The missing piece ───────────────────────────── */
-
-/*
- * The mark at 8px a unit, on a 316 × 168 stage whose bottom edge is the floor: the slab, the
- * dashed seat its half-disc belongs in, and the half-disc itself, lying on its flat side to the
- * right. The piece's x and y are measured from where it lies; SEAT is its seat from there.
- */
 const SEAT = { x: -148, y: -36 }
-/** Let go of it this close to its seat and it clicks in. */
 const REACH = 44
-/** Where on the floor it can come to rest, from where it lies: clear of the seat, inside the stage. */
 const FLOOR: [number, number] = [-20, 0]
 const CLICK = { type: 'spring', stiffness: 900, damping: 21, mass: 0.6 } as const
 const HOME = { type: 'spring', stiffness: 420, damping: 32 } as const
@@ -27,27 +18,17 @@ const SWAY = { type: 'spring', stiffness: 260, damping: 17 } as const
 const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
 const away = (x: number, y: number) => Math.hypot(x - SEAT.x, y - SEAT.y)
-/** Upright in its seat, lying flat on the floor, and turning between the two as it's carried. */
 const lean = (d: number) => {
   const t = clamp((d - 12) / 150, 0, 1)
   return -90 * t * t * (3 - 2 * t)
 }
 
-/**
- * The 404's one moment, made of the mark. The page opens with the Seated D whole; then its
- * half-disc slides out of its seat, tips over and lands on the floor beside the slab, leaving
- * the seat as a dashed outline. Pick it up and it turns upright as it nears the seat, which
- * lights in the accent once it's in reach. Let go there and it clicks home, with the site's
- * click when sound is on, and the headline admits the page is still gone. Let go anywhere else
- * and it drops back to the floor. Enter or a tap does the same without dragging.
- */
 export function Missing() {
   const { tick } = useSite()
   const x = useMotionValue(SEAT.x)
   const y = useMotionValue(SEAT.y)
   const turn = useMotionValue(0)
   const nudge = useMotionValue(0)
-  // The seat's outline gives way as the piece arrives, so no dash shows round its edge once it's home.
   const empty = useTransform(() => clamp(away(x.get(), y.get()) / 8, 0, 1))
   const [hot, setHot] = useState(false)
   const [fixed, setFixed] = useState(false)
@@ -57,7 +38,6 @@ export function Missing() {
   const later = (fn: () => void, ms: number) => void timers.current.push(window.setTimeout(fn, ms))
   useEffect(() => () => timers.current.forEach(clearTimeout), [])
 
-  /** Off the seat to the right, then over onto its flat side, landing with a little bounce. */
   const fall = () => {
     if (calm()) return void (x.set(clamp(x.get(), ...FLOOR)), y.set(0), turn.set(-90))
     const from = y.get()
@@ -71,7 +51,6 @@ export function Missing() {
     animate(turn, -90, SWAY)
   }
 
-  /** Home into its seat: the spring passes it a hair and brings it back, and the slab takes the knock. */
   const seat = () => {
     const far = away(x.get(), y.get())
     setFixed(true)
@@ -90,7 +69,6 @@ export function Missing() {
     )
   }
 
-  /** Pulled out of its seat: a short slide right to clear it, then the fall. */
   const unseat = () => {
     setFixed(false)
     if (calm()) return fall()
@@ -101,7 +79,6 @@ export function Missing() {
     })
   }
 
-  // The page opens with the mark whole; a moment later the piece falls out, unless it's already in hand.
   const intro = useRef(0)
   useEffect(() => {
     if (calm()) return void (x.set(0), y.set(0), turn.set(-90))
@@ -115,7 +92,6 @@ export function Missing() {
       <div className="relative h-[168px] w-[316px] max-w-full select-none text-ink">
         <svg width="316" height="168" viewBox="0 0 316 168" aria-hidden className="absolute inset-0 overflow-visible">
           <motion.rect x="0" y="24" width="44" height="144" rx="8.8" fill="currentColor" style={{ x: nudge }} />
-          {/* The seat, drawn a hair inside where the piece sits. */}
           <motion.path
             d="M60.75 24.75a71.25 71.25 0 0 1 0 142.5z"
             fill="none"
@@ -176,10 +152,6 @@ export function Missing() {
   )
 }
 
-/**
- * The headline's second line: what to do, until the piece is back; then an honest aside. The two
- * share one grid cell, so the taller of them holds the height and swapping never moves the page.
- */
 function Aside({ fixed }: { fixed: boolean }) {
   const line = (on: boolean) => `col-start-1 row-start-1 transition-[translate,opacity] duration-300 ease-[cubic-bezier(0.2,0.9,0.25,1)] ${on ? '' : 'opacity-0'}`
   return (
@@ -194,15 +166,8 @@ function Aside({ fixed }: { fixed: boolean }) {
   )
 }
 
-/* ───────────────────────────── The closest page ───────────────────────────── */
-
-/** A page someone might have meant: what they'd type to reach it, and where it really is. */
 export type Page = { path: string; href: string }
 
-/**
- * How many edits turn `a` into `b`, a swapped pair counting as one, and which of `b`'s letters
- * those edits touched.
- */
 function edits(a: string, b: string) {
   const d = Array.from({ length: a.length + 1 }, (_, i) => Array.from({ length: b.length + 1 }, (_, j) => (i ? (j ? 0 : i) : j)))
   const swapped = (i: number, j: number) => i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1] && a[i - 1] !== b[j - 1]
@@ -231,11 +196,6 @@ function edits(a: string, b: string) {
 
 const last = (p: string) => p.slice(p.lastIndexOf('/') + 1)
 
-/**
- * The page closest to what was asked for, by the whole path or by its last part alone (so
- * /thinking finds /components/thinking). A near miss marks the letters that were off; a far one,
- * or a match on the last part, shows the path plain.
- */
 function nearest(asked: string, pages: Page[]) {
   const typed = asked.replace(/\/+$/, '') || '/'
   const want = typed.toLowerCase()
@@ -255,12 +215,6 @@ function nearest(asked: string, pages: Page[]) {
 
 const never = () => () => {}
 
-/**
- * One line under the headline. If what was asked for is a near miss of a real page, it offers
- * that page, with the letters that were off in the accent; if nothing is close, it says plainly
- * that nothing lives there. Only the browser knows the address (the page was rendered once for
- * every miss), so the line's slot is held from the first paint and its words fade in.
- */
 export function Nearest({ pages }: { pages: Page[] }) {
   const path = usePathname()
   const ready = useSyncExternalStore(never, () => true, () => false)
@@ -294,7 +248,6 @@ function decode(path: string) {
   }
 }
 
-/** The way out when nothing is close: the site's search, which ⌘K also opens. */
 export function SearchPill() {
   const { openSearch } = useSite()
   return (

@@ -9,23 +9,12 @@ import { RollingText } from '../../ui/RollingText'
 export type Person = { id: string; name: string; hue: number; status: 'active' | 'idle'; typing?: boolean; note?: string }
 
 const SIZE = 32
-/** Closed, faces overlap by a sliver: enough to read as a group, never enough to hide a face. */
 const CLOSED = 28
 const OPEN = 38
 
 export const tone = (hue: number) => `oklch(0.62 0.13 ${hue})`
-/** The same colour, deep enough for white text on it. */
 export const label = (hue: number) => `oklch(0.53 0.13 ${hue})`
 
-/**
- * Who's here, at a glance.
- *
- * Avatars overlap until you point at them, then fan out to their names; the stack only
- * ever grows into space it already has, so nothing beside it moves. People joining slide in
- * from the left, people leaving shrink away and the rest close the gap, and the overflow
- * count rolls. A typing badge says who is writing, and idle people fade back. Click someone
- * to follow them: their colour rings the avatar, and the view goes where they go.
- */
 export function HereNow({
   people,
   max = 4,
@@ -33,15 +22,10 @@ export function HereNow({
   onFollow,
   open: forced,
 }: {
-  /** Who's here, each with a colour, a status and what they're doing. */
   people: Person[]
-  /** How many faces show before the rest become a count. */
   max?: number
-  /** The id of the person being followed, or null. */
   following: string | null
-  /** Called with a person's id to follow them, or null to stop. */
   onFollow: (id: string | null) => void
-  /** Hold the stack open, e.g. while a demo shows it off. */
   open?: boolean
 }) {
   const [hover, setHover] = useState(false)
@@ -50,7 +34,6 @@ export function HereNow({
   const root = useRef<HTMLDivElement>(null)
   const wasOpen = useRef(true)
 
-  // A finger can't leave: the stack stays fanned out until a tap lands somewhere else.
   useEffect(() => {
     if (!hover) return
     const away = (e: PointerEvent) => {
@@ -65,7 +48,6 @@ export function HereNow({
   const shown = people.slice(0, max)
   const extra = people.length - shown.length
   const step = open ? OPEN : CLOSED
-  // Room for everyone fanned out plus the overflow chip, reserved up front.
   const width = SIZE + (max - 1) * OPEN + OPEN
 
   return (
@@ -80,7 +62,6 @@ export function HereNow({
         setTip(null)
       }}
     >
-      {/* Laid out from the right edge, so the stack fans leftwards into its reserved space. */}
       <AnimatePresence initial={false}>
         {extra > 0 && (
           <motion.span
@@ -146,7 +127,6 @@ function Face({ p, followed }: { p: Person; followed: boolean }) {
   const reduce = useReducedMotion()
   return (
     <span className="relative block size-full">
-      {/* A ring of the page between faces; following adds one of their colour. Idle people lose their colour rather than their shape. */}
       <span className="block size-full rounded-full transition-[box-shadow,filter] duration-200" style={{ boxShadow: followed ? `0 0 0 2px var(--surface), 0 0 0 3.5px ${tone(p.hue)}` : '0 0 0 2px var(--surface)', filter: p.status === 'idle' ? 'grayscale(1)' : 'none' }}>
         <Orb seed={p.name} hue={p.hue} size={SIZE} />
       </span>
@@ -174,7 +154,6 @@ function Face({ p, followed }: { p: Person; followed: boolean }) {
   )
 }
 
-/** Someone else's pointer: it glides to where they point, with their name trailing it. */
 export function Cursor({ p, x, y, quiet }: { p: Person; x: number; y: number; quiet?: boolean }) {
   return (
     <motion.div

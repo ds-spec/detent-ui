@@ -9,12 +9,9 @@ import { FileGlyph } from '../../ui/FileGlyph'
 export type Upload = {
   id: string
   name: string
-  /** In bytes. */
   size: number
-  /** 0 to 1. */
   progress: number
   status: 'uploading' | 'done' | 'error'
-  /** A CSS background for images: the tile shows it, and it comes into focus as it uploads. */
   preview?: string
 }
 
@@ -22,29 +19,15 @@ const sizeOf = (b: number) => (b < 1024 ** 2 ? `${Math.max(1, Math.round(b / 102
 const extOf = (name: string) => (name.includes('.') ? name.split('.').pop()!.toUpperCase() : 'FILE')
 const enter = { type: 'spring', stiffness: 460, damping: 34 } as const
 
-/**
- * Attachments in a composer, each showing its upload in its own terms. An image is a square
- * of itself, blurred and quiet while it uploads, and the sharp picture rises through it as the
- * bytes go up, so it comes into focus the moment it's ready. A document is a card whose ground
- * fills as it goes, then settles to its kind and size. A failure tints in place and offers to
- * try again. Point at any file for its ✕.
- *
- * The row keeps one height, empty or full, and files arrive and leave sideways, so the
- * composer never changes size around them.
- */
 export function FileChips({
   files,
   onRemove,
   onRetry,
   empty = 'Attach files, or drop them here',
 }: {
-  /** The attachments, each with its progress and status. Images with a `preview` show as tiles. */
   files: Upload[]
-  /** Called with a file's id when a person removes it. */
   onRemove: (id: string) => void
-  /** Called with a file's id when a person retries a failed upload. */
   onRetry: (id: string) => void
-  /** What the row says while it's empty. */
   empty?: string
 }) {
   return (
@@ -96,7 +79,6 @@ export function FileChips({
   )
 }
 
-/** An image: blurred and quiet while it uploads, with the sharp picture rising through it. */
 function Tile({ f, onRetry }: { f: Upload; onRetry: (id: string) => void }) {
   const up = f.status === 'uploading'
   const bad = f.status === 'error'
@@ -108,7 +90,6 @@ function Tile({ f, onRetry }: { f: Upload; onRetry: (id: string) => void }) {
         className="absolute inset-0 block transition-[clip-path] duration-200 ease-linear"
         style={{ background: f.preview, clipPath: `inset(${bad ? 100 : (1 - f.progress) * 100}% 0 0 0)` }}
       />
-      {/* The edge where the picture is sharp: a hairline of light that rises with it. */}
       {up && <span aria-hidden className="absolute inset-x-0 h-px bg-white/80 transition-[top] duration-200 ease-linear" style={{ top: `${(1 - f.progress) * 100}%` }} />}
       <AnimatePresence>
         {up && (
@@ -147,13 +128,11 @@ function Tile({ f, onRetry }: { f: Upload; onRetry: (id: string) => void }) {
   )
 }
 
-/** A document: a card whose ground fills as it goes up, then settles to its kind and size. */
 function Doc({ f, onRetry }: { f: Upload; onRetry: (id: string) => void }) {
   const up = f.status === 'uploading'
   const bad = f.status === 'error'
   return (
     <div className="relative flex h-16 w-[196px] items-center gap-3 overflow-hidden rounded-[14px] bg-surface-2 pl-3 pr-3.5">
-      {/* The fill: a scale, not a width, so nothing lays out as it grows. */}
       <span
         aria-hidden
         className="absolute inset-0 origin-left transition-[scale,background-color,opacity] duration-200 ease-linear"

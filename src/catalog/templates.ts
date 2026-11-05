@@ -1,33 +1,17 @@
-/**
- * Templates: whole landing pages for a kind of product, built from the landing kit and the Pro
- * blocks, and whole apps. Plain data, safe for the server; the views are looked up in
- * src/pro/templates/registry, via `@pro`.
- */
-
-/** One stretch of a template's page. `anchor` is its id on the page, so a viewer can take you there. */
 export type Part = { anchor: string; name: string; line: string; uses: string[] }
 
 export type Template = {
   id: string
-  /** An app fills its window and plays its own demo; without this it's a landing page that scrolls. */
   form?: 'app'
-  /** The made-up product the page is for. */
   name: string
-  /** What kind of product it suits. */
   kind: string
-  /** The same, as it reads in a sentence: "For an AI support agent." */
   suits: string
-  /** The address in the browser bar. */
   window: string
-  /** One sentence: what it is. The first clause doubles as the subtitle. */
   line: string
-  /** Its sections, top to bottom; for an app, its parts. */
   parts: Part[]
-  /** What makes it, for the detail page. */
   details: string[]
 }
 
-/** Every template made, landing pages included. */
 const ALL: Template[] = [
   {
     id: 'lumen',
@@ -118,17 +102,11 @@ const ALL: Template[] = [
   },
 ]
 
-/**
- * Set aside for now: the two landing-page templates. Their code stays; they're just not listed.
- */
 export const PARKED = ['lumen', 'kiln']
 
-/** The templates on offer. */
 export const TEMPLATES: Template[] = ALL.filter((t) => !PARKED.includes(t.id))
-/** How many, said in words: "1 template", or "3 templates". */
 export const TEMPLATE_COUNT = `${TEMPLATES.length} template${TEMPLATES.length === 1 ? '' : 's'}`
 
-/** Templates on the way, named on the gallery. */
 export const SOON: { name: string; kind: string; line: string }[] = [
   { name: 'Voice assistant', kind: 'Voice', line: 'For a voice-first product: captions that hold their place, and a call you can try.' },
 ]

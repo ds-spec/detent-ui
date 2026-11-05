@@ -7,18 +7,12 @@ import { BLOCK_VIEWS } from '@pro'
 import { useNear } from '../near'
 import { Backdrop, Window } from './Studio'
 
-/**
- * A block on the index, running live at the card's own size: not a scaled picture, so a narrow
- * card shows the block's narrow layout. It only runs while it's near the screen. The preview is
- * for looking at; the card is the link, so nothing inside it competes for the press.
- */
 export function BlockCard({ id, name, kind, line, title, chrome, featured = false }: { id: string; name: string; kind: string; line: string; title: string; chrome?: 'app' | 'titled' | 'browser'; featured?: boolean }) {
   const View = BLOCK_VIEWS[id]
   const box = useRef<HTMLDivElement>(null)
   const near = useNear(box, '240px 0px', '480px 0px')
   return (
     <Link href={`/blocks/${id}`} className="ring-focus group/card block rounded-[32px]">
-      {/* The stage: the block's window on the wallpaper. The caption sits below it, on the page. */}
       <div className={`relative overflow-hidden rounded-[28px] ${featured ? 'p-3 sm:p-10' : 'p-3 sm:p-7'}`}>
         <Backdrop />
         <div ref={box} className={`relative ${featured ? 'h-[clamp(500px,54vw,720px)]' : 'h-[clamp(400px,36vw,500px)]'}`} inert>

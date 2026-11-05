@@ -14,14 +14,6 @@ import { BLOCK_VIEWS, TEMPLATE_VIEWS } from '@pro'
 import { Backdrop, Window } from '../blocks/Studio'
 import { Fit } from '../Fit'
 
-/*
- * Everything in Pro, as the bill you'd run up building it yourself: every component, block and
- * template by name, each with roughly how many working days it takes a good engineer to build to
- * this standard, drawn as a row of ticks, a tick a day. Each group adds up underneath, and the
- * whole of it at the foot, beside the price. Point at a row and the piece itself runs beside the
- * pointer; press it to go to its page.
- */
-
 type Item = { id: string; name: string; line: string; days: number; href: string; stage: () => ReactNode }
 
 const first = (s: string) => s.split(/(?<=\.)\s/)[0]
@@ -99,7 +91,6 @@ const GROUPS: { name: string; items: Item[] }[] = [
 ]
 const ALL = GROUPS.flatMap((g) => g.items)
 const MOST = Math.max(...ALL.map((i) => i.days))
-/** How many of a group show on a phone before the rest are asked for. */
 const FOLD = 6
 const pro = PLANS[0]
 
@@ -108,7 +99,6 @@ export function Ledger() {
   const [more, setMore] = useState<string[]>([])
   const [hot, setHot] = useState<string | null>(null)
   const timer = useRef(0)
-  // The preview follows the pointer, a little behind it.
   const x = useMotionValue(0)
   const y = useMotionValue(0)
   const sx = useSpring(x, { stiffness: 380, damping: 36 })
@@ -161,7 +151,6 @@ export function Ledger() {
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[14.5px] text-ink">{i.name}</span>
                     </span>
-                    {/* A tick a day: what it would take to build. */}
                     <span aria-hidden className="hidden h-4 items-end gap-[2px] sm:flex" style={{ width: MOST * 4 }}>
                       {Array.from({ length: i.days }, (_, d) => (
                         <span key={d} className={`w-[2px] rounded-full transition-colors duration-200 ${hot === i.id ? 'bg-ink' : 'bg-ink-3/40 group-hover/r:bg-ink'}`} style={{ height: (d + 1) % 5 === 0 ? 14 : 8 }} />
@@ -182,7 +171,6 @@ export function Ledger() {
         )
       })}
 
-      {/* The whole of it, beside the price. */}
       <footer className="flex flex-col gap-6 bg-[var(--well)] px-5 py-7 sm:px-8 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-[13.5px] text-ink-3">Built yourself, all of it</p>
@@ -203,7 +191,6 @@ export function Ledger() {
         </div>
       </footer>
 
-      {/* The piece under the pointer, running, beside it. */}
       <AnimatePresence>
         {item && (
           <motion.div

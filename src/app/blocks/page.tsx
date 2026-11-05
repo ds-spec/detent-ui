@@ -10,7 +10,6 @@ export const metadata: Metadata = page({
   path: '/blocks',
 })
 
-// The blocks' shelf of the library. A block's own page has the frame; this one has the site's header and footer.
 export default function BlocksPage() {
   return (
     <>

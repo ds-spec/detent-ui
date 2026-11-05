@@ -5,35 +5,19 @@ import type { ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Search } from '@/lab/icons'
 
-/*
- * The list in the frame's sidebar: what's in this part of the library, group by group. Flat
- * rows, a quiet fill under the one you point at and a firmer one under the one on show, and each
- * group folds away under its name. Typing filters by name or line. Point at a name for a moment
- * and, where the page has one, a small live preview of it opens beside the list.
- */
-
-/** `pro` marks it Pro; `free`, where a list mixes both, says so too. Components only mark Pro. */
 export type RailItem = { id: string; name: string; line?: string; pro?: boolean; free?: boolean }
 export type RailGroup = { id: string; name: string; icon?: ReactNode; color?: string; items: RailItem[] }
 
-/** Where each list was left, so moving between pages doesn't send it back to the top. */
 const left = new Map<string, number>()
 
 type Preview = (id: string, onReady: () => void, big?: boolean) => ReactNode
 
-/**
- * Point at a name for a moment and a small live preview of it opens beside the list. Returns the
- * handlers for each row and the card itself, so any list down the side can have it.
- */
 export type { Preview }
 export function usePeek(items: RailItem[], preview?: Preview) {
   const reduce = useReducedMotion()
   const [peek, setPeek] = useState<{ id: string; y: number; x: number } | null>(null)
-  // What the card shows: the last preview that was ready. The next one loads out of sight behind it
-  // and takes over only once it's ready, so moving down the list never flashes a blank card.
   const [shownAt, setShownAt] = useState<{ id: string; y: number; x: number } | null>(null)
   const [readyId, setReadyId] = useState<string | null>(null)
-  // The one under the pointer is ready: it takes the card (state derived while rendering, so there's no extra frame).
   if (peek && readyId === peek.id && (shownAt?.id !== peek.id || shownAt.y !== peek.y)) setShownAt(peek)
   const timer = useRef(0)
   useEffect(() => () => clearTimeout(timer.current), [])
@@ -43,7 +27,6 @@ export function usePeek(items: RailItem[], preview?: Preview) {
     clearTimeout(timer.current)
     const r = el.getBoundingClientRect()
     const at = { id, y: r.top + r.height / 2, x: r.right + 18 }
-    // Waits a beat on the first name, then follows at once while a preview is open.
     timer.current = window.setTimeout(() => setPeek(at), peek ? 0 : 420)
   }
   const leave = () => {
@@ -58,7 +41,6 @@ export function usePeek(items: RailItem[], preview?: Preview) {
   const top = shownAt ? Math.max(72, Math.min(shownAt.y - 112, (typeof window === 'undefined' ? 900 : innerHeight) - 252)) : 0
   const layers = [shownAt?.id, peek?.id].filter((x, i, a): x is string => !!x && a.indexOf(x) === i)
 
-  // The preview of the name under the pointer, beside the list.
   const card = (
       <AnimatePresence>
         {peek && preview && (
@@ -101,8 +83,6 @@ export function Rail({ groups, current, onPick, label, preview }: { groups: Rail
   const words = q.trim().toLowerCase()
   const shown = groups.map((g) => ({ ...g, items: g.items.filter((x) => !words || `${x.name} ${x.line ?? ''}`.toLowerCase().includes(words)) })).filter((g) => g.items.length)
 
-  // The one on show stays in sight in the list. Only the list moves, never the page behind it:
-  // arriving, it's already in place before anything paints; after that, it glides.
   const arrived = useRef(false)
   useLayoutEffect(() => {
     const box = list.current
@@ -120,7 +100,6 @@ export function Rail({ groups, current, onPick, label, preview }: { groups: Rail
 
   return (
     <div aria-label={label} role="navigation" className="relative z-30 flex min-h-0 flex-1 flex-col">
-      {/* A list short enough to take in at a glance has nothing to filter. */}
       {all.length > 8 && (
         <label className="mr-3 flex h-8 items-center gap-2 rounded-[8px] px-2 text-ink-3 transition-colors focus-within:bg-[var(--shell-on)] hover:bg-[var(--shell-hover)]">
           <Search size={14} />

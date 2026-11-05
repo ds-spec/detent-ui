@@ -3,13 +3,6 @@
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 
-/*
- * The account, set the way Vercel sets its settings: the sections down the side, and each setting a
- * card of its own, a title and one line saying what it's for, what it holds, and a band across its
- * foot with where it stands on the left and the one thing to do on the right.
- */
-
-/** One setting: a title, what it's for, what it holds, and a foot with its status and action. */
 export function SettingsCard({ id, title, line, children, foot, action, tone = 'plain' }: { id?: string; title: string; line?: ReactNode; children?: ReactNode; foot?: ReactNode; action?: ReactNode; tone?: 'plain' | 'danger' }) {
   return (
     <section id={id} aria-labelledby={id ? `${id}-title` : undefined} className={`scroll-mt-24 overflow-hidden rounded-[12px] bg-surface shadow-[0_0_0_1px_var(--line)] ${tone === 'danger' ? 'shadow-[0_0_0_1px_color-mix(in_oklch,var(--danger)_28%,transparent)]' : ''}`}>
@@ -30,14 +23,9 @@ export function SettingsCard({ id, title, line, children, foot, action, tone = '
   )
 }
 
-/** The small buttons that sit in a card's foot: the main one in ink, the rest outlined. */
 export const SMALL = 'ring-focus inline-flex h-8 items-center gap-1.5 rounded-[8px] bg-ink px-3 text-[13px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97] disabled:opacity-50'
 export const SMALL_QUIET = 'ring-focus inline-flex h-8 items-center gap-1.5 rounded-[8px] bg-surface px-3 text-[13px] font-medium text-ink shadow-[0_0_0_1px_var(--line-strong)] transition-[background-color,transform] duration-150 hover:bg-surface-2 active:scale-[0.97] disabled:opacity-50'
 
-/**
- * The sections down the side, the one in view marked as you scroll. On a phone they become a row
- * of pills across the top.
- */
 export function SettingsNav({ items }: { items: [id: string, label: string][] }) {
   const [on, setOn] = useState(items[0]?.[0])
   useEffect(() => {

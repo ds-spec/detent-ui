@@ -8,17 +8,8 @@ import { ease } from '../../lib/motion'
 import { Spinner } from '../../ui/Spinner'
 
 type Status = 'idle' | 'saving' | 'saved'
-/** For demos and tests: rename without touching focus. The selection is drawn instead of real. */
 export type RenameHandle = { edit(): void; type(text: string): void; commit(): void; cancel(): void }
 
-/**
- * Rename in place. The text becomes a field without moving a single pixel: same font, same
- * spot, the field drawn around it. File extensions stay put as a faint suffix while only the
- * name is selected, the way a file manager does it. Enter saves (with a spinner, then a
- * check), Escape puts the old name back, and a bad name shakes once and says why.
- *
- * It inherits its typography, so it works for a page title as well as a row in a list.
- */
 export function InlineRename({
   value,
   onRename,
@@ -29,19 +20,12 @@ export function InlineRename({
   className = '',
   ref,
 }: {
-  /** The current name. */
   value: string
-  /** Return a promise to show saving; reject it to roll back. */
   onRename: (next: string) => Promise<unknown> | void
-  /** Return a message to block the name, or null to allow it. */
   validate?: (next: string) => string | null
-  /** Edit the name but not its extension: the selection stops at the dot. */
   keepExtension?: boolean
-  /** Start editing on one click or on a double click. */
   activate?: 'click' | 'double-click'
-  /** What's being renamed, for screen readers. */
   label?: string
-  /** Added to the name as it's shown. */
   className?: string
   ref?: Ref<RenameHandle>
 }) {
@@ -51,7 +35,6 @@ export function InlineRename({
   const [error, setError] = useState<string | null>(null)
   const [status, setStatus] = useState<Status>('idle')
   const [w, setW] = useState(0)
-  // Driven from code: no focus is taken, so the name's selection is painted rather than real.
   const [driven, setDriven] = useState(false)
   const [painted, setPainted] = useState(false)
   const input = useRef<HTMLInputElement>(null)
@@ -84,7 +67,6 @@ export function InlineRename({
     setEditing(true)
   }
 
-  // Focus and select the name (not the extension) as the field appears.
   useLayoutEffect(() => {
     const el = input.current
     if (!editing || !el || driven) return
@@ -93,7 +75,6 @@ export function InlineRename({
     el.setSelectionRange(0, cut > 0 ? cut : el.value.length)
   }, [editing, keepExtension, driven])
 
-  // The field is exactly as wide as its text, measured from an invisible copy.
   useLayoutEffect(() => {
     if (mirror.current) setW(mirror.current.offsetWidth)
   }, [draft, editing])
@@ -160,7 +141,6 @@ export function InlineRename({
 
   return (
     <span className={`group/rename relative inline-flex min-w-0 max-w-full align-top ${className}`}>
-      {/* The field is drawn around the text with negative insets, so the text itself never moves. */}
       <span
         aria-hidden
         className={`pointer-events-none absolute -inset-x-1.5 -inset-y-0.5 rounded-[8px] transition-[background-color,box-shadow] duration-150 ${editing ? 'bg-surface' : 'group-hover/rename:bg-surface-2 group-focus-within/rename:bg-surface-2'}`}
@@ -170,7 +150,6 @@ export function InlineRename({
       <motion.span animate={shake} className="relative flex min-w-0 max-w-full">
         {editing ? (
           <span className="relative flex min-w-0 max-w-full items-baseline">
-            {/* The name's selection, painted when the rename was started from code. */}
             {painted && <span aria-hidden className="absolute left-0 top-0 h-[1lh] rounded-[2px]" style={{ width: w, background: 'color-mix(in oklch, var(--accent) 24%, transparent)' }} />}
             <input
               ref={input}
@@ -193,7 +172,6 @@ export function InlineRename({
               }}
               onBlur={() => {
                 if (settled.current) return
-                // Leaving with a bad name quietly puts the old one back.
                 if (error || !draft.trim()) cancel()
                 else commit()
               }}
@@ -235,7 +213,6 @@ export function InlineRename({
         {draft || ' '}
       </span>
 
-      {/* After the text, floating: the pencil on hover, then saving and saved. */}
       <span className="pointer-events-none absolute left-full top-1/2 ml-2.5 flex h-5 -translate-y-1/2 items-center">
         <AnimatePresence initial={false} mode="popLayout">
           {status === 'saving' ? (

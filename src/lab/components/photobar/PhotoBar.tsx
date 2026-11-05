@@ -6,7 +6,7 @@ import { motion, useReducedMotion } from 'motion/react'
 import { tap } from '../../lib/feel'
 import { ease } from '../../lib/motion'
 
-export type PhotoLook = { name: string; /** Any CSS filter. */ filter: string }
+export type PhotoLook = { name: string; filter: string }
 
 export const LOOKS: PhotoLook[] = [
   { name: 'Natural', filter: 'none' },
@@ -17,11 +17,6 @@ export const LOOKS: PhotoLook[] = [
   { name: 'Mono', filter: 'grayscale(1) contrast(1.16) brightness(1.03)' },
 ]
 
-/**
- * A finishing bar for any image. Each look shows on the picture itself, in a thumbnail you can
- * judge at a glance. Pick one, drag how strong it is, and hold the photo to see what you started
- * with. Filters are plain CSS, so it costs nothing to run.
- */
 export function PhotoBar({
   src,
   alt,
@@ -31,19 +26,12 @@ export function PhotoBar({
   onChange,
   className = '',
 }: {
-  /** The image to finish. */
   src: string
-  /** What the image shows. */
   alt: string
-  /** The looks on offer. */
   looks?: PhotoLook[]
-  /** Which look starts selected. */
   defaultLook?: number
-  /** How strong it starts, 0 to 100. */
   defaultStrength?: number
-  /** Called when the look or its strength changes. */
   onChange?: (look: PhotoLook, strength: number) => void
-  /** Classes for the frame. Give it a height. */
   className?: string
 }) {
   const [look, setLook] = useState(defaultLook)

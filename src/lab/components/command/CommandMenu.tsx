@@ -14,23 +14,18 @@ export type Command = {
   label: string
   group: string
   icon?: ReactNode
-  /** Shown on the right: a category, a shortcut, a hint. */
   hint?: ReactNode
-  /** Extra words that should find this item. */
   keywords?: string
   onSelect: () => void
 }
 
-/** For demos and tests: type, move the highlight and run, without touching focus. */
 export type CommandHandle = { type(q: string): void; move(i: number): void; run(): void }
 
 const ROW = 40
-/** A group heading: 12px above, one caption line, 4px below. */
 const HEAD = 32
 const PAD = 6
 const LIST_H = 336
 
-/** Case-insensitive match on the label first, then keywords. Returns where the label matched. */
 const match = (c: Command, q: string) => {
   if (!q) return { hit: true, at: -1 }
   const at = c.label.toLowerCase().indexOf(q)
@@ -38,12 +33,6 @@ const match = (c: Command, q: string) => {
   return { hit: `${c.group} ${c.keywords ?? ''}`.toLowerCase().includes(q), at: -1 }
 }
 
-/**
- * A command menu that opens from the top in a beat and gets out of the way. Results filter
- * as you type, with the matched letters lifted out. The highlight glides under the pointer
- * and jumps for the keyboard, and the list follows it. Focus goes back where it came from.
- * `inline` renders the same panel in place, always open, for embedding it in a page.
- */
 export function CommandMenu({
   open,
   onOpenChange,
@@ -53,17 +42,11 @@ export function CommandMenu({
   listHeight = LIST_H,
   ref,
 }: {
-  /** Whether the menu is open. */
   open: boolean
-  /** Called when it should open or close: ⌘K, Escape, or a press outside. */
   onOpenChange: (open: boolean) => void
-  /** What can be run, grouped, each with its keys and what it does. */
   commands: Command[]
-  /** Shown in the search field. */
   placeholder?: string
-  /** Show the menu in place on the page instead of over it. */
   inline?: boolean
-  /** The list's height. It's fixed, so filtering never resizes the menu. */
   listHeight?: number
   ref?: Ref<CommandHandle>
 }) {
@@ -74,7 +57,6 @@ export function CommandMenu({
   const list = useRef<HTMLDivElement>(null)
   const returnTo = useRef<HTMLElement | null>(null)
   const id = useId()
-  // What a key opens is simply there; a pointer gets its beat. Read once, as it opens.
   const [opened, setOpened] = useState(open)
   const [instant, setInstant] = useState(byKey)
   if (open !== opened) {
@@ -84,8 +66,6 @@ export function CommandMenu({
 
   const q = query.trim().toLowerCase()
   const results = useMemo(() => commands.map((c) => ({ c, ...match(c, q) })).filter((r) => r.hit), [commands, q])
-  // Rows interleave group headings and items; only items are selectable. Each knows where it sits,
-  // so filtering moves rows by transform and nothing in the list's layout ever shifts.
   const { rows, end } = useMemo(() => {
     const out: (({ kind: 'group'; label: string } | { kind: 'item'; r: (typeof results)[number]; index: number }) & { y: number })[] = []
     let index = 0
@@ -119,7 +99,6 @@ export function CommandMenu({
 
   useEffect(() => setActive(0), [q])
 
-  // Keep the highlighted row in view when the keyboard moves it (within the list only, never the page).
   useLayoutEffect(() => {
     if (!(open || inline) || via !== 'keys') return
     const box = list.current
@@ -164,7 +143,6 @@ export function CommandMenu({
     keys[e.key]()
   }
 
-  // Where the highlight sits: on the active row, wherever headings have put it.
   const lit = rowOf(active)
   const hl = lit ? { y: lit.y, show: true } : { y: 0, show: false }
 
@@ -188,7 +166,6 @@ export function CommandMenu({
       </div>
 
       <div ref={list} id={`${id}-list`} role="listbox" className="relative overflow-y-auto overscroll-contain p-1.5 [scrollbar-width:thin]" style={{ height: listHeight }}>
-        {/* One highlight for the whole list. */}
         <motion.div
           aria-hidden
           className="absolute inset-x-1.5 top-0 rounded-[10px] bg-surface-2"
@@ -220,14 +197,12 @@ export function CommandMenu({
             >
               {row.r.c.icon && <span className="flex size-4 shrink-0 items-center justify-center text-ink-3">{row.r.c.icon}</span>}
               <span className="min-w-0 flex-1 truncate">
-                {/* Rebuilt for each query: letters turning bold leave the rest of the label where it was, as new text rather than moved text. */}
                 <Label key={q} text={row.r.c.label} at={row.r.at} length={q.length} />
               </span>
               {row.r.c.hint && <span className="shrink-0 text-caption text-ink-3">{row.r.c.hint}</span>}
             </div>
           ),
         )}
-        {/* The rows are placed by transform, so this is what gives the list its scroll height. */}
         <div aria-hidden style={{ height: end - PAD }} />
         {!results.length && (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
@@ -247,7 +222,6 @@ export function CommandMenu({
           <Kbd>↵</Kbd>
           Open
         </span>
-        {/* Set right to left, so the count's start is its right edge and changing never moves it; plaintext keeps the words in reading order. */}
         <span className="tnum flex-1 text-right [direction:rtl] [unicode-bidi:plaintext]">{`${results.length} result${results.length === 1 ? '' : 's'}`}</span>
       </div>
     </>

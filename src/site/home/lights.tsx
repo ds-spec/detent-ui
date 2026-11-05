@@ -1,24 +1,12 @@
 import { useSyncExternalStore } from 'react'
 import type { ReactNode } from 'react'
 
-/*
- * The four lights on the home page: the parts people reach for first, each with its colour (a
- * window of light the part runs in), an emblem that stands for it while its card is closed, and
- * one line about it.
- */
-
 export { BRIDGE } from './bridge'
 
-/** The width of a light's colour layer: as wide as a card ever gets, so opening one only reveals more of it. */
 export const LAYER = 760
 
 export type Card = { id: string; line: string; paint: string; sheen: string; dot: string; emblem: ReactNode }
 
-/*
- * The colours: each a smooth field with a bright corner, a deep corner and a body between, like
- * light through a tinted window. No noise in the colour itself; a fine grain over it keeps it from
- * banding.
- */
 const field = (hi: string, body: string, deep: string, blush: string, base: string) =>
   [
     `radial-gradient(70% 55% at 78% 8%, ${hi} 0%, transparent 62%)`,
@@ -28,7 +16,6 @@ const field = (hi: string, body: string, deep: string, blush: string, base: stri
     base,
   ].join(', ')
 
-/* The emblems: each part reduced to one bold white shape, in the same hand as the icons. */
 const EMBLEM_PROMPT = (
   <svg viewBox="0 0 200 120" className="w-[148px]" aria-hidden>
     <rect x="10" y="38" width="180" height="48" rx="24" fill="none" stroke="white" strokeWidth="4" />
@@ -71,7 +58,6 @@ export const CARDS: Card[] = [
   { id: 'metric', line: 'The number, and why it moved', paint: field('#ffd0de', '#f5568c', '#a3164b', '#ffb0c4', 'linear-gradient(165deg, #f4588d, #c02158)'), sheen: '#ffe6ee', dot: '#ec4f86', emblem: EMBLEM_METRIC },
 ]
 
-/** Wide enough for the cards to sit side by side; below that they stack. */
 const wideQuery = '(min-width: 1024px)'
 export const useWide = () =>
   useSyncExternalStore(
@@ -84,11 +70,8 @@ export const useWide = () =>
     () => true,
   )
 
-
-/** A fine grain laid over colour, so smooth gradients never band. */
 export const GRAIN = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`
 
-/** The four colours by name, for anything else on the site that stands on one of them. */
 export type Tone = 'blue' | 'amber' | 'violet' | 'rose'
 export const TONES: Tone[] = ['blue', 'violet', 'rose', 'amber']
 const BY_TONE: Record<Tone, Card> = { blue: CARDS[0], amber: CARDS[1], violet: CARDS[2], rose: CARDS[3] }

@@ -6,7 +6,6 @@ import { Header } from '@/site/Header'
 
 export const metadata: Metadata = { title: 'Sign in', robots: { index: false, follow: false }, referrer: 'no-referrer' }
 
-/** Where a sign-in link lands: one press to finish, so a mail scanner opening it signs no one in. */
 export default function ConfirmPage() {
   return (
     <>

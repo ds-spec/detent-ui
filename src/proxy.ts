@@ -1,27 +1,7 @@
-/**
- * proxy.ts — rewrites .md suffix requests and Accept: text/markdown negotiation
- * to /api/md/<path>, the single markdown handler.
- *
- * Rules:
- * - .md suffix: /pricing.md → /api/md/pricing; /index.md → /api/md/index
- *   Any non-excluded .md request is routed to the markdown handler (which returns a
- *   clean markdown 404 if the page does not exist).
- * - Content negotiation: Accept header containing text/markdown with higher q than text/html
- *   → rewrite to /api/md/<path> for known content paths.
- * - *‌/*, missing Accept, or text/html-preferred = pass through untouched.
- * - Adds a global Link response header advertising /llms.txt, /llms-full.txt and /ai.txt
- *   on all HTML responses.
- * - Private until launch: with SITE_LOCK set, every page asks for that password once and then
- *   remembers the browser. /api (the Dodo webhook among it) and /r (the install registry) are
- *   outside the matcher, so payments and installs keep working. Unset it to open the site.
- */
-
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { SITE } from '@/catalog/pro'
 
-// ─── Allowlist for content negotiation ─────────────────────────────────────────
-// Only these path prefixes (and exact matches) will negotiate markdown via Accept header.
 const CONTENT_PATHS = [
   '/',
   '/pro',
@@ -38,13 +18,10 @@ const CONTENT_PATHS = [
   '/privacy',
 ]
 
-/** Returns true when the path is a public content route we have a renderer for. */
 function isContentPath(pathname: string): boolean {
   if (pathname === '/') return true
   return CONTENT_PATHS.some((p) => p !== '/' && (pathname === p || pathname.startsWith(p + '/')))
 }
-
-// ─── Accept header parsing ────────────────────────────────────────────────────
 
 type MediaType = { type: string; q: number }
 
@@ -62,10 +39,6 @@ function parseAccept(header: string | null): MediaType[] {
     .sort((a, b) => b.q - a.q)
 }
 
-/**
- * Returns true when the client explicitly prefers text/markdown over text/html.
- * A plain *‌/* or missing Accept never triggers this — browsers and curl must keep getting HTML.
- */
 function prefersMarkdown(acceptHeader: string | null): boolean {
   if (!acceptHeader) return false
   const types = parseAccept(acceptHeader)
@@ -76,12 +49,9 @@ function prefersMarkdown(acceptHeader: string | null): boolean {
   return mdEntry.q > htmlEntry.q
 }
 
-// ─── Private until launch ─────────────────────────────────────────────────────
-
 const LOCK_COOKIE = 'detent_lock'
 const UNLOCK_PATH = '/__unlock'
 
-/** The cookie holds a hash of the password, never the password itself. */
 async function lockToken(secret: string) {
   const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`detent:${secret}`))
   return Array.from(new Uint8Array(bytes), (b) => b.toString(16).padStart(2, '0')).join('')
@@ -89,7 +59,6 @@ async function lockToken(secret: string) {
 
 const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`)
 
-/** The one screen a visitor without the password sees. */
 function lockPage(next: string, wrong: boolean) {
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Detent</title>
 <style>:root{color-scheme:light dark;--bg:#fafafa;--ink:#1d1d1f;--ink3:#6e6e73;--field:#f0f0f2;--line:rgb(0 0 0/.08)}@media (prefers-color-scheme:dark){:root{--bg:#141416;--ink:#f5f5f7;--ink3:#a1a1a6;--field:#232327;--line:rgb(255 255 255/.08)}}
@@ -101,7 +70,6 @@ button{height:42px;border:0;border-radius:10px;background:var(--ink);color:var(-
   return new NextResponse(html, { status: 401, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-robots-tag': 'noindex, nofollow' } })
 }
 
-/** Returns a response when the site is locked and this browser hasn't unlocked it; otherwise null. */
 async function gate(request: NextRequest): Promise<NextResponse | null> {
   const secret = process.env.SITE_LOCK
   if (!secret) return null
@@ -110,7 +78,6 @@ async function gate(request: NextRequest): Promise<NextResponse | null> {
   if (pathname === UNLOCK_PATH && request.method === 'POST') {
     const form = await request.formData()
     const raw = String(form.get('next') ?? '/')
-    // Only ever send someone back somewhere on this site.
     const next = raw.startsWith('/') && !raw.startsWith('//') ? raw : '/'
     if (String(form.get('password') ?? '') !== secret) return lockPage(next, true)
     const res = NextResponse.redirect(new URL(next, request.url), 303)
@@ -121,22 +88,18 @@ async function gate(request: NextRequest): Promise<NextResponse | null> {
   return lockPage(pathname + search, false)
 }
 
-// ─── Proxy function ────────────────────────────────────────────────────────────
-
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   const locked = await gate(request)
   if (locked) return locked
 
-  // 1. .md suffix: /foo/bar.md → /api/md/foo/bar
   if (pathname.endsWith('.md')) {
     const withoutSuffix = pathname.slice(0, -3) || '/'
     const mdPath = withoutSuffix === '/' || withoutSuffix === '/index' ? '/api/md/index' : `/api/md${withoutSuffix}`
     return NextResponse.rewrite(new URL(mdPath, request.url))
   }
 
-  // 2. Content negotiation: Accept: text/markdown with higher q than text/html
   if (prefersMarkdown(request.headers.get('accept')) && isContentPath(pathname)) {
     const mdPath = pathname === '/' ? '/api/md/index' : `/api/md${pathname}`
     const rewritten = NextResponse.rewrite(new URL(mdPath, request.url))
@@ -144,10 +107,7 @@ export async function proxy(request: NextRequest) {
     return rewritten
   }
 
-  // 3. All other requests pass through — HTML is untouched.
-  //    Advertise /llms.txt, /llms-full.txt and /ai.txt via Link response header.
   const res = NextResponse.next()
-  // While the site is private, nothing in it should be indexed.
   if (process.env.SITE_LOCK) res.headers.set('x-robots-tag', 'noindex, nofollow')
   res.headers.set(
     'Link',
@@ -156,8 +116,6 @@ export async function proxy(request: NextRequest) {
   return res
 }
 
-// ─── Matcher ──────────────────────────────────────────────────────────────────
-// Exclude: API routes, Next.js internals, static assets, well-known, robots/sitemap.
 export const config = {
   matcher: [
     '/((?!api|_next/static|_next/image|_next/data|favicon\\.ico|sitemap\\.xml|robots\\.txt|manifest\\.webmanifest|\\.well-known|r/).*)',

@@ -16,14 +16,6 @@ const PEEK = 11
 const R = 19
 const C = 2 * Math.PI * R
 
-/**
- * What an agent is doing, as toasts that update in place rather than pile up. Each carries
- * the agent's orb; while a step runs, a thin ring travels round it. When the step lands the
- * ring closes into a full circle, a badge settles on the orb, and the words roll over to what
- * happened, all where they already are. Newer events stack in front and older ones step back
- * behind them; point at the stack and it fans open into a list. It only ever grows upward into
- * space it already has.
- */
 export function AgentToasts({
   events,
   agent = { name: 'Detent', hue: 310 },
@@ -32,24 +24,17 @@ export function AgentToasts({
   max = 3,
   expanded = false,
 }: {
-  /** What the agent did or is doing, newest last. */
   events: AgentEvent[]
-  /** Who's working: the name seeds their orb and the hue colours it, unless you give an avatar of your own, 30px round. */
   agent?: { name: string; hue?: number; avatar?: ReactNode }
-  /** Called with an event's id when a person presses its action. */
   onAction?: (id: string) => void
-  /** Called with an event's id when it's closed. */
   onDismiss?: (id: string) => void
-  /** How many show in the stack before older ones tuck behind. */
   max?: number
-  /** Hold the stack open, e.g. while a demo shows it off. */
   expanded?: boolean
 }) {
   const [hover, setOpen] = useState(false)
   const reduce = useReducedMotion()
   const open = hover || expanded
   const root = useRef<HTMLDivElement>(null)
-  // A finger can't leave: the stack stays open until a tap lands somewhere else.
   useEffect(() => {
     if (!hover) return
     const away = (e: PointerEvent) => e.pointerType === 'touch' && !root.current?.contains(e.target as Node) && setOpen(false)
@@ -88,9 +73,7 @@ export function AgentToasts({
               exit={{ opacity: 0, scale: 0.95, y: 10, transition: { duration: 0.2, ease: ease.out } }}
               transition={{ type: 'spring', stiffness: 380, damping: 34 }}
             >
-              {/* Behind the front toast only the edge shows: its content steps back out of sight. */}
               <motion.span className="flex min-w-0 flex-1 items-center gap-3" initial={false} animate={{ opacity: open || depth === 0 ? 1 : 0 }} transition={{ duration: 0.2 }}>
-                {/* The agent, with the ring that says it's working and the badge that says how it went. */}
                 <span className="relative flex size-10 shrink-0 items-center justify-center">
                   {agent.avatar ?? <Orb seed={agent.name} hue={agent.hue} size={30} />}
                   <svg aria-hidden width="40" height="40" viewBox="0 0 40 40" className={`absolute inset-0 -rotate-90 ${run && !reduce ? 'motion-safe:animate-[spin_1.1s_linear_infinite]' : ''}`}>
@@ -126,7 +109,6 @@ export function AgentToasts({
                     )}
                   </AnimatePresence>
                 </span>
-                {/* Its words roll over in place when the step lands. */}
                 <span className="relative h-10 min-w-0 flex-1">
                   <AnimatePresence initial={false}>
                     <motion.span

@@ -6,16 +6,11 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { tap } from '../../lib/feel'
 import { spring } from '../../lib/motion'
 
-export type ReadAlongLine = { /** Seconds into the note. */ at: number; text: string }
+export type ReadAlongLine = { at: number; text: string }
 
 const SPEEDS = [1, 1.5, 2]
 const time = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s) % 60).padStart(2, '0')}`
 
-/**
- * A voice note you can read. The sentence being said fills the card and darkens word by word as it
- * plays, so you can follow it on mute, or drag along the sound to find the part that matters. Give
- * it `src` to play real audio; without one the clock runs by itself, for demos.
- */
 export function ReadAlong({
   lines,
   length,
@@ -23,15 +18,10 @@ export function ReadAlong({
   from,
   start = 0,
 }: {
-  /** What's said, and when each sentence starts. */
   lines: ReadAlongLine[]
-  /** The note's length in seconds. */
   length: number
-  /** The audio file. */
   src?: string
-  /** Who it's from, and what about. */
   from?: string
-  /** Where it opens, in seconds. */
   start?: number
 }) {
   const [at, setAt] = useState(start)
@@ -42,7 +32,6 @@ export function ReadAlong({
   const reduce = useReducedMotion()
   const bars = useMemo(() => Array.from({ length: 72 }, (_, i) => 0.14 + 0.86 * Math.abs(Math.sin(i * 0.47) * Math.cos(i * 0.19 + 0.6) * (0.55 + 0.45 * Math.sin(i * 1.3)))), [])
 
-  // Without a file the clock runs itself, and stops at the end of the note.
   const playing = wanted && (!!src || at < length)
 
   useEffect(() => {

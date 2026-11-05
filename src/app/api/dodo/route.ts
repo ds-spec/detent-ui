@@ -3,12 +3,6 @@ import { planOfProduct } from '@/catalog/licence'
 import { emailOfAccount, recordPurchase } from '@/lib/account/keys'
 import { normalEmail } from '@/lib/account/session'
 
-/*
- * What the store tells us: a payment made, refunded or lost to a chargeback. This is what makes a
- * key work, so a request only counts with a good Standard Webhooks signature from
- * DODO_WEBHOOK_SECRET, signed with the secret's decoded base64.
- */
-
 const TOLERANCE = 300
 
 function signed(body: string, headers: Headers, secret: string) {
@@ -36,8 +30,6 @@ export async function POST(req: Request) {
   if (!secret || !signed(body, req.headers, secret)) return Response.json({ error: 'Bad signature.' }, { status: 401 })
   const { type, data } = JSON.parse(body) as Event
   const id = data?.payment_id
-  // Bought from /checkout, the order carries the account it was for: Pro goes on that account's
-  // email, whatever was typed at the store. Bought from a bare link, it goes by the receipt's email.
   const account = typeof data?.metadata?.detent_user === 'string' ? await emailOfAccount(data.metadata.detent_user) : null
   const email = account ?? normalEmail(data?.customer?.email) ?? ''
 
@@ -47,7 +39,6 @@ export async function POST(req: Request) {
     if (!plan) return Response.json({ error: 'Not a Detent product.' }, { status: 422 })
     await recordPurchase({ id, email, plan, refunded: false })
   } else if (type === 'dispute.lost' || (type === 'refund.succeeded' && !data?.is_partial)) {
-    // A partial refund keeps the licence. This may arrive first, so it's stored and the payment can't undo it.
     if (!id) return Response.json({ error: 'No payment.' }, { status: 422 })
     await recordPurchase({ id, email, plan: 'pro', refunded: true })
   }

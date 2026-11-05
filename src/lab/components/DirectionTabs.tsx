@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from 'motion/react'
 import { tap } from '../lib/feel'
 
 export type Tab = { id: string; label: string; content: ReactNode }
-/** For demos and tests: switch tabs without touching focus. */
 export type TabsHandle = { go(i: number): void }
 
 const ease = { type: 'spring', bounce: 0, duration: 0.42 } as const
@@ -17,7 +16,6 @@ const panel = {
   exit: (dir: number) => ({ x: dir * -40, opacity: 0, filter: 'blur(4px)' }),
 }
 
-/** Tabs whose content slides in from the side you moved toward, while the card's height follows. */
 export function DirectionTabs({
   tabs,
   defaultTab,
@@ -25,13 +23,9 @@ export function DirectionTabs({
   id = 'tabs',
   ref,
 }: {
-  /** Each tab's id, its label, and what it shows. */
   tabs: Tab[]
-  /** The id of the tab that's open first. */
   defaultTab?: string
-  /** Called with a tab's id when a person opens it. */
   onChange?: (id: string) => void
-  /** Keeps the sliding indicator to this set of tabs when there are several on a page. */
   id?: string
   ref?: Ref<TabsHandle>
 }) {

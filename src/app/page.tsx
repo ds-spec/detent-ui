@@ -14,16 +14,10 @@ import { Plans } from '@/site/pro/Plans'
 import { Running } from '@/site/pro/Running'
 import { DESCRIPTION, JsonLd, NAME, page, siteGraph } from '@/site/seo'
 
-/** The Pro screen that runs above the plans. */
 const SHOWN = block('support-inbox')!
 
 export const metadata: Metadata = page({ title: `${NAME} — premium React components`, absolute: true, description: DESCRIPTION, path: '/' })
 
-/*
- * The home page: sheets laid on a soft ground. The first holds the sentence and the four lights,
- * and a bridge carries the install command down to the next, the library. Then the proof that it
- * runs on the AI SDK, and Pro, each on a sheet of its own.
- */
 export default function Home() {
   const lib = libraryIndex()
   return (
@@ -37,7 +31,6 @@ export default function Home() {
 
         {AI_SDK && (
           <>
-        {/* The proof: a real AI SDK conversation, drawn by Detent, and three plain facts. */}
         <section id="ai-sdk" aria-labelledby="ai-sdk-title" className="mt-3 scroll-mt-20 px-2.5 sm:px-5">
           <div className="rounded-[26px] sm:rounded-[36px]" style={{ background: 'var(--leaf)', boxShadow: 'var(--leaf-edge)' }}>
             <div className="mx-auto max-w-[1440px] px-3 pb-6 pt-20 sm:px-8 sm:pb-8 sm:pt-28">
@@ -80,7 +73,6 @@ export default function Home() {
           </>
         )}
 
-        {/* Pro, at the end of the tour: what it adds and what it costs, in one place. */}
         <section id="pro" className="mt-3 scroll-mt-20 px-2.5 sm:px-5">
           <div className="rounded-[26px] sm:rounded-[36px]" style={{ background: 'var(--paper)', boxShadow: 'var(--leaf-edge)' }}>
             <div className="mx-auto max-w-[1440px] px-3 pb-10 pt-20 sm:px-8 sm:pb-12 sm:pt-28">

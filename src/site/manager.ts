@@ -16,7 +16,6 @@ const read = (): Manager => {
   }
 }
 
-/** One choice for the whole site, remembered: pick pnpm on one command and every command follows. */
 export function useManager() {
   const value = useSyncExternalStore(
     (fn) => {
@@ -35,7 +34,6 @@ export function useManager() {
     try {
       localStorage.setItem(KEY, m)
     } catch {
-      /* Private mode: the choice lasts the page. */
     }
     listeners.forEach((fn) => fn())
   }

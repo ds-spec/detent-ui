@@ -2,7 +2,6 @@ import { SITE } from '@/catalog/site'
 import type { Step } from '@/catalog/template-start'
 import { StartStep } from '@/site/templates/TemplateViewer'
 
-/** Setting up a project for Pro: once, then every install is the shadcn CLI as usual. */
 const STEPS: Step[] = [
   {
     title: 'Add the registry',
@@ -40,7 +39,6 @@ const STEPS: Step[] = [
   },
 ]
 
-/** What the registry says when it says no, and what to do about it. */
 const NO: [string, string][] = [
   ['Needs your key', 'The key isn’t reaching it. Check .env.local has DETENT_PRO_KEY, and that the header in components.json reads it.'],
   ['That key isn’t one of ours', 'It may have been removed. Generate a new one in your account.'],

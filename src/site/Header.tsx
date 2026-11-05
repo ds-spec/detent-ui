@@ -22,23 +22,10 @@ const NAV = [
 
 const UI = 'cubic-bezier(0.2, 0, 0, 1)'
 const here = (section: string, path: string) => path.startsWith(section)
-/** How long the bar takes to gather or open. */
 const MOVE = 220
-/** The floating bar's width, and how far each end steps in from the open bar to reach it. */
 const PILL = 980
 const INSET = `max(0px, (min(1440px, 100vw - 40px) - ${PILL}px) / 2)`
 
-/*
- * The header, made of the page's own material. Three parts on one line: the mark on the left, the
- * links in the middle in a small pill of their own, and search, the theme and the way in on the
- * right. A plate rests under the page you're on and slides to whichever link you point at, so the
- * pill reads as one control rather than five words.
- *
- * At the top of a page the bar lies open on the ground. As soon as the page moves a pill fades in
- * over the page, narrower, and the ends step in to sit on it while the links' pill dissolves into
- * it. The bar itself never changes size: only opacity and transforms move, so scrolling past the
- * top doesn't lay anything out.
- */
 export function Header() {
   const side = useSideNew()
   const [stuck, setStuck] = useState(false)
@@ -51,7 +38,6 @@ export function Header() {
     window.addEventListener('scroll', on, { passive: true })
     return () => window.removeEventListener('scroll', on)
   }, [])
-  // Moving to another page closes the menu.
   const [seen, setSeen] = useState(path)
   if (seen !== path) {
     setSeen(path)
@@ -67,12 +53,10 @@ export function Header() {
   return (
     <header className="pointer-events-none sticky top-0 z-50 h-[72px] px-2.5 sm:px-5">
       <div className="pointer-events-auto relative mx-auto grid h-[72px] max-w-[1440px] grid-cols-[1fr_auto] items-center pl-6 pr-2.5 lg:grid-cols-[1fr_auto_1fr]">
-        {/* The floating pill: always there, and only ever faded and settled. */}
         <span
           aria-hidden
           className={side ? `pointer-events-none absolute left-1/2 top-[20px] -z-10 h-[54px] w-full max-w-[980px] rounded-[16px] will-change-[opacity,transform]` : "pointer-events-none absolute left-1/2 top-[20px] -z-10 h-[54px] w-full max-w-[980px] rounded-full will-change-[opacity,transform]"}
           style={{
-            // The links' own graphite and hairline, solid, so gathering the bar keeps exactly the look it had at rest.
             background: 'var(--nav)',
             boxShadow: 'inset 0 0 0 1px var(--line), 0 14px 34px -16px rgb(0 0 0 / 0.24)',
             opacity: stuck ? 1 : 0,
@@ -91,7 +75,6 @@ export function Header() {
           <Links stuck={stuck} path={path} />
         </div>
 
-        {/* Only its buttons take the pointer: gathered, this column slides left across the links, and its empty box would otherwise sit on top of them. */}
         <div className="pointer-events-none flex items-center justify-end gap-1.5 [&>*]:pointer-events-auto" style={step(stuck, `calc(${INSET} * -1 + 2px)`)}>
           <button
             type="button"
@@ -137,10 +120,8 @@ export function Header() {
   )
 }
 
-/** One part of the bar stepping between open and gathered: across by `x`, and down onto the pill. */
 const step = (stuck: boolean, x: string) => ({ transform: stuck ? `translate(${x}, 11px)` : 'none', transition: `transform ${MOVE}ms ${UI}` })
 
-/** The links in a small pill of their own, with a plate that rests under the current page and slides to the one you point at. */
 function Links({ stuck, path }: { stuck: boolean; path: string }) {
   const side = useSideNew()
   const box = useRef<HTMLElement>(null)
@@ -194,11 +175,9 @@ function Links({ stuck, path }: { stuck: boolean; path: string }) {
   )
 }
 
-/** Below a laptop: the links drop as a sheet from under the bar. */
 function Menu({ path, onClose }: { path: string; onClose: () => void }) {
   const side = useSideNew()
   const reduce = useReducedMotion()
-  // These links never get pointed at or scrolled past first, so they're fetched as soon as they show.
   const router = useRouter()
   useEffect(() => NAV.forEach((n) => router.prefetch(n.href)), [router])
   return (
@@ -216,7 +195,6 @@ function Menu({ path, onClose }: { path: string; onClose: () => void }) {
           {n.label}
         </Link>
       ))}
-      {/* Signed out, and below a tablet, the way in and the way to start; signed in, the menu in the bar has them. */}
       <div className="when-out">
       <Link href="/account" onClick={onClose} aria-current={here('/account', path) ? 'page' : undefined} className={`ring-focus flex h-12 items-center rounded-[14px] px-3.5 text-[17px] tracking-[-0.01em] hover:bg-[var(--line)] active:bg-[var(--line)] sm:hidden ${here('/account', path) ? 'text-ink' : 'text-ink-2'}`}>
         Sign in

@@ -31,11 +31,6 @@ const FAQ: [string, string][] = [
 
 const H2 = 'text-[clamp(32px,3.4vw,48px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink'
 
-/**
- * Pro, sold by showing what it saves: what it would take to build and what it costs, one bar that
- * is the whole checkout, and the product running under it. Then the best of it in your hand, the
- * plans side by side, every piece by name, the questions people ask, how setup works, and one button that is the price.
- */
 export default function ProPage() {
   return (
     <SitePage>

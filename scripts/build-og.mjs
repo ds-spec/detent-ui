@@ -1,5 +1,3 @@
-// Draws every share image after a Workers build, as static files at the addresses the pages link to.
-// The Worker can't carry the renderer on the free plan's 3 MB, and one image costs 500 ms of CPU.
 import { appendFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { createJiti } from 'jiti'
@@ -22,6 +20,5 @@ for (const route of ROUTES) {
   }
 }
 appendFileSync(path.join(client, '_headers'), '\n/opengraph-image\n  Content-Type: image/png\n/*/opengraph-image\n  Content-Type: image/png\n')
-// Prerendered pages are read from the static assets; these copies would only fill the Worker.
 rmSync(path.join(root, 'dist/server/prerendered-routes'), { recursive: true, force: true })
 console.log(`Share images: ${count}.`)

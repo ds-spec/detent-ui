@@ -12,8 +12,6 @@ import { press } from '../lib/motion'
 import { useBench } from './bench'
 import { hover, pressed } from '@/lab/lib/hand'
 
-/* ───────────────────────────── Inbox ───────────────────────────── */
-
 const PEOPLE = {
   maya: { name: 'Maya Chen', hue: 25 },
   jonas: { name: 'Jonas Weber', hue: 250 },
@@ -184,9 +182,6 @@ export function InboxDemo() {
   )
 }
 
-/* ───────────────────────────── Stepper ───────────────────────────── */
-
-/** Holds + to show the acceleration, adds storage, then runs back down and bumps the floor. Hovering pauses; touching hands it over. */
 export function StepperDemo() {
   const b = useBench()
   const [seats, setSeats] = useState(5)

@@ -6,7 +6,6 @@ import { motion, useReducedMotion } from 'motion/react'
 
 const SMOOTH = { type: 'spring', bounce: 0, duration: 0.5 } as const
 
-/** A box that glides to the real height of what's inside it, so changing content never jumps or stretches. */
 export function AutoHeight({ children, className = '' }: { children: ReactNode; className?: string }) {
   const reduce = useReducedMotion()
   const inner = useRef<HTMLDivElement>(null)

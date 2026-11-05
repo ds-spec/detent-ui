@@ -21,7 +21,6 @@ const P: Record<string, Person> = {
 const START = ['maya', 'jonas', 'priya', 'sam', 'aiko', 'leo']
 const TYPED = 'Questions go to #support-leads; Hannah owns the macro updates.'
 
-// Where each person's pointer wanders, in the document's own coordinates.
 const SPOTS: Record<string, [number, number][]> = {
   maya: [
     [300, 60],
@@ -39,7 +38,6 @@ const SPOTS: Record<string, [number, number][]> = {
   ],
 }
 
-/** A shared doc: people come and go, Priya types, Jonas selects, and the demo follows Maya around. Hovering pauses it; touching hands it over. */
 export function PresenceDemo() {
   const b = useBench()
   const [here, setHere] = useState(START)
@@ -54,13 +52,11 @@ export function PresenceDemo() {
 
   const people = here.map((id) => ({ ...P[id], typing: id === 'priya' && typed.length > 0 && typed.length < TYPED.length }))
 
-  // Following someone means going where they go.
   useEffect(() => {
     if (!following || !at[following]) return
     scroller.current?.scrollTo({ top: Math.max(0, at[following][1] - 110), behavior: 'smooth' })
   }, [following, at])
 
-  // Pointers wander on their own, demo or not.
   useEffect(() => {
     let i = 0
     const t = setInterval(() => {
@@ -184,7 +180,6 @@ export function PresenceDemo() {
         </div>
       </div>
 
-      {/* Following: their colour frames the whole card, and a chip says whose view it is. */}
       <AnimatePresence>
         {followed && (
           <motion.div

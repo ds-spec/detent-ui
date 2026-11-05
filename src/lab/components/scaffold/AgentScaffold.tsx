@@ -14,11 +14,9 @@ import type { TreeNode } from '../tree/FileTree'
 type Phase = 'waiting' | 'scaffolding' | 'installing' | 'ready'
 
 const LABEL: Record<Phase, string> = { waiting: 'Waiting', scaffolding: 'Scaffolding', installing: 'Installing', ready: 'Ready' }
-/** Terminal rows: the whole run fits without scrolling, so the log reads top to bottom. */
 const ROWS = 10
 const TREE_ROW = 32
 
-/** Builds a nested tree from the flat list of files created so far. */
 const build = (root: string, files: string[], icons: Record<string, ReactNode>): TreeNode[] => {
   const top: TreeNode = { name: root, children: [] }
   for (const f of files) {
@@ -35,23 +33,12 @@ const build = (root: string, files: string[], icons: Record<string, ReactNode>):
   return [top]
 }
 
-/** How many tree rows the finished project needs: the root, every folder and every file. */
 const rowsFor = (files: string[]) => 1 + new Set(files.flatMap((f) => f.split('/').map((_, i, a) => a.slice(0, i + 1).join('/')))).size
 
-/**
- * Creating an agent project, as one window. The command types itself on the left and each file
- * it prints lands in the tree on the right, flashing once as its folder opens. The title bar
- * says what the run is doing and keeps time, and settles on Ready when it's done. The window is
- * sized for the finished project before the first file arrives, so nothing ever resizes.
- */
 export function AgentScaffold({ name, files, icons = {}, command = `npx create-agent ${name}` }: {
-  /** The project's name. The command and the tree's root use it. */
   name: string
-  /** Every path the command creates, in the order it prints them. The tree is sized for all of them before the first arrives. */
   files: string[]
-  /** An icon per path, for files that deserve their own mark. */
   icons?: Record<string, ReactNode>
-  /** What types itself at the prompt. */
   command?: string
 }) {
   const [made, setMade] = useState<string[]>([])
@@ -59,7 +46,6 @@ export function AgentScaffold({ name, files, icons = {}, command = `npx create-a
   const [seconds, setSeconds] = useState(0)
   const started = useRef(0)
 
-  // The clock runs from the first task until the project is ready.
   useEffect(() => {
     if (phase === 'waiting' || phase === 'ready') return
     const t = window.setInterval(() => setSeconds(Math.floor((performance.now() - started.current) / 1000)), 250)
@@ -113,7 +99,6 @@ export function AgentScaffold({ name, files, icons = {}, command = `npx create-a
         <span className="min-w-0 flex-1">
           <span className="block truncate text-headline text-ink">{name}</span>
         </span>
-        {/* What the run is doing, and for how long. */}
         <span className="flex items-center gap-2 text-footnote" role="status">
           <span className="relative flex size-2">
             {working && !reduce && <motion.span className="absolute inset-0 rounded-full bg-ink-3" animate={{ scale: [1, 2.2], opacity: [0.5, 0] }} transition={{ duration: 1.2, repeat: Infinity, ease: 'easeOut' }} />}
@@ -139,7 +124,6 @@ export function AgentScaffold({ name, files, icons = {}, command = `npx create-a
         </span>
       </header>
 
-      {/* The terminal and the tree side by side; narrow, the tree drops under the terminal. */}
       <div className="grid grid-cols-[minmax(0,1fr)_256px] @max-[560px]:grid-cols-1">
         <div className="px-2 py-1">
           <Terminal

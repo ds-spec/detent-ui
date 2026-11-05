@@ -9,7 +9,6 @@ import { Morph } from '../ui/Morph'
 import { Button } from '../ui/Button'
 
 type Phase = 'idle' | 'open' | 'sent'
-/** For demos and tests: point at a score, pick it, tick reasons and send, without touching focus. */
 export type PulseHandle = { hover(n: number): void; rate(n: number): void; toggle(reason: string): void; send(): void }
 type Tier = 'low' | 'mid' | 'high'
 
@@ -24,11 +23,6 @@ const tierOf = (s: number): Tier => (s <= 2 ? 'low' : s === 3 ? 'mid' : 'high')
 
 const PILL_H = 44
 
-/**
- * Feedback that starts as a five-dot meter. Pick a score and it opens into a card whose
- * follow-up depends on that score; sending folds it back down. The pill reserves its own
- * footprint and the card grows upward over the page, so nothing around it moves.
- */
 export function FeedbackPulse({
   question = 'Was this helpful?',
   labels = LABELS,
@@ -36,13 +30,9 @@ export function FeedbackPulse({
   onSend,
   ref,
 }: {
-  /** What's asked before anyone rates. */
   question?: string
-  /** What each of the five scores is called, lowest first. */
   labels?: string[]
-  /** The reasons offered after a low (1–2), middling (3) or high (4–5) score. */
   reasons?: Record<'low' | 'mid' | 'high', string[]>
-  /** Called with the score, the reasons picked and the note, once it's sent. */
   onSend?: (v: { score: number; reasons: string[]; note: string }) => void
   ref?: Ref<PulseHandle>
 }) {
@@ -128,7 +118,6 @@ export function FeedbackPulse({
         <Swap k={tier} className="mt-4 text-callout text-ink-2">
           {ASK[tier]}
         </Swap>
-        {/* Fixed-height chip area: switching tiers never changes the card's size. */}
         <div className="relative mt-2.5 h-[76px] pointer-coarse:h-[80px] @max-[330px]:h-[120px] @max-[260px]:h-[162px]">
           <AnimatePresence initial={false}>
             <motion.div
@@ -182,7 +171,6 @@ export function FeedbackPulse({
 
   return (
     <div ref={root} className="relative w-[272px] pointer-coarse:w-[328px]" style={{ height: PILL_H }}>
-      {/* Hung from the pill's bottom-centre by translate, so the card grows up and out without its top-left ever moving. */}
       <div className="absolute left-1/2 top-full z-10 -translate-x-1/2 -translate-y-full">
         <Morph
           view={phase}
@@ -209,7 +197,6 @@ function ReasonChip({ label, on, onToggle }: { label: string; on: boolean; onTog
         on ? 'bg-ink text-surface' : 'bg-surface-2 text-ink hover:bg-[color-mix(in_oklch,var(--surface-2)_82%,var(--ink)_6%)]'
       }`}
     >
-      {/* The tick sits in its own reserved slot, so selecting never changes the chip's width. */}
       <span className="relative mr-1 flex w-3.5 items-center justify-center">
         <AnimatePresence initial={false}>
           {on ? (
@@ -239,7 +226,6 @@ function ReasonChip({ label, on, onToggle }: { label: string; on: boolean; onTog
   )
 }
 
-/** Five dots that fill from the left. */
 function Meter({ value, labels, onHover, onPick, quiet }: { value: number; labels: string[]; onHover?: (v: number) => void; onPick?: (v: number) => void; quiet?: boolean }) {
   return (
     <div role={quiet ? undefined : 'radiogroup'} aria-label="Rating" className="flex items-center">
@@ -280,7 +266,6 @@ function Meter({ value, labels, onHover, onPick, quiet }: { value: number; label
   )
 }
 
-/** Text that crossfades in place. Width is fixed by the caller, so it never reflows. */
 function Swap({ k, className, children }: { k: string; className: string; children: ReactNode }) {
   return (
     <span className={`relative block h-[1.4em] overflow-hidden ${className}`}>

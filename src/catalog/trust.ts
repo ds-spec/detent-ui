@@ -1,25 +1,15 @@
-/**
- * The facts the trust pages are built on, in one place. Plain data, safe for the server.
- * Set the licensor's legal name and the contact address before launch; every page follows.
- */
-
-/** Who grants the licences: the legal name of the person or company that sells Detent. */
 export const LICENSOR = process.env.NEXT_PUBLIC_LICENSOR ?? 'Detent'
 
-/** Where people write about a licence, a refund or anything else. */
 export const CONTACT = process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? 'hello@detentui.com'
 
-/** How long after buying a refund is anyone's for the asking. */
 export const REFUND_DAYS = 14
 
-/** When the licence, refund and terms pages last changed. */
 export const TRIAL_INSTALLS = 10
 
 export const UPDATED = '2026-11-02'
 
 export const updated = () => new Date(`${UPDATED}T00:00:00`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
 
-/** What shipped, newest first. `name` is the short one the changelog's side list shows. Each item can link to what it's about. */
 export type Release = { date: string; name: string; title: string; line: string; items: { label: string; href?: string; pro?: boolean }[] }
 
 export const RELEASES: Release[] = [

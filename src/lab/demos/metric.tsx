@@ -7,7 +7,6 @@ import { useScript } from './chart-kit'
 
 const usd = (n: number) => `$${Math.round(n).toLocaleString('en-US')}`
 
-/** A startup's October books, read four ways. Lumpy numbers, real merchants, a reason for each. */
 const METRICS: Metric[] = [
   {
     id: 'burn',
@@ -73,11 +72,6 @@ const METRICS: Metric[] = [
   },
 ]
 
-/**
- * The month's books, read four ways. On its own it moves through each metric and, on burn and
- * revenue, points at the biggest driver for a beat, so the number shows what it would have been
- * without it. Hovering pauses; touching hands it over.
- */
 export function MetricDemo() {
   const [at, setAt] = useState('burn')
   const [aim, setAim] = useState<string | null>(null)

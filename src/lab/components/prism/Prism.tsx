@@ -4,17 +4,6 @@ import { useEffect, useImperativeHandle, useRef, useState } from 'react'
 import type { ElementType, Ref } from 'react'
 import { useReducedMotion } from 'motion/react'
 
-/*
- * The headline is glass and the cursor is the light. Each letter is a pillow of glass with a bevel
- * worked out from a blurred copy of the text; light falling through it lands on the page below,
- * thrown away from the light, brighter where the bevels focus it, and split into its colours at
- * the edges, wider the further it travels. On the letters themselves the bevels catch a glint
- * that follows the light round.
- *
- * The real text stays in the page for selection, search and screen readers; only its paint is
- * hidden once the glass has drawn its first frame, so nothing moves and nothing flashes.
- */
-
 const VERT = `#version 300 es
 void main() {
   vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2));
@@ -55,11 +44,8 @@ void main() {
   vec3 norm = vec3(0.0);
   for (int i = 0; i < BANDS; i++) norm += SPEC[i];
 
-  /* ── The light that came through ── */
   vec3 lightCol = vec3(0.0);
   if (uMode < 0.5) {
-    // Walk back toward the light; whatever glass lies on the way lit this point. Each colour bends
-    // a little differently, so the streams end in a spectrum.
     float len = min(dist * 0.8, uReach);
     float j = hash(gl_FragCoord.xy);
     const int STEPS = 22;
@@ -76,7 +62,6 @@ void main() {
     float fall = smoothstep(uReach * 1.4, 0.0, dist) * 0.6 + 0.4;
     lightCol = c * fall;
   } else {
-    // Behind each letter, the bevels gather the light into thin lines, split into colours.
     vec2 q0 = p + dir * min(dist, uReach) * 0.12;
     float e = max(1.0, uR * 0.35);
     vec2 g0 = vec2(H(q0 + vec2(e, 0.0)) - H(q0 - vec2(e, 0.0)), H(q0 + vec2(0.0, e)) - H(q0 - vec2(0.0, e))) / (2.0 * e) * uR;
@@ -94,13 +79,11 @@ void main() {
   if (uDark > 0.5) {
     light = vec4(lightCol * uIntensity, 0.0);
   } else {
-    // On a pale page, light can only show as colour.
     float a = clamp(lum * uIntensity * 0.55, 0.0, 0.5);
     vec3 tint = lum > 0.001 ? lightCol / lum : vec3(1.0);
     light = vec4(tint * a, a);
   }
 
-  /* ── The glass ── */
   float a = M(p);
   vec4 glass = vec4(0.0);
   if (a > 0.002) {
@@ -111,11 +94,9 @@ void main() {
     vec3 l = normalize(vec3(v, uLight.z));
     vec3 h = normalize(l + vec3(0.0, 0.0, 1.0));
     float nh = max(dot(n, h), 0.0);
-    // The bevels that face the light shine; the ones turned away fall into shade.
     float facing = dot(normalize(-g + 1e-5), dir);
     float bevel = tilt * smoothstep(0.0, 0.9, facing);
     float away = tilt * smoothstep(0.0, 0.9, -facing);
-    // A soft reflection of the light, travelling across the faces of the letters.
     float sheen = exp(-dot(v, v) / (2.0 * pow(uLight.z * 0.32, 2.0)));
     float spec = pow(nh, 160.0);
     vec3 body = uDark > 0.5 ? uInk * 0.72 : uInk;
@@ -129,7 +110,6 @@ void main() {
   o = glass + light * (1.0 - glass.a);
 }`
 
-/** A box blur, three passes, which comes close to a gaussian. */
 function blur(src: Float32Array, w: number, h: number, r: number) {
   const tmp = new Float32Array(src.length)
   const line = (from: Float32Array, to: Float32Array, n: number, count: number, stride: number, step: number) => {
@@ -153,18 +133,10 @@ function blur(src: Float32Array, w: number, h: number, r: number) {
 }
 
 export type PrismHandle = {
-  /** Move the light to a point, as fractions of the headline's box (it may be outside it), over `ms`. */
   lightTo(x: number, y: number, ms?: number): Promise<void>
-  /** Give the light back to the cursor and its own drift. */
   release(): void
 }
 
-/**
- * A headline made of glass, lit by the cursor: the letters catch a glint as the light moves, and
- * the light that passes through them lands on the page split into its colours. Left alone, the
- * light drifts slowly over it like the sun. Without WebGL, or before the first frame, it's just
- * the headline.
- */
 export function Prism({
   children,
   as: Tag = 'h1',
@@ -176,19 +148,13 @@ export function Prism({
   drift = true,
   ref,
 }: {
-  /** The words. Plain text, so it can be measured letter by letter. */
   children: string
   as?: ElementType
   className?: string
-  /** How strong the light on the page is, 0 to 1.5. */
   intensity?: number
-  /** How far the colours part, 0 to 2. */
   spread?: number
-  /** How high the glass sits over the page, which is how far the light is thrown. 0.5 to 2. */
   elevation?: number
-  /** Let the cursor be the light. */
   follow?: boolean
-  /** Let the light wander when nobody is moving it. */
   drift?: boolean
   ref?: Ref<PrismHandle>
 }) {
@@ -198,7 +164,6 @@ export function Prism({
   const [box, setBox] = useState<{ pad: number; w: number; h: number } | null>(null)
   const [ready, setReady] = useState(false)
   const api = useRef<PrismHandle>({ lightTo: async () => {}, release: () => {} })
-  // Read by the drawing loop every frame, so changing a prop never rebuilds the glass.
   const opts = useRef({ intensity, spread, elevation, follow, drift, reduce })
   useEffect(() => {
     opts.current = { intensity, spread, elevation, follow, drift, reduce }
@@ -246,7 +211,6 @@ export function Prism({
     const heightTex = texture()
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1)
 
-    /* ── The text, as the glass sees it ── */
     let size = { w: 0, h: 0, pad: 0, font: 16, dpr: 1 }
     let ink: [number, number, number] = [0, 0, 0]
     let dark = 0
@@ -272,7 +236,6 @@ export function Prism({
       cv.height = Math.round(Hh * dpr)
       readInk()
 
-      // Every letter is drawn where the page put it, so the glass and the real text never disagree.
       const fontStr = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`
       const draw = (scale: number) => {
         const c = document.createElement('canvas')
@@ -314,13 +277,11 @@ export function Prism({
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, soft.width, soft.height, 0, gl.RED, gl.FLOAT, hgt)
     }
 
-    /* ── The light ── */
     const light = { x: 0, y: 0, tx: 0, ty: 0, set: false }
     let lastMove = -1e9
     let driven: { x: number; y: number } | null = null
     const home = (t: number) => {
       const { w, h, pad } = size
-      // The sun's path: a slow, wide arc above and to the sides of the words.
       const s = opts.current.reduce || !opts.current.drift ? 0 : t / 1000
       return { x: pad + (w - pad * 2) * (0.5 + 0.46 * Math.sin(s * 0.42 + 2.2)), y: pad - h * 0.5 + h * 0.2 * Math.sin(s * 0.57) }
     }
@@ -357,7 +318,6 @@ export function Prism({
       },
     }
 
-    /* ── Drawing, only while it can be seen ── */
     let visible = true
     const io = new IntersectionObserver(([en]) => {
       visible = en.isIntersecting

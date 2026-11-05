@@ -29,7 +29,6 @@ import { TEMPLATE_RAIL } from './rail'
 import { TemplatePiece } from '../library/Library'
 import { wellOf } from '../wells'
 
-/** The template, scrolling in its own window, kept out of the viewer's renders so resizing stays smooth. */
 const Page = memo(function Page({ id, scroller, onScroll, theme }: { id: string; scroller: RefObject<HTMLDivElement | null>; onScroll: () => void; theme?: 'light' | 'dark' }) {
   return (
     <div ref={scroller} onScroll={onScroll} className="h-full overflow-y-auto [scrollbar-width:thin]">
@@ -38,11 +37,6 @@ const Page = memo(function Page({ id, scroller, onScroll, theme }: { id: string;
   )
 })
 
-/**
- * The templates' layout: the frame stays put and only what's in it changes. It holds the list of
- * templates and each template; the running app at /live is the one page with no frame at all.
- */
-/** A template, small, on its well: what the strip shows beside a mark you point at. */
 const peekTemplate = (id: string, onReady: () => void) => (
   <div className="absolute inset-0" style={{ background: wellOf('violet') }}>
     <TemplatePiece id={id} onReady={onReady} />
@@ -53,12 +47,10 @@ export function TemplateExhibit({ children }: { children: ReactNode }) {
   const [, , slug = '', own] = usePathname().split('/')
   const { id, go } = useWant(slug, '/templates')
   const t = template(id)
-  // The shelf itself is the library's page, drawn by the route.
   if (own || !slug || (id && !t)) return children
   return (
     <Shell bare list={<Rail label="Templates" groups={TEMPLATE_RAIL} current={id} onPick={go} preview={peekTemplate} />} bar={<Trail steps={t ? ['Templates', t.name] : ['Templates']} />}>
       {t && <TemplateViewer key={t.id} id={t.id} go={go} />}
-      {/* The list's page while it's the one open; a template's own part draws nothing. */}
       <div className="contents" style={{ display: id === slug ? undefined : 'none' }}>
         {children}
       </div>
@@ -66,12 +58,6 @@ export function TemplateExhibit({ children }: { children: ReactNode }) {
   )
 }
 
-/**
- * A template on the desk: the whole site live in a browser window you can resize from a phone's
- * width to the desk's, scroll, switch to dark, or read as code. Below, every section in order;
- * pick one and the page on the desk scrolls to it, and the list follows the page as you scroll.
- * An app fills the window instead of scrolling, so its parts are listed rather than jumped to.
- */
 function TemplateViewer({ id, go }: { id: string; go: (id: string) => void }) {
   const t = template(id)!
   const app = t.form === 'app'
@@ -96,8 +82,6 @@ function TemplateViewer({ id, go }: { id: string; go: (id: string) => void }) {
     return () => window.removeEventListener('keydown', on)
   }, [present])
 
-  // Which section is at the top of the window, so the list can say where you are. Made once, so
-  // the page it's handed to never re-renders because of it.
   const [onScroll] = useState(() => () => {
     const box = scroller.current
     if (!box) return
@@ -116,7 +100,6 @@ function TemplateViewer({ id, go }: { id: string; go: (id: string) => void }) {
     const box = scroller.current
     const el = box?.querySelector<HTMLElement>(`#${anchor}`)
     if (!box || !el) return
-    // Under the page's own sticky nav, which is 64px tall.
     const y = anchor === t.parts[0].anchor ? 0 : el.getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop - 64
     box.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' })
     document.querySelector('[data-desk]')?.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' })
@@ -136,7 +119,6 @@ function TemplateViewer({ id, go }: { id: string; go: (id: string) => void }) {
               </>
             )}
           </p>
-          {/* The list down the side does this on a laptop; below one, this is the way back. */}
           <Link href="/templates" className="ring-focus rounded-[6px] text-footnote text-ink-3 transition-colors hover:text-ink lg:hidden">
             All templates
           </Link>
@@ -271,7 +253,6 @@ function TemplateViewer({ id, go }: { id: string; go: (id: string) => void }) {
   )
 }
 
-/** One step of making a template yours: its number, what to do and why, and the code, with the file it goes in. */
 export function StartStep({ n, step }: { n: number; step: Step }) {
   const [copied, setCopied] = useState(false)
   const block = step.code?.includes('\n')

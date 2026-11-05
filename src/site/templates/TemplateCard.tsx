@@ -12,17 +12,9 @@ import { Backdrop, Window } from '../blocks/Studio'
 import { useNear } from '../near'
 import type { Tone } from '../home/lights'
 
-/** Each template stands on its own light. */
 const TONE: Record<string, Tone> = { detent: 'blue' }
 
-/**
- * A template on the gallery, running live in a browser window. A whole site doesn't fit in a
- * card, so pointing at it takes you on a tour: the page scrolls slowly from top to bottom and
- * every section plays as it comes past. Leave and it glides back to the top. The card is the
- * link; nothing inside it takes the pointer.
- */
 export function TemplateCard({ t }: { t: Template }) {
-  // An app fills its window and plays its own demo, so there's no page to tour.
   const app = t.form === 'app'
   const scheme = useTheme()
   const box = useRef<HTMLDivElement>(null)
@@ -41,7 +33,6 @@ export function TemplateCard({ t }: { t: Template }) {
     if (!dist) return
     setTouring(down)
     tour.current = animate(el.scrollTop, end, {
-      // Down at reading pace; back up in a breath.
       duration: down ? Math.min(18, dist / 600) : Math.min(1.1, 0.4 + dist / 8000),
       ease: down ? [0.45, 0, 0.55, 1] : [0.2, 0.9, 0.25, 1],
       onUpdate: (v) => {
@@ -52,7 +43,6 @@ export function TemplateCard({ t }: { t: Template }) {
   }
 
   return (
-    // The page inside has links of its own, so the card isn't one: a single link lies over all of it.
     <article className="group/card relative rounded-[30px] bg-surface p-2 shadow-[var(--card-edge)] transition-shadow duration-300 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--card-lift)]" onPointerEnter={(e) => e.pointerType === 'mouse' && go(true)} onPointerLeave={() => go(false)}>
       <div className="relative overflow-hidden rounded-[24px] p-3 sm:p-10">
         <Backdrop tone={TONE[t.id] ?? 'rose'} />

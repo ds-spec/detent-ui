@@ -15,11 +15,6 @@ import { View } from './View'
 
 const spring = { type: 'spring', stiffness: 520, damping: 42 } as const
 
-/**
- * The components page: a quiet index on the left and one component at a time, large, on
- * the right, with its notes below the fold. A small mark glides down the index to whatever
- * is open, ↑ ↓ browse from anywhere, / searches, P lifts the stage to fill the screen, and I inspects.
- */
 export function Browser({ children }: { children: ReactNode }) {
   const path = usePathname()
   const router = useRouter()
@@ -28,7 +23,6 @@ export function Browser({ children }: { children: ReactNode }) {
   const [present, setPresent] = useState(false)
   const [inspect, setInspect] = useState(false)
 
-  // Which way we moved through the list, so the stage can slide the right way. Each move clicks, if sound is on.
   const { tick, openSearch } = useSite()
   const last = useRef(index)
   const [dir, setDir] = useState(1)
@@ -37,11 +31,9 @@ export function Browser({ children }: { children: ReactNode }) {
     setDir(index >= last.current ? 1 : -1)
     last.current = index
     tick()
-    // Reading the notes and moving on brings the new component back into view.
     if (window.scrollY > 120) window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [index, tick])
 
-  // Presenting holds the page still behind the stage.
   useEffect(() => {
     document.documentElement.style.overflow = present ? 'hidden' : ''
     return () => {
@@ -64,7 +56,6 @@ export function Browser({ children }: { children: ReactNode }) {
         openSearch()
         return
       }
-      // Never take keys from fields or from components that use them.
       if (t.closest('input, textarea, [contenteditable], [role=listbox], [role=tree], [role=slider], [role=spinbutton], [role=dialog], [role=grid], [role=radiogroup]')) return
       const k = ev.key.toLowerCase()
       if (k === 'arrowdown' || k === 'arrowright' || k === 'j') go(index + 1)
@@ -99,11 +90,9 @@ export function Browser({ children }: { children: ReactNode }) {
   )
 }
 
-/** Every component by family, in small type. A short mark glides to the open one and its name steps in beside it. */
 function Index({ id }: { id: string }) {
   const mark = useId()
   const nav = useRef<HTMLElement>(null)
-  // Keep the open component in view inside the index (never by scrolling the page).
   useEffect(() => {
     const box = nav.current
     const el = box?.querySelector<HTMLElement>(`[data-id="${id}"]`)
@@ -168,7 +157,6 @@ function Index({ id }: { id: string }) {
   )
 }
 
-/** Narrow screens: the index becomes one scrolling line, with the same mark underneath. */
 function Strip({ id }: { id: string }) {
   const mark = useId()
   const strip = useRef<HTMLDivElement>(null)

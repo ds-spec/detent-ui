@@ -18,18 +18,6 @@ import { FAMILY_EVENT } from './FamilyTag'
 import { useSite } from '../Providers'
 import { watchLine } from '../line'
 
-/**
- * The library as an index. Every component's name, set large, in one list; beside it a stage
- * that shows one of them at full size. Scroll the names past the reading line and the one on
- * it comes into ink and takes the stage. The scroll has detents: each name settles onto the
- * line with a small stop, and the stage takes the new component in one calm crossfade. Press a
- * name to bring it to the line; press it again, or its Open, to go to its page. What's on the
- * stage is named above it, so the way in never falls below the fold.
- *
- * Below 1024px there's no stage: each name carries its component underneath it.
- */
-
-/** How long the line has to rest on a name before the stage changes, so a fast scroll doesn't load everything it passes. */
 const SETTLE = 140
 
 export function IndexGallery() {
@@ -45,11 +33,9 @@ export function IndexGallery() {
   const now = useRef(active)
   const settle = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // A family tag elsewhere on the page opens the index on that family.
   useEffect(() => {
     const go = (ev: Event) => {
       setFamily((ev as CustomEvent<string>).detail)
-      // A family asked for by name shows whole: the price filter would only hide some of it.
       setAccess(null)
       document.getElementById('library')?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
     }
@@ -57,7 +43,6 @@ export function IndexGallery() {
     return () => window.removeEventListener(FAMILY_EVENT, go)
   }, [])
 
-  // A name crossing the reading line becomes the current one; the stage follows once it rests there.
   useEffect(() => {
     const el = box.current
     if (!el) return
@@ -72,12 +57,10 @@ export function IndexGallery() {
     })
   }, [family, access, tick])
 
-  // A filter can take the current name away; the first of what's left stands in for it.
   const on = list.some((e) => e.id === active) ? active : list[0]?.id
   const shown = list.some((e) => e.id === stage) ? stage : list[0]?.id
   const current = ENTRIES.find((e) => e.id === shown)!
 
-  // The row carries the offset that seats it on the reading line, so it's the row that scrolls.
   const toLine = (el: HTMLElement) => (el.closest('li') ?? el).scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' })
   const keys = (ev: KeyboardEvent<HTMLUListElement>) => {
     if (ev.key !== 'ArrowDown' && ev.key !== 'ArrowUp') return
@@ -93,7 +76,6 @@ export function IndexGallery() {
   return (
     <div ref={box} className="index-detents grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
       <div className="min-w-0">
-        {/* Free and Pro narrow the list by what it costs; families narrow it to one kind. Counts follow both, and a pairing that would leave nothing can't be picked. */}
         <div role="group" aria-label="Price" className="flex gap-1.5">
           {(['free', 'pro'] as const).map((a) => (
             <Chip key={a} on={access === a} n={ENTRIES.filter((e) => (!family || e.category === family) && fits(e, a)).length} onClick={() => setAccess((x) => (x === a ? null : a))}>
@@ -127,7 +109,6 @@ export function IndexGallery() {
         </ul>
       </div>
 
-      {/* The stage: one component, as large as it can be shown, seated as it arrives. */}
       <div className="sticky top-24 hidden h-[calc(100dvh-128px)] min-h-[560px] lg:block">
         <div className="relative h-full overflow-hidden rounded-[32px] bg-card shadow-[inset_0_0_0_1px_light-dark(transparent,var(--line))]">
           <Caption e={current} />
@@ -142,7 +123,6 @@ export function IndexGallery() {
   )
 }
 
-/** A filter. Its count keeps two digits' room, so changing filters never reflows the row; one that would show nothing rests disabled. */
 function Chip({ on, n, dot, onClick, children }: { on: boolean; n: number; dot?: string; onClick: () => void; children: ReactNode }) {
   return (
     <button type="button" aria-pressed={on} disabled={!n && !on} onClick={onClick} className={`ring-focus flex h-8 items-center gap-1.5 rounded-full px-3 text-footnote transition-colors disabled:opacity-35 ${on ? 'bg-surface-2 font-medium text-ink' : 'text-ink-3 enabled:hover:text-ink-2'}`}>
@@ -153,7 +133,6 @@ function Chip({ on, n, dot, onClick, children }: { on: boolean; n: number; dot?:
   )
 }
 
-/** One name in the index. On the line it's ink with a tick beside it; off it, it waits in grey. */
 function Row({ e, on, onPick }: { e: Entry; on: boolean; onPick: (el: HTMLElement) => void }) {
   const pro = isProComponent(e.id)
   const router = useRouter()
@@ -171,7 +150,6 @@ function Row({ e, on, onPick }: { e: Entry; on: boolean; onPick: (el: HTMLElemen
         <span className={`truncate text-[clamp(28px,2.7vw,40px)] font-normal leading-[1.1] tracking-[-0.045em] transition-colors duration-200 ${on ? 'text-ink' : 'text-ink/25 group-hover:text-ink/50'}`}>{e.name}</span>
         {pro && <ProTag className={`shrink-0 transition-opacity duration-200 ${on ? '' : 'opacity-40'}`} />}
       </button>
-      {/* The way in, right on the reading line. */}
       <Link
         href={`/components/${e.id}`}
         tabIndex={on ? 0 : -1}
@@ -186,7 +164,6 @@ function Row({ e, on, onPick }: { e: Entry; on: boolean; onPick: (el: HTMLElemen
   )
 }
 
-/** The component on the stage, at full size when it fits. */
 function Stage({ e }: { e: Entry }) {
   const Demo = DEMOS[e.id]
   return Demo ? (
@@ -196,7 +173,6 @@ function Stage({ e }: { e: Entry }) {
   ) : null
 }
 
-/** What's on the stage, in one fixed line across its top: its name, its plan, what it does, and the way in. */
 function Caption({ e }: { e: Entry }) {
   const pro = isProComponent(e.id)
   return (
@@ -219,7 +195,6 @@ function Caption({ e }: { e: Entry }) {
   )
 }
 
-/** On a phone: the name, then its component right under it, running once it's near. */
 function Mobile({ e, pro }: { e: Entry; pro: boolean }) {
   const card = useRef<HTMLDivElement>(null)
   const near = useNear(card)
@@ -232,7 +207,6 @@ function Mobile({ e, pro }: { e: Entry; pro: boolean }) {
         {pro && <ProTag />}
         <ArrowRight size={16} className="ml-auto text-ink-3" />
       </Link>
-      {/* Not a link itself: the component inside has its own buttons and links. */}
       <div ref={card} className="relative overflow-hidden rounded-[24px] bg-card" style={{ height: `clamp(${Math.round(h * 0.62 + 40)}px, calc(${(h / w).toFixed(4)} * (100vw - 80px) + 40px), ${h + 40}px)` }}>
         {near && Demo && (
           <Fit pad={20} max={1} min={0.62}>

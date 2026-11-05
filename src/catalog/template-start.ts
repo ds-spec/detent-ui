@@ -1,9 +1,3 @@
-/**
- * Making a template yours, step by step: what a buyer does after paying, in order, with the exact
- * file and the exact lines. A template isn't a component you configure with props, it's an app you
- * take over, so this is its documentation. Each step is a title, a line, and code when there is some.
- */
-
 export type Step = { title: string; line: string; code?: string; file?: string }
 
 const page = (name: string, file: string, wrap = 'h-dvh') => `'use client'

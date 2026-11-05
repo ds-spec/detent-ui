@@ -38,12 +38,6 @@ const iconFor = (row: Row, open: boolean) => {
   return /\.(tsx?|jsx?|json|ya?ml|toml|css)$/.test(row.node.name) ? <Code size={16} /> : <FilePage size={16} />
 }
 
-/**
- * A file tree for code and agent tools. Opening a folder lets its children cascade in while
- * their indent guide draws down; the guide of the folder you're in glows. Files that appear
- * while you watch flash in place and their folders open themselves. Fully keyboard driven:
- * arrows walk and open, Left climbs to the parent, typing jumps.
- */
 export function FileTree({
   nodes,
   defaultOpen = [],
@@ -51,15 +45,10 @@ export function FileTree({
   onSelect,
   label = 'Files',
 }: {
-  /** The folders and files. A node with children is a folder. */
   nodes: TreeNode[]
-  /** Paths of the folders open at first. */
   defaultOpen?: string[]
-  /** The selected path, to control it from outside. Leave it out and the tree keeps its own. */
   selected?: string | null
-  /** Called with a file's path when a person opens it. */
   onSelect?: (path: string) => void
-  /** The tree's accessible name. */
   label?: string
 }) {
   const [open, setOpen] = useState(() => new Set(defaultOpen))
@@ -72,14 +61,12 @@ export function FileTree({
   const typed = useRef({ text: '', at: 0 })
   const reduce = useReducedMotion()
   const id = useId()
-  // Rows unfold by their own height and are stacked by transform, so a folder opening never moves the rows below it in the layout.
   const stack = useRef<HTMLDivElement>(null)
   useStack(stack)
 
   const selected = selectedProp !== undefined ? selectedProp : own
   const rows = useMemo(() => flatten(nodes, open), [nodes, open])
 
-  // Files that arrive later flash once, and the folders they land in open on their own.
   useEffect(() => {
     const now = allPaths(nodes)
     const added = now.filter((p) => !known.current.has(p))
@@ -97,7 +84,6 @@ export function FileTree({
     return () => clearTimeout(t)
   }, [nodes])
 
-  // Rows revealed together cascade in order; everything else appears at once.
   const entering = rows.filter((r) => !shown.current.has(r.path)).map((r) => r.path)
   useEffect(() => {
     shown.current = new Set(rows.map((r) => r.path))
@@ -204,7 +190,6 @@ export function FileTree({
                 className={`group/row relative flex cursor-default items-center gap-2 rounded-[8px] pr-2 text-callout transition-colors duration-150 ${isSelected ? 'bg-surface-2 text-ink' : 'text-ink hover:bg-[color-mix(in_oklch,var(--surface-2)_60%,transparent)]'}`}
                 style={{ height: ROW, paddingLeft: PAD + row.depth * INDENT, boxShadow: isCursor ? 'inset 0 0 0 1px var(--line-strong)' : undefined }}
               >
-                {/* A file that just appeared lights up once, then settles. */}
                 <AnimatePresence>
                   {fresh.has(row.path) && (
                     <motion.span
@@ -217,7 +202,6 @@ export function FileTree({
                     />
                   )}
                 </AnimatePresence>
-                {/* Indent guides, one per ancestor. The guide of the folder you're in is brighter. */}
                 {Array.from({ length: row.depth }, (_, level) => {
                   const ancestor = row.path
                     .split('/')

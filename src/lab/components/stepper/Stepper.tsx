@@ -8,16 +8,9 @@ import { Minus, Plus } from '../../icons'
 import { ease, press } from '../../lib/motion'
 
 const DIGIT = '0.62em'
-/** For demos and tests: press and hold a button, or step, without touching focus. */
 export type StepperHandle = { hold(dir: 1 | -1): void; release(): void; bump(n: number): void }
 const SCRUB_PX = 9
 
-/**
- * A number stepper that feels physical. Digits roll in the direction you're counting, holding
- * a button speeds up the longer you hold, and you can drag across the number to scrub. At its
- * limits the number gives a small nudge instead of going dead. Arrow keys work too, with
- * Shift for tens.
- */
 export function Stepper({
   value,
   onChange,
@@ -27,17 +20,11 @@ export function Stepper({
   label,
   ref,
 }: {
-  /** The number shown. */
   value: number
-  /** Called with the next number, by a press, a hold or typing. */
   onChange: (next: number) => void
-  /** The lowest it goes. */
   min?: number
-  /** The highest it goes. */
   max?: number
-  /** How much each press changes it. */
   step?: number
-  /** What's being counted, for screen readers. */
   label: string
   ref?: Ref<StepperHandle>
 }) {
@@ -51,7 +38,6 @@ export function Stepper({
 
   useEffect(() => () => clearTimeout(timer.current), [])
 
-  /** Moves by `n` steps; returns false (and nudges) when a limit stops it. */
   const bump = (n: number) => {
     const v = current.current
     const next = Math.min(max, Math.max(min, v + n * step))
@@ -67,7 +53,6 @@ export function Stepper({
   const hold = (dir: 1 | -1) => {
     clearTimeout(timer.current)
     if (!bump(dir)) return
-    // Repeats start after a beat, then speed up the longer you hold.
     let delay = 380
     const tick = () => {
       if (!bump(dir)) return
@@ -178,7 +163,6 @@ export function Stepper({
   )
 }
 
-/** Digits that roll the way you're counting: up brings new digits from below, down from above. */
 export function Ticker({ value }: {
   value: number
 }) {
@@ -192,7 +176,6 @@ export function Ticker({ value }: {
     <span className="tnum relative flex overflow-hidden" style={{ height: '1.3em', lineHeight: '1.3em' }}>
       <AnimatePresence initial={false}>
         {chars.map((c, i) => (
-          // Keyed from the right, so the ones column stays the ones column as numbers grow.
           <motion.span
             key={chars.length - i}
             className="relative block overflow-hidden"

@@ -8,7 +8,6 @@ export const metadata: Metadata = page({
   path: '/components',
 })
 
-// The library's front: every component as a live card. The site's header and footer come from the layout.
 export default function ComponentsPage() {
   return <Library shelf="components" />
 }

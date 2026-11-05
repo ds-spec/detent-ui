@@ -8,10 +8,6 @@ import { Backdrop, Window } from '../blocks/Studio'
 import { Fit } from '../Fit'
 import { useNear } from '../near'
 
-/**
- * One Pro screen, running, above the plans: the thing the prices are for. To watch, not to use, like
- * the stage on the Pro page, and only while it's near the screen.
- */
 export function Running({ id, name, title, count }: { id: string; name: string; title: string; count: number }) {
   const box = useRef<HTMLDivElement>(null)
   const near = useNear(box, '300px 0px', '700px 0px')

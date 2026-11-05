@@ -6,7 +6,6 @@ import { Check, Copy } from '@/lab/icons'
 
 export type File = { name: string; note: string; code: string; html: string }
 
-/** A few files, highlighted, a tab each, with what each one is for and a copy button. */
 export function Files({ files }: { files: File[] }) {
   const [at, setAt] = useState(0)
   const [copied, setCopied] = useState(false)
@@ -17,7 +16,6 @@ export function Files({ files }: { files: File[] }) {
     try {
       await navigator.clipboard.writeText(file.code)
     } catch {
-      /* Clipboard blocked: the code is right there to select. */
     }
     setCopied(true)
     clearTimeout(t.current)

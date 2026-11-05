@@ -13,17 +13,11 @@ import { ease, spring } from '../../lib/motion'
 export type ChecklistStep = {
   id: string
   title: string
-  /** One line on what this step does. */
   line: string
-  /** The label on its button. */
   action: string
-  /** A rough time, like "2 min". */
   takes?: string
-  /** Something real to show while it's open: the record to add, who's invited, the account. */
   preview?: ReactNode
-  /** The step's own colour: any CSS background. */
   tint?: string
-  /** Does the work. The step stays busy until it resolves. */
   onAction?: () => void | Promise<void>
 }
 
@@ -34,11 +28,6 @@ const TINTS = [
   'radial-gradient(110% 150% at 0% 0%, #aeeed5, transparent 72%), radial-gradient(110% 150% at 100% 100%, #bfe8ff, transparent 70%), #e7f7ef',
 ]
 
-/**
- * Everything between signing up and going live, on one card. Only the step you're on is open, in
- * its own colour, showing the real thing it's about and the one button that does it. Finish it and
- * the next opens by itself, so the list always says where you are.
- */
 export function Checklist({
   steps,
   done: initial = [],
@@ -48,19 +37,12 @@ export function Checklist({
   finishedAction,
   onFinish,
 }: {
-  /** The steps, in order. */
   steps: ChecklistStep[]
-  /** Ids already finished. */
   done?: string[]
-  /** The grey line under the count. */
   then?: string
-  /** The headline once every step is done. */
   finished?: string
-  /** The grey line under it. */
   finishedLine?: string
-  /** A last button, shown once everything's done. */
   finishedAction?: ReactNode
-  /** Called when the last step finishes. */
   onFinish?: () => void
 }) {
   const [done, setDone] = useState(initial)

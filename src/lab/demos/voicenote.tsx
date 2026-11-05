@@ -8,7 +8,6 @@ import { useLoop } from './loop'
 
 const SAID = 'Your refund for order 4821 went out this morning. It’s on its way to the Visa ending 4021, and usually lands in three to five days. I’ve also flagged the carrier: that’s the third damaged box this month.'
 
-/** When each word is said: an even pace, a longer breath after a comma, longer still after a full stop. */
 const WORDS: SpokenWord[] = (() => {
   let at = 0.25
   return SAID.split(' ').map((word) => {
@@ -19,7 +18,6 @@ const WORDS: SpokenWord[] = (() => {
 })()
 const DURATION = Math.ceil(WORDS[WORDS.length - 1].at + 0.8)
 
-/** An agent answers by voice: the note plays, speeds up, and plays out to the end. */
 export function VoiceNoteDemo() {
   const note = useRef<VoiceNoteHandle>(null)
   const handlers = useLoop(async (beat) => {
@@ -30,7 +28,6 @@ export function VoiceNoteDemo() {
       note.current?.play()
       await beat(3800)
       note.current?.speed(1.5)
-      // The rest of the note at 1.5×; it stops itself at the end and rests there before the next run.
       await beat(((DURATION - 3.8) / 1.5) * 1000 + 2400)
       note.current?.pause()
     }

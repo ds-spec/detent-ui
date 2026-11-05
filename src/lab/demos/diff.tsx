@@ -53,10 +53,6 @@ const HUNKS: Hunk[] = [
 const TOTAL = HUNKS.reduce((n, h) => n + h.lines.length, 0)
 const BREAKS = HUNKS.slice(0, -1).reduce<number[]>((a, h) => [...a, (a.at(-1) ?? 0) + h.lines.length], [])
 
-/**
- * The agent writes the change, then a reviewer works through it: a look at the split view,
- * two accepts, one reject, apply. Hovering pauses it; touching it hands over the controls.
- */
 export function DiffDemo() {
   const [run, setRun] = useState(0)
   return <Session key={run} onDone={() => setRun((r) => r + 1)} />
@@ -72,7 +68,6 @@ function Session({ onDone }: { onDone: () => void }) {
   useEffect(() => {
     let live = true
     const wait = (ms: number) => new Promise<void>((r, x) => setTimeout(() => (live ? r() : x(new Error('stopped'))), ms))
-    // Waits out the time, and longer while someone is looking. Once they've taken over, it stops.
     const beat = async (ms: number) => {
       for (let t = 0; t < ms || held.current; t += 100) await wait(100)
       if (touched.current) throw new Error('taken over')

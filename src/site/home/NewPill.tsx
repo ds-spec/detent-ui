@@ -12,7 +12,6 @@ const NEW = [
   { href: '/blocks/integrations', name: 'Integrations' },
 ]
 
-/** The announcement pill: the newest things take turns, rolling through a masked slot that never changes size, always at full ink. */
 export function NewPill() {
   const [i, setI] = useState(0)
   useEffect(() => {

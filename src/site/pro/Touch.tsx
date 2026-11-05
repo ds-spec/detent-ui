@@ -6,12 +6,6 @@ import { LivePlate } from '../LivePlate'
 import { wellOf } from '../wells'
 import type { Tone } from '../home/lights'
 
-/*
- * The first thing under the hero: Pro's best work, in the hand. The Pro page's other stages are
- * for watching and comparing; here nothing is inert. Each part only runs while it's near the
- * screen, so several live pieces, some of them WebGL, cost one at a time.
- */
-
 const PIECES: { id: string; name: string; line: string; tone: Tone; bleed?: boolean; className: string }[] = [
   { id: 'region', name: 'Region wheel', line: 'Flick the drum and the Earth turns with it, in today’s real sunlight.', tone: 'blue', bleed: true, className: 'h-[580px] sm:h-[640px] lg:col-span-12 lg:h-[700px]' },
   { id: 'glyph', name: 'Glyph art', line: 'Any icon or word, drawn in characters that light up under your hand.', tone: 'amber', className: 'h-[520px] lg:col-span-7 lg:h-[600px]' },

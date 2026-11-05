@@ -12,25 +12,15 @@ import { Button } from '../ui/Button'
 import { FileGlyph } from '../ui/FileGlyph'
 import { Kbd } from '../ui/Kbd'
 
-export type Entry = { id: string; name: string; meta: string; /** A CSS background for image files. */ preview?: string }
-/** For demos and tests: point at a row, delete, undo and start over without touching focus. */
+export type Entry = { id: string; name: string; meta: string; preview?: string }
 export type UndoHandle = { point(id: string | null): void; remove(id: string): void; undo(): void; reset(): void }
 
 const ROW = 56
 const THUMB = 28
 const THUMB_W = 23
-/** Resting tilt of the thumbnails in the tray, oldest first. */
 const TILT = [-9, 5, -3]
 const fold = { type: 'spring', bounce: 0, duration: 0.36 } as const
 
-/**
- * A file list where delete is instant and forgiving. The row folds away and its thumbnail
- * drops into a tray at the bottom of the card; everything deleted in a burst gathers there
- * as one batch with a single Undo. Each new delete restarts the clock, hovering the tray
- * pauses it, and ⌘Z works too. Undo puts every file back in its original place.
- *
- * The list and the tray both reserve their space, so nothing outside the card ever moves.
- */
 export function UndoList({
   initial,
   title = 'Recent files',
@@ -39,15 +29,10 @@ export function UndoList({
   onUndo,
   ref,
 }: {
-  /** The files to list. */
   initial: Entry[]
-  /** The list's heading. */
   title?: string
-  /** How long a deleted batch can be undone. Every new delete restarts it. */
   seconds?: number
-  /** Called once the undo window closes, with every file deleted in that batch. Delete them for real here. */
   onDelete?: (entries: Entry[]) => void
-  /** Called with the files put back by Undo or ⌘Z. */
   onUndo?: (entries: Entry[]) => void
   ref?: Ref<UndoHandle>
 }) {
@@ -68,7 +53,6 @@ export function UndoList({
   const rows = useRef<Record<string, HTMLDivElement | null>>({})
   const badges = useRef<Record<string, HTMLSpanElement | null>>({})
   const from = useRef(new Map<string, DOMRect>())
-  // Rows fold by their own height and are stacked by transform, so one folding never moves the rows below it in the layout.
   const list = useRef<HTMLUListElement>(null)
   useStack(list)
 
@@ -79,7 +63,6 @@ export function UndoList({
     if (trashRef.current.includes(id)) return
     const badge = badges.current[id]
     if (badge) from.current.set(id, badge.getBoundingClientRect())
-    // Keep keyboard users in the list: focus moves to the neighbour.
     const at = visible.findIndex((i) => i.id === id)
     const next = visible[at + 1] ?? visible[at - 1]
     if (next && document.activeElement === rows.current[id]) rows.current[next.id]?.focus()
@@ -104,15 +87,12 @@ export function UndoList({
     },
   }))
 
-  // One clock for the whole batch. It restarts on every delete and only drains while
-  // nobody is hovering the tray.
   useEffect(() => {
     if (!trash.length) return
     left.set(1)
     let raf = 0
     let last = performance.now()
     const tick = (t: number) => {
-      // Real elapsed time, capped so a long-hidden tab doesn't expire on return.
       const dt = Math.min(500, t - last)
       last = t
       if (!pausedRef.current) {
@@ -159,7 +139,6 @@ export function UndoList({
         </span>
       </div>
 
-      {/* Fixed height: rows fold away inside it, never moving what sits below the card. */}
       <div className="relative" style={{ height: ROW * initial.length }}>
         <ul ref={list} className="relative">
           <AnimatePresence initial={false}>
@@ -239,7 +218,6 @@ export function UndoList({
         </AnimatePresence>
       </div>
 
-      {/* The tray. Its space is always reserved: a hint at rest, the undo bar while something is pending. */}
       <div className="relative mt-1 h-[56px]" onPointerEnter={() => hold(true)} onPointerLeave={() => hold(false)}>
         <AnimatePresence initial={false}>
           {binned.length ? (
@@ -267,7 +245,6 @@ export function UndoList({
           )}
         </AnimatePresence>
 
-        {/* Thumbnails live outside the fading bar so they're visible for the whole flight. */}
         <div className="absolute left-3 top-1/2 h-[28px] w-[48px] -translate-y-1/2">
           <AnimatePresence>
             {binned.slice(-3).map((it, i, all) => (
@@ -323,9 +300,6 @@ export function UndoList({
   )
 }
 
-/* ───────────────────────────── Parts ───────────────────────────── */
-
-/** A thumbnail that flies from its row into the tray, then rests in a small tilted stack. */
 function Thumb({ item, slot, total, from }: { item: Entry; slot: number; total: number; from: Map<string, DOMRect> }) {
   const ref = useRef<HTMLSpanElement>(null)
   const reduce = useReducedMotion()
@@ -338,7 +312,6 @@ function Thumb({ item, slot, total, from }: { item: Entry; slot: number; total: 
     const el = ref.current
     from.delete(item.id)
     if (!start || !el || reduce) return
-    // Measure by centres, and convert screen pixels to local ones in case an ancestor is scaled.
     const me = el.getBoundingClientRect()
     const k = me.width / THUMB_W || 1
     x.set((start.left + start.width / 2 - (me.left + me.width / 2)) / k)
@@ -350,8 +323,6 @@ function Thumb({ item, slot, total, from }: { item: Entry; slot: number; total: 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Newest sits on top at the right; older ones fan out behind it. Position, flight and
-  // tilt live on separate layers so the tilt never bends the flight path.
   const offset = (slot - (total - 1)) * 10 + 22
   return (
     <motion.span
@@ -377,7 +348,6 @@ function Thumb({ item, slot, total, from }: { item: Entry; slot: number; total: 
   )
 }
 
-/** The countdown ring around the undo arrow. It drains with the batch clock. */
 function Ring({ left }: { left: MotionValue<number> }) {
   return (
     <span className="relative flex size-[26px] items-center justify-center">

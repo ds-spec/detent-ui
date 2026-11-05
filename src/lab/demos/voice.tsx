@@ -20,11 +20,6 @@ type Recognition = {
   stop(): void
 }
 
-/**
- * Dictates a message, lets the quiet finish it, sends it, then starts a take and throws it
- * away. Press the mic yourself and it listens for real: your microphone drives the waveform
- * and, where the browser can, your words fill the field.
- */
 export function VoiceDemo() {
   const b = useBench()
   const level = useMotionValue(0)
@@ -40,7 +35,6 @@ export function VoiceDemo() {
   const held = useRef(false)
   const touched = useRef(false)
 
-  // A simulated voice: syllable-shaped bursts while speaking, a low hiss between phrases.
   useAnimationFrame((t) => {
     if (real.current) return
     if (now.current.state !== 'listening') return level.set(0)
@@ -93,7 +87,6 @@ export function VoiceDemo() {
         },
       }
     } catch {
-      /* No microphone or no permission: the take stays quiet and ends on its own. */
     }
   }, [level])
 
@@ -132,7 +125,6 @@ export function VoiceDemo() {
         setInterim(heard)
         await wait(150 + Math.random() * 120)
       }
-      // Recognition commits the phrase once it's sure of it.
       setText((t) => join(t, heard))
       setInterim('')
       speaking.current = false
@@ -146,7 +138,6 @@ export function VoiceDemo() {
           await say(p)
           await wait(380)
         }
-        // Quiet now: the ring fills and the take finishes itself.
         while (now.current.state === 'listening') await wait(100)
         await beat(1500)
         voice.current?.send()

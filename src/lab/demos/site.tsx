@@ -6,9 +6,6 @@ import type { WaitlistHandle } from '../components/site/Waitlist'
 import { useBench } from './bench'
 import { hover, pressed } from '@/lab/lib/hand'
 
-/* ───────────────────────────── Waitlist ───────────────────────────── */
-
-/** Signs up on its own: an unfinished address shakes, the fixed one folds into a spinner and a place in line. Hovering pauses; touching hands it over. */
 export function WaitlistDemo() {
   const b = useBench()
   const list = useRef<WaitlistHandle>(null)

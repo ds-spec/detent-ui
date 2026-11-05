@@ -17,7 +17,6 @@ type Seen = { name: string; href: string; install: string }
 const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve']
 const PACE = 26
 
-/** What a path was, if it's something you can take home. */
 function seenAt(path: string): Seen | null {
   const [, area, id] = path.split('/')
   if (area === 'components') {
@@ -39,7 +38,6 @@ function minutes(ms: number) {
   return m < 120 ? 'over an hour' : `${Math.floor(m / 60)} hours`
 }
 
-/** One sentence about this visit, from what was actually seen and measured. */
 function compose(): { parts: Part[]; last: Seen | null } {
   const v = readVisit()
   const seen: Seen[] = []
@@ -68,13 +66,6 @@ function compose(): { parts: Part[]; last: Seen | null } {
   return { parts, last: seen[seen.length - 1] ?? null }
 }
 
-/**
- * The footer writes itself. When you reach it, it says in one sentence what this visit has
- * been: how long, what you looked at, and how far the layout moved while you did, measured
- * across every page. Each name is a way back. The words stream in the way an answer does:
- * every word holds its place from the start, lands in the accent and cools to ink, so the
- * sentence never re-wraps as it writes. Nothing here leaves the tab.
- */
 export function Recap() {
   const path = usePathname()
   const box = useRef<HTMLDivElement>(null)
@@ -83,14 +74,12 @@ export function Recap() {
   const [run, setRun] = useState(0)
   const reduce = useReducedMotion()
 
-  // Note the page, then compose before paint, so the sentence has its full size before anyone could see it.
   useLayoutEffect(() => {
     recordPage(path)
     setSaid(compose())
     setShown(0)
   }, [path])
 
-  // Write it out each time it comes into view with something new to say.
   const last = useRef('')
   useEffect(() => {
     const el = box.current
@@ -139,7 +128,6 @@ export function Recap() {
         style={{ ['--ai-word' as string]: 'var(--accent)' }}
       >
         {said?.parts.map((p, k) => {
-          // Spaces stay real text between the word spans, so the line breaks exactly where the finished sentence will.
           const tokens = p.t.split(/(\s+)/).filter(Boolean)
           const body = tokens.map((tok, j) => (/^\s+$/.test(tok) ? tok : word(tok, `${k}-${j}`)))
           if (p.href)

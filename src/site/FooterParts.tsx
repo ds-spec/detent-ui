@@ -8,7 +8,6 @@ import { BAYER } from './Dither'
 
 type Choice = 'light' | 'dark' | 'system'
 const dark = () => matchMedia('(prefers-color-scheme: dark)').matches
-/** The saved choice is the store: no saved theme means light. */
 const readChoice = (): Choice => {
   try {
     const s = localStorage.getItem('theme')
@@ -26,7 +25,6 @@ const onChoice = (cb: () => void) => {
   }
 }
 
-/** Light, dark, or whatever the system says: a plate glides to the choice, and the page follows at once. */
 export function ThemeSwitch() {
   const id = useId()
   const choice = useSyncExternalStore<Choice | null>(onChoice, readChoice, () => null)
@@ -35,7 +33,6 @@ export function ThemeSwitch() {
     try {
       localStorage.setItem('theme', c)
     } catch {
-      /* storage unavailable */
     }
     window.dispatchEvent(new Event('detent:theme'))
   }
@@ -72,16 +69,8 @@ export function ThemeSwitch() {
   )
 }
 
-/* ───────────────────────────── The wordmark ───────────────────────────── */
-
-/*
- * The wordmark's layout, measured from Geist at weight 760 and 300 units, tracked -16. The D is
- * the mark itself, scaled to Geist's cap height (213), so the logo and the word are one object;
- * the letters sit as close to it as they sit to each other. The view stops 38 units above the
- * baseline, so the word sinks off the page.
- */
 const CAP = 213
-const S = CAP / 18 // the mark's grid unit, so its D is exactly a capital tall
+const S = CAP / 18
 const BASE = 213
 const VIEW = { w: 931, h: 175 }
 const WORD: [string, number][] = [
@@ -92,19 +81,10 @@ const WORD: [string, number][] = [
   ['t', 802.01],
 ]
 const WEIGHT = 760
-/** One printed pixel, in CSS pixels. */
 const CELL = 3
-/** How strongly the name is printed at rest: barely there. */
 const FAINT = 0.09
-/** The light under the pointer, as a share of the word's width. */
 const LENS = 0.09
 
-/**
- * The foot of every page: the name, monumental and faint, printed in fine ordered dither and
- * sinking off the bottom edge, where it thins to single pixels. The first time it's seen it prints
- * in from the top. Point at it and a soft light follows the hand, bringing the pixels under it up
- * toward full ink, like a torch over a page.
- */
 export function Wordmark() {
   const wrap = useRef<HTMLDivElement>(null)
   const canvas = useRef<HTMLCanvasElement>(null)
@@ -118,13 +98,11 @@ export function Wordmark() {
     let w = 0
     let h = 0
     let dpr = 1
-    // The pointer, eased; the lens grows in while the hand is over the word and fades when it leaves.
     const at = { x: -1, y: -1, tx: -1, ty: -1, r: 0, tr: 0 }
     let printed = still ? 1 : 0
     let seen = false
     let raf = 0
 
-    // The word, drawn once at this size into a hidden canvas, so each cell can ask whether it's inside a letter.
     const shapeUp = () => {
       w = box.clientWidth
       h = Math.round((w * VIEW.h) / VIEW.w)
@@ -132,7 +110,6 @@ export function Wordmark() {
       cv.width = Math.round(w * dpr)
       cv.height = Math.round(h * dpr)
       cv.style.height = `${h}px`
-      // Not laid out yet, or hidden: nothing to draw, and a 0-wide canvas can't be read. The resize brings it back.
       if (!w || !h) {
         shape = new Uint8ClampedArray()
         return
@@ -173,7 +150,6 @@ export function Wordmark() {
       const R = Math.max(1, w * LENS * at.r)
       for (let y = 0; y < rows; y++) {
         const cy = y * CELL + CELL / 2
-        // Whole for most of their height, breaking into dither only where the page cuts them off; while printing in, the top comes first.
         const sink = Math.min(1, 1.6 - (cy / h) * 1.5)
         const front = printed * 1.4 - cy / h
         for (let x = 0; x < cols; x++) {
@@ -187,7 +163,6 @@ export function Wordmark() {
             light = Math.max(light, lit)
           }
           if (light <= BAYER[(y % 8) * 8 + (x % 8)]) continue
-          // Faint, the way a name is pressed into paper; under the light it comes up toward full ink.
           g.globalAlpha = FAINT + lit * 0.62
           g.fillRect(x * CELL, y * CELL, CELL, CELL)
         }
@@ -222,7 +197,6 @@ export function Wordmark() {
       shapeUp()
       again()
     })
-    // A theme change recolours the print.
     const mo = new MutationObserver(again)
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class'] })
     void document.fonts.ready.then(() => {

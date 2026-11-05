@@ -7,11 +7,6 @@ import { FREE_BLOCKS, PLANS, PRO_COMPONENTS } from '@/catalog/pro'
 import { TEMPLATES } from '@/catalog/templates'
 import { Check } from '@/lab/icons'
 
-/*
- * What Pro holds, said plainly: every piece by name, grouped, each group with roughly how long it
- * takes to build. Then the plans side by side, row by row, so the difference is a glance.
- */
-
 const GROUPS: { name: string; note?: string; items: { name: string; href: string }[] }[] = [
   { name: 'Components', items: PRO_COMPONENTS.map((id) => ({ name: entry(id)?.name ?? id, href: `/components/${id}` })) },
   { name: 'Blocks', items: PRO_BLOCKS.map((b) => ({ name: b.name, href: `/blocks/${b.id}` })) },
@@ -57,7 +52,6 @@ const NO = (
   </span>
 )
 
-/** Free and each plan, a column each, a row for every difference that matters. */
 const ROWS: [string, ReactNode, ReactNode, ReactNode][] = [
   ['Price', '$0', `$${pro.price} once`, `$${all.price} once`],
   ['Components', FREE, `All ${ENTRIES.length}`, `All ${ENTRIES.length}`],

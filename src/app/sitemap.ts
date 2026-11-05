@@ -6,7 +6,6 @@ import { BLOCKS } from '@/catalog/blocks'
 import { url } from '@/site/seo'
 import { TEMPLATES } from '@/catalog/templates'
 
-/** Every page worth finding: the site's own, then each component, block and template. */
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date(`${RELEASES[0].date}T00:00:00Z`)
   const at = (path: string, priority: number, changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'] = 'weekly') => ({ url: url(path), lastModified, changeFrequency, priority })

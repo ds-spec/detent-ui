@@ -33,7 +33,6 @@ import { useSideNew } from '../shell/side'
 import { BlockPiece, MoreLike } from '../library/Library'
 import { wellOf } from '../wells'
 
-/** Widths the frame clicks into as you drag it: the sizes a screen most often meets. */
 const DETENTS = [
   { w: 390, name: 'Phone' },
   { w: 768, name: 'Tablet' },
@@ -43,29 +42,21 @@ const MIN = 340
 const SNAP = 14
 const settle = { type: 'spring', stiffness: 460, damping: 44 } as const
 
-
-/** A plain click moves in place; a click that means a new tab stays a link. */
 const movesTo = (go: (id: string) => void, id: string) => (e: React.MouseEvent) => {
   if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return
   e.preventDefault()
   go(id)
 }
 
-/** Every block for the list down the side, kind by kind. */
 const KIND_LOOK = { app: { icon: <Layers size={12} />, color: 'var(--data)' }, flow: { icon: <Node size={12} />, color: 'var(--agents)' }, section: { icon: <Note size={12} />, color: 'var(--marketing)' } } as const
 const RAIL: RailGroup[] = BLOCK_GROUPS.filter((g) => g.items.length).map((g) => ({ id: g.k, name: `${KINDS[g.k]}s`, ...KIND_LOOK[g.k], items: g.items.map((b) => ({ id: b.id, name: b.name, line: b.short, pro: isProBlock(b.id), free: !isProBlock(b.id) })) }))
 
-/** A block, small, on its well: what the strip shows beside a mark you point at. */
 const peekBlock = (id: string, onReady: () => void) => (
   <div className="absolute inset-0" style={{ background: wellOf('blue') }}>
     <BlockPiece id={id} onReady={onReady} />
   </div>
 )
 
-/**
- * The blocks' layout: the frame stays put and only the block in it changes, so moving between them
- * is one continuous page. `children` is the route's own part, which adds nothing visible.
- */
 export function BlockExhibit({ children }: { children: ReactNode }) {
   const router = useRouter()
   const { id, go } = useWant(usePathname().split('/')[2] ?? '', '/blocks')
@@ -89,13 +80,7 @@ export function BlockExhibit({ children }: { children: ReactNode }) {
   )
 }
 
-/**
- * A block on its desk. The frame is the block's container, and the block sizes itself by it,
- * so dragging the handle shows the real responsive behaviour, not a scaled picture. The ruler
- * above clicks into the common widths, the way the library's name says things should.
- */
 function BlockViewer({ b, go }: { b: Block; go: (id: string) => void }) {
-  // Previous and next follow the order the site lists them in.
   const at = BLOCK_ORDER.indexOf(b)
   const [mode, setMode] = useState<'preview' | 'code'>('preview')
   const [run, setRun] = useState(0)
@@ -115,7 +100,6 @@ function BlockViewer({ b, go }: { b: Block; go: (id: string) => void }) {
   const prev = BLOCK_ORDER[(at - 1 + BLOCK_ORDER.length) % BLOCK_ORDER.length]
   const next = BLOCK_ORDER[(at + 1) % BLOCK_ORDER.length]
 
-  // ← and → walk through the blocks, unless a field, the frame's handle or the block itself has the keys.
   useEffect(() => {
     const on = (e: KeyboardEvent) => {
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey || present) return
@@ -131,7 +115,6 @@ function BlockViewer({ b, go }: { b: Block; go: (id: string) => void }) {
   if (side)
     return (
       <main className="mx-auto max-w-[1280px] px-4 pb-24 sm:px-8 lg:pb-16">
-        {/* One calm line, the same as a component's: what it is, and how to get it. */}
         <header className="flex flex-col gap-4 pt-7 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
           <div className="min-w-0">
             <p className="mb-2 flex items-center gap-2 text-[13px] text-ink-3">
@@ -190,7 +173,6 @@ function BlockViewer({ b, go }: { b: Block; go: (id: string) => void }) {
         </div>
       </header>
 
-      {/* Above the desk, quietly: what you're looking at on the left, three small tools on the right. */}
       <div className="relative mt-8">
         <div className="mb-3 flex items-center justify-between">
           <span className="flex rounded-full bg-surface-2 p-1">
@@ -215,7 +197,6 @@ function BlockViewer({ b, go }: { b: Block; go: (id: string) => void }) {
 
       <Props b={b} />
 
-      {/* The way on: the blocks either side, small enough to pass, plain enough to press. */}
       <nav aria-label="More blocks" className="mt-28 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Neighbour b={prev} dir="prev" go={go} />
         <Neighbour b={next} dir="next" go={go} />
@@ -225,13 +206,6 @@ function BlockViewer({ b, go }: { b: Block; go: (id: string) => void }) {
   )
 }
 
-/* ───────────────────────────── Switcher ───────────────────────────── */
-
-/**
- * Previous, every block, next, by the title: as quiet as the component pages' own, an arrow
- * either side of "All blocks" and no frame around them. "/" opens the list, grouped the way the
- * Blocks page groups it, with the one you're on in view.
- */
 function Switcher({ current, prev, next, go }: { current: string; prev: Block; next: Block; go: (id: string) => void }) {
   const [open, setOpen] = useState(false)
   const box = useRef<HTMLDivElement>(null)
@@ -252,7 +226,6 @@ function Switcher({ current, prev, next, go }: { current: string; prev: Block; n
     if (!open) return
     const down = (e: PointerEvent) => !box.current?.contains(e.target as Node) && setOpen(false)
     window.addEventListener('pointerdown', down)
-    // The one you're on, in view as the list opens.
     const menu = list.current
     const on = menu?.querySelector<HTMLElement>('[aria-selected="true"]')
     if (menu && on) menu.scrollTop += on.getBoundingClientRect().top - menu.getBoundingClientRect().top - (menu.clientHeight - on.offsetHeight) / 2
@@ -307,7 +280,6 @@ function Switcher({ current, prev, next, go }: { current: string; prev: Block; n
   )
 }
 
-/** An arrow to the next or previous block, naming it under the pointer. */
 function Step({ b, dir, go }: { b: Block; dir: 'prev' | 'next'; go: (id: string) => void }) {
   const [tip, setTip] = useState(false)
   return (
@@ -333,7 +305,6 @@ function Step({ b, dir, go }: { b: Block; dir: 'prev' | 'next'; go: (id: string)
   )
 }
 
-/** The block either side, at the foot of the page: its name and what it is, and an arrow that leans the way you'd go. */
 function Neighbour({ b, dir, go }: { b: Block; dir: 'prev' | 'next'; go: (id: string) => void }) {
   const back = dir === 'prev'
   return (
@@ -357,18 +328,10 @@ function Neighbour({ b, dir, go }: { b: Block; dir: 'prev' | 'next'; go: (id: st
   )
 }
 
-/* ───────────────────────────── Props ───────────────────────────── */
-
 const isEvent = (p: { type: string }) => p.type.includes('=>')
-/** The names a callback is called with, read from its type: `(conversation: Conversation, text: string) => void` gives "conversation, text". */
 const argsOf = (type: string) => [...type.split('=>')[0].matchAll(/(\w+)\s*:/g)].map((m) => m[1]).join(', ')
-/** What's worth showing first in the usage: your records (arrays and maps) before plain copy. */
 const weight = (p: { type: string }) => (/\[\]|Record<|\{/.test(p.type) ? 0 : 1)
 
-/**
- * The wiring, as you'd write it: the block with your data passed in and your handlers, the way a
- * real app uses it. The data are the records it shows; the handlers are what it tells you.
- */
 function Usage({ b }: { b: Block }) {
   const data = b.props.filter((p) => !isEvent(p)).sort((x, y) => weight(x) - weight(y)).slice(0, 3)
   const events = b.props.filter(isEvent).slice(0, 3)
@@ -405,11 +368,6 @@ function Usage({ b }: { b: Block }) {
   )
 }
 
-/**
- * Wiring the block into an app, grouped by job rather than listed as an API: what you pass in, what
- * it tells you back, and the three every block shares in one line. The source is yours, so this is
- * only what connects it; everything else you change in the file.
- */
 function Props({ b }: { b: Block }) {
   const data = b.props.filter((p) => !isEvent(p)).sort((x, y) => weight(x) - weight(y))
   const events = b.props.filter(isEvent)
@@ -431,13 +389,8 @@ function Props({ b }: { b: Block }) {
   )
 }
 
-/**
- * Screens of one product that are sold as separate blocks: pressing a page in one's sidebar opens
- * the block that is that page, so on the site they read as one app.
- */
 const LINKED: Record<string, Record<string, string>> = {}
 
-/** The block itself, kept out of the viewer's renders: dragging the frame only resizes its box. */
 const Live = memo(function Live({ id }: { id: string }) {
   const router = useRouter()
   const View = BLOCK_VIEWS[id] as ComponentType<{ onNavigate?: (page: string) => void }>
@@ -445,11 +398,6 @@ const Live = memo(function Live({ id }: { id: string }) {
   return links ? <View onNavigate={(page) => links[page] && router.push(`/blocks/${links[page]}`, { scroll: false })} /> : <View />
 })
 
-/**
- * The desk: a backdrop, a ruler, and whatever it shows in a window you can resize, from a phone's
- * width to the desk's. Blocks and templates both sit on it. `view` is what runs in the window and
- * `code` what the Code tab shows.
- */
 export function Desk({ title, chrome, run, mode, theme, present, onExit, view, code, grow = false }: { /** A page section, not a screen: below a laptop the window grows to hold it, so nothing scrolls inside a scroll. */ grow?: boolean; title: string; chrome?: 'app' | 'titled' | 'browser'; run: number; mode: 'preview' | 'code'; theme: 'light' | 'dark' | null; present: boolean; onExit: () => void; view: ReactNode; code: ReactNode }) {
   const track = useRef<HTMLDivElement>(null)
   const [tall, setTall] = useState<number | null>(null)
@@ -463,7 +411,6 @@ export function Desk({ title, chrome, run, mode, theme, present, onExit, view, c
       if (app) setTall((was) => Math.max(was ?? 0, app.scrollHeight + box.clientHeight - app.clientHeight))
     }
     measure()
-    // The block loads a moment after the page does, and its first content a moment after that.
     const poll = setInterval(measure, 300)
     const stop = setTimeout(() => clearInterval(poll), 4000)
     window.addEventListener('resize', measure)
@@ -474,7 +421,6 @@ export function Desk({ title, chrome, run, mode, theme, present, onExit, view, c
     }
   }, [grow, present, title])
   const [max, setMax] = useState(0)
-  // null follows the desk: the frame is as wide as there's room for.
   const [w, setW] = useState<number | null>(null)
   const [dragging, setDragging] = useState(false)
   const glide = useRef<AnimationPlaybackControls | null>(null)
@@ -487,7 +433,6 @@ export function Desk({ title, chrome, run, mode, theme, present, onExit, view, c
     const ro = new ResizeObserver(read)
     ro.observe(el)
     return () => ro.disconnect()
-    // Leaving full screen brings a new track to measure.
   }, [present])
 
   const width = w === null ? max : Math.min(w, max)
@@ -503,7 +448,6 @@ export function Desk({ title, chrome, run, mode, theme, present, onExit, view, c
     glide.current = animate(width, end, { ...settle, onUpdate: (v) => setW(v), onComplete: () => setW(target) })
   }
 
-  // Drag the handle: the frame follows, and clicks into a detent when it passes close to one.
   const drag = (e: React.PointerEvent<HTMLElement>) => {
     e.preventDefault()
     glide.current?.stop()
@@ -543,7 +487,6 @@ export function Desk({ title, chrome, run, mode, theme, present, onExit, view, c
     e.preventDefault()
   }
 
-  // Full screen is the block alone: no backdrop, no window, no ruler, edge to edge on the page's own ground.
   if (present)
     return (
       <motion.div data-theme={theme ?? undefined} className="fixed inset-0 z-50 bg-bg text-ink" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
@@ -563,8 +506,6 @@ export function Desk({ title, chrome, run, mode, theme, present, onExit, view, c
 
   return (
     <>
-      {/* The desk: the block's own backdrop, a ruler, and the block in a window you can resize. */}
-      {/* The wallpaper's sheen sits 15% past the desk, so as a section grows to hold its block the percentage would move it. Set in vh, it stays put. */}
       <div data-desk data-theme={theme ?? undefined} className="relative mt-6 rounded-[32px] px-1.5 pb-1.5 pt-1.5 text-ink max-sm:-mx-3 sm:px-8 sm:pb-8 sm:pt-0 [&>span>span:first-child]:top-[-15vh]">
         <Backdrop />
         <Ruler max={max} width={width} stops={stops} here={here} onPick={to} />
@@ -608,18 +549,12 @@ export function Desk({ title, chrome, run, mode, theme, present, onExit, view, c
   )
 }
 
-/**
- * A ruler across the top of the desk: a tick every 50px, the common widths named, and the
- * frame's own width riding along its edge. At a detent the name lights up; between them the
- * width itself shows, and the names it would cover step aside.
- */
 function Ruler({ max, width, stops, here, onPick }: { max: number; width: number; stops: typeof DETENTS; here: string | null; onPick: (w: number | null) => void }) {
   const marks = [...stops, ...(max > 0 ? [{ w: max, name: 'Full' }] : [])]
   const free = !here
   const x = Math.min(max - 28, Math.max(28, width))
   return (
     <div className="relative hidden h-12 sm:block">
-      {/* Ticks: minor every 50, major every 100, drawn by the background so there are no nodes to lay out. */}
       <span
         aria-hidden
         className="absolute inset-x-0 bottom-2 h-2.5"
@@ -650,7 +585,6 @@ function Ruler({ max, width, stops, here, onPick }: { max: number; width: number
           </span>
         )
       })}
-      {/* The frame's edge on the ruler: a solid notch, and its width while it's between detents. */}
       <span aria-hidden className="absolute bottom-1.5 h-4 w-[2px] rounded-full bg-ink" style={{ transform: `translateX(${Math.max(0, width - 1)}px)` }} />
       <span aria-hidden className="pointer-events-none absolute left-0 top-1 flex h-6 -translate-x-1/2 items-center rounded-full bg-ink px-2 text-caption font-medium text-surface transition-opacity duration-150" style={{ left: x, opacity: free ? 1 : 0 }}>
         <RollingText text={String(Math.round(width))} />
@@ -659,7 +593,6 @@ function Ruler({ max, width, stops, here, onPick }: { max: number; width: number
   )
 }
 
-/** The way out of full screen: a small pill at the foot, faint until it's pointed at. Escape works too. */
 export function ExitFull({ onExit }: { onExit: () => void }) {
   return (
     <motion.button

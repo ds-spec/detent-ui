@@ -16,10 +16,8 @@ const long = (d: string) => new Date(`${d}T00:00:00`).toLocaleDateString('en-US'
 const day = (d: string) => new Date(`${d}T00:00:00`).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
 const slug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 
-/** What shipped, by day: each day's date stays beside its releases while you read them. */
 export default function Changelog() {
   const days = [...new Set(RELEASES.map((r) => r.date))]
-  // The list down the side: each release by name, under the day it shipped, newest first.
   const rail: RailGroup[] = days.map((d) => ({ id: d, name: day(d), items: RELEASES.filter((r) => r.date === d).map((r) => ({ id: slug(r.title), name: r.name })) }))
   const links = Object.fromEntries(RELEASES.map((r) => [slug(r.title), `#${slug(r.title)}`]))
   return (

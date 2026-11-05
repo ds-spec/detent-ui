@@ -16,20 +16,15 @@ import { ProTag } from '../blocks/ProTag'
 import { useNear } from '../near'
 import { FAMILY_EVENT } from './FamilyTag'
 
-/** Each demo's natural size, and the spot version's where the gallery shows one: cards are sized from these so the demo shows as large as it can. */
 const NAT: Record<string, [number, number]> = { ...SIZE, ...SPOT_SIZE }
-/** Air around a demo, and the smallest a demo may shrink in the gallery before it crops instead. */
 const PAD = 28
 const MIN_ZOOM = 0.62
-/** Grid rows are this tall; every card's position and height snap to them. The gap between cards is four rows. */
 const ROW = 4
 const GAP = 16
 
-/** Components that need room: they take two columns wherever there are two to take. Listed in the order they appear. */
 const WIDE_ORDER = ['radar', 'prompt', 'confirm', 'dates', 'dialog', 'rewrite', 'trace', 'toasts', 'scaffold']
 const WIDE = new Set(WIDE_ORDER)
 
-/** The column layouts, with each one's card width (one column, and two side by side). */
 const LAYOUTS = [
   { cols: 2, col: 480, pair: 976 },
   { cols: 3, col: 427, pair: 869 },
@@ -37,7 +32,6 @@ const LAYOUTS = [
 
 const snap = (px: number) => Math.ceil(px / ROW) * ROW
 
-/** How tall a card needs to be to show its demo as large as the card's width allows. */
 const heightFor = (id: string, width: number) => {
   const n = NAT[id]
   if (!n) return snap(Math.min(480, Math.max(360, width * 0.55)))
@@ -45,7 +39,6 @@ const heightFor = (id: string, width: number) => {
   return snap(Math.max(260, n[1] * z + PAD * 2))
 }
 
-/** On narrow screens: one column, the height following the card's width, worked out in CSS so it's right before the demo loads. */
 const fluid = (id: string) => {
   const n = NAT[id]
   if (!n) return 'clamp(300px, 72cqw, 480px)'
@@ -53,11 +46,8 @@ const fluid = (id: string) => {
   return `clamp(${Math.max(220, Math.round(h * MIN_ZOOM + PAD * 2))}px, calc(${(h / w).toFixed(4)} * (100cqw - ${PAD * 2}px) + ${PAD * 2}px), ${h + PAD * 2}px)`
 }
 
-/** Wide cards spread evenly through the rest, so the grid never turns into a stack of wide cards. */
 const arrange = (list: Entry[]) => {
   const wides = list.filter((e) => WIDE.has(e.id)).sort((a, b) => WIDE_ORDER.indexOf(a.id) - WIDE_ORDER.indexOf(b.id))
-  // Small pieces are spread through the rest rather than left to gather at the end, where the
-  // last cards in each column get stretched to even out the bottom edge.
   const small = (e: Entry) => (NAT[e.id]?.[1] ?? 999) <= 260
   const big = list.filter((e) => !WIDE.has(e.id) && !small(e))
   const tiny = list.filter((e) => !WIDE.has(e.id) && small(e))
@@ -78,14 +68,6 @@ const arrange = (list: Entry[]) => {
 
 type Slot = { c: number; span: number; top: number; h: number; base: number }
 
-/**
- * Places every card so the grid has no holes. One-column cards go to the shortest column.
- * Before a wide card lands, the gap under the shorter of its two columns is filled with the
- * card that fits it best, and whatever sliver is left is absorbed by stretching the card
- * above it. A wide card that can't land without leaving a gap waits for the next one-column
- * card to go first. At the end the columns are evened out the same way, so the bottom edge
- * is flush. Everything is computed from fixed sizes, so it's right on the first paint.
- */
 const pack = (order: Entry[], cols: number, col: number, pair: number) => {
   const slots = new Map<string, Slot>()
   const bottom: number[] = Array(cols).fill(0)
@@ -103,7 +85,6 @@ const pack = (order: Entry[], cols: number, col: number, pair: number) => {
       stack[i].push(e.id)
     }
   }
-  // The card at the foot of column i can grow if nothing sits under it in any column it covers.
   const growable = (i: number) => {
     const id = last[i]
     const s = id ? slots.get(id) : undefined
@@ -111,8 +92,6 @@ const pack = (order: Entry[], cols: number, col: number, pair: number) => {
     for (let k = s.c; k < s.c + s.span; k++) if (last[k] !== id) return false
     return true
   }
-  // Bring column i down to `to`. The extra is shared by the run of one-column cards at its foot,
-  // so each grows a little rather than one growing a lot; a lone wide card at the foot grows instead.
   const reach = (i: number, to: number) => {
     const d = to - bottom[i]
     if (d <= 0) return
@@ -139,16 +118,12 @@ const pack = (order: Entry[], cols: number, col: number, pair: number) => {
     s.h += d
     for (let k = s.c; k < s.c + s.span; k++) bottom[k] += d
   }
-  // Cards that could fill a gap of `room`: one column, no taller than the gap allows (nearest first).
   const fits = (room: number) => queue.filter((x) => !wide(x) && size(x) + GAP <= room + 40)
 
-  // The run of one-column cards at a column's foot, or a lone wide card there, can stretch.
   const stretchable = (i: number) => {
     const id = stack[i].at(-1)
     return (!!id && slots.get(id)!.span === 1) || growable(i)
   }
-  // A card at the foot of a neighbouring column can widen across column i, if the space beside it is free.
-  // While placing a wide card, only its partner column's card may widen, so nothing outside the pair moves.
   const beside = (i: number, only?: number) => {
     for (const j of only === undefined ? [i - 1, i + 1] : [only]) {
       if (j < 0 || j >= cols || bottom[j] <= bottom[i]) continue
@@ -173,7 +148,6 @@ const pack = (order: Entry[], cols: number, col: number, pair: number) => {
     bottom[i] = bottom[b.j]
     return true
   }
-  // How much stretching it would take to level a pair of columns, or Infinity if it can't be done cleanly.
   const leftover = (i: number) => {
     const low = bottom[i] < bottom[i + 1] ? i : i + 1
     const room = Math.max(bottom[i], bottom[i + 1]) - bottom[low]
@@ -192,7 +166,6 @@ const pack = (order: Entry[], cols: number, col: number, pair: number) => {
       put(e, c, 1, bottom[c])
       continue
     }
-    // Only wide cards left and more than two columns: nothing could sit beside it, so it takes the full width.
     if (cols > 2 && !queue.some((x) => !wide(x))) {
       const top = Math.max(...bottom)
       for (let i = 0; i < cols; i++) if (!stretchable(i) || bottom[i] < top) reach(i, top)
@@ -200,7 +173,6 @@ const pack = (order: Entry[], cols: number, col: number, pair: number) => {
       put(e, 0, cols, Math.max(...bottom))
       continue
     }
-    // The pair it lands on best: high up, and needing as little stretching as possible to level.
     let c = -1
     let cost = Infinity
     for (let i = 0; i + 1 < cols; i++) {
@@ -210,7 +182,6 @@ const pack = (order: Entry[], cols: number, col: number, pair: number) => {
         c = i
       }
     }
-    // If that would still mean a big stretch (or a hole), let a one-column card go first and look again.
     const next = queue.findIndex((x) => !wide(x))
     const rest = c < 0 ? Infinity : leftover(c)
     if (next >= 0 && (c < 0 || (rest > 96 && (waited.get(e.id) ?? 0) < 2))) {
@@ -222,19 +193,16 @@ const pack = (order: Entry[], cols: number, col: number, pair: number) => {
       continue
     }
     if (c < 0) c = 0
-    // Fill the gap under the shorter column with the best-fitting cards.
     for (;;) {
       const top = Math.max(bottom[c], bottom[c + 1])
       const low = bottom[c] < bottom[c + 1] ? c : c + 1
       const room = top - bottom[low]
       const near = fits(room)
       if (!room || !near.length) break
-      // The closest fit wins; between near-equal fits, the one that comes sooner keeps the order.
       const best = near.reduce((a, b) => (Math.abs(room - size(b) - GAP) < Math.abs(room - size(a) - GAP) - 24 ? b : a))
       queue.splice(queue.indexOf(best), 1)
       put(best, low, 1, bottom[low])
     }
-    // Level the pair: stretch the shorter column, or widen its partner's card across it. Repeat until they meet.
     for (let round = 0; round < 3 && bottom[c] !== bottom[c + 1]; round++) {
       const top = Math.max(bottom[c], bottom[c + 1])
       for (const i of [c, c + 1]) {
@@ -246,22 +214,15 @@ const pack = (order: Entry[], cols: number, col: number, pair: number) => {
   }
   const end = Math.max(...bottom)
   for (let i = 0; i < cols; i++) reach(i, end)
-  // A column still short at the end has nothing above it that can grow; a card beside it widens across instead.
   for (let i = 0; i < cols; i++) if (bottom[i] < end) widen(i)
   return slots
 }
 
 const spring = { type: 'spring', stiffness: 380, damping: 38 } as const
 
-/**
- * The library, live: every component in a quiet masonry of soft cards. A family filter
- * re-flows the cards on a spring. A card shows nothing but its component until you point
- * at it; then a faint light follows the cursor and the name rises in a corner.
- */
 export function Gallery() {
   const [lens, setLens] = useState<Lens>('family')
   const [value, setValue] = useState('all')
-  // A family tag elsewhere on the page opens the gallery on that family.
   useEffect(() => {
     const go = (e: Event) => {
       setLens('family')
@@ -285,7 +246,6 @@ export function Gallery() {
         onChange={setValue}
       />
       <LayoutGroup>
-        {/* One column on phones; on wider screens every card has a computed place, so there are no holes. */}
         <div className="@container mt-6 grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-2 md:auto-rows-[4px] md:gap-y-0 xl:grid-cols-3">
           {shown.map((e) => (
             <Card key={e.id} e={e} at={[two.get(e.id)!, three.get(e.id)!]} />
@@ -298,7 +258,6 @@ export function Gallery() {
 
 type Lens = 'family' | 'feel'
 
-/** Two ways to browse: by family, or by how a component feels in the hand. The chips swap in place. */
 function Filters({ lens, value, onLens, onChange }: { lens: Lens; value: string; onLens: (l: Lens) => void; onChange: (v: string) => void }) {
   const plate = useId()
   return (
@@ -359,10 +318,6 @@ function Families({ lens, value, onChange }: { lens: Lens; value: string; onChan
   )
 }
 
-/**
- * Packing never leaves a hole, but evening out the columns can stretch a card. A few orders of
- * the last cards are tried and the layout whose most-stretched card stretches least wins.
- */
 const best = (order: Entry[], cols: number, col: number, pair: number) => {
   const tail = Math.min(10, order.length)
   const head = order.slice(0, order.length - tail)
@@ -392,7 +347,6 @@ function Card({ e, at }: { e: Entry; at: [Slot, Slot] }) {
   const [two, three] = at.map(area)
   const [hover, setHover] = useState(false)
 
-
   return (
     <motion.article
       layout="position"
@@ -410,7 +364,6 @@ function Card({ e, at }: { e: Entry; at: [Slot, Slot] }) {
       >
         <Invite box={box} active={near && !hover} />
         {isProComponent(e.id) && <ProTag className="pointer-events-none absolute right-3.5 top-3.5 z-10" />}
-        {/* The card is always there; its component comes into focus as it arrives. */}
         {near && (
           <motion.div className="absolute inset-0" initial={{ opacity: 0, scale: 0.985 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, ease: [0.2, 0.9, 0.25, 1] }}>
             {e.bleed ? (
@@ -422,7 +375,6 @@ function Card({ e, at }: { e: Entry; at: [Slot, Slot] }) {
             )}
           </motion.div>
         )}
-        {/* The name only arrives when you point at the card (always shown on touch screens). */}
         <Link
           href={`/components/${e.id}`}
           className="ring-focus group/name absolute bottom-3.5 left-3.5 flex h-9 translate-y-1.5 items-center gap-2 rounded-full bg-surface/85 pl-3.5 pr-3 text-footnote font-medium text-ink opacity-0 shadow-border backdrop-blur transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.2,0.9,0.25,1)] focus-visible:translate-y-0 focus-visible:opacity-100 group-hover/card:translate-y-0 group-hover/card:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100"
@@ -435,11 +387,6 @@ function Card({ e, at }: { e: Entry; at: [Slot, Slot] }) {
   )
 }
 
-/**
- * An invitation, not a demo: when a card has sat in view for a moment, a cursor comes to rest
- * on its main control (whatever the demo marks with data-invite) and presses it now and then.
- * It leaves the moment you point at the card yourself, and never shows on touch screens.
- */
 function Invite({ box, active }: { box: RefObject<HTMLDivElement | null>; active: boolean }) {
   const [at, setAt] = useState<{ x: number; y: number } | null>(null)
   const [fine] = useState(() => typeof window !== 'undefined' && matchMedia('(hover: hover) and (pointer: fine)').matches)
@@ -452,7 +399,6 @@ function Invite({ box, active }: { box: RefObject<HTMLDivElement | null>; active
       const r = el.getBoundingClientRect()
       const c = b.getBoundingClientRect()
       if (!r.width || r.bottom < c.top || r.top > c.bottom) return setAt(null)
-      // Rest at the control's lower-right corner, so the pointer never covers its label.
       setAt({ x: Math.round(r.right - c.left - Math.min(16, r.width * 0.2)), y: Math.round(r.bottom - c.top - Math.min(12, r.height * 0.3)) })
     }
     const first = window.setTimeout(find, 2200)
@@ -474,7 +420,6 @@ function Invite({ box, active }: { box: RefObject<HTMLDivElement | null>; active
           exit={{ opacity: 0, transition: { duration: 0.15 } }}
           transition={{ left: { type: 'spring', stiffness: 160, damping: 22 }, top: { type: 'spring', stiffness: 160, damping: 22 }, opacity: { duration: 0.4 } }}
         >
-          {/* Now and then it presses: the pointer dips and a ring spreads from its tip. */}
           <motion.span className="absolute -left-3 -top-3 size-6 rounded-full border border-[color-mix(in_oklch,var(--ink)_35%,transparent)]" initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: [0.4, 1.5], opacity: [0.55, 0] }} transition={{ duration: 1.1, repeat: Infinity, repeatDelay: 2.5, delay: 1.15, ease: 'easeOut' }} />
           <motion.svg width="17" height="19" viewBox="0 0 16 18" className="block drop-shadow-[0_2px_3px_rgb(0_0_0/0.25)]" style={{ originX: 0, originY: 0 }} animate={{ scale: [1, 0.86, 1] }} transition={{ duration: 0.36, repeat: Infinity, repeatDelay: 3.24, delay: 1 }}>
             <path d="M1.5 1.5v13.2l3.6-3.4 2.4 5.2 2.4-1.1-2.3-5.1h5z" fill="var(--ink)" stroke="var(--surface)" strokeWidth="1.3" strokeLinejoin="round" />

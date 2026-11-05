@@ -21,7 +21,6 @@ export const metadata: Metadata = page({
 
 const [pro] = PLANS
 
-/** The list down the side: this page's sections, then the parts the chat is made of. */
 const PARTS = ['trace', 'models']
 const RAIL: RailGroup[] = [
   {
@@ -52,7 +51,6 @@ const LINKS: Record<string, string> = {
   ...Object.fromEntries(PARTS.map((id) => [id, `/components/${id}`])),
 }
 
-/** What each part of a UIMessage becomes. */
 const MAP: { parts: string[]; becomes: string; line: string }[] = [
   { parts: ['reasoning'], becomes: 'The live thought', line: 'One sentence at a time while it thinks, never a word at a time, then “Thought for 4s” with the steps folded under it.' },
   { parts: ['tool-*', 'dynamic-tool'], becomes: 'Steps and spans', line: 'Each call is a step under the thought and a row in the run’s waterfall, timed from when it starts to when its output comes back.' },
@@ -62,10 +60,6 @@ const MAP: { parts: string[]; becomes: string; line: string }[] = [
   { parts: ['step-start'], becomes: 'Model calls', line: 'Each step the model takes is its own row in the waterfall, with the tools it asked for hanging under it.' },
 ]
 
-/**
- * The AI SDK, end to end: the Agent chat block live on a real route, then what each part of a
- * message becomes, then the code it takes. The demo is the argument; everything under it says how.
- */
 export default async function AiSdk() {
   if (!AI_SDK) notFound()
   const shown = (await asset<{ name: string; note: string; code: string; html: string }[]>('ai-files.json')) ?? []

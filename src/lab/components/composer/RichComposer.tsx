@@ -7,29 +7,15 @@ import { ArrowUp, Link } from '@/lab/icons'
 import { tap } from '@/lab/lib/feel'
 import { ease, spring } from '@/lab/lib/motion'
 
-/*
- * A composer for comments and messages that formats as you write. Type **like this** and it turns
- * bold the moment the closing stars land; the same for _italic_, `code` and ~~strike~~. @ brings
- * up the people you can mention and their name goes in as one piece: Backspace lights it first,
- * then takes it. Select some words and a small toolbar rises over them, gliding as the selection
- * changes; its link button turns into a field right there. Pasting brings in plain words only,
- * and a link pasted over a selection becomes a link. Enter sends; Shift+Enter starts a new line.
- */
-
 export type Person = { id: string; name: string; role?: string; hue?: number }
 export type Mark = 'b' | 'i' | 'c' | 's'
-/** What was written, as runs of text with their marks, mentions and line breaks. */
 export type Run = { kind: 'text'; text: string; marks: Mark[]; href?: string } | { kind: 'mention'; id: string; name: string } | { kind: 'break' }
 export type Sent = { runs: Run[]; markdown: string; text: string; mentions: string[] }
 
 export type ComposerHandle = {
-  /** Writes at the end, as typing would, without taking focus. */
   type(text: string): void
-  /** Picks the n-th person in the open mention list. */
   choose(n: number): void
-  /** Selects the first match of some words, as a hand would, without touching the page's selection. */
   select(words: string | null): void
-  /** Applies a mark to the selection. */
   format(mark: Mark): void
   send(): void
   clear(): void
@@ -51,7 +37,6 @@ const HL = 'composer-selection'
 
 const markOf = (el: Element): Mark | null => (el.tagName === 'STRONG' || el.tagName === 'B' ? 'b' : el.tagName === 'EM' || el.tagName === 'I' ? 'i' : el.tagName === 'CODE' ? 'c' : el.tagName === 'S' || el.tagName === 'STRIKE' ? 's' : null)
 
-/** The caret at the very end of what's written. */
 function endOf(root: HTMLElement): Range {
   const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
   let last: Text | null = null
@@ -66,7 +51,6 @@ function endOf(root: HTMLElement): Range {
   return r
 }
 
-/** Puts plain text in at a caret and returns the caret after it. */
 function insertAt(range: Range, text: string): Range {
   let node = range.startContainer
   let at = range.startOffset
@@ -83,7 +67,6 @@ function insertAt(range: Range, text: string): Range {
   return r
 }
 
-/** If the words just before the caret close a markdown mark, turns them into it. Returns the new caret. */
 function shortcut(range: Range): Range | null {
   const node = range.startContainer
   if (!(node instanceof Text) || node.parentElement?.closest('code,[data-mention]')) return null
@@ -99,7 +82,6 @@ function shortcut(range: Range): Range | null {
     el.className = MARK_CLASS[mark]
     el.textContent = inner
     mid.replaceWith(el)
-    // A zero-width space after the mark, so what's typed next isn't swallowed into it.
     const after = document.createTextNode(ZW)
     el.after(after)
     const r = document.createRange()
@@ -110,7 +92,6 @@ function shortcut(range: Range): Range | null {
   return null
 }
 
-/** An @ being typed just before the caret: where it starts and what's been typed after it. */
 function mentionAt(range: Range) {
   const node = range.startContainer
   if (!(node instanceof Text) || node.parentElement?.closest('code')) return null
@@ -119,7 +100,6 @@ function mentionAt(range: Range) {
   return { node, start: range.startOffset - m[2].length - 1, end: range.startOffset, query: m[2] }
 }
 
-/** Wraps a range in a mark, or takes the mark off if the range is already inside one. Returns the range over the result. */
 function toggleMark(root: HTMLElement, range: Range, tag: string, attrs?: Record<string, string>, cls = ''): Range {
   const base = range.commonAncestorContainer
   const inside = (base instanceof Element ? base : base.parentElement)?.closest(tag)
@@ -145,7 +125,6 @@ function toggleMark(root: HTMLElement, range: Range, tag: string, attrs?: Record
   return r
 }
 
-/** Reads what's written into runs. */
 export function parse(root: Node): Run[] {
   const out: Run[] = []
   const walk = (n: Node, marks: Mark[], href?: string) => {
@@ -185,7 +164,6 @@ const toMarkdown = (runs: Run[]) =>
     })
     .join('')
 
-/** Renders runs as they were written: for the message once it's sent. */
 export function Runs({ runs }: { runs: Run[] }) {
   return (
     <>
@@ -228,7 +206,6 @@ export function RichComposer({
   onSend,
   ref,
 }: {
-  /** Who can be mentioned. */
   people: Person[]
   placeholder?: string
   onSend?: (sent: Sent) => void
@@ -251,7 +228,6 @@ export function RichComposer({
 
   const matches = mention ? people.filter((p) => p.name.toLowerCase().split(/\s+/).some((w) => w.startsWith(mention.query.toLowerCase()))).slice(0, 5) : []
 
-  /** A rect from the screen in the wrapper's own pixels, whatever the page's zoom. */
   const local = (r: DOMRect) => {
     const w = wrap.current!
     const b = w.getBoundingClientRect()
@@ -259,7 +235,6 @@ export function RichComposer({
     return { x: (r.left - b.left) / k, y: (r.top - b.top) / k, w: r.width / k, h: r.height / k, right: (r.right - b.left) / k }
   }
 
-  /** After any change at a caret: format what closed, and open or follow a mention. */
   const settle = (range: Range | null) => {
     const el = editor.current
     if (!el) return
@@ -288,7 +263,6 @@ export function RichComposer({
     })
   }
 
-  /** Swaps the typed @name for the person, as one piece. */
   const putMention = (p: Person) => {
     const m = query.current
     const el = editor.current
@@ -318,7 +292,6 @@ export function RichComposer({
     setEmpty(false)
   }
 
-  /** Lights a range's words and puts the toolbar over them. */
   const showTool = (range: Range | null) => {
     if (!range || range.collapsed || !editor.current?.contains(range.commonAncestorContainer)) {
       setTool(null)
@@ -339,7 +312,6 @@ export function RichComposer({
     setTool({ x: rects.length > 1 ? all.x + all.w / 2 : first.x + first.w / 2, y: first.y, marks, link })
   }
 
-  /** Opens the link field, keeping the words it'll link drawn as selected while focus is in the field. */
   const startLink = () => {
     if (saved.current && typeof CSS !== 'undefined' && 'highlights' in CSS) CSS.highlights.set(HL, new Highlight(saved.current))
     setLinking(true)
@@ -369,7 +341,6 @@ export function RichComposer({
     keep(next)
   }
 
-  /** After formatting, keeps the same words selected: the page's selection if it was ours, otherwise the drawn one. */
   const keep = (r: Range) => {
     const el = editor.current!
     const sel = getSelection()
@@ -394,7 +365,6 @@ export function RichComposer({
     if (typeof CSS !== 'undefined' && 'highlights' in CSS) CSS.highlights.delete(HL)
   }
 
-  // The toolbar follows the page's selection while it's inside the composer.
   useEffect(() => {
     const on = () => {
       const sel = getSelection()
@@ -499,7 +469,6 @@ export function RichComposer({
       send()
       return
     }
-    // A mention goes in two presses: the first lights it, the second takes it.
     if (e.key === 'Backspace') {
       const sel = getSelection()
       if (!sel?.isCollapsed || !sel.rangeCount) return
@@ -576,7 +545,6 @@ export function RichComposer({
         </div>
       </div>
 
-      {/* People to mention, above the @. */}
       <AnimatePresence>
         {mention && matches.length > 0 && (
           <motion.div
@@ -621,7 +589,6 @@ export function RichComposer({
         )}
       </AnimatePresence>
 
-      {/* The selection toolbar, risen over the selected words. */}
       <AnimatePresence>
         {tool && (
           <motion.div

@@ -11,23 +11,12 @@ import { ease, press, spring } from '../../lib/motion'
 export type VoiceState = 'idle' | 'listening'
 export type VoiceHandle = { send(): void }
 
-/** The field's width when there's room; a narrower container gets all it has. */
 const W = 440
 const BAR = 36
 const COLS = 30
 const ROWS = 5
 const CANCEL_AT = -72
 
-/**
- * A message field you can talk to.
- *
- * Tap the mic and it stretches into a live level meter the width of the bar, a field of dots
- * that scrolls as you speak; hold it instead and it records only while held. While it listens,
- * the mic beside the clock fills with your voice. Words arrive grey as they're heard and firm up
- * to full ink once recognition commits them. Stop talking and a ring fills around the check;
- * finish it yourself with Enter, or slide the bar left (or press Escape) to throw the take away.
- * The text keeps its place throughout: the field and the bar never change size.
- */
 export function VoiceInput({
   state,
   level,
@@ -42,27 +31,16 @@ export function VoiceInput({
   placeholder = 'Message Copilot, or tap the mic',
   ref,
 }: {
-  /** Listening or not. */
   state: VoiceState
-  /** Loudness, 0 to 1, from the microphone (or anything else). */
   level: MotionValue<number>
-  /** The committed text: anything typed plus words recognition is sure of. */
   text: string
-  /** Words heard but not yet committed. */
   interim: string
-  /** Called as the text changes, by typing or by speech. */
   onTextChange: (t: string) => void
-  /** Called when a person starts listening. Start recognition here. */
   onStart: () => void
-  /** Called when listening should stop, by a press or by quiet. */
   onStop: () => void
-  /** Called when a person throws the recording away. */
   onCancel: () => void
-  /** Called with the text a person sends. */
   onSend: (t: string) => void
-  /** Stop on its own after this much quiet. */
   autoStop?: number
-  /** Shown while the field is empty. */
   placeholder?: string
   ref?: Ref<VoiceHandle>
 }) {
@@ -81,14 +59,12 @@ export function VoiceInput({
   const held = useRef<number | null>(null)
   const drag = useMotionValue(0)
 
-  // The clock, from the moment listening starts.
   useEffect(() => {
     if (!listening) return
     const t0 = performance.now()
     const tick = () => setElapsed(Math.floor((performance.now() - t0) / 1000))
     const first = setTimeout(tick)
     const t = setInterval(tick, 250)
-    // Follow focus into the bar only if it was already in the field; a demo starting it never steals focus.
     if (root.current?.contains(document.activeElement)) done.current?.focus({ preventScroll: true })
     return () => {
       clearTimeout(first)
@@ -96,7 +72,6 @@ export function VoiceInput({
     }
   }, [listening])
 
-  // Quiet fills the ring around the check; a sound empties it again.
   const quiet = useMotionValue(0)
   const since = useRef(0)
   useAnimationFrame((_, delta) => {
@@ -115,7 +90,6 @@ export function VoiceInput({
     }
   })
 
-  // The newest words stay in view.
   useLayoutEffect(() => {
     const el = box.current
     if (el) el.scrollTop = el.scrollHeight
@@ -143,7 +117,6 @@ export function VoiceInput({
     }
   }
 
-  // A tap toggles; a hold records only while held.
   const down = (e: PointerEvent) => {
     if (e.button !== 0 || listening) return
     held.current = performance.now()
@@ -164,7 +137,6 @@ export function VoiceInput({
     if (info.offset.x < CANCEL_AT) onCancel()
   }
 
-  // The mic sits at the end; when there's something to send it steps left to make room for Send.
   const slot = text.trim() ? BAR + 6 : 0
   const committed = words(text)
   const heard = words(interim)
@@ -180,7 +152,6 @@ export function VoiceInput({
           <AnimatePresence initial={false} mode="popLayout">
             <motion.div key={sent} className="relative min-h-full" exit={{ opacity: 0, y: -14, transition: { duration: 0.28, ease: ease.out } }}>
               {listening ? (
-                // While listening the text is read-only; each word keeps its slot, so committing only changes its colour.
                 <p className="whitespace-pre-wrap pb-3">
                   {[...committed, ...heard].map((w, i) => (
                     <span key={i} className={`heard-in transition-colors duration-500 ${i < committed.length ? 'text-ink' : 'text-ink-3'}`}>
@@ -225,8 +196,6 @@ export function VoiceInput({
           </AnimatePresence>
           <span className="flex-1" />
 
-          {/* The mic and the bar are one surface: it grows leftwards from the mic's own spot. The bar is
-              always full width and a clip reveals it, so growing never moves anything on the page. */}
           <motion.div
             className="absolute top-1/2 z-10 -translate-y-1/2 overflow-hidden"
             initial={false}
@@ -301,7 +270,6 @@ export function VoiceInput({
             </AnimatePresence>
           </motion.div>
 
-          {/* Send waits in its own slot and only appears with something to send. */}
           <AnimatePresence>
             {!listening && text.trim() && (
               <motion.button
@@ -333,11 +301,6 @@ const swap = {
 
 const words = (s: string) => s.split(/\s+/).filter(Boolean)
 
-/**
- * The level meter: a field of dots, a column for each moment, scrolling right to left. A column
- * lights outward from its middle row as loud as that moment was, so speech reads as a shape and
- * the quiet between phrases as a single line. Dots are written straight to the DOM each frame.
- */
 function Meter({ level }: { level: MotionValue<number> }) {
   const dots = useRef<(HTMLSpanElement | null)[]>([])
   const history = useRef<number[]>(Array(COLS).fill(0))
@@ -351,7 +314,6 @@ function Meter({ level }: { level: MotionValue<number> }) {
     history.current.push(smooth.current)
     history.current.shift()
     history.current.forEach((v, c) => {
-      // How far from the middle row this moment reaches: 0 (just the middle) to 2 (all five).
       const reach = v < 0.06 ? -1 : v < 0.3 ? 0 : v < 0.6 ? 1 : 2
       for (let r = 0; r < ROWS; r++) {
         const el = dots.current[r * COLS + c]
@@ -375,7 +337,6 @@ function Meter({ level }: { level: MotionValue<number> }) {
   )
 }
 
-/** The mic beside the clock: its capsule fills from the bottom with the voice, in the accent. */
 function LiveMic({ level }: { level: MotionValue<number> }) {
   const fill = useRef<SVGRectElement>(null)
   const smooth = useRef(0)
@@ -399,7 +360,6 @@ function LiveMic({ level }: { level: MotionValue<number> }) {
   )
 }
 
-/** A thin ring around the check that fills while it's quiet. */
 function Ring({ progress }: { progress: MotionValue<number> }) {
   const op = useTransform(progress, [0, 0.03], [0, 1])
   return (

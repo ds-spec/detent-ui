@@ -9,8 +9,6 @@ import { CopyCommand } from '../components/terminal/Terminal'
 import { Bubble, Calendar, Orbit, Wrench } from '../icons'
 import { useBench } from './bench'
 
-/* ───────────────────────────── Scaffold: one window, terminal → tree ───────────────────────────── */
-
 const FILES = ['prompt.md', 'agent.ts', 'tools/refund.ts', 'tools/lookup-order.ts', 'channels/slack.ts']
 const ICONS: Record<string, ReactNode> = {
   'tools/refund.ts': <Wrench size={16} />,
@@ -22,8 +20,6 @@ export function ScaffoldDemo() {
   const b = useBench()
   return <AgentScaffold name={b.get('name', 'support-bot')} files={FILES} icons={ICONS} />
 }
-
-/* ───────────────────────────── File tree on its own ───────────────────────────── */
 
 const PROJECT: TreeNode[] = [
   {

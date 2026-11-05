@@ -13,8 +13,6 @@ const APR = 0.249
 
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
 
-/** A card's month: anything under the statement balance carries into next month at the card's rate. */
-/** Next month's interest on whatever's left of the statement. */
 const cost = (v: number) => (Math.max(0, STATEMENT - v) * APR) / 12
 
 const describe = (v: number): SettleReading => {
@@ -23,7 +21,6 @@ const describe = (v: number): SettleReading => {
   return { tone: 'warn', value: usd.format(cost(v)), label: 'interest' }
 }
 
-/** Someone works out what to pay this month: a bit more than the minimum, then the statement, past it, back, and pays. */
 export function SettleDemo() {
   const b = useBench()
   const wheel = useRef<SettleHandle>(null)

@@ -12,9 +12,7 @@ import { Avatar as Face } from '../../ui/Avatar'
 
 export type InboxItem = {
   id: string
-  /** A person (soft initials in their colour) or an app (pass an icon and a tile background). */
   from: { name: string; hue?: number; tint?: string; icon?: ReactNode }
-  /** Wrap names and objects in <b> to lift them out of the sentence. */
   text: ReactNode
   meta: string
   at: number
@@ -26,12 +24,6 @@ export type InboxItem = {
 const LIST_H = 312
 const fold = { type: 'spring', bounce: 0, duration: 0.34 } as const
 
-/*
- * The time the rows are measured against, ticking every 20 seconds. It's read through an external
- * store, not during render: a server prerender sees no time at all (every row says "Just now"),
- * and the browser reads the real time once it has the page. Frameworks that prerender (Next.js
- * among them) flag a clock read while rendering.
- */
 const TICK = 20_000
 const tick = (onChange: () => void) => {
   const t = setInterval(onChange, TICK)
@@ -50,12 +42,6 @@ const ago = (t: number, now: number) => {
   return h < 24 ? `${h}h ago` : `${Math.round(h / 24)}d ago`
 }
 
-/**
- * A notification bell with an inbox. When something new arrives the bell rings (the clapper
- * swings a beat behind the body) and the count rolls. The inbox grows out of the bell and
- * floats over the page. Rows mark themselves read on click, invites answer in place, and
- * live work shows its progress right in the row.
- */
 export function Inbox({
   items,
   onRead,
@@ -65,19 +51,12 @@ export function Inbox({
   align = 'end',
   defaultOpen = false,
 }: {
-  /** The notifications, newest first. */
   items: InboxItem[]
-  /** Called with an item's id when it's opened or marked read. */
   onRead: (id: string) => void
-  /** Called when a person marks everything read. */
   onReadAll: () => void
-  /** Called with an item's id when it's swiped or closed away. */
   onDismiss: (id: string) => void
-  /** Called with an invite's id and whether it was accepted. */
   onInvite?: (id: string, accept: boolean) => void
-  /** Which edge of the bell the inbox lines up with. */
   align?: 'start' | 'center' | 'end'
-  /** Start with the inbox open. */
   defaultOpen?: boolean
 }) {
   const [open, setOpen] = useState(defaultOpen)
@@ -93,7 +72,6 @@ export function Inbox({
   const unread = items.filter((i) => i.unread).length
   const shown = tab === 'unread' ? items.filter((i) => i.unread) : items
 
-  // Ring when a new unread item lands on top.
   const top = items[0]?.id
   const lastTop = useRef(top)
   useEffect(() => {
@@ -219,9 +197,6 @@ export function Inbox({
   )
 }
 
-/* ───────────────────────────── Parts ───────────────────────────── */
-
-/** Our bell, drawn so the body and the solid clapper can move separately. */
 function RingingBell({ body, clapper }: { body: AnimationControls; clapper: AnimationControls }) {
   return (
     <motion.svg
@@ -343,7 +318,6 @@ function Row({
           {n.invite && <Invite id={n.id} invite={n.invite} onInvite={onInvite} />}
         </div>
 
-        {/* One fixed slot: the unread dot, swapped for an action on hover or focus. */}
         <span className="absolute right-2 top-2.5 size-6">
           <span className="absolute inset-0 flex items-center justify-center transition-opacity duration-150 group-hover/row:opacity-0 group-focus-within/row:opacity-0 pointer-coarse:opacity-0">
             <AnimatePresence custom={sweepDelay}>
@@ -405,7 +379,6 @@ function Avatar({ from, done }: { from: InboxItem['from']; done?: boolean }) {
   )
 }
 
-/** Accept or decline right in the row. The answer replaces the buttons in the same space. */
 function Invite({ id, invite, onInvite }: {
   id: string
   invite: NonNullable<InboxItem['invite']>

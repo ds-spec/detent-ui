@@ -11,7 +11,6 @@ const script = WindSong({ weight: '400', subsets: ['latin'], display: 'swap' })
 
 const NAMES = ['Maya Chen', 'Jonas Weber', 'Aiko Tanaka']
 
-/** Someone types their name and the pencil signs it, a letter at a time; Enter adds the flourish. */
 export function SignatureDemo() {
   const b = useBench()
   const [name, setName] = useState('')
@@ -20,7 +19,6 @@ export function SignatureDemo() {
     for (let round = 0; ; round++) {
       const n = NAMES[round % NAMES.length]
       await beat(900)
-      // People don't type at an even pace: capitals and the space take a beat longer.
       for (let i = 1; i <= n.length; i++) {
         setName(n.slice(0, i))
         const c = n[i - 1]
