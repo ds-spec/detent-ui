@@ -5,7 +5,7 @@ import { BLOCKS } from '@/catalog/blocks'
 import { TEMPLATE_COUNT } from '@/catalog/templates'
 
 export const NAME = 'Detent'
-export const TAGLINE = 'Most apps look the same. Yours won’t.'
+export const TAGLINE = 'Make your product feel expensive.'
 export const FREE_COUNT = ENTRIES.length - PRO_COMPONENTS.length
 
 export const DESCRIPTION = `Well-made React components for your product. Installed with shadcn, styled by your theme, yours to change. ${FREE_COUNT} of ${ENTRIES.length} are free.`

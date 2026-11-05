@@ -44,12 +44,12 @@ export function HomeHero({ lib }: { lib: LibItem[] }) {
             <Announcement href="/components/rewind" linkAs={Link} className="rise">
               Rewind and Popup
             </Announcement>
-            <h1 className="focus-in mt-7 text-[clamp(42px,5vw,74px)] font-normal leading-[1.01] tracking-[-0.055em] text-ink">
-              Most apps look the same.
+            <h1 className="focus-in mt-7 text-[clamp(36px,5vw,74px)] font-normal leading-[1.01] tracking-[-0.055em] text-ink">
+              Make your product
               <br />
               <span className="text-quiet">
-                Yours{' '}
-                <DitherWord color={dot ?? 'currentColor'}>won’t</DitherWord>.
+                feel{' '}
+                <DitherWord color={dot ?? 'currentColor'}>expensive</DitherWord>.
               </span>
             </h1>
             <p className="rise mt-6 max-w-[540px] text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>

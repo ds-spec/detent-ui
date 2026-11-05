@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { CONTENT_TYPE, OG } from '@/site/og'
 
-export const alt = 'Detent, the React component library. Most apps look the same. Yours won’t.'
+export const alt = 'Detent, the React component library. Make your product feel expensive.'
 export const size = OG
 export const contentType = CONTENT_TYPE
 
