@@ -305,22 +305,24 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
 
       {shown && (
         <Layer>
-          <motion.div className={`pointer-events-none ${fill(contained).split(' ')[0]} z-50 ${INK}`} style={{ left: spot.x, top: spot.y, x, y, filter: EDGE, width, height, opacity: fade }}>
+          <motion.div className={`pointer-events-none ${fill(contained).split(' ')[0]} z-50 ${INK}`} style={{ left: spot.x, top: spot.y, x, y, width, height, opacity: fade }}>
             <motion.div aria-hidden className="pointer-events-none absolute inset-0 rounded-[16px] shadow-[0_18px_36px_-6px_rgb(0_0_0/0.22)]" style={{ opacity: open }} />
-            <motion.div
-              ref={sheet}
-              role="listbox"
-              aria-label={label}
-              onPointerDown={(e) => e.preventDefault()}
-              onMouseDown={(e) => e.preventDefault()}
-              className={`pointer-events-auto relative select-none bg-surface text-ink ${textClass}`}
-              style={{ clipPath: clip, width, height, paddingTop: PAD, paddingBottom: PAD }}
-            >
-              {rows(false)}
-              <motion.div aria-hidden className="pointer-events-none absolute inset-0 bg-ink text-surface" style={{ clipPath: window_, opacity: inverted, paddingTop: PAD }}>
-                {rows(true)}
+            <div className="absolute inset-0" style={{ filter: EDGE }}>
+              <motion.div
+                ref={sheet}
+                role="listbox"
+                aria-label={label}
+                onPointerDown={(e) => e.preventDefault()}
+                onMouseDown={(e) => e.preventDefault()}
+                className={`pointer-events-auto relative select-none bg-surface text-ink ${textClass}`}
+                style={{ clipPath: clip, width, height, paddingTop: PAD, paddingBottom: PAD }}
+              >
+                {rows(false)}
+                <motion.div aria-hidden className="pointer-events-none absolute inset-0 bg-ink text-surface" style={{ clipPath: window_, opacity: inverted, paddingTop: PAD }}>
+                  {rows(true)}
+                </motion.div>
               </motion.div>
-            </motion.div>
+            </div>
           </motion.div>
         </Layer>
       )}
