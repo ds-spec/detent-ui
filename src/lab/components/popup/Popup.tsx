@@ -65,7 +65,7 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
   const sheet = useRef<HTMLDivElement>(null)
   const probes = useRef<(HTMLSpanElement | null)[]>([])
   const nudge = useRef({ x: 0, y: 0 })
-  const live = useRef({ mode: 'shut' as 'shut' | 'press' | 'tap', y0: 0, u0: 0, left: false, lost: false, active: start, value: start })
+  const live = useRef({ mode: 'shut' as 'shut' | 'press' | 'tap', y0: 0, u0: 0, left: false, lost: false, active: start, value: start, l: 0, r: 0 })
 
   const open = useMotionValue(0)
   const anchor = useMotionValue(start)
@@ -87,7 +87,6 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
   })
   const window_ = useTransform(plate, (p) => `inset(${PAD + p}px ${PAD}px ${height - PAD - ROW - p}px ${PAD}px round 10px)`)
   const inverted = useTransform([open, on], ([o, v]: number[]) => clamp((o - 0.3) / 0.5, 0, 1) * v)
-  const shadow = useTransform(open, (o) => `${EDGE} drop-shadow(0 18px 28px rgb(0 0 0 / ${0.2 * o}))`)
 
   const widths = () => probes.current.map((p) => (p?.offsetWidth ?? 0) + LEFT + RIGHT)
 
@@ -132,6 +131,9 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
       y: top < 12 ? 12 - top : Math.min(0, f.height - 12 - (top + height)),
     }
     setSpot({ x: box.x, y: box.y })
+    const at = pill.current!.getBoundingClientRect()
+    s.l = at.left + nudge.current.x
+    s.r = s.l + widthRef.current
     s.active = s.value
     setActive(s.value)
     setFrom(s.value)
@@ -183,8 +185,7 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
     const s = live.current
     if (s.mode !== 'press') return
     const d = e.clientY - s.y0
-    const box = sheet.current?.getBoundingClientRect()
-    s.lost = !!box && (e.clientX < box.left - LOST || e.clientX > box.right + LOST)
+    s.lost = e.clientX < s.l - LOST || e.clientX > s.r + LOST
     on.set(s.lost ? 0 : 1)
     const hi = ROW * (options.length - 1)
     const u = s.u0 + d
@@ -304,7 +305,8 @@ export function Popup({ options, value: controlled, defaultValue, onChange, labe
 
       {shown && (
         <Layer>
-          <motion.div className={`pointer-events-none ${fill(contained).split(' ')[0]} z-50 ${INK}`} style={{ left: spot.x, top: spot.y, x, y, filter: shadow, width, height, opacity: fade }}>
+          <motion.div className={`pointer-events-none ${fill(contained).split(' ')[0]} z-50 ${INK}`} style={{ left: spot.x, top: spot.y, x, y, filter: EDGE, width, height, opacity: fade }}>
+            <motion.div aria-hidden className="pointer-events-none absolute inset-0 rounded-[16px] shadow-[0_18px_36px_-6px_rgb(0_0_0/0.22)]" style={{ opacity: open }} />
             <motion.div
               ref={sheet}
               role="listbox"
