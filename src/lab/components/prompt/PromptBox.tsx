@@ -82,8 +82,8 @@ export const PROMPT_H = FRAME + REST + HEAD
 export const PROMPT_H_BARE = FRAME + REST
 export const PROMPT_STRIP = STRIP
 
-const TEXT = 'text-[length:var(--p-text,17px)]! tracking-[-0.011em]'
-const ROW_TEXT = 'text-[length:var(--p-row,16px)] tracking-[-0.006em]'
+const TEXT = 'text-[length:var(--p-text,17px)]! @max-[479px]:text-[length:min(var(--p-text,17px),16px)]! tracking-[-0.011em]'
+const ROW_TEXT = 'text-[length:var(--p-row,16px)] @max-[479px]:text-[length:min(var(--p-row,16px),15px)] tracking-[-0.006em]'
 const HIT = "pointer-coarse:before:absolute pointer-coarse:before:left-1/2 pointer-coarse:before:top-1/2 pointer-coarse:before:size-[44px] pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-['']"
 const TAP = { whileTap: press, transition: { scale: { duration: 0.1, ease: ease.out } } }
 const keep = (e: ReactMouseEvent) => e.preventDefault()
@@ -625,7 +625,7 @@ export function PromptBox({
             <Modes modes={modes} mode={mode} onMode={setMode} />
             {model &&
               (models?.length ? (
-                <span className="hidden shrink-0 items-center @min-[480px]:flex">
+                <span className="flex shrink-0 items-center">
                   <Reach
                     label={`Model: ${model}`}
                     items={models.map((m) => ({
@@ -641,10 +641,10 @@ export function PromptBox({
                     open={modelMenu}
                     setOpen={setModelMenu}
                     layer={layer}
-                    className={`h-[34px] gap-[7px] rounded-full pl-[10px] pr-[12px] shadow-[inset_0_0_0_1px_var(--c-key)] hover:bg-[var(--c-hover)] ${quiet}`}
+                    className={`h-[34px] gap-[7px] rounded-full shadow-[inset_0_0_0_1px_var(--c-key)] hover:bg-[var(--c-hover)] ${chosen?.icon ? 'w-[34px] justify-center @min-[400px]:w-auto @min-[400px]:justify-start @min-[400px]:pl-[10px] @min-[400px]:pr-[12px]' : 'pl-[10px] pr-[12px]'} ${quiet}`}
                   >
                     {chosen?.icon}
-                    <span className="text-[var(--c-ink)]">{chosen?.short ?? model}</span>
+                    <span className={`text-[var(--c-ink)] ${chosen?.icon ? 'hidden @min-[400px]:inline' : ''}`}>{chosen?.short ?? model}</span>
                   </Reach>
                 </span>
               ) : (
@@ -830,7 +830,7 @@ function Spin({ still }: { still: boolean }) {
 
 function Chip({ file, onRemove, ref }: { file: Attachment; onRemove: (byKey: boolean) => void; ref?: Ref<HTMLDivElement> }) {
   return (
-    <motion.div ref={ref} layout="position" data-file={file.id} className="flex h-[36px] max-w-[236px] shrink-0 cursor-default items-center gap-[6px] rounded-[11px] pl-[12px] pr-[4px] text-[15px] text-[var(--c-ink)] shadow-[inset_0_0_0_1px_var(--c-edge-on)]" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: ease.out } }} exit={{ opacity: 0, y: 6, transition: { duration: 0.12, ease: ease.out } }}>
+    <motion.div ref={ref} layout="position" data-file={file.id} className="flex h-[36px] max-w-[236px] shrink-0 cursor-default items-center gap-[6px] rounded-[11px] pl-[12px] pr-[4px] text-[15px] @max-[479px]:text-[14px] text-[var(--c-ink)] shadow-[inset_0_0_0_1px_var(--c-edge-on)]" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.2, ease: ease.out } }} exit={{ opacity: 0, y: 6, transition: { duration: 0.12, ease: ease.out } }}>
       {file.url && <span className="size-[20px] shrink-0 rounded-[5px] bg-cover bg-center" style={{ backgroundImage: `url("${file.url}")` }} />}
       <span className="min-w-0 truncate">{file.name}</span>
       <motion.button type="button" {...TAP} aria-label={`Remove ${file.name}`} onMouseDown={keep} onClick={(e) => onRemove(e.detail === 0)} className="relative flex size-[28px] shrink-0 items-center justify-center rounded-full opacity-60 outline-none before:absolute before:-inset-[8px] before:content-[''] hover:opacity-100 focus-visible:opacity-100">
