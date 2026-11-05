@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { PRO_BLOCKS } from '@/catalog/effort'
 import { PRO_COMPONENTS, TERMS } from '@/catalog/pro'
 import { TEMPLATE_COUNT } from '@/catalog/templates'
-import { REFUND_DAYS } from '@/catalog/trust'
+import { REFUND_DAYS, TRIAL_INSTALLS } from '@/catalog/trust'
 import { BigBuy, BuyBar, BuyProvider, HeroHead, WideStage } from '@/site/pro/Buy'
 import { Compare, Inside } from '@/site/pro/Inside'
 import { Install } from '@/site/pro/Install'
@@ -22,11 +22,11 @@ const FAQ: [string, string][] = [
   ['Is it a subscription?', 'No. You pay once and keep it, along with every update that ships after you buy.'],
   ['What’s the difference between the plans?', 'Pro is what you build the product with: the Pro components and the Pro blocks. Pro + Templates adds the Detent app template, a whole app to start from, and every template still to come.'],
   ['Will it match my design?', 'Installed with shadcn, Detent takes on your theme: your primary becomes its accent, it uses your background, borders and muted text, and .dark turns it dark. Your fonts stay yours.'],
-  ['How do I install Pro?', 'With the shadcn CLI, from Detent’s private registry. Sign in with your email, generate a key, add it and the registry to the project once, as in Set up once below, then install like anything else: npx shadcn add @detent-pro/lens. The source lands in your project.'],
+  ['How do I install Pro?', 'With the shadcn CLI, from Detent’s private registry. Sign in with your email, generate a key, add it and the registry to the project once, as in Set up once below, then install like anything else: npx shadcn add @detent-pro/glyph. The source lands in your project.'],
   ['Can my team share one licence?', 'A licence is for one person, so each person building with it needs their own. Your keys work in CI and shared repos.'],
   ['Can I use it for client work?', 'Yes, in as many projects as you like, commercial ones included. What you can’t do is resell or redistribute the components themselves.'],
   ['Do the free components stay free?', 'Yes. Everything free stays free, and keeps getting better alongside Pro.'],
-  ['What if it’s not right for me?', `Email within ${REFUND_DAYS} days of buying and you get every cent back. No form, no questions.`],
+  ['What if it’s not right for me?', `Try up to ${TRIAL_INSTALLS} components in your first ${REFUND_DAYS} days. If it isn’t right, email us and you get every cent back, no form, no questions.`],
 ]
 
 const H2 = 'text-[clamp(32px,3.4vw,48px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink'

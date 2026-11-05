@@ -28,7 +28,7 @@ const STEPS: Step[] = [
   {
     title: 'Install anything',
     line: 'Components and blocks by name, and with Pro + Templates the template too, as template-detent. The source lands in your project, yours to change.',
-    code: 'npx shadcn add @detent-pro/lens',
+    code: 'npx shadcn add @detent-pro/glyph',
   },
   {
     title: 'Respect reduced motion',

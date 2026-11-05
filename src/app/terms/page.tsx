@@ -38,7 +38,7 @@ export default function Terms() {
               <P>Pro is one payment, not a subscription. Prices are shown in US dollars; tax is added at checkout where it applies.</P>
               <P>Payments are taken by our checkout partner, which acts as the merchant of record: it handles the payment, your receipt and any sales tax or VAT, and its own terms cover the payment itself.</P>
               <P>
-                If it isn’t right for you, you have {REFUND_DAYS} days to ask for your money back. The {link('/refunds', 'refund policy')} has the details.
+                If it isn’t right for you, you have {REFUND_DAYS} days to try it and ask for your money back. The {link('/refunds', 'refund policy')} has the details.
               </P>
             </>
           ),

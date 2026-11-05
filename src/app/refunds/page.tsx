@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
-import { CONTACT, REFUND_DAYS, updated } from '@/catalog/trust'
+import { CONTACT, REFUND_DAYS, TRIAL_INSTALLS, updated } from '@/catalog/trust'
 import { LegalPage, List, P } from '@/site/trust/Legal'
 import { page } from '@/site/seo'
 
 export const metadata: Metadata = page({
   title: 'Refunds',
-  description: `If Detent Pro isn’t right for you, ask within ${REFUND_DAYS} days and get every penny back.`,
+  description: `Try Detent Pro for ${REFUND_DAYS} days. If it isn’t right for you, ask and get every penny back.`,
   path: '/refunds',
   image: '/opengraph-image',
 })
@@ -21,10 +21,28 @@ export default function Refunds() {
   return (
     <LegalPage
       label="Refunds"
-      title={`${REFUND_DAYS} days to change your mind.`}
-      intro={<p>If Pro isn’t what you needed, write within {REFUND_DAYS} days of buying it and you’ll get all of it back. You don’t need a reason.</p>}
+      title={`${REFUND_DAYS} days to try it properly.`}
+      intro={
+        <p>
+          Install a few components, put them in your app, see how they feel. If Pro isn’t what you needed, write within {REFUND_DAYS} days and you’ll get all of it back. You don’t need a reason.
+        </p>
+      }
       updated={updated()}
       sections={[
+        {
+          id: 'trying',
+          title: 'Trying versus using',
+          body: (
+            <>
+              <P>
+                The refund covers trying Pro: up to {TRIAL_INSTALLS} components and blocks installed, and no templates downloaded. That’s plenty to know whether it’s right for you, and your account page shows how many you’ve tried.
+              </P>
+              <P>
+                Past that, you’ve put Pro to real use, so the purchase is final. Templates are final once downloaded, since each one is a whole product in a single download. We keep a simple record of what each key installs, which is how we can say yes to a refund straight away instead of asking you questions.
+              </P>
+            </>
+          ),
+        },
         {
           id: 'how',
           title: 'How to ask',
@@ -38,12 +56,12 @@ export default function Refunds() {
         {
           id: 'what',
           title: 'What happens next',
-          body: <List items={['Your keys stop working with the private registry.', 'Code you installed should come out of your projects, and you agree not to keep using it.', 'If you buy again later, you start a new licence on the same terms as everyone else.']} />,
+          body: <List items={['Your keys stop working with the private registry.', 'Code you installed should come out of your projects, and you agree not to keep using it.', 'If you buy again later, that purchase is final: the trial is once per person.']} />,
         },
         {
           id: 'after',
           title: `After ${REFUND_DAYS} days`,
-          body: <P>Past the {REFUND_DAYS} days, purchases are final. If something’s wrong with Detent itself, like a component that doesn’t work as described, write anyway: we’ll fix it, or make it right.</P>,
+          body: <P>Past the {REFUND_DAYS} days, purchases are final. Whenever you bought, if something’s wrong with Detent itself, like a component that doesn’t work as described, write anyway: we’ll fix it, or make it right.</P>,
         },
         {
           id: 'upgrades',

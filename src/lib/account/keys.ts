@@ -1,6 +1,7 @@
 import 'server-only'
 import { randomBytes, randomUUID } from 'node:crypto'
 import type { Plan } from '@/catalog/licence'
+import { REFUND_DAYS } from '@/catalog/trust'
 import { db } from './db'
 import { hash } from './session'
 
@@ -69,9 +70,21 @@ export async function keyEmail(secret: string) {
   return String(rows[0].email)
 }
 
+export type Usage = { components: number; templates: number; until: number; open: boolean }
 
 /** Records an order from the store. The store can send the same one twice, and that's fine. */
 /** Keeps a refund once it's seen: the store may deliver or retry a paid event after it. */
+export async function recordInstall(email: string, item: string, kind: 'component' | 'template') {
+  await (await db()).execute({ sql: 'insert or ignore into install (email, item, kind, at) values (?, ?, ?, ?)', args: [email, item, kind, Date.now()] })
+}
+
+export async function usageFor(email: string, since: number): Promise<Usage> {
+  const { rows } = await (await db()).execute({ sql: 'select kind, count(*) as n from install where email = ? group by kind', args: [email] })
+  const n = (kind: string) => Number(rows.find((r) => r.kind === kind)?.n ?? 0)
+  const until = since + REFUND_DAYS * 86_400_000
+  return { components: n('component'), templates: n('template'), until, open: Date.now() <= until }
+}
+
 export async function recordPurchase(order: { id: string; email: string; plan: Plan; refunded: boolean }) {
   await (await db()).execute({
     sql: `insert into purchase (order_id, email, plan, refunded, created_at) values (?, ?, ?, ?, ?)

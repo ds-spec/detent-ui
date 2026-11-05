@@ -13,6 +13,8 @@ export const CONTACT = process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? 'hello@detentui.
 export const REFUND_DAYS = 14
 
 /** When the licence, refund and terms pages last changed. */
+export const TRIAL_INSTALLS = 10
+
 export const UPDATED = '2026-11-02'
 
 export const updated = () => new Date(`${UPDATED}T00:00:00`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })

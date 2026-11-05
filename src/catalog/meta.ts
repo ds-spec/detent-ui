@@ -1651,6 +1651,16 @@ const ALL: Entry[] = [
     line: 'Hairline threads sweep in from both edges and gather through your call to action. They tighten as you come near, part around your hand, and a press sends light out along every one.',
     details: ['It fills its parent, so give the section a height.', 'The headline, line and button are yours; `sentLabel` changes the button once pressed.', 'Nothing is drawn while it is off screen.', 'With reduced motion the threads hold still, and the words and button work without WebGL.'],
   },
+  {
+    id: 'glyph',
+    name: 'Glyph art',
+    short: 'Any icon or word, drawn in characters',
+    category: 'marketing',
+    feel: ['press', 'drag'],
+    bleed: true,
+    line: 'Hand it an SVG icon or a word and it draws it in shimmering characters, lit from the top left. Switch the shape and the characters re-form into the new one. Move over it and they light up; press for a ripple.',
+    details: ['It fills its parent and sizes its characters to the space, so it reads the same on a phone and a wide screen.', 'Pass any 24×24 icon path through `shape`, from simple-icons or your own set, or a word.', 'It takes your text colour and your `--accent`, so it follows light and dark on its own.', 'It assembles the first time it comes into view and pauses off screen and in hidden tabs.', 'With reduced motion it shows the finished shape and holds still. Give it a `label` and screen readers hear it as an image.'],
+  },
 ]
 
 export { UNLISTED }

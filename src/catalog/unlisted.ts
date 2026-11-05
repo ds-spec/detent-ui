@@ -17,9 +17,7 @@
 export const UNLISTED = new Set([
   // 2026-11-02: the owner's cut. Read-along doubled Voice note.
   'tour', 'readalong', 'dock',
-  // 2026-11-02: hidden while its shader is redone.
-  'dotlight',
-  // 2026-10-31, later: the UI audit found these two can't reach the bar.
+  'dotlight', 'lens',
   'feedback', 'codeblock', 'donut', 'photobar', 'hold', 'kanban', 'answer',
   // 2026-11-01: the owner's cut from the board of 45.
   'scaffold', 'ask', 'images', 'signature', 'video', 'presence', 'checklist', 'secret', 'reveal', 'approval',

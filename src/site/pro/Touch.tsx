@@ -14,7 +14,7 @@ import type { Tone } from '../home/lights'
 
 const PIECES: { id: string; name: string; line: string; tone: Tone; bleed?: boolean; className: string }[] = [
   { id: 'region', name: 'Region wheel', line: 'Flick the drum and the Earth turns with it, in today’s real sunlight.', tone: 'blue', bleed: true, className: 'h-[580px] sm:h-[640px] lg:col-span-12 lg:h-[700px]' },
-  { id: 'lens', name: 'Lens chart', line: 'Drag across it to ask if a day was really unusual.', tone: 'amber', className: 'h-[520px] lg:col-span-7 lg:h-[600px]' },
+  { id: 'glyph', name: 'Glyph art', line: 'Any icon or word, drawn in characters that light up under your hand.', tone: 'amber', className: 'h-[520px] lg:col-span-7 lg:h-[600px]' },
   { id: 'find', name: 'Lit find', line: 'Search lights the sentence, not only the word.', tone: 'blue', className: 'h-[520px] lg:col-span-5 lg:h-[600px]' },
   { id: 'threads', name: 'Thread hero', line: 'Threads that lead the eye to your button.', tone: 'rose', bleed: true, className: 'h-[560px] lg:col-span-12 lg:h-[640px]' },
 ]

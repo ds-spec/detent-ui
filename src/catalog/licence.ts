@@ -10,7 +10,7 @@
 import { keyEmail, planFor } from '@/lib/account/keys'
 
 export type Plan = 'pro' | 'all'
-export type Check = { ok: true; plan: Plan } | { ok: false; reason: string }
+export type Check = { ok: true; plan: Plan; email: string | null } | { ok: false; reason: string }
 
 const ids = (v: string | undefined) => new Set((v ?? '').split(',').map((s) => s.trim()).filter(Boolean))
 
@@ -24,9 +24,9 @@ export function planOfProduct(id: string | null | undefined): Plan | null {
 /** Whether a key may install Pro, and which plan it's for. */
 export async function checkLicence(key: string): Promise<Check> {
   const dev = process.env.DETENT_DEV_KEY
-  if (dev && key === dev) return { ok: true, plan: 'all' }
+  if (dev && key === dev) return { ok: true, plan: 'all', email: null }
   const email = await keyEmail(key)
   if (!email) return { ok: false, reason: 'That key isn’t one of ours.' }
   const plan = await planFor(email)
-  return plan ? { ok: true, plan } : { ok: false, reason: `No Pro purchase on ${email} yet.` }
+  return plan ? { ok: true, plan, email } : { ok: false, reason: `No Pro purchase on ${email} yet.` }
 }

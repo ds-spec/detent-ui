@@ -23,7 +23,7 @@ const ROWS: [string, string][] = [
   ['region', 'popup'],
   ['upload', 'voicenote'],
   ['halo', 'rewind'],
-  ['lens', 'threads'],
+  ['glyph', 'threads'],
 ]
 
 /**

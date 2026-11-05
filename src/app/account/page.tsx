@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { LAST_USED, socialProviders, type Provider } from '@/lib/account/auth'
-import { listKeys, MAX_KEYS, purchaseFor } from '@/lib/account/keys'
+import { listKeys, MAX_KEYS, purchaseFor, usageFor } from '@/lib/account/keys'
 import { safeNext } from '@/lib/account/next'
 import { currentAccount } from '@/lib/account/session'
 import { buying } from '@/site/account/buying'
@@ -54,7 +54,8 @@ async function Account({ query }: { query: Promise<Back> }) {
   if (next !== '/account') redirect(next)
 
   const [purchase, keys] = await Promise.all([purchaseFor(account.email), listKeys(account.email)])
-  return <AccountView account={account} purchase={purchase} keys={keys} fromCheckout={fromCheckout} max={MAX_KEYS} />
+  const usage = purchase ? await usageFor(account.email, purchase.since).catch(() => null) : null
+  return <AccountView account={account} purchase={purchase} keys={keys} usage={usage} fromCheckout={fromCheckout} max={MAX_KEYS} />
 }
 
 /** Sign in, and once in, the plan and the keys. Everything that knows who you are streams in behind Suspense. */

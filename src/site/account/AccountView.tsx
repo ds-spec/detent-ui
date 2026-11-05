@@ -6,6 +6,7 @@ import { CONTACT } from '@/catalog/trust'
 import { Key } from '@/lab/blocks/kit/icons'
 import { KeySheet, RemoveKey, Snippet } from './Forms'
 import { Membership } from './Membership'
+import type { Usage } from '@/lib/account/keys'
 import { ProBadge } from './ProBadge'
 import { SettingsCard, SettingsNav, SMALL_QUIET } from './Settings'
 import { Avatar, SignOutButton } from '@/site/UserMenu'
@@ -44,12 +45,12 @@ const USE: Step[] = [
 }`,
   },
   { title: 'Add your key', line: 'In .env.local, out of git. Give CI and your host the same variable.', file: '.env.local', code: 'DETENT_PRO_KEY=dtnt_your-key\n' },
-  { title: 'Install anything', line: 'Components and blocks by name. The source lands in your project, yours to change.', code: 'npx shadcn add @detent-pro/lens' },
+  { title: 'Install anything', line: 'Components and blocks by name. The source lands in your project, yours to change.', code: 'npx shadcn add @detent-pro/glyph' },
 ]
 
 export type AccountKey = { id: string; name: string; hint: string; createdAt: number; usedAt: number | null }
 
-export function AccountView({ account, purchase, keys, fromCheckout, max = 5 }: { account: { email: string; name: string; image: string | null }; purchase: { plan: Plan; since: number } | null; keys: AccountKey[]; fromCheckout: boolean; max?: number }) {
+export function AccountView({ account, purchase, keys, usage = null, fromCheckout, max = 5 }: { account: { email: string; name: string; image: string | null }; purchase: { plan: Plan; since: number } | null; keys: AccountKey[]; usage?: Usage | null; fromCheckout: boolean; max?: number }) {
   const MAX_KEYS = max
   const name = account.name || account.email.split('@')[0]
   return (
@@ -78,7 +79,7 @@ export function AccountView({ account, purchase, keys, fromCheckout, max = 5 }: 
           ]}
         />
         <div className="grid min-w-0 gap-6">
-          <Membership purchase={purchase} arriving={fromCheckout && !purchase} thanks={fromCheckout} />
+          <Membership purchase={purchase} usage={usage} arriving={fromCheckout && !purchase} thanks={fromCheckout} />
 
           <SettingsCard
             id="keys"

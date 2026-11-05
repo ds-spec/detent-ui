@@ -74,6 +74,7 @@ export const SIZE: Record<string, [number, number]> = {
   reveal: [520, 740],
   dotlight: [860, 560],
   threads: [980, 620],
+  glyph: [860, 560],
   confirm: [580, 400],
   dialog: [600, 440],
   signature: [520, 365],

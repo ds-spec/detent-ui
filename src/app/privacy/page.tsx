@@ -34,6 +34,7 @@ export default function Privacy() {
                 'Sign-in records: your session, and how you last signed in, so you stay signed in and we can keep your account safe.',
                 'Your purchases: which plan, when, the payment reference from Dodo Payments, and whether it was refunded. We never see or store your card details.',
                 'Your licence keys, and checks of a key when it installs Pro components, so a key only works for the person who bought it.',
+                'Which Pro components and templates each account has installed, and when. It’s how your account page counts what you’ve tried, and how we answer refund requests fairly.',
                 'What you send us by email, so we can reply.',
               ]}
             />

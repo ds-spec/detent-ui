@@ -28,6 +28,7 @@ const PRO_CODE = [
   'find',
   'reveal',
   'threads',
+  'glyph',
   'dotlight',
 ]
 

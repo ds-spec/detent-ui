@@ -28,6 +28,7 @@ export const DAYS: Record<string, number> = {
   codeblock: 6,
   region: 14,
   threads: 8,
+  glyph: 6,
   find: 9,
   reveal: 10,
   dotlight: 9,

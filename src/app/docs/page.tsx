@@ -169,7 +169,7 @@ export default function Docs() {
                   <Snippet file=".env.local" code="DETENT_PRO_KEY=dtnt_your-key" />
                 </Step>
                 <Step n={4} title="Install anything" line="Components and blocks by name, from their pages." last>
-                  <CopyCommand fill command={installCommand('lens', false)} />
+                  <CopyCommand fill command={installCommand('glyph', false)} />
                 </Step>
               </Steps>
             </Section>

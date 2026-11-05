@@ -77,6 +77,7 @@ export const FILES: Record<string, string[]> = {
   halo: ['components/halo/HaloBands.tsx', 'lib/grain.ts'],
   slices: ['components/slices/SliceText.tsx'],
   threads: ['../pro/components/threads/ThreadHero.tsx'],
+  glyph: ['../pro/components/glyph/GlyphArt.tsx'],
   region: ['../pro/components/region/RegionWheel.tsx', '../pro/components/region/land.ts', 'ui/RollingText.tsx', 'lib/detent.ts'],
   find: ['../pro/components/find/LitFind.tsx', 'lib/detent.ts'],
   reveal: ['../pro/components/reveal/ImageReveal.tsx'],
