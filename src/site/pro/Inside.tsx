@@ -39,7 +39,7 @@ export function Inside() {
   )
 }
 
-const [pro, all] = PLANS
+const [pro] = PLANS
 const FREE = ENTRIES.length - PRO_COMPONENTS.length
 const YES = (
   <span role="img" aria-label="Included" className="inline-flex">
@@ -52,27 +52,27 @@ const NO = (
   </span>
 )
 
-const ROWS: [string, ReactNode, ReactNode, ReactNode][] = [
-  ['Price', '$0', `$${pro.price} once`, `$${all.price} once`],
-  ['Components', FREE, `All ${ENTRIES.length}`, `All ${ENTRIES.length}`],
-  ['Blocks, whole screens', FREE_BLOCKS.length, `All ${BLOCKS.length}`, `All ${BLOCKS.length}`],
-  ['App templates', NO, NO, `${TEMPLATES.length}, and every new one`],
-  ['Takes your shadcn theme', YES, YES, YES],
-  ['Installs from', 'Public registry', 'Private registry', 'Private registry'],
-  ['People', 'Anyone', 'One', 'One'],
-  ['Licence', 'MIT', 'Unlimited projects', 'Unlimited projects'],
+const ROWS: [string, ReactNode, ReactNode][] = [
+  ['Price', '$0', `$${pro.price} once`],
+  ['Components', FREE, `All ${ENTRIES.length}`],
+  ['Blocks, whole screens', FREE_BLOCKS.length, `All ${BLOCKS.length}`],
+  ['App templates', NO, `${TEMPLATES.length}, and every new one`],
+  ['Takes your shadcn theme', YES, YES],
+  ['Installs from', 'Public registry', 'Private registry'],
+  ['People', 'Anyone', 'One'],
+  ['Licence', 'MIT', 'Unlimited projects'],
 ]
 
 export function Compare() {
-  const heads = ['Free', pro.name, all.name]
+  const heads = ['Free', pro.name]
   return (
     <div className="md:overflow-x-auto">
-      <table className="block w-full table-fixed border-collapse text-left md:table md:min-w-[720px]">
+      <table className="block w-full table-fixed border-collapse text-left md:table md:min-w-[560px]">
         <thead className="hidden md:table-header-group">
           <tr>
-            <th className="w-[26%] pb-4" />
+            <th className="w-[34%] pb-4" />
             {heads.map((h, i) => (
-              <th key={h} scope="col" className={`pb-4 text-[16px] font-normal tracking-[-0.01em] ${i === 2 ? 'text-ink' : 'text-ink-2'}`}>
+              <th key={h} scope="col" className={`pb-4 text-[16px] font-normal tracking-[-0.01em] ${i === 1 ? 'text-ink' : 'text-ink-2'}`}>
                 {h}
               </th>
             ))}
