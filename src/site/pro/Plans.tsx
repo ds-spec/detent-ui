@@ -1,5 +1,5 @@
 import { Check, Code, Refresh, Undo } from '@/lab/icons'
-import { PLANS } from '@/catalog/pro'
+import { ON_SALE } from '@/catalog/pro'
 import type { Plan } from '@/catalog/pro'
 import { REFUND_DAYS } from '@/catalog/trust'
 import { PlanButton } from '../Owned'
@@ -8,7 +8,7 @@ export function Plans({ compact = false }: { compact?: boolean }) {
   return (
     <div>
       <div className="mx-auto grid max-w-[860px] gap-3 md:grid-cols-2">
-        {PLANS.map((p) => (
+        {ON_SALE.map((p) => (
           <PlanCard key={p.id} plan={p} compact={compact} />
         ))}
       </div>

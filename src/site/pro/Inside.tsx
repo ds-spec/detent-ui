@@ -10,7 +10,7 @@ import { Check } from '@/lab/icons'
 const GROUPS: { name: string; note?: string; items: { name: string; href: string }[] }[] = [
   { name: 'Components', items: PRO_COMPONENTS.map((id) => ({ name: entry(id)?.name ?? id, href: `/components/${id}` })) },
   { name: 'Blocks', items: PRO_BLOCKS.map((b) => ({ name: b.name, href: `/blocks/${b.id}` })) },
-  { name: 'Templates', note: 'With Pro + Templates', items: TEMPLATES.map((t) => ({ name: `${t.name} · ${t.kind}`, href: `/templates/${t.id}` })) },
+  { name: 'Templates', note: 'Included in Pro', items: TEMPLATES.map((t) => ({ name: `${t.name} · ${t.kind}`, href: `/templates/${t.id}` })) },
 ]
 
 export function Inside() {

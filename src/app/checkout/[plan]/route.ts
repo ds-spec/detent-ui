@@ -2,7 +2,7 @@ import { checkoutFor } from '@/catalog/pro'
 import { getAuth } from '@/lib/account/auth'
 import { planFor } from '@/lib/account/keys'
 
-const PLANS = ['pro', 'all', 'upgrade'] as const
+const PLANS = ['pro'] as const
 type Asked = (typeof PLANS)[number]
 
 export async function GET(req: Request, { params }: { params: Promise<{ plan: string }> }) {
@@ -14,9 +14,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ plan: st
   if (!user) return to(`/account?next=/checkout/${asked}`)
   const email = user.email.toLowerCase()
   const owned = await planFor(email)
-  if (owned === 'all') return to('/account')
-  const plan = owned === 'pro' ? (asked === 'pro' ? null : 'upgrade') : asked === 'upgrade' ? null : asked
-  if (!plan) return to(owned === 'pro' ? '/account' : '/pro')
-  const store = checkoutFor(plan, { id: user.id, email })
+  if (owned) return to('/account')
+  const store = checkoutFor(asked, { id: user.id, email })
   return store ? Response.redirect(store, 303) : to('/pro')
 }

@@ -10,7 +10,6 @@ import { Bolt, ChevronDown, Key, LogOut, Person, Terminal } from '@/lab/blocks/k
 import { Orb } from '@/lab/ui/Orb'
 import { Spinner } from '@/lab/ui/Spinner'
 import { ProBadge } from './account/ProBadge'
-import { UPGRADE } from '@/catalog/pro'
 
 export type Me = { name: string; email: string; image: string | null; plan: 'pro' | 'all' | null }
 
@@ -185,11 +184,6 @@ export function UserMenu() {
             {!me.plan && (
               <Item href="/pro" icon={Bolt} onPick={close} accent>
                 Get Pro
-              </Item>
-            )}
-            {me.plan === 'pro' && (
-              <Item href={UPGRADE.href} icon={Bolt} onPick={close} accent>
-                {UPGRADE.cta} · ${UPGRADE.price}
               </Item>
             )}
             <div aria-hidden className="mx-1 my-1 h-px bg-line" />

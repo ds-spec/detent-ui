@@ -59,9 +59,9 @@ export default function Licence() {
           title: 'What a Pro licence covers',
           body: (
             <>
-              <P>A Pro licence covers the {PRO_COMPONENTS.length} Pro components, every block that isn’t free and, with Pro + Templates, every template: everything sold now and every update that follows.</P>
+              <P>A Pro licence covers the {PRO_COMPONENTS.length} Pro components, every block that isn’t free and every template: everything sold now and every update that follows.</P>
               <P>
-                <Strong>Pro</Strong> and <Strong>Pro + Templates</Strong> are for one person, who can make keys for CI and shared repositories.
+                <Strong>Pro</Strong> is for one person, who can make keys for CI and shared repositories.
               </P>
             </>
           ),

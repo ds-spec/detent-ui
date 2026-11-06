@@ -62,11 +62,6 @@ export default function Refunds() {
           title: `After ${REFUND_DAYS} days`,
           body: <P>Past the {REFUND_DAYS} days, purchases are final. Whenever you bought, if something’s wrong with Detent itself, like a component that doesn’t work as described, write anyway: we’ll fix it, or make it right.</P>,
         },
-        {
-          id: 'upgrades',
-          title: 'Upgrades',
-          body: <P>Moving from Pro to Pro + Templates, you pay only the difference, and the {REFUND_DAYS} days start again for the upgrade.</P>,
-        },
       ]}
     />
   )

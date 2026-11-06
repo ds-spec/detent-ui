@@ -66,7 +66,6 @@ const comeBack = (link: string) => {
 export const CHECKOUT = {
   pro: comeBack(process.env.NEXT_PUBLIC_CHECKOUT_PRO ?? '#checkout'),
   all: comeBack(process.env.NEXT_PUBLIC_CHECKOUT_ALL ?? '#checkout'),
-  upgrade: comeBack(process.env.NEXT_PUBLIC_CHECKOUT_UPGRADE ?? '#checkout'),
 }
 
 export function checkoutFor(plan: keyof typeof CHECKOUT, account: { id: string; email: string }) {
@@ -89,6 +88,7 @@ export type Plan = {
   href: string
   features: string[]
   best?: boolean
+  retired?: boolean
 }
 
 export const PLANS: Plan[] = [
@@ -100,7 +100,7 @@ export const PLANS: Plan[] = [
     line: 'Everything you build the product with.',
     cta: 'Get Pro',
     href: '/checkout/pro',
-    features: [`${PRO_COMPONENTS.length} Pro components`, `${PRO_BLOCK_COUNT} blocks: whole screens, already working`, 'Installs with the shadcn CLI', 'Source in your project, yours to change', 'Every update, for life', 'Unlimited projects'],
+    features: [`${PRO_COMPONENTS.length} Pro components`, `${PRO_BLOCK_COUNT} blocks: whole screens, already working`, 'The Detent app template', 'Installs with the shadcn CLI', 'Source in your project, yours to change', 'Every update, for life', 'Unlimited projects'],
   },
   {
     id: 'all',
@@ -110,11 +110,11 @@ export const PLANS: Plan[] = [
     line: 'Everything in Pro, and a whole app to start from.',
     cta: 'Get everything',
     href: '/checkout/all',
-    best: true,
+    retired: true,
     features: ['Everything in Pro', 'The Detent app template', 'More shipping fast, and only good ones', 'Real routes, data and AI wired in', 'Every update, for life', 'Unlimited projects'],
   },
 ]
 
-export const UPGRADE = { href: '/checkout/upgrade', price: PLANS[1].price - PLANS[0].price, cta: 'Unlock Templates' }
+export const ON_SALE = PLANS.filter((p) => !p.retired)
 
 export const TERMS = 'One payment · Every update for life · Unlimited projects'

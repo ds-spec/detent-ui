@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { PLANS, UPGRADE } from '@/catalog/pro'
+import { PLANS } from '@/catalog/pro'
 import { AI_SDK, FIRST_BLOCK, FIRST_COMPONENT } from '@/catalog/site'
 import { ArrowRight, Clock, Folder, Layers, Orbit, Search, Sliders, Table } from '@/lab/icons'
 import { Rail } from '../exhibit/Rail'
@@ -74,17 +74,9 @@ export function Shell({ list, bar, children, bare = false }: { list: ReactNode; 
             <Link href="/pro" className="ring-focus group/pro mr-3 mt-2 flex items-center gap-2 rounded-[10px] px-2.5 py-2 text-[12.5px] text-ink-2 transition-colors hover:bg-[var(--shell-hover)] hover:text-ink active:bg-[var(--shell-on)]">
               <span className="rounded-[5px] bg-ink px-1.5 text-[10.5px] font-medium leading-[18px] text-surface">Pro</span>
               Pricing
-              <span className="ml-auto text-ink-3">from ${PLANS[0].price}</span>
+              <span className="ml-auto text-ink-3">${PLANS[0].price}</span>
               <ArrowRight size={12} className="text-ink-3 transition-transform duration-150 group-hover/pro:translate-x-0.5" />
             </Link>
-          }
-          pro={
-            <a href={UPGRADE.href} className="ring-focus group/pro mr-3 mt-2 flex items-center gap-2 rounded-[10px] px-2.5 py-2 text-[12.5px] text-ink-2 transition-colors hover:bg-[var(--shell-hover)] hover:text-ink active:bg-[var(--shell-on)]">
-              <span className="rounded-[5px] bg-ink px-1.5 text-[10.5px] font-medium leading-[18px] text-surface">New</span>
-              Templates
-              <span className="ml-auto text-ink-3">+${UPGRADE.price}</span>
-              <ArrowRight size={12} className="text-ink-3 transition-transform duration-150 group-hover/pro:translate-x-0.5" />
-            </a>
           }
         />
       </aside>
@@ -171,11 +163,6 @@ function Bare({ rail, children }: { rail: { groups: RailGroup[]; current: string
               <Link href="/pro" className={`ring-focus ml-1.5 flex h-8 items-center rounded-[9px] px-3 text-[13px] font-medium transition-transform duration-150 active:scale-[0.97] ${BTN.accent}`}>
                 Get Pro
               </Link>
-            }
-            pro={
-              <a href={UPGRADE.href} className={`ring-focus ml-1.5 flex h-8 items-center rounded-[9px] px-3 text-[13px] font-medium transition-transform duration-150 active:scale-[0.97] ${BTN.accent}`}>
-                {UPGRADE.cta}
-              </a>
             }
           />
         </div>

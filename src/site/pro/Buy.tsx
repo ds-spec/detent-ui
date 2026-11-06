@@ -5,7 +5,7 @@ import type { ComponentType, ReactNode } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { BLOCKS } from '@/catalog/blocks'
-import { PLANS, PRO_BLOCK_COUNT, PRO_COMPONENTS, UPGRADE } from '@/catalog/pro'
+import { PLANS, PRO_BLOCK_COUNT, PRO_COMPONENTS } from '@/catalog/pro'
 import type { Plan } from '@/catalog/pro'
 import { TEMPLATES, TEMPLATE_COUNT } from '@/catalog/templates'
 import { REFUND_DAYS } from '@/catalog/trust'
@@ -26,9 +26,7 @@ type Choice = { edition: Edition; setEdition: (e: Edition) => void }
 const Ctx = createContext<Choice | null>(null)
 
 export function BuyProvider({ children }: { children: ReactNode }) {
-  const [picked, setEdition] = useState<Edition | null>(null)
-  const owned = useOwned()
-  const edition = picked ?? (owned === 'pro' ? 'all' : 'pro')
+  const [edition, setEdition] = useState<Edition>('pro')
   return <Ctx.Provider value={{ edition, setEdition }}>{children}</Ctx.Provider>
 }
 
@@ -38,11 +36,8 @@ export function useChoice() {
   const c = useContext(Ctx)
   if (!c) throw new Error('The parts of the buy panel sit inside BuyProvider')
   const owned = useOwned()
-  const base = plan(c.edition)
-  const upgrade = owned === 'pro' && c.edition === 'all'
-  const shown = upgrade ? { ...base, price: UPGRADE.price, cta: UPGRADE.cta, href: UPGRADE.href } : base
-  const buyable = owned !== 'all' && !(owned === 'pro' && c.edition === 'pro')
-  return { ...c, plan: shown, buyable, upgrade }
+  const buyable = owned !== 'all' && owned !== 'pro'
+  return { ...c, edition: 'pro' as Edition, plan: plan('pro'), buyable, upgrade: false }
 }
 
 type Shot = { id: string; name: string; line: string; count: string; href: string; title: string; chrome: 'browser' | 'titled'; view: ComponentType }
@@ -60,22 +55,20 @@ const TEMPLATE_SHOTS: Shot[] = ['detent'].flatMap((id) => {
   return [{ id, name: t.name, line: t.kind, count: 'The whole app', href: `/templates/${id}`, title: t.window, chrome: 'browser', view: View }]
 })
 
+const SHOTS = [...BLOCK_SHOTS, ...TEMPLATE_SHOTS]
+
 const DWELL = 9000
 
 export function Stage() {
-  const { edition } = useChoice()
-  const all = edition === 'all'
   return (
     <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
-      <Shots key={edition} shots={all ? TEMPLATE_SHOTS : BLOCK_SHOTS} tone={all ? 'amber' : 'violet'} />
+      <Shots shots={SHOTS} tone="violet" />
     </div>
   )
 }
 
 export function WideStage() {
-  const { edition } = useChoice()
-  const all = edition === 'all'
-  return <Shots key={edition} shots={all ? TEMPLATE_SHOTS : BLOCK_SHOTS} tone={all ? 'amber' : 'violet'} wide />
+  return <Shots shots={SHOTS} tone="violet" wide />
 }
 
 function Shots({ shots, tone, wide = false }: { shots: Shot[]; tone: 'amber' | 'violet'; wide?: boolean }) {
@@ -140,13 +133,12 @@ function Shots({ shots, tone, wide = false }: { shots: Shot[]; tone: 'amber' | '
 }
 
 export function Choose() {
-  const { edition, setEdition, upgrade } = useChoice()
+  const { edition, setEdition } = useChoice()
   const owned = useOwned()
   return (
     <div className="flex min-w-0 flex-col gap-6">
-      <Question title="Edition." quiet="What you’re building.">
-        <Tile name="edition" on={edition === 'pro'} onPick={() => setEdition('pro')} title="Pro" price={owned === 'pro' ? 'Yours' : `$${plan('pro').price}`} line={`${PRO_COMPONENTS.length} Pro components and ${PRO_BLOCK_COUNT} whole screens, already working.`} />
-        <Tile name="edition" on={edition === 'all'} onPick={() => setEdition('all')} title="Pro + Templates" price={upgrade || owned === 'pro' ? `+$${UPGRADE.price}` : `$${plan('all').price}`} line={`Everything in Pro, plus ${TEMPLATE_COUNT}, with every new one.`} note={TEMPLATES.length === 1 ? 'One template today. More are shipping fast, and only ones we’d use ourselves.' : undefined} />
+      <Question title="Pro." quiet="Everything in Detent.">
+        <Tile name="edition" on={edition === 'pro'} onPick={() => setEdition('pro')} title="Pro" price={owned ? 'Yours' : `$${plan('pro').price}`} line={`${PRO_COMPONENTS.length} Pro components, ${PRO_BLOCK_COUNT} whole screens and ${TEMPLATE_COUNT}, already working.`} />
       </Question>
       <Summary />
     </div>
@@ -275,20 +267,12 @@ export function HeroHead() {
 
 export function BuyBar() {
   const side = useSideNew()
-  const { edition, setEdition, plan, buyable } = useChoice()
-  const what = edition === 'all' ? `${PRO_COMPONENTS.length} Pro components, ${PRO_BLOCK_COUNT} screens and ${TEMPLATE_COUNT}` : `${PRO_COMPONENTS.length} Pro components and ${PRO_BLOCK_COUNT} whole screens`
+  const { plan, buyable } = useChoice()
+  const what = `${PRO_COMPONENTS.length} Pro components, ${PRO_BLOCK_COUNT} screens and ${TEMPLATE_COUNT}`
   return (
     <div className="flex w-full flex-col items-center">
       <div className={side ? `flex w-full max-w-[600px] flex-col gap-3 rounded-[26px] bg-surface p-2 shadow-[var(--card-edge)] sm:flex-row sm:items-center sm:rounded-[18px] sm:gap-2` : "flex w-full max-w-[600px] flex-col gap-3 rounded-[26px] bg-surface p-2 shadow-[var(--card-edge)] sm:flex-row sm:items-center sm:rounded-full sm:gap-2"}>
-        <Seg
-          label="Edition"
-          value={edition}
-          onPick={(v) => setEdition(v as Edition)}
-          options={[
-            ['pro', 'Pro', false],
-            ['all', 'Pro + Templates', false],
-          ]}
-        />
+        <p className="px-4 pt-1 text-[15px] tracking-[-0.01em] text-ink sm:pt-0">Detent Pro</p>
         <div className="flex items-center gap-3 px-2 pb-1 sm:ml-auto sm:p-0">
           <p className="flex flex-1 items-baseline gap-1 sm:flex-none">
             <span className="tnum text-[24px] leading-none tracking-[-0.04em] text-ink">
@@ -304,36 +288,11 @@ export function BuyBar() {
       </div>
       <p className="mt-4 max-w-[920px] text-balance px-4 text-center text-[13px] leading-[1.7] text-ink-3">
         <span className="text-ink-2">
-          {what}, for {plan.seats}.
+          {what}, for {plan.seats}. Launch price: it goes up as the library grows.
         </span>{' '}
-        {edition === 'all' && <span className="text-ink-2">More templates are shipping fast, and only ones we’d use ourselves. </span>}
         One payment · Every update for life · {REFUND_DAYS}-day refund · The source is yours
       </p>
     </div>
   )
 }
 
-function Seg({ label, value, onPick, options }: { label: string; value: string; onPick: (v: string) => void; options: [string, string, boolean][] }) {
-  const side = useSideNew()
-  return (
-    <div role="radiogroup" aria-label={label} className={`grid grid-cols-2 sm:flex ${side ? `rounded-[12px] p-[3px] ${BTN.track}` : 'rounded-full bg-surface-2 p-1'}`}>
-      {options.map(([v, name, disabled]) => {
-        const on = v === value
-        return (
-          <button
-            key={v}
-            type="button"
-            role="radio"
-            aria-checked={on}
-            disabled={disabled}
-            onClick={() => onPick(v)}
-            className={`ring-focus relative h-9 whitespace-nowrap px-4 ${side ? 'rounded-[9px]' : 'rounded-full'} text-[14px] transition-[color,transform] duration-150 enabled:active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 ${on ? 'text-ink' : 'text-ink-3 enabled:hover:text-ink'}`}
-          >
-            {on && <motion.span layoutId={`seg-${label}`} className={`absolute inset-0 ${side ? `rounded-[9px] ${BTN.plate}` : 'rounded-full bg-surface shadow-[var(--card-edge)]'}`} transition={{ type: 'spring', stiffness: 520, damping: 42 }} />}
-            <span className="relative">{name}</span>
-          </button>
-        )
-      })}
-    </div>
-  )
-}

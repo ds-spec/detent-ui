@@ -2,7 +2,7 @@ import { ENTRIES, entry } from '@/catalog/meta'
 import { BLOCKS } from '@/catalog/blocks'
 import { TEMPLATES, TEMPLATE_COUNT } from '@/catalog/templates'
 import { RELEASES, CONTACT } from '@/catalog/trust'
-import { FREE_BLOCKS, PLANS, PRO_COMPONENTS, PRO_BLOCK_COUNT, SITE, installCommand, isProBlock, isProComponent } from '@/catalog/pro'
+import { FREE_BLOCKS, ON_SALE, PLANS, PRO_COMPONENTS, PRO_BLOCK_COUNT, SITE, installCommand, isProBlock, isProComponent } from '@/catalog/pro'
 import { NAME, DESCRIPTION, TAGLINE, FREE_COUNT } from '@/site/seo'
 import { abs, envelope, fmtDate, itemList, kvTable, today } from './format'
 
@@ -34,7 +34,7 @@ function renderHome(): string {
     `## Plans`,
     '',
     kvTable(
-      PLANS.map((p) => [`${p.name} — $${p.price}`, p.line]),
+      ON_SALE.map((p) => [`${p.name} — $${p.price}`, p.line]),
       ['Plan', 'Description'],
     ),
     '',
@@ -71,7 +71,7 @@ function renderPro(): string {
     `## Plans`,
     '',
     kvTable(
-      PLANS.map((p) => [`${p.name} — $${p.price}`, `${p.line} ${p.seats}`]),
+      ON_SALE.map((p) => [`${p.name} — $${p.price}`, `${p.line} ${p.seats}`]),
       ['Plan', 'Details'],
     ),
     '',
@@ -163,7 +163,7 @@ function renderTemplates(): string {
 
   return envelope({
     title: `${NAME} Templates`,
-    summary: `${TEMPLATE_COUNT}, with Pro + Templates.`,
+    summary: `${TEMPLATE_COUNT}, with Pro.`,
     path: '/templates',
     body,
     related: [{ label: 'Pro', href: abs('/pro') }, { label: 'Blocks', href: abs('/blocks') }],
@@ -381,7 +381,7 @@ function renderDocs(): string {
     '### 4. Install anything',
     '',
     '```bash',
-    installCommand('lens', false),
+    installCommand('glyph', false),
     '```',
     '',
     '## If something goes wrong',

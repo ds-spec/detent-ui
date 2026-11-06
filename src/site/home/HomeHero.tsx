@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react'
 import type { MotionValue } from 'motion/react'
 import { DEMOS } from '@/catalog/demos'
-import { PLANS, UPGRADE, installCommand, isProComponent } from '@/catalog/pro'
+import { PLANS, installCommand, isProComponent } from '@/catalog/pro'
 import { FIRST_COMPONENT } from '@/catalog/site'
 import { Announcement } from '@/lab/components/announce/Announcement'
 import { ArrowRight, ArrowUpRight, Chart, Note, Play, Prompt } from '@/lab/icons'
@@ -65,11 +65,6 @@ export function HomeHero({ lib }: { lib: LibItem[] }) {
                   <Link href="/pro" className={side ? `ring-focus flex h-11 items-center whitespace-nowrap rounded-[11px] ${BTN.plate} px-5 text-[14px] font-medium transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4` : "ring-focus flex h-11 items-center whitespace-nowrap rounded-full bg-surface px-5 text-[14px] font-medium text-ink shadow-raised transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4"}>
                     Get Pro<span className="hidden sm:inline">&nbsp;· ${PLANS[0].price}</span>
                   </Link>
-                }
-                pro={
-                  <a href={UPGRADE.href} className={side ? `ring-focus flex h-11 items-center whitespace-nowrap rounded-[11px] ${BTN.plate} px-5 text-[14px] font-medium transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4` : "ring-focus flex h-11 items-center whitespace-nowrap rounded-full bg-surface px-5 text-[14px] font-medium text-ink shadow-raised transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4"}>
-                    {UPGRADE.cta}<span className="hidden sm:inline">&nbsp;· ${UPGRADE.price}</span>
-                  </a>
                 }
               />
             </div>

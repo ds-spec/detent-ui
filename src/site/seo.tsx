@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { ENTRIES } from '@/catalog/meta'
-import { PLANS, PRO_COMPONENTS, SITE } from '@/catalog/pro'
+import { ON_SALE, PRO_COMPONENTS, SITE } from '@/catalog/pro'
 import { BLOCKS } from '@/catalog/blocks'
 import { TEMPLATE_COUNT } from '@/catalog/templates'
 
@@ -56,7 +56,7 @@ export const siteGraph = () => ({
       applicationSubCategory: 'React component library',
       operatingSystem: 'Web',
       publisher: { '@id': `${url()}/#organization` },
-      offers: [{ '@type': 'Offer', name: 'Free components', price: 0, priceCurrency: 'USD' }, ...PLANS.map((p) => ({ '@type': 'Offer', name: p.name, price: p.price, priceCurrency: 'USD', url: url('/pro#pricing') }))],
+      offers: [{ '@type': 'Offer', name: 'Free components', price: 0, priceCurrency: 'USD' }, ...ON_SALE.map((p) => ({ '@type': 'Offer', name: p.name, price: p.price, priceCurrency: 'USD', url: url('/pro#pricing') }))],
     },
   ],
 })
@@ -71,7 +71,7 @@ export const proGraph = (faq: [string, string][]) => ({
       brand: { '@type': 'Brand', name: NAME },
       url: url('/pro'),
       image: url('/pro/opengraph-image'),
-      offers: PLANS.map((p) => ({ '@type': 'Offer', name: p.name, price: p.price, priceCurrency: 'USD', availability: 'https://schema.org/InStock', url: url('/pro#pricing') })),
+      offers: ON_SALE.map((p) => ({ '@type': 'Offer', name: p.name, price: p.price, priceCurrency: 'USD', availability: 'https://schema.org/InStock', url: url('/pro#pricing') })),
     },
     { '@type': 'FAQPage', mainEntity: faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) },
   ],

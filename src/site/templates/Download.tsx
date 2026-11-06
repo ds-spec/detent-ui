@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { PLANS, UPGRADE } from '@/catalog/pro'
+import { PLANS } from '@/catalog/pro'
 import { Check } from '@/lab/icons'
 
 type Owner = 'all' | 'pro' | null
@@ -11,7 +11,7 @@ export function DownloadStarter({ id, name }: { id: string; name: string }) {
   const [key, setKey] = useState('')
   const [open, setOpen] = useState(false)
   const [owner, setOwner] = useState<Owner | undefined>(undefined)
-  const plan = PLANS.find((p) => p.id === 'all')!
+  const plan = PLANS[0]
   const [state, setState] = useState<{ kind: 'idle' | 'busy' | 'done' } | { kind: 'error'; text: string }>({ kind: 'idle' })
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export function DownloadStarter({ id, name }: { id: string; name: string }) {
     }
   }, [])
 
-  const owns = owner === 'all'
+  const owns = owner === 'all' || owner === 'pro'
 
   const download = async () => {
     if (!owns && !key.trim()) return setState({ kind: 'error', text: 'Paste your key first. You can generate one in your account.' })
@@ -71,22 +71,13 @@ export function DownloadStarter({ id, name }: { id: string; name: string }) {
         </form>
       ) : (
         <>
-          {owner === 'pro' ? (
-            <>
-              <p className="mt-3 text-footnote leading-[1.55] text-ink-2">You already have Pro. Add every template, today’s and every new one, for ${UPGRADE.price}: just the difference.</p>
-              <a href={UPGRADE.href} className="ring-focus mt-3 flex h-9 w-full items-center justify-center rounded-[10px] bg-ink text-footnote font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]">
-                {UPGRADE.cta} · ${UPGRADE.price}
-              </a>
-            </>
-          ) : (
-            <p className="mt-3 text-footnote text-ink-2">
-              Comes with{' '}
-              <Link href="/pro" className="ring-focus rounded-[4px] font-medium text-ink underline-offset-2 hover:underline">
-                {plan.name}
-              </Link>{' '}
-              · ${plan.price}
-            </p>
-          )}
+          <p className="mt-3 text-footnote text-ink-2">
+            Comes with{' '}
+            <Link href="/pro" className="ring-focus rounded-[4px] font-medium text-ink underline-offset-2 hover:underline">
+              {plan.name}
+            </Link>{' '}
+            · ${plan.price}
+          </p>
           {open ? (
             <form
               className="mt-3 flex flex-col gap-2"
@@ -109,11 +100,9 @@ export function DownloadStarter({ id, name }: { id: string; name: string }) {
               {button}
             </form>
           ) : (
-            owner !== 'pro' && (
               <button type="button" onClick={() => setOpen(true)} className="ring-focus mt-1 -ml-1 flex h-9 items-center rounded-[8px] px-1 text-footnote text-ink-3 transition-colors duration-150 hover:text-ink active:text-ink-2">
                 Already have a key? Paste it here
               </button>
-            )
           )}
         </>
       )}

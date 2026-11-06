@@ -33,7 +33,7 @@ async function planOf(req: Request): Promise<{ plan: Plan | null; email: string 
 async function send(req: Request, id: string) {
   const who = await planOf(req)
   if (who instanceof Response) return who
-  if (who.plan !== 'all') return answer(403, `Templates come with Pro + Templates. See ${SITE}/pro`)
+  if (!who.plan) return answer(403, `Templates come with Pro. See ${SITE}/pro`)
   const item = proItemByName(`template-${id}`)
   const theme = proItemByName('theme')
   if (!item || !theme) return answer(404, `There’s no ${id} template to download.`)

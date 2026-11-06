@@ -20,7 +20,7 @@ export const metadata: Metadata = page({
 const FAQ: [string, string][] = [
   ['Who is it for?', 'Developers building a product in React who want it to look finished: a SaaS, a dashboard, a marketplace, or a website. If you already use shadcn, it drops straight in.'],
   ['Is it a subscription?', 'No. You pay once and keep it, along with every update that ships after you buy.'],
-  ['What’s the difference between the plans?', 'Pro is what you build the product with: the Pro components and the Pro blocks. Pro + Templates adds the Detent app template, a whole app to start from, and every template still to come.'],
+  ['What’s in Pro?', 'Everything Detent sells: the Pro components, the Pro blocks and the Detent app template, plus every one we add. One price, once.'],
   ['Will it match my design?', 'Installed with shadcn, Detent takes on your theme: your primary becomes its accent, it uses your background, borders and muted text, and .dark turns it dark. Your fonts stay yours.'],
   ['How do I install Pro?', 'With the shadcn CLI, from Detent’s private registry. Sign in with your email, generate a key, add it and the registry to the project once, as in Set up once below, then install like anything else: npx shadcn add @detent-pro/glyph. The source lands in your project.'],
   ['Can my team share one licence?', 'A licence is for one person, so each person building with it needs their own. Your keys work in CI and shared repos.'],

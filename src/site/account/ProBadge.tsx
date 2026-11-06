@@ -12,7 +12,7 @@ function Seated({ size }: { size: number }) {
   )
 }
 
-export const planLabel = (plan: Plan) => (plan === 'all' ? 'Pro + Templates' : 'Pro')
+export const planLabel = (plan: Plan) => (plan ? 'Pro' : 'Free')
 
 export function ProBadge({ plan, size = 'sm' }: { plan: Plan; size?: 'sm' | 'lg' }) {
   const lg = size === 'lg'

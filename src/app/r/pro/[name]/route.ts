@@ -19,7 +19,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ name: st
   if (!check.ok) return answer(403, `${check.reason} Your keys are at ${SITE}/account, or write to us.`)
   const item = proItemByName(name)
   if (!item) return answer(404, hasProItems() ? `There’s no ${name} in Detent Pro.` : 'The Pro registry isn’t available on this build.')
-  if (name.startsWith('template-') && check.plan === 'pro') return answer(403, `${item.title} comes with Pro + Templates. Upgrade at ${SITE}/pro`)
   const kind = name.startsWith('template-') ? 'template' : item.type === 'registry:component' || item.type === 'registry:block' ? 'component' : null
   if (kind && check.email) await recordInstall(check.email, name, kind).catch(() => {})
   return Response.json(item, { headers: { 'cache-control': 'private, no-store' } })

@@ -26,7 +26,7 @@ const STEPS: Step[] = [
   },
   {
     title: 'Install anything',
-    line: 'Components and blocks by name, and with Pro + Templates the template too, as template-detent. The source lands in your project, yours to change.',
+    line: 'Components, blocks and the template by name, the template as template-detent. The source lands in your project, yours to change.',
     code: 'npx shadcn add @detent-pro/glyph',
   },
   {
@@ -43,7 +43,6 @@ const NO: [string, string][] = [
   ['Needs your key', 'The key isn’t reaching it. Check .env.local has DETENT_PRO_KEY, and that the header in components.json reads it.'],
   ['That key isn’t one of ours', 'It may have been removed. Generate a new one in your account.'],
   ['No Pro purchase on this email yet', 'Sign in with the address on your receipt. Bought with another one? Write to us and we’ll move it.'],
-  ['Comes with Pro + Templates', 'Templates are in Pro + Templates. Upgrading keeps your key.'],
   ['Couldn’t check your key just now', 'Try again in a minute.'],
 ]
 

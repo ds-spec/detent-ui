@@ -1,7 +1,6 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { UPGRADE } from '@/catalog/pro'
 import type { Plan } from '@/catalog/pro'
 import { useMe } from './UserMenu'
 
@@ -22,13 +21,7 @@ export function ForPlan({ none, pro = null, all = null }: { none: ReactNode; pro
 
 export function PlanButton({ plan, className }: { plan: Plan; className: string }) {
   const owned = useOwned()
-  if (owned === 'all' || (owned === 'pro' && plan.id === 'pro')) return null
-  if (owned === 'pro')
-    return (
-      <a href={UPGRADE.href} className={className}>
-        {UPGRADE.cta} · ${UPGRADE.price}
-      </a>
-    )
+  if (owned === 'all' || owned === 'pro') return null
   return (
     <a href={plan.href} className={`${className} ${owned === undefined ? 'when-out' : ''}`}>
       {plan.cta}

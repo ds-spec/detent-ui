@@ -93,9 +93,9 @@ export function Code({ id }: { id: string }) {
   )
 }
 
-function Locked({ id, files }: { id: string; files: SourceFile[] }) {
+function Locked({ files }: { id: string; files: SourceFile[] }) {
   const side = useSideNew()
-  const plan = PLANS.find((p) => p.id === (id.startsWith('template-') ? 'all' : 'pro'))!
+  const plan = PLANS[0]
   const total = files.reduce((n, f) => n + f.lines, 0)
   return (
     <div className="absolute inset-x-3 bottom-3 top-[68px] flex flex-col overflow-hidden rounded-[20px] bg-surface shadow-border">
