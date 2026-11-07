@@ -14,7 +14,7 @@ export function PromoStrip() {
   const [copied, setCopied] = useState(false)
   const timer = useRef(0)
   useEffect(() => () => clearTimeout(timer.current), [])
-  if (!PROMO || owned) return null
+  if (!PROMO) return null
   const code = PROMO.code
 
   const copy = () => {
@@ -25,7 +25,16 @@ export function PromoStrip() {
   }
 
   return (
-    <div role="region" aria-label="Offer" className="relative z-[51] bg-[#0b0b0d] text-white">
+    <AnimatePresence initial={false}>
+      {!owned && (
+    <motion.div
+      key="strip"
+      role="region"
+      aria-label="Offer"
+      exit={{ height: 0, opacity: 0 }}
+      transition={{ height: { type: 'spring', stiffness: 380, damping: 40 }, opacity: { duration: 0.18 } }}
+      className="relative z-[51] h-[38px] overflow-hidden bg-[#0b0b0d] text-white"
+    >
       <div className="mx-auto flex h-[38px] max-w-[1440px] items-center justify-center gap-2.5 px-3 text-[13px] text-white/60 sm:gap-3 sm:text-[13.5px]">
         <p className="flex min-w-0 items-center gap-[0.3em] whitespace-nowrap leading-[1.25]">
           <span className="hidden sm:inline">Grab</span>
@@ -65,7 +74,9 @@ export function PromoStrip() {
         </a>
       </div>
       <span aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-white/[0.06]" />
-    </div>
+    </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
 
