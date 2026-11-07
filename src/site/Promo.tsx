@@ -74,11 +74,12 @@ export function PromoStrip() {
             )}
           </span>
           <span aria-hidden className="h-3.5 border-l border-dashed border-white/25" />
-          <span className="grid size-[26px] place-items-center pr-0.5">
-            <AnimatePresence mode="popLayout" initial={false}>
+          <span className="grid size-[26px] place-items-center pr-0.5 [&>*]:col-start-1 [&>*]:row-start-1">
+            <AnimatePresence initial={false}>
               {copied ? (
                 <motion.svg
                   key="done"
+                  className="block"
                   width="13"
                   height="13"
                   viewBox="0 0 14 14"
@@ -103,7 +104,7 @@ export function PromoStrip() {
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="1.3"
-                  className="text-white/55 transition-colors duration-150 group-hover/code:text-white"
+                  className="block text-white/55 transition-colors duration-150 group-hover/code:text-white"
                   initial={{ scale: 0.6, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.6, opacity: 0 }}
