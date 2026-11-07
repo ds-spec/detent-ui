@@ -13,6 +13,7 @@ import { ArrowRight, ArrowUpRight, Chart, Note, Play, Prompt } from '@/lab/icons
 import { Fit } from '@/site/Fit'
 import { CopyCommand } from '@/site/parts'
 import { ForPlan } from '@/site/Owned'
+import { Price } from '@/site/Promo'
 import { BRIDGE, CARDS, GRAIN, LAYER, useWide } from './lights'
 import type { Card } from './lights'
 import { BTN, useSideNew } from '../shell/side'
@@ -63,7 +64,7 @@ export function HomeHero({ lib }: { lib: LibItem[] }) {
               <ForPlan
                 none={
                   <Link href="/pro" className={side ? `ring-focus flex h-11 items-center whitespace-nowrap rounded-[11px] ${BTN.plate} px-5 text-[14px] font-medium transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4` : "ring-focus flex h-11 items-center whitespace-nowrap rounded-full bg-surface px-5 text-[14px] font-medium text-ink shadow-raised transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4"}>
-                    Get Pro<span className="hidden sm:inline">&nbsp;· ${PLANS[0].price}</span>
+                    Get Pro<span className="hidden sm:inline">&nbsp;· <Price value={PLANS[0].price} /></span>
                   </Link>
                 }
               />

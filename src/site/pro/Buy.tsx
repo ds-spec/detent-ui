@@ -9,6 +9,8 @@ import { PLANS, PRO_BLOCK_COUNT, PRO_COMPONENTS } from '@/catalog/pro'
 import type { Plan } from '@/catalog/pro'
 import { TEMPLATES, TEMPLATE_COUNT } from '@/catalog/templates'
 import { REFUND_DAYS } from '@/catalog/trust'
+import { PROMO } from '@/catalog/promo'
+import { nowPrice } from '../Promo'
 import { ArrowRight, ArrowUpRight, Check, Code, Refresh, Undo } from '@/lab/icons'
 import { RollingText } from '@/lab/ui/RollingText'
 import { BLOCK_VIEWS, TEMPLATE_VIEWS } from '@pro'
@@ -196,8 +198,9 @@ function Summary() {
           </p>
         </div>
         <p className="flex shrink-0 items-baseline gap-1.5">
+          {PROMO && <s className="tnum text-[18px] leading-none text-ink-3">${plan.price}</s>}
           <span className="tnum text-[40px] leading-none tracking-[-0.045em] text-ink">
-            <RollingText text={`$${plan.price}`} proportional />
+            <RollingText text={`$${nowPrice(plan.price)}`} proportional />
           </span>
           <span className="text-[14px] text-ink-3">once</span>
         </p>
@@ -250,12 +253,12 @@ export function HeroHead() {
   return (
     <div className="flex flex-col items-center text-center">
       <h1 className="focus-in text-[clamp(40px,5vw,72px)] font-normal leading-[1.02] tracking-[-0.055em] text-ink">
-        <span className="sr-only">Make your app feel expensive. Pay ${plan.price}, once.</span>
+        <span className="sr-only">Make your app feel expensive. Pay ${nowPrice(plan.price)}, once.</span>
         <span aria-hidden className="block">
           Make your app feel expensive.
         </span>
         <span aria-hidden className="block text-quiet">
-          Pay <RollingText text={`$${plan.price}`} proportional />, once.
+          Pay {PROMO && <s className="decoration-[0.06em]">${plan.price}</s>} <RollingText text={`$${nowPrice(plan.price)}`} proportional />, once.
         </span>
       </h1>
       <p className="rise mt-6 max-w-[520px] text-balance text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
@@ -275,8 +278,9 @@ export function BuyBar() {
         <p className="px-4 pt-1 text-[15px] tracking-[-0.01em] text-ink sm:pt-0">Detent Pro</p>
         <div className="flex items-center gap-3 px-2 pb-1 sm:ml-auto sm:p-0">
           <p className="flex flex-1 items-baseline gap-1 sm:flex-none">
+            {PROMO && <s className="tnum text-[14px] leading-none text-ink-3">${plan.price}</s>}
             <span className="tnum text-[24px] leading-none tracking-[-0.04em] text-ink">
-              <RollingText text={`$${plan.price}`} proportional />
+              <RollingText text={`$${nowPrice(plan.price)}`} proportional />
             </span>
             <span className="text-[13px] text-ink-3">once</span>
           </p>
@@ -288,7 +292,7 @@ export function BuyBar() {
       </div>
       <p className="mt-4 max-w-[920px] text-balance px-4 text-center text-[13px] leading-[1.7] text-ink-3">
         <span className="text-ink-2">
-          {what}, for {plan.seats}. Launch price: it goes up as the library grows.
+          {what}, for {plan.seats}. {PROMO ? `$${PROMO.price} with code ${PROMO.code} at checkout. ` : ''}Launch price: it goes up as the library grows.
         </span>{' '}
         One payment · Every update for life · {REFUND_DAYS}-day refund · The source is yours
       </p>

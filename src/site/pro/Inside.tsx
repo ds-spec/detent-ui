@@ -6,6 +6,7 @@ import { ENTRIES, entry } from '@/catalog/meta'
 import { FREE_BLOCKS, PLANS, PRO_COMPONENTS } from '@/catalog/pro'
 import { TEMPLATES } from '@/catalog/templates'
 import { Check } from '@/lab/icons'
+import { Price } from '../Promo'
 
 const GROUPS: { name: string; note?: string; items: { name: string; href: string }[] }[] = [
   { name: 'Components', items: PRO_COMPONENTS.map((id) => ({ name: entry(id)?.name ?? id, href: `/components/${id}` })) },
@@ -53,7 +54,7 @@ const NO = (
 )
 
 const ROWS: [string, ReactNode, ReactNode][] = [
-  ['Price', '$0', `$${pro.price} once`],
+  ['Price', '$0', <><Price key="p" value={pro.price} /> once</>],
   ['Components', FREE, `All ${ENTRIES.length}`],
   ['Blocks, whole screens', FREE_BLOCKS.length, `All ${BLOCKS.length}`],
   ['App templates', NO, `${TEMPLATES.length}, and every new one`],
