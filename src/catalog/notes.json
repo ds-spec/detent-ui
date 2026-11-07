@@ -800,5 +800,11 @@
     "placeholder": "Shown in the field while it's empty.",
     "action": "The button's words.",
     "done": "The line under the field once someone's in."
+  },
+  "hello": {
+    "initial": "The locale code it opens on, like `hi-IN`.",
+    "locales": "The languages to offer: each has a code, its name in its own language and in English, the country, a greeting, and a point on the map. Left out, it uses the 37 it ships with.",
+    "auto": "Open on the visitor's browser language when it's in the list.",
+    "onChange": "Called with the locale a person picks."
   }
 }

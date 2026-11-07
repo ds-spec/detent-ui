@@ -21,6 +21,8 @@
   "find": 964,
   "forecast": 703,
   "funnel": 1085,
+  "glyph": 208,
+  "hello": 1107,
   "histogram": 951,
   "kanban": 489,
   "lens": 895,
@@ -42,6 +44,5 @@
   "tour": 483,
   "trace": 425,
   "video": 1772,
-  "voice-mode": 873,
-  "glyph": 207
+  "voice-mode": 873
 }

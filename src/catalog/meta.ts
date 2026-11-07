@@ -1636,6 +1636,16 @@ const ALL: Entry[] = [
     line: 'Hand it an SVG icon or a word and it draws it in shimmering characters, lit from the top left. Switch the shape and the characters re-form into the new one. Move over it and they light up; press for a ripple.',
     details: ['It fills its parent and sizes its characters to the space, so it reads the same on a phone and a wide screen.', 'Pass any 24×24 icon path through `shape`, from simple-icons or your own set, or a word.', 'It takes your text colour and your `--accent`, so it follows light and dark on its own.', 'It assembles the first time it comes into view and pauses off screen and in hidden tabs.', 'With reduced motion it shows the finished shape and holds still. Give it a `label` and screen readers hear it as an image.'],
   },
+  {
+    id: 'hello',
+    name: 'Hello globe',
+    short: 'Choose a language on a globe written in its scripts',
+    category: 'inputs',
+    feel: ['drag', 'press'],
+    bleed: true,
+    line: 'A language picker with the world under it, drawn in the letters each place writes in. Pick a language and the globe turns there, and its country lights up in orange, spelling the greeting.',
+    details: ['Spin the globe and let go: it settles on the nearest language. Tap a country to choose it.', 'Search by language, country, code or the greeting itself, and the globe turns under each match as you move through the list.', 'Pass your own `locales` with a greeting and a point on the map, or use the 37 it comes with.', 'Set `auto` to open on the visitor\'s browser language; `onChange` hands you the one they pick.', 'Works from the keyboard and follows light and dark. With reduced motion the globe moves straight to each place.'],
+  },
 ]
 
 export { UNLISTED }

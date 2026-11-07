@@ -69,6 +69,7 @@ export const SIZE: Record<string, [number, number]> = {
   dotlight: [860, 560],
   threads: [980, 620],
   glyph: [860, 560],
+  hello: [860, 680],
   confirm: [580, 400],
   dialog: [600, 440],
   signature: [520, 365],
