@@ -42,8 +42,8 @@ export function HomeHero({ lib }: { lib: LibItem[] }) {
       <div className="relative rounded-[26px] sm:rounded-[36px]" style={{ background: 'var(--leaf)', boxShadow: 'var(--leaf-edge)' }}>
         <div className="mx-auto max-w-[1440px] px-4 pb-3 pt-12 sm:px-8 sm:pb-4 sm:pt-16">
           <div className="flex flex-col items-center px-2 text-center">
-            <Announcement href="/components/rewind" linkAs={Link} className="rise">
-              Rewind and Popup
+            <Announcement href="/components/glyph" linkAs={Link} className="rise">
+              Glyph art and Phrase
             </Announcement>
             <h1 className="focus-in mt-7 text-[clamp(36px,5vw,74px)] font-normal leading-[1.01] tracking-[-0.055em] text-ink">
               Make your product

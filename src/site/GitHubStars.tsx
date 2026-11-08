@@ -5,7 +5,8 @@ import { siGithub } from 'simple-icons'
 
 export const REPO = 'ds-spec/detent-ui'
 const KEY = 'detent.stars'
-const FALLBACK = 12
+const FALLBACK = 0
+const SHOW_FROM = 100
 
 const STAR = 'M12 2.6l2.83 5.74 6.33.92-4.58 4.46 1.08 6.3L12 17.04l-5.66 2.98 1.08-6.3-4.58-4.46 6.33-.92L12 2.6z'
 
@@ -47,8 +48,8 @@ export function GitHubStars({ className = '', style, label }: { className?: stri
       href={`https://github.com/${REPO}`}
       target="_blank"
       rel="noreferrer"
-      aria-label={`Star Detent on GitHub, ${stars} stars`}
-      className={`group/gh ring-focus flex h-9 items-center gap-2 rounded-full pl-2.5 pr-3.5 text-[13px] text-ink-2 transition-[color,transform] duration-150 hover:text-ink active:scale-[0.97] ${className}`}
+      aria-label={stars >= SHOW_FROM ? `Star Detent on GitHub, ${stars} stars` : 'Detent on GitHub'}
+      className={`group/gh ring-focus flex h-9 items-center gap-2 rounded-full ${stars >= SHOW_FROM || label ? 'pl-2.5 pr-3.5' : 'w-9 justify-center'} text-[13px] text-ink-2 transition-[color,transform] duration-150 hover:text-ink active:scale-[0.97] ${className}`}
       style={style}
     >
       <span aria-hidden className="relative grid size-[18px] place-items-center">
@@ -60,7 +61,7 @@ export function GitHubStars({ className = '', style, label }: { className?: stri
         </svg>
       </span>
       {label && <span className="flex-1">{label}</span>}
-      <span className={label ? 'tabular-nums text-ink-3' : 'tabular-nums font-medium'}>{short(stars)}</span>
+      {stars >= SHOW_FROM && <span className={label ? 'tabular-nums text-ink-3' : 'tabular-nums font-medium'}>{short(stars)}</span>}
     </a>
   )
 }
