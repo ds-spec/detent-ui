@@ -1646,6 +1646,15 @@ const ALL: Entry[] = [
     line: 'A language picker with the world under it, drawn in the letters each place writes in. Pick a language and the globe turns there, and its country lights up in orange, spelling the greeting.',
     details: ['Spin the globe and let go: it settles on the nearest language. Tap a country to choose it.', 'Search by language, country, code or the greeting itself, and the globe turns under each match as you move through the list.', 'Pass your own `locales` with a greeting and a point on the map, or use the 37 it comes with.', 'Set `auto` to open on the visitor\'s browser language; `onChange` hands you the one they pick.', 'Works from the keyboard and follows light and dark. With reduced motion the globe moves straight to each place.'],
   },
+  {
+    id: 'emoji',
+    name: 'Emoji picker',
+    short: 'A field of emoji you can fling, search and drop into a message',
+    category: 'inputs',
+    feel: ['drag', 'press'],
+    line: 'Emoji and symbols laid out as one round field instead of a grid. Fling it and it keeps gliding, the ones in the middle swell under your finger, and a tap sends the emoji flying into the message where your caret is.',
+    details: ['Search by name and the field re-packs around the matches; clear it and everything slides back.', 'The tabs jump between Smileys, Nature, Objects, Symbols, Arrows and Math.', 'Arrow keys move through the field, Enter adds the one in the middle, and typing goes straight to search.', '`draft` sets the opening message, `onPick` hands you each emoji and `onSend` the finished text.', 'Follows light and dark. With reduced motion picks land without flying.'],
+  },
 ]
 
 export { UNLISTED }

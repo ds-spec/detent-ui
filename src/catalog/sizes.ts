@@ -70,6 +70,7 @@ export const SIZE: Record<string, [number, number]> = {
   threads: [980, 620],
   glyph: [860, 560],
   hello: [860, 680],
+  emoji: [760, 720],
   confirm: [580, 400],
   dialog: [600, 440],
   signature: [520, 365],

@@ -23,6 +23,7 @@ export const DAYS: Record<string, number> = {
   threads: 8,
   glyph: 6,
   hello: 9,
+  emoji: 6,
   find: 9,
   reveal: 10,
   dotlight: 9,

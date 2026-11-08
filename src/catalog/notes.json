@@ -806,5 +806,10 @@
     "locales": "The languages to offer: each has a code, its name in its own language and in English, the country, a greeting, and a point on the map. Left out, it uses the 37 it ships with.",
     "auto": "Open on the visitor's browser language when it's in the list.",
     "onChange": "Called with the locale a person picks."
+  },
+  "emoji": {
+    "draft": "The text the message opens with.",
+    "onPick": "Called with each emoji or symbol a person adds.",
+    "onSend": "Called with the message text when Send is pressed; the field then clears."
   }
 }
