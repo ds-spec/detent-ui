@@ -14,6 +14,7 @@ import { Fit } from '@/site/Fit'
 import { CopyCommand } from '@/site/parts'
 import { ForPlan } from '@/site/Owned'
 import { Price } from '@/site/Promo'
+import { REFUND_DAYS } from '@/catalog/trust'
 import { BRIDGE, CARDS, GRAIN, LAYER, useWide } from './lights'
 import type { Card } from './lights'
 import { BTN, useSideNew } from '../shell/side'
@@ -69,6 +70,7 @@ export function HomeHero({ lib }: { lib: LibItem[] }) {
                 }
               />
             </div>
+            <ForPlan none={<p className="rise mt-4 text-[13px] text-ink-3" style={{ animationDelay: '260ms' }}>Pro comes with a full refund within {REFUND_DAYS} days.</p>} />
           </div>
           <Plates lib={lib} onOpen={setOpen} className="rise mt-12 lg:mt-14 lg:h-[clamp(480px,calc(100svh-300px),620px)]" />
         </div>

@@ -9,6 +9,7 @@ import { BESIDE } from '@/catalog/beside'
 import { DEMOS, preloadDemo } from '@/catalog/demos'
 import { CATEGORIES, ENTRIES } from '@/catalog/meta'
 import { SIZE } from '@/catalog/sizes'
+import { ProPitch } from '@/site/ProPitch'
 import { isProComponent } from '@/catalog/pro'
 import { track } from '@/site/track'
 import { Code as CodeIcon, Expand, Eye, Moon, Refresh, Sun } from '@/lab/icons'
@@ -332,6 +333,8 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
       )}
 
       {BESIDE[e.id] && <Beside key={`beside-${e.id}`} id={BESIDE[e.id]} />}
+
+      <ProPitch id={e.id} />
 
       <MoreLike key={`more-${e.id}`} shelf="components" id={e.id} />
 
