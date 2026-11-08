@@ -811,5 +811,16 @@
     "draft": "The text the message opens with.",
     "onPick": "Called with each emoji or symbol a person adds.",
     "onSend": "Called with the message text when Send is pressed; the field then clears."
+  },
+  "agent-canvas": {
+    "agents": "The agents to offer, in order. Use the built-in `claude`, `chatgpt` and `grok`, or pass your own as `{ id, name, mark, placeholder }` to add Gemini, Perplexity or your own bot. One agent hides the switcher.",
+    "agent": "The `id` of the agent it opens in. Ignored unless it's in `agents`; defaults to the first.",
+    "product": "Your product's name, shown as \"Claude × Relay\".",
+    "productMark": "Your product's mark, drawn in white on black in the header. Card avatars come from `respond`.",
+    "prompt": "The request it plays on load. Switching agents replays the latest request, including one a person typed.",
+    "respond": "Turns a request into what happens: the chat `steps`, the canvas `title`, `subtitle` and `stat`, the `cards` that write themselves (title, body with **bold** and @mentions, chips), the `ask`, the `confirm` labels and the `reply`. It gets the chosen agent too, so it can route on `agent.id` to Claude, OpenAI, xAI or your own model, and it can be async. Mark a step `writes` to write the canvas during it and `counts` to roll the stat. Defaults to `relayPlan`, the Linear and Slack demo.",
+    "autoplay": "Play `prompt` on load. Set it to false to start empty and wait for someone to type.",
+    "onEnable": "Called with the plan and the request when someone confirms.",
+    "onDraft": "Called with the plan and the request when someone declines."
   }
 }

@@ -30,6 +30,7 @@ const PRO_CODE = [
   'threads',
   'glyph',
   'hello',
+  'agent-canvas',
   'emoji',
   'dotlight',
 ]

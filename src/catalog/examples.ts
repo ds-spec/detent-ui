@@ -1,4 +1,50 @@
 export const EXAMPLES: Record<string, string> = {
+  'agent-canvas': `"use client"
+
+import { AgentCanvas, type Agent, type Plan } from "@/components/detent/components/agent-canvas/AgentCanvas"
+
+const gemini: Agent = { id: "gemini", name: "Gemini", mark: <img src="/gemini.svg" alt="" width={16} height={16} />, placeholder: "Ask Gemini" }
+
+async function respond(request: string, agent: Agent): Promise<Plan> {
+  const res = await fetch("/api/plan", { method: "POST", body: JSON.stringify({ request, model: agent.id }) })
+  const { channel } = (await res.json()) as { channel: string }
+  return {
+    title: "Weekly deploy digest",
+    subtitle: \`Every Monday at 9:00 in \${channel}\`,
+    stat: { value: 4, label: "last month" },
+    steps: [
+      { working: "Reading your deploys", done: "Found 48 deploys · last month" },
+      { working: "Writing the digest", done: "Deploy digest · Mondays", writes: true },
+      { working: "Checking last month", done: "Would have sent 4 times", counts: true },
+    ],
+    cards: [
+      {
+        eyebrow: channel,
+        meta: "Mon 9:00",
+        author: "Pulse",
+        body: "**12 deploys**, 2 rollbacks and 1 incident last week. Biggest change by @maya.",
+        chips: [{ label: "12 deploys", dot: "#30a46c" }, { label: "2 rollbacks", dot: "#e5484d" }],
+      },
+    ],
+    footer: "Preview from last week",
+    ask: "Send it every Monday?",
+    confirm: { yes: "Schedule it", no: "Not now" },
+    reply: { yes: "Scheduled. The first one goes out Monday.", no: "Saved for later." },
+  }
+}
+
+export default function DeployDigest() {
+  return (
+    <AgentCanvas
+      product="Pulse"
+      agents={["claude", "chatgpt", gemini]}
+      prompt="Send a weekly deploy digest to #eng every Monday morning"
+      respond={respond}
+      onEnable={(plan, request) => console.log("schedule", plan.title, request)}
+    />
+  )
+}
+`,
   rings: `"use client"
 
 import { ChartCard, GoalNumerals, compact } from "@/components/detent/components/charts/GoalNumerals"

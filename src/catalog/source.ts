@@ -77,6 +77,7 @@ export const FILES: Record<string, string[]> = {
   slices: ['components/slices/SliceText.tsx'],
   threads: ['../pro/components/threads/ThreadHero.tsx'],
   glyph: ['../pro/components/glyph/GlyphArt.tsx'],
+  'agent-canvas': ['../pro/components/agent-canvas/AgentCanvas.tsx', '../pro/components/agent-canvas/marks.tsx', 'lib/motion.ts'],
   hello: ['../pro/components/hello/HelloGlobe.tsx', '../pro/components/hello/locales.ts', '../pro/components/region/land.ts', 'lib/motion.ts'],
   emoji: ['../pro/components/emoji/EmojiPicker.tsx', '../pro/components/emoji/glyphs.ts', 'lib/detent.ts', 'lib/motion.ts'],
   region: ['../pro/components/region/RegionWheel.tsx', '../pro/components/region/land.ts', 'ui/RollingText.tsx', 'lib/detent.ts'],

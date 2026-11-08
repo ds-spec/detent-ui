@@ -1647,6 +1647,17 @@ const ALL: Entry[] = [
     details: ['Spin the globe and let go: it settles on the nearest language. Tap a country to choose it.', 'Search by language, country, code or the greeting itself, and the globe turns under each match as you move through the list.', 'Pass your own `locales` with a greeting and a point on the map, or use the 37 it comes with.', 'Set `auto` to open on the visitor\'s browser language; `onChange` hands you the one they pick.', 'Works from the keyboard and follows light and dark. With reduced motion the globe moves straight to each place.'],
   },
   {
+    id: 'agent-canvas',
+    name: 'Agent canvas',
+    short: 'Set something up by asking your agent, and watch it get written',
+    category: 'agents',
+    feel: ['type', 'press'],
+    tags: ['New'],
+    bleed: true,
+    line: 'Your product, working inside Claude, ChatGPT or Grok. Someone says what should happen, the agent checks off its work in the chat, and the result writes itself on a canvas beside it: the rule, the Linear issue it will open and the Slack post it will send.',
+    details: ['Nothing turns on by itself: the agent asks first, and `onEnable` or `onDraft` tells you which they chose.', 'Switch agents and the same request plays out inside that one, with its real mark. Claude, ChatGPT and Grok are built in, and you can add your own.', 'Cards take a title, a body with bold and mentions, chips and an avatar, so the canvas can show an issue, a message, an email or anything your product makes.', 'Make it yours with `respond`: return your own steps, title, stat and cards, from a fixed plan or a real call to Claude, OpenAI or xAI, and it writes them onto the canvas.', 'Follows light and dark, works on a phone, and with reduced motion everything lands at once.'],
+  },
+  {
     id: 'emoji',
     name: 'Emoji picker',
     short: 'A field of emoji you can fling, search and drop into a message',
