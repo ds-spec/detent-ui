@@ -11,7 +11,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ plan: st
   if (!PLANS.includes(asked)) return to('/pro')
   const session = await (await getAuth()).api.getSession({ headers: req.headers })
   const user = session?.user.emailVerified ? session.user : null
-  if (!user) return to(`/account?next=/checkout/${asked}`)
+  if (!user) {
+    const store = checkoutFor(asked, null)
+    if (!store) return to('/pro')
+    return Response.redirect(store, 303)
+  }
   const email = user.email.toLowerCase()
   const owned = await planFor(email)
   if (owned) return to('/account')

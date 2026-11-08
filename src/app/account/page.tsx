@@ -44,7 +44,7 @@ async function Account({ query }: { query: Promise<Back> }) {
     const lastUsed = (await cookies()).get(LAST_USED)?.value
     const shared = { providers, error, lastUsed }
     if (next !== '/account') return <SignIn title="Sign in to get Pro" lead="Pro goes on your account, so your keys work the moment you’ve paid." next={next} buying={buying(next.split('/').pop())} {...shared} />
-    if (fromCheckout) return <SignIn title="Thank you. Now your key." lead="Your payment went through. Sign in with the address you paid with, and your key works right away." email={back.email} {...shared} />
+    if (fromCheckout) return <SignIn title="Thank you. Now your key." lead={back.email ? `Your payment went through. We’ve emailed a sign-in link to ${back.email}. Open it, or sign in here with that address, and Pro is on your account.` : 'Your payment went through. We’ve emailed a sign-in link to the address you paid with. Open it, or sign in here with that address, and Pro is on your account.'} email={back.email} {...shared} />
     return <SignIn title="Sign in to Detent" lead="Get your keys for the Pro registry." {...shared} />
   }
   if (next !== '/account') redirect(next)

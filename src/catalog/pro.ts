@@ -70,10 +70,11 @@ export const CHECKOUT = {
   all: comeBack(process.env.NEXT_PUBLIC_CHECKOUT_ALL ?? '#checkout'),
 }
 
-export function checkoutFor(plan: keyof typeof CHECKOUT, account: { id: string; email: string }) {
+export function checkoutFor(plan: keyof typeof CHECKOUT, account: { id: string; email: string } | null) {
   const link = CHECKOUT[plan]
   if (!/^https?:\/\//.test(link)) return null
   const url = new URL(link)
+  if (!account) return url.toString()
   url.searchParams.set('email', account.email)
   url.searchParams.set('disableEmail', 'true')
   url.searchParams.set('metadata_detent_user', account.id)

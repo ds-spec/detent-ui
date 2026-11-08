@@ -91,6 +91,10 @@ const create = (client: Client) =>
           const verify = new URL(url)
           const next = safeNext(verify.searchParams.get('callbackURL'))
           const link = `${verify.origin}/account/confirm#${new URLSearchParams({ token, email, next })}`
+          if (!ctx?.request && headers?.get('x-detent-purchase')) {
+            await deliver(email, 'You’re in: Detent Pro', `Thank you for buying Detent Pro.\n\nSign in to get your key:\n\n${link}\n\nThe link lasts ${LINK_MINUTES} minutes and works once. If it runs out, sign in at ${verify.origin}/account with this email and Pro is there.`)
+            return
+          }
           await deliver(email, 'Sign in to Detent', `Sign in to Detent:\n\n${link}\n\nThe link lasts ${LINK_MINUTES} minutes and works once. If you didn’t ask for it, you can ignore this email.`)
         },
       }),

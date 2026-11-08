@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { planOfProduct } from '@/catalog/licence'
+import { getAuth } from '@/lib/account/auth'
 import { emailOfAccount, recordPurchase } from '@/lib/account/keys'
 import { normalEmail } from '@/lib/account/session'
 
@@ -24,6 +25,15 @@ type Event = {
   data?: { payment_id?: string; is_partial?: boolean; customer?: { email?: string | null } | null; product_cart?: { product_id: string }[] | null; metadata?: Record<string, unknown> | null }
 }
 
+async function welcome(email: string) {
+  try {
+    const auth = await getAuth()
+    await auth.api.signInMagicLink({ body: { email, callbackURL: '/account' }, headers: new Headers({ 'cf-connecting-ip': 'purchase', 'x-detent-purchase': '1' }) })
+  } catch (error) {
+    console.error('[dodo] welcome email', error)
+  }
+}
+
 export async function POST(req: Request) {
   const secret = process.env.DODO_WEBHOOK_SECRET
   const body = await req.text()
@@ -38,6 +48,7 @@ export async function POST(req: Request) {
     const plan = data?.product_cart?.map((p) => planOfProduct(p.product_id)).find(Boolean)
     if (!plan) return Response.json({ error: 'Not a Detent product.' }, { status: 422 })
     await recordPurchase({ id, email, plan, refunded: false })
+    if (!account) await welcome(email)
   } else if (type === 'dispute.lost' || (type === 'refund.succeeded' && !data?.is_partial)) {
     if (!id) return Response.json({ error: 'No payment.' }, { status: 422 })
     await recordPurchase({ id, email, plan: 'pro', refunded: true })
