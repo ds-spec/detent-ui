@@ -35,7 +35,9 @@ export function ShiftDemo() {
   const b = useBench()
   return (
     <div className="flex size-full items-center justify-center p-4">
-      <Shift title="Top sources" items={ITEMS} period="Last 30 days" delta={18.4} onViewChange={b.on('onViewChange')} />
+      <div className="w-[380px] max-w-full">
+        <Shift title="Top sources" items={ITEMS} period="Last 30 days" delta={18.4} onViewChange={b.on('onViewChange')} />
+      </div>
     </div>
   )
 }

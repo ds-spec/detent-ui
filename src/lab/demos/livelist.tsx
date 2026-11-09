@@ -49,7 +49,7 @@ export function LiveListDemo() {
   }, [])
   return (
     <div className="flex size-full items-center justify-center p-4">
-      <div className="w-full max-w-[400px] min-w-0">
+      <div className="w-[400px] min-w-0 max-w-full">
         <LiveList
           title="Friday launch"
           people={PEOPLE}
