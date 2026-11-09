@@ -822,5 +822,48 @@
     "autoplay": "Play `prompt` on load. Set it to false to start empty and wait for someone to type.",
     "onEnable": "Called with the plan and the request when someone confirms.",
     "onDraft": "Called with the plan and the request when someone declines."
+  },
+  "shift": {
+    "title": "The card's name, shown in its header.",
+    "items": "The sources: each has an id, a label, a value, an optional delta (percent change) and an icon.",
+    "period": "What the total covers, shown beside it, like \"Last 30 days\".",
+    "unit": "What is being counted, used in the headline and empty state.",
+    "delta": "The total's change, shown beside the headline.",
+    "limit": "How many sources to show before the rest fold into one row.",
+    "view": "The view to show: list, bars or change. Pair with onViewChange.",
+    "defaultView": "The view to start on when you don't control it.",
+    "onViewChange": "Called with the view a person switches to.",
+    "format": "Turns a number into the text shown for it."
+  },
+  "livelist": {
+    "title": "The list's name, shown in its header.",
+    "people": "Everyone on the list: an id, a name and a hue for their colour.",
+    "groups": "The groups items are filed under: an id, a label and a hue.",
+    "items": "The items, when you control the list. Pair with onItemsChange.",
+    "defaultItems": "The items to start with when the list keeps its own state.",
+    "onItemsChange": "Called with the whole list after any add or tick.",
+    "me": "The id of the person using it; their items are added under this id.",
+    "height": "The height of the scrolling body in pixels. The card never grows past it."
+  },
+  "mcp": {
+    "name": "Your server's name, shown in the title and configs.",
+    "slug": "The key your server is saved under in each editor's config.",
+    "url": "The remote server's URL.",
+    "icon": "Your logo, shown in the dark tile.",
+    "description": "One line on what the server gives access to.",
+    "clients": "The editors to offer: an id, a label, an icon and an optional tint for the copy glow.",
+    "tools": "How many tools the server exposes, shown once connected.",
+    "client": "The editor to show, when you control it. Pair with onClientChange.",
+    "defaultClient": "The editor to start on when you don't control it.",
+    "onClientChange": "Called with the editor a person picks.",
+    "status": "idle, waiting or connected. Drive it from your server; left out, copying sets waiting.",
+    "onCopy": "Called with the editor when the config is copied or Add to Cursor is pressed.",
+    "auth": "How the remote server signs in, shown in the header.",
+    "pkg": "Your npm package. Set it to offer a Local option that runs it with npx.",
+    "envVar": "The environment variable the local server reads its key from.",
+    "apiKey": "A key to put in the local config.",
+    "onCreateKey": "Makes a key when \"Create one\" is pressed; return it and it lands in the config.",
+    "defaultTransport": "Start on remote or local.",
+    "defaultScope": "Start on this project or everywhere."
   }
 }

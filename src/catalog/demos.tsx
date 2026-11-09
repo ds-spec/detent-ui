@@ -74,6 +74,8 @@ const FREE: Record<string, ComponentType> = {
   trend: lazy('trend', () => import('@/lab/demos/trend').then((m) => m.TrendDemo)),
   carousel: lazy('carousel', () => import('@/lab/demos/carousel').then((m) => m.CarouselDemo)),
   phrase: lazy('phrase', () => import('@/lab/demos/phrase').then((m) => m.PhraseDemo)),
+  shift: lazy('shift', () => import('@/lab/demos/shift').then((m) => m.ShiftDemo)),
+  livelist: lazy('livelist', () => import('@/lab/demos/livelist').then((m) => m.LiveListDemo)),
 }
 
 export const preloadDemo = (id: string) => void (loads[id] ?? (() => preloadProDemo(id)))()
