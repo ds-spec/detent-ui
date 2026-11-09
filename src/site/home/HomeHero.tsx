@@ -20,6 +20,7 @@ import type { Card } from './lights'
 import { BTN, useSideNew } from '../shell/side'
 import { DitherWord } from '../Dither'
 import type { LibItem } from './library'
+import type { Latest } from '@/catalog/latest'
 
 if (typeof window !== 'undefined') void import('@/lab/demos/inputs')
 
@@ -34,7 +35,7 @@ const UNIT = `var(--plate)`
 const widthOf = (open: number) => `calc(${UNIT} * ${(1 + GROW * open).toFixed(4)})`
 const ICON: Record<string, ReactNode> = { prompt: <Prompt size={15} />, models: <Note size={15} />, voicenote: <Play size={15} />, metric: <Chart size={15} /> }
 
-export function HomeHero({ lib }: { lib: LibItem[] }) {
+export function HomeHero({ lib, fresh }: { lib: LibItem[]; fresh: Latest }) {
   const side = useSideNew()
   const [open, setOpen] = useState(CARDS[0].id)
   const dot = CARDS.find((c) => c.id === open)?.dot
@@ -43,8 +44,8 @@ export function HomeHero({ lib }: { lib: LibItem[] }) {
       <div className="relative rounded-[26px] sm:rounded-[36px]" style={{ background: 'var(--leaf)', boxShadow: 'var(--leaf-edge)' }}>
         <div className="mx-auto max-w-[1440px] px-4 pb-3 pt-12 sm:px-8 sm:pb-4 sm:pt-16">
           <div className="flex flex-col items-center px-2 text-center">
-            <Announcement href="/components/glyph" linkAs={Link} className="rise">
-              Glyph art and Phrase
+            <Announcement href={fresh.href} linkAs={Link} className="rise">
+              {fresh.text}
             </Announcement>
             <h1 className="focus-in mt-7 text-[clamp(36px,5vw,74px)] font-normal leading-[1.01] tracking-[-0.055em] text-ink">
               Make your product

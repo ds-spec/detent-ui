@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { block } from '@/catalog/blocks'
+import { latest } from '@/catalog/latest'
 import { PRO_BLOCK_COUNT, PRO_COMPONENTS } from '@/catalog/pro'
 import { Live } from '@/site/ai/Live'
 import { AI_SDK } from '@/catalog/site'
@@ -25,7 +26,7 @@ export default function Home() {
       <Header />
       <main>
         <JsonLd data={siteGraph()} />
-        <HomeHero lib={lib} />
+        <HomeHero lib={lib} fresh={latest()} />
         <div style={{ height: BRIDGE }} />
         <HomeLibrary lib={lib} />
 
