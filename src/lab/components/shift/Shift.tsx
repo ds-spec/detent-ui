@@ -152,7 +152,7 @@ function Head({ focus, items, total, unit, period, delta, pct, format, still }: 
       </p>
       <p className="flex shrink-0 items-center gap-2 pb-0.5 text-[12px]">
         {shown !== undefined && <span className={shown >= 0 ? UP : DOWN}>{signed(shown)}</span>}
-        <span className="text-ink-3">{on ? `${pct(on.value)} of ${unit}` : period}</span>
+        <span className="text-ink-3 max-[360px]:hidden">{on ? `${pct(on.value)} of ${unit}` : period}</span>
       </p>
     </div>
   )
