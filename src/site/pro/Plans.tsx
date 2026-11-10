@@ -16,14 +16,14 @@ export function Plans({ compact = false }: { compact?: boolean }) {
       <ul className={`mx-auto mt-3 grid gap-x-6 gap-y-3 rounded-[22px] px-6 py-5 text-[13.5px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)] sm:grid-cols-2 ${ON_SALE.length > 1 ? 'max-w-[860px] lg:grid-cols-4' : 'max-w-[520px]'}`}>
         {(
           [
-            [<Check key="c" size={14} />, 'One payment, never a subscription'],
+            [<Check key="c" size={14} />, 'Pay once, no subscription'],
             [<Refresh key="r" size={14} />, 'Every update, for life'],
             [<Undo key="u" size={14} />, `${REFUND_DAYS}-day refund, no questions`],
-            [<Code key="o" size={14} />, 'Source in your project, yours to change'],
+            [<Code key="o" size={14} />, 'Source code, yours to edit'],
           ] as const
         ).map(([icon, text]) => (
-          <li key={text} className="flex items-center gap-2.5">
-            <span className="text-ink-3">{icon}</span>
+          <li key={text} className="flex items-start gap-2.5 leading-[20px]">
+            <span className="flex h-5 shrink-0 items-center text-ink-3">{icon}</span>
             {text}
           </li>
         ))}
