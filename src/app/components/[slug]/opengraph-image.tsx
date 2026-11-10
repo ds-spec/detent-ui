@@ -15,5 +15,5 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   const e = entry(slug)
   if (!e) return pageImage({ kicker: 'Component', title: 'Detent' })
   const pro = isProComponent(e.id)
-  return pageImage({ kicker: `React component · ${CATEGORIES.find((c) => c.id === e.category)?.name ?? 'Detent'}`, title: e.name, tag: pro ? 'Pro' : 'Free · MIT' })
+  return pageImage({ kicker: `React component · ${CATEGORIES.find((c) => c.id === e.category)?.name ?? 'Detent'}`, title: e.name, tag: pro ? 'Pro' : 'Free · MIT', shot: `components/${e.id}` })
 }

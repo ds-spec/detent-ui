@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+import { block } from '@/catalog/blocks'
 import { entry } from '@/catalog/meta'
-import { PLANS, PRO_BLOCK_COUNT, PRO_COMPONENTS, isProComponent } from '@/catalog/pro'
+import { PLANS, PRO_BLOCK_COUNT, PRO_COMPONENTS, isProBlock, isProComponent } from '@/catalog/pro'
 import { TEMPLATE_COUNT } from '@/catalog/templates'
 import { REFUND_DAYS } from '@/catalog/trust'
 import { ArrowRight, ArrowUpRight } from '@/lab/icons'
@@ -10,16 +11,18 @@ import { ForPlan } from './Owned'
 import { Price } from './Promo'
 
 const PICKS = ['glyph', 'region', 'threads', 'find', 'funnel', 'forecast']
+const BLOCK_PICKS = ['onboarding', 'support-inbox', 'task-to-merge', 'agent-chat', 'evals', 'calendar']
 
-export function ProPitch({ id }: { id: string }) {
-  const pro = isProComponent(id)
-  const name = entry(id)?.name ?? id
-  const others = PICKS.filter((p) => p !== id && PRO_COMPONENTS.includes(p)).slice(0, 4)
+export function ProPitch({ id, shelf = 'components' }: { id: string; shelf?: 'components' | 'blocks' }) {
+  const blocks = shelf === 'blocks'
+  const pro = blocks ? isProBlock(id) : isProComponent(id)
+  const name = (blocks ? block(id)?.name : entry(id)?.name) ?? id
+  const others = blocks ? BLOCK_PICKS.filter((p) => p !== id && isProBlock(p)).slice(0, 4) : PICKS.filter((p) => p !== id && PRO_COMPONENTS.includes(p)).slice(0, 4)
   const plan = PLANS[0]
   return (
     <ForPlan
       none={
-        <section aria-labelledby="pro-pitch" className="mt-12 overflow-hidden rounded-[28px] bg-surface shadow-[var(--card-edge)] sm:mt-16">
+        <section aria-labelledby="pro-pitch" className={`overflow-hidden rounded-[28px] bg-surface shadow-[var(--card-edge)] ${blocks ? 'mt-6 sm:mt-8' : 'mt-12 sm:mt-16'}`}>
           <div className="grid gap-8 p-7 sm:p-9 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
               <h2 id="pro-pitch" className="text-[clamp(24px,2.4vw,32px)] font-normal leading-[1.1] tracking-[-0.035em] text-ink">
@@ -29,7 +32,7 @@ export function ProPitch({ id }: { id: string }) {
                   </>
                 ) : (
                   <>
-                    Like this one? <span className="text-quiet">Pro has {PRO_COMPONENTS.length} more.</span>
+                    Like this one? <span className="text-quiet">Pro has {blocks ? `${PRO_BLOCK_COUNT} more screens` : `${PRO_COMPONENTS.length} more`}.</span>
                   </>
                 )}
               </h2>
@@ -39,8 +42,8 @@ export function ProPitch({ id }: { id: string }) {
               <ul className="mt-5 flex flex-wrap gap-2">
                 {others.map((o) => (
                   <li key={o}>
-                    <Link href={`/components/${o}`} className="ring-focus group/chip flex h-8 items-center gap-1 rounded-full bg-surface-2 pl-3 pr-2.5 text-[13px] text-ink-2 transition-colors duration-150 hover:text-ink">
-                      {entry(o)?.name ?? o}
+                    <Link href={`/${shelf}/${o}`} className="ring-focus group/chip flex h-8 items-center gap-1 rounded-full bg-surface-2 pl-3 pr-2.5 text-[13px] text-ink-2 transition-colors duration-150 hover:text-ink">
+                      {(blocks ? block(o)?.name : entry(o)?.name) ?? o}
                       <ArrowUpRight size={11} className="text-ink-3 transition-transform duration-150 group-hover/chip:-translate-y-px group-hover/chip:translate-x-px" />
                     </Link>
                   </li>
