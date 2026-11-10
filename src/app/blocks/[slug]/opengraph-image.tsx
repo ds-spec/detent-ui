@@ -1,4 +1,5 @@
 import { BLOCKS, block } from '@/catalog/blocks'
+import { isProBlock } from '@/catalog/pro'
 import { CONTENT_TYPE, OG, pageImage } from '@/site/og'
 
 export const alt = 'A Detent block: a whole screen for an AI product, already working'
@@ -15,5 +16,5 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   const { slug } = await params
   const b = block(slug)
   if (!b) return pageImage({ kicker: 'Block', title: 'Detent' })
-  return pageImage({ kicker: `Block · ${KIND[b.kind]}`, title: b.name, tag: 'Pro' })
+  return pageImage({ kicker: `Block · ${KIND[b.kind]}`, title: b.name, tag: isProBlock(b.id) ? 'Pro' : 'Free · MIT', shot: `blocks/${b.id}` })
 }

@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { ImageResponse } from 'next/og'
 import type { ReactNode } from 'react'
+import { SHOT } from './og-shot'
 
 let font: Promise<Buffer> | null = null
 const geist = () => (font ??= import('../../.detent/og-font.json').then((m) => Buffer.from(m.default.data, 'base64')))
@@ -40,16 +41,43 @@ const Name = () => (
   </div>
 )
 
-export async function pageImage({ kicker, title, turn, tag }: { kicker: string; title: string; turn?: string; tag?: string }) {
+const shotOf = (shot: string) =>
+  readFile(path.join(process.cwd(), 'public/media/og/shots', `${shot}.jpg`)).then(
+    (b) => `data:image/jpeg;base64,${b.toString('base64')}`,
+    () => null,
+  )
+
+const FRAME = { x: 48, y: 44, w: OG.width - 96 }
+
+async function ShotStage({ src, head, kicker, title }: { src: string; head: ReactNode; kicker: string; title: string }) {
+  const h = Math.round((FRAME.w * SHOT.height) / SHOT.width)
+  return (
+    <div style={{ width: '100%', height: '100%', display: 'flex', position: 'relative', background: '#030305' }}>
+      <div style={{ position: 'absolute', left: FRAME.x, top: FRAME.y, width: FRAME.w, height: h, display: 'flex', borderRadius: 18, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.14)' }}>
+        <img src={src} width={FRAME.w} height={h} alt="" />
+      </div>
+      <div style={{ position: 'absolute', left: EDGE, bottom: 40, display: 'flex', alignItems: 'center' }}>{head}</div>
+      <div style={{ position: 'absolute', right: EDGE, bottom: 34, display: 'flex', alignItems: 'baseline' }}>
+        <span style={{ fontSize: 19, color: QUIET, marginRight: 14 }}>{kicker}</span>
+        <span style={{ fontSize: 34, lineHeight: 1, color: INK, letterSpacing: '-0.035em' }}>{title}</span>
+      </div>
+    </div>
+  )
+}
+
+export async function pageImage({ kicker, title, turn, tag, shot }: { kicker: string; title: string; turn?: string; tag?: string; shot?: string }) {
+  const head = (
+    <>
+      <Name />
+      {tag && <span style={{ display: 'flex', alignItems: 'center', height: 26, marginLeft: 12, padding: '0 10px', borderRadius: 26, fontSize: 15, color: QUIET, border: '1px solid rgba(255,255,255,0.16)' }}>{tag}</span>}
+    </>
+  )
+  const src = shot ? await shotOf(shot) : null
+  if (src) return new ImageResponse(await ShotStage({ src, head, kicker, title }), await options())
   const words = [...title.split(' ').map((w) => [w, INK]), ...(turn ? turn.split(' ').map((w) => [w, QUIET]) : [])]
   return new ImageResponse(
     await Stage({
-      head: (
-        <>
-          <Name />
-          {tag && <span style={{ display: 'flex', alignItems: 'center', height: 26, marginLeft: 12, padding: '0 10px', borderRadius: 26, fontSize: 15, color: QUIET, border: '1px solid rgba(255,255,255,0.16)' }}>{tag}</span>}
-        </>
-      ),
+      head,
       children: [
         <span key="k" style={{ fontSize: 19, color: QUIET, marginBottom: 8 }}>{kicker}</span>,
         <div key="t" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', fontSize: 36, lineHeight: 1.12, letterSpacing: '-0.035em', columnGap: 36 * 0.24 }}>

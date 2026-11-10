@@ -32,6 +32,7 @@ import { DeviceStage } from './DeviceStage'
 import { useSideNew } from '../shell/side'
 import { BlockPiece, MoreLike } from '../library/Library'
 import { wellOf } from '../wells'
+import { ProPitch } from '../ProPitch'
 
 const DETENTS = [
   { w: 390, name: 'Phone' },
@@ -144,6 +145,7 @@ function BlockViewer({ b, go }: { b: Block; go: (id: string) => void }) {
           code={<Code id={b.id} />}
         />
         {present && <Desk title={b.window} chrome={b.chrome} run={run} mode={mode} theme={stageTheme} present onExit={() => setPresent(false)} view={<Live id={b.id} />} code={<Code id={b.id} />} />}
+        <ProPitch id={b.id} shelf="blocks" />
         <Props b={b} />
         <nav aria-label="More blocks" className="mt-28 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Neighbour b={prev} dir="prev" go={go} />
@@ -194,6 +196,8 @@ function BlockViewer({ b, go }: { b: Block; go: (id: string) => void }) {
         </div>
         <Desk grow={b.kind === 'section'} title={b.window} chrome={b.chrome} run={run} mode={mode} theme={stageTheme} present={present} onExit={() => setPresent(false)} view={<Live id={b.id} />} code={<Code id={b.id} />} />
       </div>
+
+      <ProPitch id={b.id} shelf="blocks" />
 
       <Props b={b} />
 
