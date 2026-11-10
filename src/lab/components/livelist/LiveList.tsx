@@ -8,12 +8,16 @@ import { RollingText } from '../../ui/RollingText'
 export type LivePerson = { id: string; name: string; hue: number }
 export type LiveGroup = { id: string; label: string; hue: number }
 export type LiveItem = { id: string; title: string; group: string; by: string; done?: boolean; at?: number }
+type Snap = { order: string[]; done: Record<string, boolean>; keep: Record<string, LiveItem> }
+
+const take = (list: LiveItem[]): Snap => ({ order: list.map((i) => i.id), done: Object.fromEntries(list.map((i) => [i.id, !!i.done])), keep: Object.fromEntries(list.map((i) => [i.id, i])) })
 
 const ROW = 36
 const FRESH = 2200
 const SETTLE = 700
 const EASE = [0.3, 0, 0.2, 1] as const
 const GROW = { duration: 0.26, ease: EASE }
+const IDLE = 4000
 const HAIR = 'border-[light-dark(rgb(0_0_0/.06),rgb(255_255_255/.07))]'
 
 const initials = (name: string) =>
@@ -84,6 +88,9 @@ export function LiveList({
   const [settling, setSettling] = useState<Record<string, boolean>>({})
   const [draft, setDraft] = useState('')
   const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
+  const [snap, setSnap] = useState<Snap | null>(null)
+  const [landed, setLanded] = useState<Record<string, boolean>>({})
+  const inside = useRef({ hover: false, focus: false })
 
   const live = useRef({ items, controlled: controlled !== undefined, onItemsChange, still })
   useLayoutEffect(() => {
@@ -102,6 +109,7 @@ export function LiveList({
       if (!item) return
       const next = !item.done
       commit(live.current.items.map((i) => (i.id === id ? { ...i, done: next } : i)))
+      setSnap((s) => (s ? { ...s, done: { ...s.done, [id]: next } } : s))
       clearTimeout(timers.current[id])
       if (next && !live.current.still) {
         setSettling((s) => ({ ...s, [id]: true }))
@@ -122,11 +130,31 @@ export function LiveList({
     return () => Object.values(t).forEach(clearTimeout)
   }, [])
 
+  const hold = () => setSnap((s) => s ?? take(live.current.items))
+  const flush = (keep: boolean) => {
+    if (!snap) return
+    const ids = live.current.items.filter((i) => !snap.done.hasOwnProperty(i.id)).map((i) => i.id)
+    if (ids.length) {
+      setLanded(Object.fromEntries(ids.map((id) => [id, true])))
+      clearTimeout(timers.current.__landed)
+      timers.current.__landed = setTimeout(() => setLanded({}), FRESH)
+    }
+    setSnap(keep ? take(live.current.items) : null)
+  }
+  const release = () => {
+    if (!inside.current.hover && !inside.current.focus) flush(false)
+  }
+
   const who = useMemo(() => Object.fromEntries(people.map((p) => [p.id, p])), [people])
   const total = items.length
   const finished = items.filter((i) => i.done).length
-  const done = items.filter((i) => i.done && !settling[i.id])
-  const isFresh = (i: LiveItem) => i.at !== undefined && now - i.at < FRESH
+  const byId = new Map(items.map((i) => [i.id, i]))
+  const seen = snap ? snap.order.map((id) => byId.get(id) ?? snap.keep[id]) : items
+  const waiting = snap ? items.filter((i) => !snap.done.hasOwnProperty(i.id)) : []
+  const placed = (i: LiveItem) => (snap ? snap.done[i.id] : !!i.done)
+  const done = seen.filter((i) => placed(i) && !settling[i.id])
+  const isFresh = (i: LiveItem) => !!landed[i.id] || (!snap && i.at !== undefined && now - i.at < FRESH)
+  const waitingBy = [...new Set(waiting.map((i) => i.by))].map((id) => who[id]).filter(Boolean)
 
   const add = (e: FormEvent) => {
     e.preventDefault()
@@ -134,7 +162,9 @@ export function LiveList({
     const group = groups.find((g) => tag && (g.id === tag || g.label.toLowerCase().startsWith(tag)))?.id ?? groups[0]?.id
     const text = draft.replace(/#\w+/, '').replace(/\s+/g, ' ').trim()
     if (!text || !group) return
-    commit([...items, { id: `${Date.now()}`, title: text, group, by: me, at: Date.now() }])
+    const item = { id: `${Date.now()}`, title: text, group, by: me, at: Date.now() }
+    setSnap((s) => (s ? { order: [...s.order, item.id], done: { ...s.done, [item.id]: false }, keep: { ...s.keep, [item.id]: item } } : s))
+    commit([...items, item])
     setDraft('')
     setShut((s) => ({ ...s, [group]: false }))
   }
@@ -174,10 +204,39 @@ export function LiveList({
           </div>
         </div>
 
-        <div className="flex flex-col overflow-hidden rounded-[16px] bg-surface shadow-[0_0_0_0.5px_light-dark(rgb(0_0_0/.09),rgb(255_255_255/.08)),0_1px_2px_rgb(0_0_0/.04),0_8px_24px_-12px_rgb(0_0_0/.12)]">
+        <div
+          onPointerEnter={(e) => {
+            if (e.pointerType !== 'mouse') return
+            inside.current.hover = true
+            hold()
+          }}
+          onPointerLeave={(e) => {
+            if (e.pointerType !== 'mouse') return
+            inside.current.hover = false
+            release()
+          }}
+          onPointerDown={(e) => {
+            if (e.pointerType === 'mouse') return
+            hold()
+            clearTimeout(timers.current.__idle)
+            timers.current.__idle = setTimeout(() => {
+              if (!inside.current.focus) setSnap(null)
+            }, IDLE)
+          }}
+          onFocus={(e) => {
+            if (e.target.tagName !== 'INPUT' && !e.target.matches(':focus-visible')) return
+            inside.current.focus = true
+            hold()
+          }}
+          onBlur={(e) => {
+            if (e.currentTarget.contains(e.relatedTarget as Node)) return
+            inside.current.focus = false
+            release()
+          }}
+          className="relative flex flex-col overflow-hidden rounded-[16px] bg-surface shadow-[0_0_0_0.5px_light-dark(rgb(0_0_0/.09),rgb(255_255_255/.08)),0_1px_2px_rgb(0_0_0/.04),0_8px_24px_-12px_rgb(0_0_0/.12)]">
           <div className="overflow-y-auto overscroll-contain px-1.5 py-1 [mask-image:linear-gradient(to_bottom,transparent,#000_8px,#000_calc(100%-14px),transparent)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style={{ height }}>
             {groups.map((g) => {
-              const rows = items.filter((i) => i.group === g.id && (!i.done || settling[i.id]))
+              const rows = seen.filter((i) => i.group === g.id && (!placed(i) || settling[i.id]))
               const closed = !!shut[g.id]
               return (
                 <section key={g.id} className="pt-1">
@@ -213,6 +272,34 @@ export function LiveList({
               </Fold>
             </section>
           </div>
+
+          <AnimatePresence>
+            {waiting.length > 0 && (
+              <motion.button
+                type="button"
+                aria-label={`Show ${waiting.length} new`}
+                onClick={() => flush(true)}
+                initial={{ opacity: 0, y: -6, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -6, scale: 0.96, transition: { duration: still ? 0 : 0.14 } }}
+                transition={{ duration: still ? 0 : 0.2, ease: EASE }}
+                whileTap={{ scale: 0.96 }}
+                className="ring-focus absolute left-1/2 top-2 z-10 flex h-7 -translate-x-1/2 items-center gap-1.5 rounded-full bg-ink pl-1 pr-2.5 text-[12px] font-medium text-surface shadow-[0_6px_16px_-6px_rgb(0_0_0/.35)]"
+              >
+                <span className="flex -space-x-[4px]">
+                  {waitingBy.slice(0, 3).map((p) => (
+                    <span key={p.id} className="rounded-full shadow-[0_0_0_1.5px_var(--ink)]">
+                      <Face person={p} size={20} />
+                    </span>
+                  ))}
+                </span>
+                <span className="flex items-center whitespace-nowrap">
+                  <RollingText text={`${waiting.length}`} proportional still={still} />
+                  <span className="ml-[0.28em]">new</span>
+                </span>
+              </motion.button>
+            )}
+          </AnimatePresence>
 
           <form onSubmit={add} className={`relative border-t ${HAIR}`}>
             <div className="flex h-[46px] items-center gap-2.5 px-4">

@@ -1695,6 +1695,7 @@ const ALL: Entry[] = [
       'Type `#` in the box to file an item under a group; Tab completes it.',
       'Items from teammates fade in tinted in their colour with "Name · just now", then settle.',
       'A ticked item strikes through, waits a beat in case it was a slip, then moves into Done.',
+      'While you read, the list holds still: teammates’ new items wait behind a "2 new" pill and land when you tap it or look away.',
       'Pass `people`, `groups` and `items`; `onItemsChange` hands you the list after every add or tick, so it plugs into any sync layer.',
       'The body scrolls inside a fixed `height`, so the page around it never moves. Follows light and dark and reduced motion.',
     ],
