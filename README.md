@@ -50,7 +50,7 @@ export default function RootLayout({ children }) {
 
 ## Free components
 
-All 16 are MIT licensed.
+All 18 are MIT licensed.
 
 | Component | What it does | Install |
 | --- | --- | --- |
@@ -70,6 +70,8 @@ All 16 are MIT licensed.
 | [Halo bands](https://detentui.com/components/halo) | A glow that restarts at every curved edge and follows the pointer | `halo` |
 | [Announcement pill](https://detentui.com/components/announce) | The pill above a headline, with a line of light that runs round it once | `announce` |
 | [Slice text](https://detentui.com/components/slices) | Strips fly in and align into letters, then cut apart around the pointer | `slices` |
+| [Shift](https://detentui.com/components/shift) | Where your visitors come from, as a list, bars or change, with every number moving to its new place | `shift` |
+| [Live list](https://detentui.com/components/livelist) | A checklist your whole team writes in at once, each item arriving with who added it | `livelist` |
 
 Swap the name into the command: `npx shadcn add https://detentui.com/r/<name>`.
 
@@ -91,7 +93,7 @@ Point Cursor, Claude Code or any agent at [`detentui.com/llms.txt`](https://dete
 
 ## Detent Pro
 
-15 more components, 12 whole-screen blocks and a full app template, with more on the way. One payment, every update for life. See [detentui.com/pro](https://detentui.com/pro).
+19 more components, 12 whole-screen blocks and a full app template, with more on the way. One payment, every update for life. See [detentui.com/pro](https://detentui.com/pro).
 
 Pro source lives in a private repository. Without it, this one still builds and runs: each Pro preview becomes a locked stand-in from `src/locked`.
 
