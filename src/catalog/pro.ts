@@ -48,14 +48,6 @@ export const PRO_BLOCK_COUNT = BLOCK_IDS.length - FREE_BLOCKS.length
 
 export const isLockedSource = (slug: string, blocks: string[]) => isProComponent(slug) || (blocks.includes(slug) && !FREE_BLOCKS.includes(slug)) || slug.startsWith('template-')
 
-export const KITS: Record<string, { name: string; line: string; items: string[] }> = {
-  'agent-kit': {
-    name: 'Agent kit',
-    line: 'The free components for an agent product: the scaffold it builds in, the prompt box, and the diff you review.',
-    items: ['scaffold', 'prompt', 'diff'],
-  },
-}
-
 import { SITE } from './site'
 
 export { SITE, installCommand } from './site'

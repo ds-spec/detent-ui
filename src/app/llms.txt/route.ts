@@ -1,5 +1,5 @@
 import { ENTRIES } from '@/catalog/meta'
-import { KITS, SITE, installCommand, isProBlock, isProComponent } from '@/catalog/pro'
+import { SITE, installCommand, isProBlock, isProComponent } from '@/catalog/pro'
 import { BLOCKS } from '@/catalog/blocks'
 import { TEMPLATES } from '@/catalog/templates'
 import { CONTACT } from '@/catalog/trust'
@@ -26,11 +26,6 @@ export function GET() {
     '## Docs & Guides',
     `- [Get started](${SITE}/docs.md): Set up a project, install a first component, connect Pro, and hand it to a coding agent`,
     `- [Design System](${SITE}/system.md): Tokens, typography, layout principles, and styling rules`,
-    '',
-    '## Kits',
-    ...Object.entries(KITS).map(
-      ([id, k]) => `- [${k.name}](${SITE}/r/${id}.json): ${k.line} \`${installCommand(id, true)}\``,
-    ),
     '',
     '## Free components',
     ...free.map(

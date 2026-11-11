@@ -4,7 +4,7 @@ import path from 'node:path'
 import { BLOCKS } from '@/catalog/blocks'
 import { ENTRIES } from './meta'
 import { FILES } from './source'
-import { FREE_BLOCKS, KITS, SITE, isProBlock, isProComponent } from './pro'
+import { FREE_BLOCKS, SITE, isProBlock, isProComponent } from './pro'
 import { TEMPLATES } from './templates'
 
 const ROOT = process.cwd()
@@ -29,7 +29,7 @@ export type RegistryItem = {
 type CssTree = { [key: string]: string | CssTree }
 
 export function freeNames() {
-  return [...ENTRIES.filter((e) => !isProComponent(e.id)).map((e) => e.id), ...FREE_BLOCKS, ...Object.keys(KITS)]
+  return [...ENTRIES.filter((e) => !isProComponent(e.id)).map((e) => e.id), ...FREE_BLOCKS]
 }
 
 export const isProName = (name: string) => isProComponent(name) || isProBlock(name) || name.startsWith('template-')
@@ -190,8 +190,6 @@ const describe = (name: string) => {
   if (e) return { title: e.name, description: e.line, type: 'registry:component' }
   const b = BLOCKS.find((x) => x.id === name)
   if (b) return { title: b.name, description: b.line, type: 'registry:block' }
-  const k = KITS[name]
-  if (k) return { title: k.name, description: k.line, type: 'registry:block' }
   return null
 }
 
@@ -220,8 +218,6 @@ export async function registryItem(name: string): Promise<RegistryItem | null> {
   if (name === 'theme') return null
   const about = describe(name)
   if (!about) return null
-  if (KITS[name])
-    return { $schema: SCHEMA, name, ...about, author: 'Detent', registryDependencies: KITS[name].items.map(itemUrl), files: [] }
   return build(name, itemUrl('theme'))
 }
 
@@ -329,7 +325,7 @@ export async function themeFor(names: string[]): Promise<RegistryItem> {
   const all = statements(await readFile(path.join(SRC, 'app/globals.css'), 'utf8'))
   let words = new Set<string>()
   for (const name of names) {
-    const entry = !KITS[name] && entryOf(name)
+    const entry = entryOf(name)
     if (!entry) continue
     for (const code of (await gather(entry)).files.values()) stringWords(code).forEach((w) => words.add(w))
   }
