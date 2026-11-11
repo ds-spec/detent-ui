@@ -6,7 +6,7 @@ export const REFUND_DAYS = 14
 
 export const TRIAL_INSTALLS = 5
 
-export const EARLY_TRIAL = { installs: 10, before: Date.parse('2026-11-12T00:00:00+05:30'), until: 'November 11, 2026' }
+export const EARLY_TRIAL = { installs: 10, before: Date.parse('2026-11-12T00:00:00+05:30') }
 
 export const trialFor = (since: number) => (since < EARLY_TRIAL.before ? EARLY_TRIAL.installs : TRIAL_INSTALLS)
 

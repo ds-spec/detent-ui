@@ -1,7 +1,7 @@
 import { ENTRIES, entry } from '@/catalog/meta'
 import { BLOCKS } from '@/catalog/blocks'
 import { TEMPLATES, TEMPLATE_COUNT } from '@/catalog/templates'
-import { RELEASES, CONTACT, EARLY_TRIAL, REFUND_DAYS, TRIAL_INSTALLS } from '@/catalog/trust'
+import { RELEASES, CONTACT, REFUND_DAYS, TRIAL_INSTALLS } from '@/catalog/trust'
 import { FREE_BLOCKS, ON_SALE, PLANS, PRO_COMPONENTS, PRO_BLOCK_COUNT, SITE, installCommand, isProBlock, isProComponent } from '@/catalog/pro'
 import { NAME, DESCRIPTION, TAGLINE, FREE_COUNT } from '@/site/seo'
 import { abs, envelope, fmtDate, itemList, kvTable, today } from './format'
@@ -304,8 +304,6 @@ function renderRefunds(): string {
     `Try up to ${TRIAL_INSTALLS} Pro components or blocks in your first ${REFUND_DAYS} days. If Pro isn’t right for you, email us within those ${REFUND_DAYS} days for a full refund. You don’t need a reason.`,
     '',
     `Past ${TRIAL_INSTALLS} installs or ${REFUND_DAYS} days, the purchase is final. Templates are final once downloaded. If something doesn’t work as described, write anyway and we’ll make it right.`,
-    '',
-    `Bought on or before ${EARLY_TRIAL.until}? Your limit stays at ${EARLY_TRIAL.installs}.`,
     '',
     `Contact: ${CONTACT}`,
   ].join('\n')

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { CONTACT, EARLY_TRIAL, REFUND_DAYS, REFUND_RULE_UPDATED, TRIAL_INSTALLS, updated } from '@/catalog/trust'
+import { CONTACT, REFUND_DAYS, REFUND_RULE_UPDATED, TRIAL_INSTALLS, updated } from '@/catalog/trust'
 import { LegalPage, List, P } from '@/site/trust/Legal'
 import { page } from '@/site/seo'
 
@@ -38,9 +38,6 @@ export default function Refunds() {
               </P>
               <P>
                 Past that, you’ve put Pro to real use, so the purchase is final. Templates are final once downloaded, since each one is a whole product in a single download. We keep a simple record of what each key installs, which is how we can say yes to a refund straight away instead of asking you questions.
-              </P>
-              <P>
-                Bought on or before {EARLY_TRIAL.until}? Your limit stays at {EARLY_TRIAL.installs}, as it was when you bought.
               </P>
             </>
           ),
