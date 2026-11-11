@@ -65,11 +65,6 @@ export async function recordInstall(email: string, item: string, kind: 'componen
   await (await db()).execute({ sql: 'insert or ignore into install (email, item, kind, at) values (?, ?, ?, ?)', args: [email, item, kind, Date.now()] })
 }
 
-export async function countFreeInstall(item: string) {
-  const day = new Date().toISOString().slice(0, 10)
-  await (await db()).execute({ sql: 'insert into free_install (item, day, n) values (?, ?, 1) on conflict (item, day) do update set n = n + 1', args: [item, day] })
-}
-
 export async function usageFor(email: string, since: number): Promise<Usage> {
   const { rows } = await (await db()).execute({ sql: 'select kind, count(*) as n from install where email = ? group by kind', args: [email] })
   const n = (kind: string) => Number(rows.find((r) => r.kind === kind)?.n ?? 0)

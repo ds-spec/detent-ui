@@ -18,6 +18,9 @@ const SCHEMA = [
   `create table if not exists free_install (item text not null, day text not null, n integer not null, primary key (item, day))`,
   `create table if not exists attempt (bucket text not null, at integer not null)`,
   `create index if not exists attempt_bucket on attempt (bucket, at)`,
+  `create table if not exists free_installer (item text not null, day text not null, who text not null, primary key (item, day, who))`,
+  `create table if not exists free_fetch (item text not null, day text not null, via text not null, n integer not null, primary key (item, day, via))`,
+  `create table if not exists install_salt (day text primary key, value text not null)`,
 ]
 
 let ready: Promise<Client> | undefined

@@ -33,14 +33,29 @@ const table = async (sql, args) => {
   }
 }
 
-const free = await table('select item, sum(n) as n from free_install where day >= ? group by item order by n desc', [since])
+const people = await table('select item, count(*) as n from free_installer where day >= ? group by item order by n desc', [since])
+const daily = await table('select day, count(distinct who) as n from free_installer where day >= ? group by day order by day', [since])
+const fetches = await table('select item, via, sum(n) as n from free_fetch where day >= ? group by item, via', [since])
+const legacy = await table('select sum(n) as n from free_install where day >= ?', [since])
 const pro = await table('select item, count(*) as n from install where at >= ? group by item order by n desc', [Date.parse(`${since}T00:00:00Z`)])
 
-const show = (title, rows) => {
-  const total = rows.reduce((sum, r) => sum + Number(r.n), 0)
-  console.log(`\n${title}: ${total} in the last ${days} day${days === 1 ? '' : 's'}`)
-  if (rows.length) console.table(rows.map((r) => ({ piece: titles.get(r.item) ?? r.item, id: r.item, installs: Number(r.n) })))
-}
+const span = `in the last ${days} day${days === 1 ? '' : 's'}`
+const sum = (rows) => rows.reduce((total, r) => total + Number(r.n), 0)
+const name = (item) => titles.get(item) ?? item
 
-show('Free installs', free)
-show('Pro installs', pro)
+console.log(`\nFree installs: ${sum(people)} ${span}`)
+console.log('From the shadcn CLI only, one per person per component per day.')
+if (people.length) console.table(people.map((r) => ({ piece: name(r.item), id: r.item, installs: Number(r.n) })))
+if (daily.length) console.table(daily.map((r) => ({ day: r.day, people: Number(r.n) })))
+
+const via = (item, kind) => Number(fetches.find((r) => r.item === item && r.via === kind)?.n ?? 0)
+const looked = [...new Set(fetches.map((r) => r.item))].map((item) => ({ piece: name(item), id: item, browser: via(item, 'browser'), agent: via(item, 'agent'), other: via(item, 'other') }))
+console.log(`\nOpened without installing: ${sum(fetches)} ${span}`)
+console.log('Browsers, AI agents, and scripts like curl. Not installs.')
+if (looked.length) console.table(looked.sort((a, b) => b.browser + b.agent + b.other - (a.browser + a.agent + a.other)))
+
+const before = Number(legacy[0]?.n ?? 0)
+if (before) console.log(`\nBefore this counter: ${before} raw requests, not people. One CLI install made two, and browsers and scripts counted too.`)
+
+console.log(`\nPro installs: ${sum(pro)} ${span}`)
+if (pro.length) console.table(pro.map((r) => ({ piece: name(r.item), id: r.item, installs: Number(r.n) })))
