@@ -61,7 +61,7 @@ export function ProPitch({ id, shelf = 'components' }: { id: string; shelf?: 'co
                 Get Pro
                 <ArrowRight size={14} className="transition-transform duration-150 group-hover/buy:translate-x-0.5" />
               </a>
-              <p className="text-[12.5px] text-ink-3">Full refund within {REFUND_DAYS} days, no questions.</p>
+              <p className="text-[12.5px] text-ink-3">{REFUND_DAYS}-day refund while you try it.</p>
             </div>
           </div>
         </section>

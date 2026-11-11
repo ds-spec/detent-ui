@@ -1,7 +1,7 @@
 import { ENTRIES, entry } from '@/catalog/meta'
 import { BLOCKS } from '@/catalog/blocks'
 import { TEMPLATES, TEMPLATE_COUNT } from '@/catalog/templates'
-import { RELEASES, CONTACT } from '@/catalog/trust'
+import { RELEASES, CONTACT, EARLY_TRIAL, REFUND_DAYS, TRIAL_INSTALLS } from '@/catalog/trust'
 import { FREE_BLOCKS, ON_SALE, PLANS, PRO_COMPONENTS, PRO_BLOCK_COUNT, SITE, installCommand, isProBlock, isProComponent } from '@/catalog/pro'
 import { NAME, DESCRIPTION, TAGLINE, FREE_COUNT } from '@/site/seo'
 import { abs, envelope, fmtDate, itemList, kvTable, today } from './format'
@@ -301,7 +301,11 @@ function renderRefunds(): string {
   const body = [
     '## Refund policy',
     '',
-    'You may request a full refund within 14 days of purchase, no questions asked. After 14 days, refunds are at our discretion.',
+    `Try up to ${TRIAL_INSTALLS} Pro components or blocks in your first ${REFUND_DAYS} days. If Pro isn’t right for you, email us within those ${REFUND_DAYS} days for a full refund. You don’t need a reason.`,
+    '',
+    `Past ${TRIAL_INSTALLS} installs or ${REFUND_DAYS} days, the purchase is final. Templates are final once downloaded. If something doesn’t work as described, write anyway and we’ll make it right.`,
+    '',
+    `Bought on or before ${EARLY_TRIAL.until}? Your limit stays at ${EARLY_TRIAL.installs}.`,
     '',
     `Contact: ${CONTACT}`,
   ].join('\n')
@@ -582,7 +586,7 @@ const STATIC_ROUTES: Record<string, { render: () => string | null; desc: string;
   '/changelog':   { render: renderChangelog,  desc: 'Every update, newest first',                      isStatic: false },
   '/licence':     { render: renderLicence,    desc: 'Licence terms and key conditions',                isStatic: true },
   '/terms':       { render: renderTerms,      desc: 'Terms of service',                                isStatic: true },
-  '/refunds':     { render: renderRefunds,    desc: 'Refund policy: 14 days, no questions asked',      isStatic: true },
+  '/refunds':     { render: renderRefunds,    desc: `Refund policy: ${REFUND_DAYS} days, up to ${TRIAL_INSTALLS} components or blocks`,      isStatic: true },
   '/privacy':     { render: renderPrivacy,    desc: 'What we keep, who helps run it, and how to remove it', isStatic: true },
 }
 

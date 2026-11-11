@@ -71,7 +71,7 @@ export function HomeHero({ lib, fresh }: { lib: LibItem[]; fresh: Latest }) {
                 }
               />
             </div>
-            <ForPlan none={<p className="rise mt-4 text-[13px] text-ink-3" style={{ animationDelay: '260ms' }}>Pro comes with a full refund within {REFUND_DAYS} days.</p>} />
+            <ForPlan none={<p className="rise mt-4 text-[13px] text-ink-3" style={{ animationDelay: '260ms' }}>Pro comes with a {REFUND_DAYS}-day refund.</p>} />
           </div>
           <Plates lib={lib} onOpen={setOpen} className="rise mt-12 lg:mt-14 lg:h-[clamp(480px,calc(100svh-300px),620px)]" />
         </div>

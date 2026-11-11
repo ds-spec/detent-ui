@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { PLANS, PRO_BLOCK_COUNT, PRO_COMPONENTS } from '@/catalog/pro'
 import type { Plan } from '@/catalog/licence'
 import { TEMPLATES } from '@/catalog/templates'
-import { REFUND_DAYS, TRIAL_INSTALLS } from '@/catalog/trust'
+import { REFUND_DAYS, trialFor } from '@/catalog/trust'
 import type { Usage } from '@/lib/account/keys'
 import { DetentMark } from '@/lab/ui/DetentMark'
 import { Arriving } from './Forms'
@@ -21,11 +21,11 @@ function Stat({ label, value }: { label: string; value: ReactNode }) {
   )
 }
 
-function Trial({ usage }: { usage: Usage }) {
+function Trial({ usage, limit }: { usage: Usage; limit: number }) {
   const until = usage.until
   if (!usage.open) return null
-  const used = Math.min(usage.components, TRIAL_INSTALLS)
-  const open = usage.components <= TRIAL_INSTALLS && usage.templates === 0
+  const used = Math.min(usage.components, limit)
+  const open = usage.components <= limit && usage.templates === 0
   return (
     <div className="mt-5 rounded-[12px] bg-[color-mix(in_oklch,var(--ink)_3%,transparent)] px-4 py-3.5">
       <div className="flex items-baseline justify-between gap-3">
@@ -34,16 +34,16 @@ function Trial({ usage }: { usage: Usage }) {
       </div>
       <p className="mt-1 text-[13px] leading-[1.5] text-ink-3">
         {open
-          ? `Take your time trying it. If Pro isn’t right for you, a full refund is yours while you’ve installed up to ${TRIAL_INSTALLS} components and no templates.`
+          ? `Take your time trying it. If Pro isn’t right for you, a full refund is yours while you’ve installed up to ${limit} components or blocks, and no templates.`
           : 'You’ve put Pro to real use, so this purchase is now final. If anything doesn’t work as it should, write to us and we’ll make it right.'}
       </p>
       {open && (
         <div className="mt-3 flex items-center gap-3">
           <span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-[color-mix(in_oklch,var(--ink)_8%,transparent)]">
-            <span className="absolute inset-y-0 left-0 rounded-full bg-ink transition-[width] duration-500" style={{ width: `${(used / TRIAL_INSTALLS) * 100}%` }} />
+            <span className="absolute inset-y-0 left-0 rounded-full bg-ink transition-[width] duration-500" style={{ width: `${(used / limit) * 100}%` }} />
           </span>
           <span className="tnum shrink-0 text-[12.5px] text-ink-3">
-            {used} of {TRIAL_INSTALLS} tried
+            {used} of {limit} tried
           </span>
         </div>
       )}
@@ -77,7 +77,7 @@ export function Membership({ purchase, usage = null, arriving, thanks }: { purch
           <Stat label="Blocks" value={PRO_BLOCK_COUNT} />
           {purchase.plan === 'all' ? <Stat label="Templates" value={TEMPLATES.length} /> : <Stat label="Updates" value="For life" />}
         </dl>
-        {usage && <Trial usage={usage} />}
+        {usage && <Trial usage={usage} limit={trialFor(purchase.since)} />}
       </SettingsCard>
     )
   if (arriving)

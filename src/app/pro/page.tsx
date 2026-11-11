@@ -26,7 +26,7 @@ const FAQ: [string, string][] = [
   ['Can my team share one licence?', 'A licence is for one person, so each person building with it needs their own. Your keys work in CI and shared repos.'],
   ['Can I use it for client work?', 'Yes, in as many projects as you like, commercial ones included. What you can’t do is resell or redistribute the components themselves.'],
   ['Do the free components stay free?', 'Yes. Everything free stays free, and keeps getting better alongside Pro.'],
-  ['What if it’s not right for me?', `Try up to ${TRIAL_INSTALLS} components in your first ${REFUND_DAYS} days. If it isn’t right, email us and you get every cent back, no form, no questions.`],
+  ['What if it’s not right for me?', `Try up to ${TRIAL_INSTALLS} components or blocks in your first ${REFUND_DAYS} days. If it isn’t right, email us and you get every cent back, no form, no questions.`],
 ]
 
 const H2 = 'text-[clamp(32px,3.4vw,48px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink'

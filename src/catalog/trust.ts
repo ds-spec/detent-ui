@@ -4,11 +4,17 @@ export const CONTACT = process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? 'hello@detentui.
 
 export const REFUND_DAYS = 14
 
-export const TRIAL_INSTALLS = 10
+export const TRIAL_INSTALLS = 5
+
+export const EARLY_TRIAL = { installs: 10, before: Date.parse('2026-11-12T00:00:00+05:30'), until: 'November 11, 2026' }
+
+export const trialFor = (since: number) => (since < EARLY_TRIAL.before ? EARLY_TRIAL.installs : TRIAL_INSTALLS)
 
 export const UPDATED = '2026-11-02'
 
-export const updated = () => new Date(`${UPDATED}T00:00:00`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+export const REFUND_RULE_UPDATED = '2026-11-11'
+
+export const updated = (on = UPDATED) => new Date(`${on}T00:00:00`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
 
 export type Release = { date: string; name: string; title: string; line: string; items: { label: string; href?: string; pro?: boolean }[] }
 

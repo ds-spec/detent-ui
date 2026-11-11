@@ -179,7 +179,7 @@ function Tile({ name, on, disabled = false, short = false, onPick, title, price,
 const PROMISES = [
   [<Check key="c" size={14} />, 'One payment, no subscription'],
   [<Refresh key="r" size={14} />, 'Every update, for life'],
-  [<Undo key="u" size={14} />, `${REFUND_DAYS}-day refund, no questions`],
+  [<Undo key="u" size={14} />, `${REFUND_DAYS}-day refund`],
   [<Code key="o" size={14} />, 'The source is yours to change'],
 ] as const
 

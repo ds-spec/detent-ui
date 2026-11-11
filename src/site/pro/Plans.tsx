@@ -18,7 +18,7 @@ export function Plans({ compact = false }: { compact?: boolean }) {
           [
             [<Check key="c" size={14} />, 'Pay once, no subscription'],
             [<Refresh key="r" size={14} />, 'Every update, for life'],
-            [<Undo key="u" size={14} />, `${REFUND_DAYS}-day refund, no questions`],
+            [<Undo key="u" size={14} />, `${REFUND_DAYS}-day refund`],
             [<Code key="o" size={14} />, 'Source code, yours to edit'],
           ] as const
         ).map(([icon, text]) => (
@@ -49,7 +49,7 @@ function PlanCard({ plan, compact }: { plan: Plan; compact: boolean }) {
         <span className={`text-[13.5px] ${ink ? 'text-surface/60' : 'text-ink-3'}`}>once, for {plan.seats}</span>
       </p>
       <PlanButton plan={plan} className={`ring-focus mt-8 flex h-11 items-center justify-center rounded-full text-[14px] font-medium transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.98] ${ink ? 'bg-surface text-ink' : 'bg-ink text-surface'}`} />
-      <p className={`mt-3 text-center text-[12.5px] ${ink ? 'text-surface/55' : 'text-ink-3'}`}>Full refund within {REFUND_DAYS} days, no questions.</p>
+      <p className={`mt-3 text-center text-[12.5px] ${ink ? 'text-surface/55' : 'text-ink-3'}`}>{REFUND_DAYS}-day refund while you try it.</p>
       {!compact && (
         <ul className={`mt-8 flex flex-col gap-3 pt-7 text-[14px] ${ink ? 'text-surface/85 shadow-[inset_0_1px_0_rgb(255_255_255/0.14)]' : 'text-ink-2 shadow-[inset_0_1px_0_var(--line)]'}`}>
           {features.map((f) => (
