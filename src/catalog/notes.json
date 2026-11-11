@@ -60,7 +60,8 @@
   "askchart": {
     "ask": "Answers a question, given the steps so far, so follow-ups can build on them.",
     "initial": "A first question and its answer to start from.",
-    "onAnswer": "Called with each new answer."
+    "onAnswer": "Called with each new answer.",
+    "suggestions": "Questions offered as buttons before the first one is asked."
   },
   "billing": {
     "plans": "The plans to offer, cheapest first. Defaults to Free, Team and Scale.",
