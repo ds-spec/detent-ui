@@ -25,7 +25,7 @@ const NAV = [
 const UI = 'cubic-bezier(0.2, 0, 0, 1)'
 const here = (section: string, path: string) => path.startsWith(section)
 const MOVE = 220
-const PILL = 980
+const PILL = 1120
 const INSET = `max(0px, (min(1440px, 100vw - 40px) - ${PILL}px) / 2)`
 
 export function Header() {
@@ -60,7 +60,7 @@ export function Header() {
       <div className="pointer-events-auto relative mx-auto grid h-[72px] max-w-[1440px] grid-cols-[1fr_auto] items-center pl-6 pr-2.5 lg:grid-cols-[1fr_auto_1fr]">
         <span
           aria-hidden
-          className={side ? `pointer-events-none absolute left-1/2 top-[20px] -z-10 h-[54px] w-full max-w-[980px] rounded-[16px] will-change-[opacity,transform]` : "pointer-events-none absolute left-1/2 top-[20px] -z-10 h-[54px] w-full max-w-[980px] rounded-full will-change-[opacity,transform]"}
+          className={side ? `pointer-events-none absolute left-1/2 top-[20px] -z-10 h-[54px] w-full max-w-[1120px] rounded-[16px] will-change-[opacity,transform]` : "pointer-events-none absolute left-1/2 top-[20px] -z-10 h-[54px] w-full max-w-[1120px] rounded-full will-change-[opacity,transform]"}
           style={{
             background: 'var(--nav)',
             boxShadow: 'inset 0 0 0 1px var(--line), 0 14px 34px -16px rgb(0 0 0 / 0.24)',
