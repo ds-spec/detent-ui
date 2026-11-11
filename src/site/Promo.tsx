@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { PLANS } from '@/catalog/pro'
 import { usePathname } from 'next/navigation'
@@ -35,22 +35,9 @@ function useLeft() {
 
 export function PromoStrip() {
   const owned = useOwned()
-  const [copied, setCopied] = useState(false)
-  const [round, setRound] = useState(0)
-  const timer = useRef(0)
   const promo = usePromo()
   const left = useLeft()
-  useEffect(() => () => clearTimeout(timer.current), [])
   if (!promo) return null
-  const code = promo.code
-
-  const copy = () => {
-    void navigator.clipboard?.writeText(code).catch(() => {})
-    setCopied(true)
-    setRound((r) => r + 1)
-    clearTimeout(timer.current)
-    timer.current = window.setTimeout(() => setCopied(false), 1600)
-  }
 
   return (
     <AnimatePresence initial={false}>
@@ -71,80 +58,19 @@ export function PromoStrip() {
           <span className="bg-clip-text font-semibold text-transparent" style={{ backgroundImage: BLUE }}>
             Pro
           </span>
-          <span>with</span>
         </p>
-        <button
-          type="button"
-          onClick={copy}
-          aria-label={copied ? `Copied ${code}` : `Copy code ${code}`}
-          className="group/code relative flex h-[26px] shrink-0 items-center rounded-[7px] bg-white/[0.07] outline-none transition-[background-color,scale] duration-150 hover:bg-white/[0.12] focus-visible:ring-2 focus-visible:ring-white/40 active:scale-[0.96]"
+        <span
+          className="relative flex h-[26px] shrink-0 items-center gap-[0.4em] rounded-[7px] bg-white/[0.07] px-2.5 tabular-nums"
           style={{ mask: TICKET, WebkitMask: TICKET }}
         >
-          <span
-            aria-hidden
-            className="pointer-events-none absolute inset-0 rounded-[7px] transition-shadow duration-300"
-            style={{ boxShadow: copied ? 'inset 0 0 0 1px rgb(110 231 160 / 0.7)' : 'inset 0 0 0 1px rgb(255 255 255 / 0.2)' }}
-          />
-          <span className="relative overflow-hidden pl-3 pr-2.5 font-mono text-[12px] font-semibold tracking-[0.08em] text-white">
-            {code}
-            {copied && (
-              <motion.span
-                key={round}
-                aria-hidden
-                className="pointer-events-none absolute inset-y-0 w-8 -skew-x-12 bg-gradient-to-r from-transparent via-white/35 to-transparent"
-                initial={{ left: '-40%' }}
-                animate={{ left: '120%' }}
-                transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
-              />
-            )}
+          <span aria-hidden className="pointer-events-none absolute inset-0 rounded-[7px] shadow-[inset_0_0_0_1px_rgb(255_255_255/0.2)]" />
+          <s className="text-[12px] text-white/45 decoration-white/45">
+            <span className="sr-only">was </span>${PLANS[0].price}
+          </s>
+          <span className="text-[13px] font-semibold text-white">
+            <span className="sr-only">now </span>${promo.price}
           </span>
-          <span aria-hidden className="h-3.5 border-l border-dashed border-white/25" />
-          <span className="grid size-[26px] place-items-center pr-0.5 [&>*]:col-start-1 [&>*]:row-start-1">
-            <AnimatePresence initial={false}>
-              {copied ? (
-                <motion.svg
-                  key="done"
-                  className="block"
-                  width="13"
-                  height="13"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  stroke="rgb(110 231 160)"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  initial={{ scale: 0.6, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.6, opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 600, damping: 30 }}
-                >
-                  <motion.path d="M3 7.4 5.8 10 11 4.2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.28, delay: 0.05, ease: [0.65, 0, 0.35, 1] }} />
-                </motion.svg>
-              ) : (
-                <motion.svg
-                  key="copy"
-                  width="13"
-                  height="13"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.3"
-                  className="block text-white/55 transition-colors duration-150 group-hover/code:text-white"
-                  initial={{ scale: 0.6, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.6, opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 600, damping: 30 }}
-                >
-                  <rect x="4.6" y="4.6" width="7" height="7" rx="1.8" />
-                  <path d="M9.4 4.4V3.6a1.6 1.6 0 0 0-1.6-1.6H3.6A1.6 1.6 0 0 0 2 3.6v4.2a1.6 1.6 0 0 0 1.6 1.6h.8" />
-                </motion.svg>
-              )}
-            </AnimatePresence>
-          </span>
-          <span className="sr-only" aria-live="polite">
-            {copied ? 'Code copied' : ''}
-          </span>
-        </button>
+        </span>
         {left && (
           <span className="hidden whitespace-nowrap tabular-nums text-white/45 md:inline">
             ends in <span className="text-white/80">{left}</span>

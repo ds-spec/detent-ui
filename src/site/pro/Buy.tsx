@@ -294,7 +294,7 @@ export function BuyBar() {
       </div>
       <p className="mt-4 max-w-[920px] text-balance px-4 text-center text-[13px] leading-[1.7] text-ink-3">
         <span className="text-ink-2">
-          {what}, for {plan.seats}. {promo ? `$${promo.price} with code ${promo.code} at checkout. ` : ''}Launch price: it goes up as the library grows.
+          {what}, for {plan.seats}. {promo ? `$${promo.price} until ${promo.until}, no code needed. ` : ''}Launch price: it goes up as the library grows.
         </span>{' '}
         One payment · Every update for life · {REFUND_DAYS}-day refund · The source is yours
       </p>

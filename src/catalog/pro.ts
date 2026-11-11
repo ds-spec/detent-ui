@@ -64,6 +64,7 @@ const comeBack = (link: string) => {
   if (!/^https?:\/\//.test(link)) return link
   const url = new URL(link)
   if (!url.searchParams.has('redirect_url')) url.searchParams.set('redirect_url', `${SITE}/account?bought=1`)
+  if (!url.searchParams.has('showDiscounts')) url.searchParams.set('showDiscounts', 'false')
   return url.toString()
 }
 
