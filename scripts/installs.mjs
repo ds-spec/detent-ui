@@ -9,6 +9,17 @@ const env = Object.fromEntries(
     .map((m) => [m[1], m[2].trim().replace(/^(['"])(.*)\1$/, '$2')]),
 )
 
+const read = (file) => {
+  try {
+    return JSON.parse(readFileSync(file, 'utf8'))
+  } catch {
+    return null
+  }
+}
+const titles = new Map(
+  [...(read('public/_data/index.json')?.items ?? []), ...Object.values(read('.detent/pro-registry.json')?.items ?? {})].map((i) => [i.name, i.title]),
+)
+
 const days = Math.max(1, Number(process.argv[2]) || 7)
 const since = new Date(Date.now() - (days - 1) * 86_400_000).toISOString().slice(0, 10)
 const client = createClient({ url: env.DETENT_DB_URL ?? 'file:.detent/account.db', authToken: env.DETENT_DB_TOKEN })
@@ -28,7 +39,7 @@ const pro = await table('select item, count(*) as n from install where at >= ? g
 const show = (title, rows) => {
   const total = rows.reduce((sum, r) => sum + Number(r.n), 0)
   console.log(`\n${title}: ${total} in the last ${days} day${days === 1 ? '' : 's'}`)
-  if (rows.length) console.table(rows.map((r) => ({ piece: r.item, installs: Number(r.n) })))
+  if (rows.length) console.table(rows.map((r) => ({ piece: titles.get(r.item) ?? r.item, id: r.item, installs: Number(r.n) })))
 }
 
 show('Free installs', free)
