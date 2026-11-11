@@ -16,6 +16,7 @@ const SCHEMA = [
   `create index if not exists purchase_email on purchase (email)`,
   `create table if not exists install (email text not null, item text not null, kind text not null, at integer not null, primary key (email, item))`,
   `create table if not exists free_install (item text not null, day text not null, n integer not null, primary key (item, day))`,
+  `create table if not exists feedback (email text primary key, text text not null, share integer not null default 0, at integer not null)`,
   `create table if not exists attempt (bucket text not null, at integer not null)`,
   `create index if not exists attempt_bucket on attempt (bucket, at)`,
   `create table if not exists free_installer (item text not null, day text not null, who text not null, primary key (item, day, who))`,

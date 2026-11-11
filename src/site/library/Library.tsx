@@ -14,6 +14,7 @@ import { TEMPLATES } from '@/catalog/templates'
 import { ArrowUpRight } from '@/lab/icons'
 import { Mini } from '../Mini'
 import { ForPlan } from '../Owned'
+import { PriceNow } from '../Promo'
 import { useNear } from '../near'
 import { TemplateCard } from '../templates/TemplateCard'
 import { wellOf } from '../wells'
@@ -98,7 +99,7 @@ export function Library({ shelf }: { shelf: Shelf }) {
                 none={
                 <Link href="/pro" className="ring-focus group/pro flex items-center gap-2 rounded-[10px] text-[14px] text-ink-3 transition-colors hover:text-ink">
                   <span>
-                    <span className="text-ink">{pro} of these are Pro.</span> All of them, and every one we add, for ${PLANS[0].price} once.
+                    <span className="text-ink">{pro} of these are Pro.</span> All of them, and every one we add, for <PriceNow value={PLANS[0].price} /> once.
                   </span>
                   <ArrowUpRight size={13} className="shrink-0 transition-transform duration-150 group-hover/pro:-translate-y-px group-hover/pro:translate-x-px" />
                 </Link>

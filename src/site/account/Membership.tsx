@@ -6,6 +6,7 @@ import { TEMPLATES } from '@/catalog/templates'
 import { REFUND_DAYS, trialFor } from '@/catalog/trust'
 import type { Usage } from '@/lib/account/keys'
 import { DetentMark } from '@/lab/ui/DetentMark'
+import { PriceNow } from '../Promo'
 import { Arriving } from './Forms'
 import { planLabel } from './ProBadge'
 import { SettingsCard, SMALL, SMALL_QUIET } from './Settings'
@@ -60,7 +61,7 @@ export function Membership({ purchase, usage = null, arriving, thanks }: { purch
         line={thanks ? 'Welcome. Everything in it is yours.' : 'Everything in it is yours, with every update for life.'}
         foot={`Yours since ${day(purchase.since)}`}
         action={
-          <Link href="/pro#install" className={SMALL_QUIET}>
+          <Link href="/docs#pro" className={SMALL_QUIET}>
             How to install
           </Link>
         }
@@ -102,7 +103,9 @@ export function Membership({ purchase, usage = null, arriving, thanks }: { purch
           {[...PLANS].reverse().map((plan) => (
             <a key={plan.id} href={plan.href} className={plan.best ? SMALL : SMALL_QUIET}>
               Get {plan.name}
-              <span className="tnum opacity-60">${plan.price}</span>
+              <span className="tnum opacity-60">
+                <PriceNow value={plan.price} />
+              </span>
             </a>
           ))}
         </div>

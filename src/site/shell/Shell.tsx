@@ -12,6 +12,7 @@ import type { RailGroup } from '../exhibit/Rail'
 import { Header } from '../Header'
 import { ForPlan } from '../Owned'
 import { Mark, ThemeButton } from '../parts'
+import { PriceNow } from '../Promo'
 import { useSite } from '../Providers'
 import { SideNext } from './SideNext'
 import { BTN, useSideNew } from './side'
@@ -74,7 +75,7 @@ export function Shell({ list, bar, children, bare = false }: { list: ReactNode; 
             <Link href="/pro" className="ring-focus group/pro mr-3 mt-2 flex items-center gap-2 rounded-[10px] px-2.5 py-2 text-[12.5px] text-ink-2 transition-colors hover:bg-[var(--shell-hover)] hover:text-ink active:bg-[var(--shell-on)]">
               <span className="rounded-[5px] bg-ink px-1.5 text-[10.5px] font-medium leading-[18px] text-surface">Pro</span>
               Pricing
-              <span className="ml-auto text-ink-3">${PLANS[0].price}</span>
+              <span className="ml-auto text-ink-3"><PriceNow value={PLANS[0].price} /></span>
               <ArrowRight size={12} className="text-ink-3 transition-transform duration-150 group-hover/pro:translate-x-0.5" />
             </Link>
           }

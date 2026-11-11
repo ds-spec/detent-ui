@@ -79,6 +79,7 @@ export function PromoStrip() {
         )}
         <a
           href={PLANS[0].href}
+          data-cta="strip"
           className="group/buy flex h-[24px] shrink-0 items-center gap-1 rounded-full bg-white pl-2.5 pr-2 text-[12.5px] font-semibold text-[#0b0b0d] outline-none transition-[opacity,scale] duration-150 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-white/50 active:scale-[0.97]"
         >
           Buy now
@@ -104,6 +105,11 @@ export function Price({ value, className = '' }: { value: number; className?: st
 }
 
 export const priceWith = (promo: Promo | null, value: number) => (promo && promo.price < value ? promo.price : value)
+
+export function PriceNow({ value }: { value: number }) {
+  const promo = usePromo()
+  return <>${priceWith(promo, value)}</>
+}
 
 export function MobileBuy() {
   const owned = useOwned()
@@ -133,7 +139,7 @@ export function MobileBuy() {
           <span className="tnum text-[17px] tracking-[-0.02em] [&_s]:text-white/45">
             <Price value={PLANS[0].price} />
           </span>
-          <a href={PLANS[0].href} className="flex h-10 items-center rounded-[12px] bg-white px-4 text-[14px] font-semibold text-[#0b0b0d] active:scale-[0.97]">
+          <a href={PLANS[0].href} data-cta="mobile-bar" className="flex h-10 items-center rounded-[12px] bg-white px-4 text-[14px] font-semibold text-[#0b0b0d] active:scale-[0.97]">
             Get Pro
           </a>
         </motion.div>

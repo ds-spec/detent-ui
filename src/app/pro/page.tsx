@@ -1,11 +1,15 @@
 import type { Metadata } from 'next'
 import { PRO_BLOCKS } from '@/catalog/effort'
-import { PRO_COMPONENTS, TERMS } from '@/catalog/pro'
-import { TEMPLATE_COUNT } from '@/catalog/templates'
-import { REFUND_DAYS, TRIAL_INSTALLS } from '@/catalog/trust'
-import { BigBuy, BuyBar, BuyProvider, HeroHead, WideStage } from '@/site/pro/Buy'
+import { BLOCKS } from '@/catalog/blocks'
+import { ENTRIES } from '@/catalog/meta'
+import { PRO_COMPONENTS } from '@/catalog/pro'
+import { TEMPLATE_COUNT, TEMPLATES } from '@/catalog/templates'
+import { CONTACT, REFUND_DAYS, TRIAL_INSTALLS } from '@/catalog/trust'
+import { Check } from '@/lab/icons'
+import { BigBuy, BuyBar, BuyNote, BuyProvider, HeroHead, WideStage } from '@/site/pro/Buy'
 import { Compare, Inside } from '@/site/pro/Inside'
 import { Install } from '@/site/pro/Install'
+import { Quotes } from '@/site/pro/Quotes'
 import { Touch } from '@/site/pro/Touch'
 import { JsonLd, page, proGraph } from '@/site/seo'
 import { SitePage } from '@/site/sheets'
@@ -18,16 +22,18 @@ export const metadata: Metadata = page({
 })
 
 const FAQ: [string, string][] = [
-  ['Who is it for?', 'Developers building a product in React who want it to look finished: a SaaS, a dashboard, a marketplace, or a website. If you already use shadcn, it drops straight in.'],
-  ['Is it a subscription?', 'No. You pay once and keep it, along with every update that ships after you buy.'],
-  ['What’s in Pro?', 'Everything Detent sells: the Pro components, the Pro blocks and the Detent app template, plus every one we add. One price, once.'],
+  ['Is it a subscription?', 'No. You pay once and keep it, along with every update and every new piece that ships after you buy.'],
+  ['Will it work in my project?', 'If you’re building in React with Tailwind CSS v4, yes: a SaaS, a dashboard, a marketplace or a website. Pro installs with the shadcn CLI into the project you already have, so there’s no new styling system to learn. Next.js is what we test on.'],
   ['Will it match my design?', 'Installed with shadcn, Detent takes on your theme: your primary becomes its accent, it uses your background, borders and muted text, and .dark turns it dark. Your fonts stay yours.'],
+  ['Can I change the code?', 'Yes. Every piece lands in your project as source files, the same way shadcn components do. Restyle it, cut it down, rename it. It’s yours.'],
+  ['Can I use it for client work?', 'Yes, in as many projects as you like, commercial ones included. What you can’t do is resell or redistribute the components themselves.'],
+  ['What if it’s not right for me?', `Try up to ${TRIAL_INSTALLS} components or blocks in your first ${REFUND_DAYS} days. If it isn’t right, email us and you get every cent back, no form, no questions.`],
   ['How do I install Pro?', 'With the shadcn CLI, from Detent’s private registry. Sign in with your email, generate a key, add it and the registry to the project once, as in Set up once below, then install like anything else: npx shadcn add @detent-pro/glyph. The source lands in your project.'],
   ['Can my team share one licence?', 'A licence is for one person, so each person building with it needs their own. Your keys work in CI and shared repos.'],
-  ['Can I use it for client work?', 'Yes, in as many projects as you like, commercial ones included. What you can’t do is resell or redistribute the components themselves.'],
-  ['Do the free components stay free?', 'Yes. Everything free stays free, and keeps getting better alongside Pro.'],
-  ['What if it’s not right for me?', `Try up to ${TRIAL_INSTALLS} components or blocks in your first ${REFUND_DAYS} days. If it isn’t right, email us and you get every cent back, no form, no questions.`],
+  ['What if I get stuck?', `Write to ${CONTACT}. You’ll hear back from the person who built it.`],
 ]
+
+const INCLUDED = [`All ${ENTRIES.length} components`, `All ${BLOCKS.length} blocks`, ...TEMPLATES.map((t) => `The ${t.name} template`), 'Every update, for life', 'Unlimited projects', `${REFUND_DAYS}-day refund`]
 
 const H2 = 'text-[clamp(32px,3.4vw,48px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink'
 
@@ -54,6 +60,22 @@ export default function ProPage() {
           <div className="mt-10 sm:mt-14">
             <Touch />
           </div>
+        </section>
+
+        <section aria-labelledby="quotes-title" className="mx-auto mt-28 max-w-[1360px] px-5 sm:mt-36 sm:px-6">
+          <h2 id="quotes-title" className={H2}>
+            Made for people who notice.
+            <span className="block text-quiet">A few of them said so.</span>
+          </h2>
+          <div className="mt-10 sm:mt-14">
+            <Quotes />
+          </div>
+          <p className="mt-8 text-[15px] leading-[1.6] text-ink-3">
+            <span className="text-ink">Over 1,000 people bookmarked the Onboarding block on X.</span>{' '}
+            <a href="https://x.com/next_gendev/status/2119335361554030899" target="_blank" rel="noopener noreferrer" className="ring-focus rounded-[4px] text-ink-2 underline decoration-[var(--line-strong)] underline-offset-[3px] transition-colors duration-150 hover:text-ink hover:decoration-ink">
+              See the post
+            </a>
+          </p>
         </section>
 
         <section aria-labelledby="compare-title" className="mx-auto mt-28 max-w-[1360px] px-5 sm:mt-36 sm:px-6">
@@ -105,7 +127,6 @@ export default function ProPage() {
             Set up once.
             <span className="block text-quiet">Then it’s just shadcn.</span>
           </h2>
-          <p className="mt-5 max-w-[560px] text-[16px] leading-[1.6] text-ink-3">Pro installs from a private registry with the shadcn CLI. Two files in your project, then add anything by name.</p>
           <div className="mt-10 sm:mt-14">
             <Install />
           </div>
@@ -116,10 +137,20 @@ export default function ProPage() {
             Everything in Pro, today.
             <span className="block text-quiet">One payment, yours for good.</span>
           </h2>
-          <div className="mt-10 flex w-full justify-center sm:mt-12">
+          <ul className="mt-8 flex max-w-[720px] flex-wrap justify-center gap-x-6 gap-y-2.5 text-[14px] text-ink-2">
+            {INCLUDED.map((x) => (
+              <li key={x} className="flex items-center gap-2">
+                <span className="text-accent">
+                  <Check size={14} strokeWidth={2.4} />
+                </span>
+                {x}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-10 flex w-full justify-center">
             <BigBuy />
           </div>
-          <p className="mt-5 text-[13px] text-ink-3">{TERMS}</p>
+          <BuyNote />
         </section>
       </BuyProvider>
     </SitePage>

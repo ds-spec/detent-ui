@@ -1,72 +1,32 @@
-import { SITE } from '@/catalog/site'
-import type { Step } from '@/catalog/template-start'
-import { StartStep } from '@/site/templates/TemplateViewer'
+import type { ReactNode } from 'react'
+import Link from 'next/link'
+import { ArrowRight } from '@/lab/icons'
 
-const STEPS: Step[] = [
+const STEPS: { title: string; line: ReactNode }[] = [
+  { title: 'Make a key', line: 'Sign in at /account with the email you bought with, and generate one.' },
+  { title: 'Connect it once', line: 'One block in components.json, and your key in .env.local.' },
   {
-    title: 'Add the registry',
-    line: 'Tell the shadcn CLI where Detent Pro lives and how to sign in to it. It goes beside what shadcn already wrote there.',
-    file: 'components.json',
-    code: `{
-  "registries": {
-    "@detent-pro": {
-      "url": "${SITE}/r/pro/{name}.json",
-      "headers": {
-        "Authorization": "Bearer \${DETENT_PRO_KEY}"
-      }
-    }
-  }
-}`,
+    title: 'Install by name',
+    line: <code className="font-mono text-[13px] text-ink-2">npx shadcn add @detent-pro/glyph</code>,
   },
-  {
-    title: 'Add your key',
-    line: 'Sign in at /account with the email you bought with and generate a key. Keep it out of git: put it in .env.local here, and give CI and your host the same variable.',
-    file: '.env.local',
-    code: 'DETENT_PRO_KEY=dtnt_your-key\n',
-  },
-  {
-    title: 'Install anything',
-    line: 'Components, blocks and the template by name, the template as template-detent. The source lands in your project, yours to change.',
-    code: 'npx shadcn add @detent-pro/glyph',
-  },
-  {
-    title: 'Respect reduced motion',
-    line: 'Wrap your app in this once, around everything in your root layout. For anyone who asks their device for less motion, things stop moving and fades stay.',
-    file: 'app/layout.tsx',
-    code: `import { MotionConfig } from 'motion/react'
-
-<MotionConfig reducedMotion="user">{children}</MotionConfig>`,
-  },
-]
-
-const NO: [string, string][] = [
-  ['Needs your key', 'The key isn’t reaching it. Check .env.local has DETENT_PRO_KEY, and that the header in components.json reads it.'],
-  ['That key isn’t one of ours', 'It may have been removed. Generate a new one in your account.'],
-  ['No Pro purchase on this email yet', 'Sign in with the address on your receipt. Bought with another one? Write to us and we’ll move it.'],
-  ['Couldn’t check your key just now', 'Try again in a minute.'],
 ]
 
 export function Install() {
   return (
-    <div className="grid gap-x-16 gap-y-10 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-      <div>
-        <ol>
-          {STEPS.map((step, i) => (
-            <StartStep key={step.title} n={i + 1} step={step} />
-          ))}
-        </ol>
-      </div>
-      <div className="lg:pt-6">
-        <p className="text-headline text-ink">If it says no</p>
-        <dl className="mt-4">
-          {NO.map(([said, fix]) => (
-            <div key={said} className="py-4 shadow-[inset_0_1px_0_var(--line)]">
-              <dt className="text-callout text-ink">“{said}”</dt>
-              <dd className="mt-1 text-callout leading-[1.6] text-ink-3">{fix}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
+    <div>
+      <ol className="grid gap-3 md:grid-cols-3">
+        {STEPS.map((s, i) => (
+          <li key={s.title} className="rounded-[24px] bg-surface p-6 shadow-[var(--card-edge)] sm:p-7">
+            <span className="tnum text-[13px] text-ink-3">{i + 1}</span>
+            <p className="mt-3 text-[17px] tracking-[-0.015em] text-ink">{s.title}</p>
+            <p className="mt-1.5 text-[14px] leading-[1.6] text-ink-3">{s.line}</p>
+          </li>
+        ))}
+      </ol>
+      <Link href="/docs#pro" className="ring-focus group/go mt-6 inline-flex h-10 items-center gap-2 rounded-full px-1 text-[14px] font-medium text-ink-2 transition-[color,transform] duration-150 hover:text-ink active:scale-[0.97]">
+        Full setup, step by step
+        <ArrowRight size={13} className="transition-transform duration-150 group-hover/go:translate-x-0.5" />
+      </Link>
     </div>
   )
 }

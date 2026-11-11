@@ -65,6 +65,21 @@ export async function recordInstall(email: string, item: string, kind: 'componen
   await (await db()).execute({ sql: 'insert or ignore into install (email, item, kind, at) values (?, ?, ?, ?)', args: [email, item, kind, Date.now()] })
 }
 
+export type Feedback = { text: string; share: boolean; at: number }
+
+export async function feedbackFor(email: string): Promise<Feedback | null> {
+  const { rows } = await (await db()).execute({ sql: 'select text, share, at from feedback where email = ?', args: [email] })
+  const r = rows[0]
+  return r ? { text: String(r.text), share: Number(r.share) === 1, at: Number(r.at) } : null
+}
+
+export async function saveFeedback(email: string, text: string, share: boolean) {
+  await (await db()).execute({
+    sql: 'insert into feedback (email, text, share, at) values (?, ?, ?, ?) on conflict (email) do update set text = excluded.text, share = excluded.share, at = excluded.at',
+    args: [email, text, share ? 1 : 0, Date.now()],
+  })
+}
+
 export async function usageFor(email: string, since: number): Promise<Usage> {
   const { rows } = await (await db()).execute({ sql: 'select kind, count(*) as n from install where email = ? group by kind', args: [email] })
   const n = (kind: string) => Number(rows.find((r) => r.kind === kind)?.n ?? 0)

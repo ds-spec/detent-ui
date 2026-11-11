@@ -5,12 +5,24 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { isAPIError } from 'better-auth/api'
 import { getAuth, socialProviders, type Provider } from '@/lib/account/auth'
-import { createKey, MAX_KEYS, removeKey } from '@/lib/account/keys'
+import { createKey, MAX_KEYS, purchaseFor, removeKey, saveFeedback } from '@/lib/account/keys'
 import { safeNext } from '@/lib/account/next'
 import { currentEmail, endSession, normalEmail } from '@/lib/account/session'
 
 export type LinkState = { sent?: string; error?: string; email?: string }
 export type KeyState = { secret?: string; error?: string }
+export type FeedbackState = { saved?: boolean; error?: string }
+
+export async function sendFeedback(_: FeedbackState, form: FormData): Promise<FeedbackState> {
+  const email = await currentEmail()
+  if (!email) redirect('/account')
+  if (!(await purchaseFor(email))) return { error: 'This opens once Pro is on your account.' }
+  const text = String(form.get('text') ?? '').trim().slice(0, 600)
+  if (text.length < 3) return { error: 'Write a few words first.' }
+  await saveFeedback(email, text, form.get('share') === 'on')
+  revalidatePath('/account')
+  return { saved: true }
+}
 
 export async function askForLink(_: LinkState, form: FormData): Promise<LinkState> {
   const email = normalEmail(form.get('email'))

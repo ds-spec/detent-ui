@@ -17,6 +17,7 @@ import { Backdrop, Window } from '../blocks/Studio'
 import { useOwned } from '../Owned'
 import { BTN, useSideNew } from '../shell/side'
 import { DitherIcon } from '../Dither'
+import { InDirectory } from '../Directory'
 import { Fit } from '../Fit'
 
 const UI = [0.2, 0, 0, 1] as const
@@ -224,11 +225,13 @@ function Summary() {
 export function BigBuy() {
   const side = useSideNew()
   const { plan, buyable } = useChoice()
+  const promo = usePromo()
   const [hot, setHot] = useState(false)
   if (!buyable) return null
   return (
     <a
       href={plan.href}
+      data-cta="pro-bottom"
       onPointerEnter={() => setHot(true)}
       onPointerLeave={() => setHot(false)}
       onFocus={() => setHot(true)}
@@ -236,8 +239,9 @@ export function BigBuy() {
       className={side ? `ring-focus group/big flex h-20 w-full max-w-[720px] items-center gap-4 rounded-[18px] ${BTN.accent} pl-7 pr-2.5 transition-transform duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] active:scale-[0.985] sm:h-24 sm:pl-10 sm:pr-3` : "ring-focus group/big flex h-20 w-full max-w-[720px] items-center gap-4 rounded-full bg-ink pl-7 pr-2.5 text-surface transition-transform duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] active:scale-[0.985] sm:h-24 sm:pl-10 sm:pr-3"}
     >
       <span className="min-w-0 flex-1 truncate text-left text-[clamp(20px,2.6vw,30px)] tracking-[-0.03em]">{plan.cta}</span>
-      <span className="tnum shrink-0 text-[clamp(20px,2.6vw,30px)] tracking-[-0.03em]">
-        <RollingText text={`$${plan.price}`} proportional />
+      <span className="tnum flex shrink-0 items-baseline gap-2 text-[clamp(20px,2.6vw,30px)] tracking-[-0.03em]">
+        {promo && <s className="text-[0.6em] opacity-60">${plan.price}</s>}
+        <RollingText text={`$${priceWith(promo, plan.price)}`} proportional />
       </span>
       <span className={side ? `grid size-[60px] shrink-0 place-items-center rounded-[12px] bg-surface text-ink transition-transform duration-200 [transition-timing-function:cubic-bezier(0.2,0,0,1)] sm:size-[72px]` : "grid size-[60px] shrink-0 place-items-center rounded-full bg-surface text-ink transition-transform duration-200 [transition-timing-function:cubic-bezier(0.2,0,0,1)] sm:size-[72px]"}>
         <DitherIcon color={hot ? 'var(--accent)' : 'var(--ink)'} size={24}>
@@ -248,11 +252,23 @@ export function BigBuy() {
   )
 }
 
+export function BuyNote() {
+  const { plan, buyable } = useChoice()
+  const promo = usePromo()
+  if (!buyable) return null
+  return (
+    <p className="mt-5 text-[13px] text-ink-3">
+      {promo ? `$${promo.price} until ${promo.until}, then $${plan.price}. ` : ''}One payment, no subscription.
+    </p>
+  )
+}
+
 export function HeroHead() {
   const { plan } = useChoice()
   const promo = usePromo()
   return (
     <div className="flex flex-col items-center text-center">
+      <InDirectory pill className="rise mb-7" />
       <h1 className="focus-in text-[clamp(40px,5vw,72px)] font-normal leading-[1.02] tracking-[-0.055em] text-ink">
         <span className="sr-only">Make your app feel expensive. Pay ${priceWith(promo, plan.price)}, once.</span>
         <span aria-hidden className="block">
@@ -262,8 +278,8 @@ export function HeroHead() {
           Pay {promo && <s className="decoration-[0.06em]">${plan.price}</s>} <RollingText text={`$${priceWith(promo, plan.price)}`} proportional />, once.
         </span>
       </h1>
-      <p className="rise mt-6 max-w-[520px] text-balance text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
-        Every Pro component and screen, as code in your own project. Pay once, change anything, keep it.
+      <p className="rise mt-6 max-w-[560px] text-balance text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
+        Components and full product screens you won’t find in shadcn. They install with the shadcn CLI, take on your theme, and the code is yours to change.
       </p>
     </div>
   )
@@ -286,17 +302,14 @@ export function BuyBar() {
             </span>
             <span className="text-[13px] text-ink-3">once</span>
           </p>
-          {buyable && <a href={plan.href} className={side ? `ring-focus group/buy flex h-11 shrink-0 items-center gap-2 rounded-[11px] ${BTN.accent} pl-5 pr-4 text-[15px] font-medium transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] active:scale-[0.97]` : "ring-focus group/buy flex h-11 shrink-0 items-center gap-2 rounded-full bg-ink pl-5 pr-4 text-[15px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.97]"}>
+          {buyable && <a href={plan.href} data-cta="pro-top" className={side ? `ring-focus group/buy flex h-11 shrink-0 items-center gap-2 rounded-[11px] ${BTN.accent} pl-5 pr-4 text-[15px] font-medium transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] active:scale-[0.97]` : "ring-focus group/buy flex h-11 shrink-0 items-center gap-2 rounded-full bg-ink pl-5 pr-4 text-[15px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.97]"}>
             {plan.cta}
             <ArrowRight size={15} className="transition-transform duration-150 group-hover/buy:translate-x-0.5" />
           </a>}
         </div>
       </div>
-      <p className="mt-4 max-w-[920px] text-balance px-4 text-center text-[13px] leading-[1.7] text-ink-3">
-        <span className="text-ink-2">
-          {what}, for {plan.seats}. {promo ? `$${promo.price} until ${promo.until}, no code needed. ` : ''}Launch price: it goes up as the library grows.
-        </span>{' '}
-        One payment · Every update for life · {REFUND_DAYS}-day refund · The source is yours
+      <p className="mt-4 text-balance px-4 text-center text-[13px] leading-[1.7] text-ink-3">
+        {what} · Every update for life · {REFUND_DAYS}-day refund
       </p>
     </div>
   )

@@ -10,6 +10,7 @@ import * as I from '@/lab/icons'
 import { Mark, ThemeButton } from '../parts'
 import { useSite } from '../Providers'
 import { ForPlan } from '../Owned'
+import { PriceNow } from '../Promo'
 import { usePeek } from '../exhibit/Rail'
 import type { RailGroup } from '../exhibit/Rail'
 
@@ -108,7 +109,7 @@ export function SideNext({ groups, current, onPick, preview, label = 'Components
           <Link href="/pro" className="ring-focus group/pro mt-1 flex items-center gap-2 rounded-[10px] px-2.5 py-2 text-[12.5px] text-ink-2 transition-colors hover:bg-[var(--shell-hover)] hover:text-ink">
             <span className="rounded-[5px] bg-[var(--accent)] px-1.5 text-[10.5px] font-medium leading-[18px] text-white">Pro</span>
             Pricing
-            <span className="ml-auto text-ink-3">${PLANS[0].price}</span>
+            <span className="ml-auto text-ink-3"><PriceNow value={PLANS[0].price} /></span>
             <I.ArrowRight size={12} className="text-ink-3" />
           </Link>
         }

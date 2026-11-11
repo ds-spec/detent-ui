@@ -12,6 +12,7 @@ import { Snippet } from '@/site/account/Forms'
 import { Footer } from '@/site/Footer'
 import { Header } from '@/site/Header'
 import { CopyCommand } from '@/site/parts'
+import { PriceNow } from '@/site/Promo'
 import { page } from '@/site/seo'
 import { CopyPrompt } from './CopyPrompt'
 
@@ -131,7 +132,7 @@ export default function Docs() {
                 <>
                   Pro installs the same way, from a private registry that knows your key.{' '}
                   <Link href="/pro" className={LINK}>
-                    Pro is ${PLANS[0].price}, once
+                    Pro is <PriceNow value={PLANS[0].price} />, once
                   </Link>
                   , with every update for life.
                 </>
@@ -167,6 +168,7 @@ export default function Docs() {
               <div className="overflow-hidden rounded-[14px] shadow-[0_0_0_1px_var(--line)]">
                 <Fix q="pnpm stops with ERR_PNPM_IGNORED_BUILDS">That’s pnpm holding back Next.js’s own build scripts in a new project, not Detent. Run pnpm approve-builds, then install again.</Fix>
                 <Fix q="A Pro install answers 401 or 403">Check that the key is in .env.local as DETENT_PRO_KEY, that the registry block is in components.json, and that the key is still listed on your account page.</Fix>
+                <Fix q="It says there’s no Pro purchase on this email">Sign in with the address on your receipt. Bought with another one? Write to us and we’ll move it.</Fix>
                 <Fix q="Colours or type look unstyled">The theme stylesheet isn’t being loaded. The first install imports it into your global CSS; if you moved that file, import it again.</Fix>
                 <Fix q="My coding agent installs the wrong thing">
                   Point it at {HOST}/llms.txt first. It lists every component with the exact command that installs it, so the agent doesn’t have to guess.

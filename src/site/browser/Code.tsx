@@ -8,6 +8,7 @@ import { PLANS } from '@/catalog/pro'
 import type { SourceFile } from '@/catalog/source'
 import { BTN, useSideNew } from '../shell/side'
 import { ProTag } from '../blocks/ProTag'
+import { PriceNow } from '../Promo'
 import { track } from '../track'
 
 const cache = new Map<string, Promise<SourceFile[]>>()
@@ -124,9 +125,9 @@ function Locked({ files }: { id: string; files: SourceFile[] }) {
               {total.toLocaleString('en-US')} lines across {files.length === 1 ? 'one file' : `${files.length} files`}. Install it from the private registry and it&rsquo;s yours to read, change and keep.
             </p>
             <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
-              <Link href="/pro#pricing" className={side ? `ring-focus flex h-10 items-center justify-center rounded-[10px] ${BTN.accent} px-5 text-footnote font-medium transition-[opacity,transform] duration-150 active:scale-[0.97]` : "ring-focus flex h-10 items-center justify-center rounded-full bg-ink px-5 text-footnote font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]"}>
-                {plan.cta} · ${plan.price}
-              </Link>
+              <a href={plan.href} data-cta="code-lock" className={side ? `ring-focus flex h-10 items-center justify-center rounded-[10px] ${BTN.accent} px-5 text-footnote font-medium transition-[opacity,transform] duration-150 active:scale-[0.97]` : "ring-focus flex h-10 items-center justify-center rounded-full bg-ink px-5 text-footnote font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]"}>
+                {plan.cta} · <PriceNow value={plan.price} />
+              </a>
               <Link href="/pro" className={side ? `ring-focus flex h-10 items-center justify-center rounded-[10px] ${BTN.plate} px-5 text-footnote font-medium text-ink transition-[background-color,transform] duration-150 active:scale-[0.97]` : "ring-focus flex h-10 items-center justify-center rounded-full bg-surface-2 px-5 text-footnote font-medium text-ink transition-[background-color,transform] duration-150 hover:bg-card active:scale-[0.97]"}>
                 What&rsquo;s in Pro
               </Link>

@@ -13,7 +13,7 @@ import { Price } from './Promo'
 const PICKS = ['glyph', 'region', 'threads', 'find', 'funnel', 'forecast']
 const BLOCK_PICKS = ['onboarding', 'support-inbox', 'task-to-merge', 'agent-chat', 'evals', 'calendar']
 
-export function ProPitch({ id, shelf = 'components' }: { id: string; shelf?: 'components' | 'blocks' }) {
+export function ProPitch({ id, shelf = 'components', near = false }: { id: string; shelf?: 'components' | 'blocks'; near?: boolean }) {
   const blocks = shelf === 'blocks'
   const pro = blocks ? isProBlock(id) : isProComponent(id)
   const name = (blocks ? block(id)?.name : entry(id)?.name) ?? id
@@ -22,7 +22,7 @@ export function ProPitch({ id, shelf = 'components' }: { id: string; shelf?: 'co
   return (
     <ForPlan
       none={
-        <section aria-labelledby="pro-pitch" className={`overflow-hidden rounded-[28px] bg-surface shadow-[var(--card-edge)] ${blocks ? 'mt-6 sm:mt-8' : 'mt-12 sm:mt-16'}`}>
+        <section aria-labelledby="pro-pitch" className={`overflow-hidden rounded-[28px] bg-surface shadow-[var(--card-edge)] ${near ? 'mt-3 sm:mt-5' : blocks ? 'mt-6 sm:mt-8' : 'mt-12 sm:mt-16'}`}>
           <div className="grid gap-8 p-7 sm:p-9 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
               <h2 id="pro-pitch" className="text-[clamp(24px,2.4vw,32px)] font-normal leading-[1.1] tracking-[-0.035em] text-ink">
@@ -57,7 +57,7 @@ export function ProPitch({ id, shelf = 'components' }: { id: string; shelf?: 'co
                 </span>
                 <span className="text-[14px] text-ink-3">once</span>
               </p>
-              <a href={plan.href} className="ring-focus group/buy mt-2 flex h-11 items-center gap-2 rounded-full bg-ink pl-5 pr-4 text-[14px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]">
+              <a href={plan.href} data-cta="piece-pitch" className="ring-focus group/buy mt-2 flex h-11 items-center gap-2 rounded-full bg-ink pl-5 pr-4 text-[14px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]">
                 Get Pro
                 <ArrowRight size={14} className="transition-transform duration-150 group-hover/buy:translate-x-0.5" />
               </a>

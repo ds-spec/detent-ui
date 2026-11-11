@@ -6,7 +6,8 @@ import { CONTACT } from '@/catalog/trust'
 import { Key } from '@/lab/blocks/kit/icons'
 import { KeySheet, RemoveKey, Snippet } from './Forms'
 import { Membership } from './Membership'
-import type { Usage } from '@/lib/account/keys'
+import type { Feedback, Usage } from '@/lib/account/keys'
+import { FeedbackCard } from './Feedback'
 import { ProBadge } from './ProBadge'
 import { SettingsCard, SettingsNav, SMALL_QUIET } from './Settings'
 import { Avatar, SignOutButton } from '@/site/UserMenu'
@@ -43,9 +44,10 @@ const USE: Step[] = [
 
 export type AccountKey = { id: string; name: string; hint: string; createdAt: number; usedAt: number | null }
 
-export function AccountView({ account, purchase, keys, usage = null, fromCheckout, max = 5 }: { account: { email: string; name: string; image: string | null }; purchase: { plan: Plan; since: number } | null; keys: AccountKey[]; usage?: Usage | null; fromCheckout: boolean; max?: number }) {
+export function AccountView({ account, purchase, keys, usage = null, feedback = null, fromCheckout, max = 5 }: { account: { email: string; name: string; image: string | null }; purchase: { plan: Plan; since: number } | null; keys: AccountKey[]; usage?: Usage | null; feedback?: Feedback | null; fromCheckout: boolean; max?: number }) {
   const MAX_KEYS = max
   const name = account.name || account.email.split('@')[0]
+  const ask = !!purchase && (!!feedback || (usage?.components ?? 0) >= 2)
   return (
     <div className="mx-auto max-w-[1040px] pb-20 pt-10 sm:pt-14">
       <header className="flex items-center gap-4">
@@ -65,6 +67,7 @@ export function AccountView({ account, purchase, keys, usage = null, fromCheckou
         <SettingsNav
           items={[
             ['plan', 'Plan'],
+            ...(ask ? ([['feedback', 'Feedback']] as [string, string][]) : []),
             ['keys', 'API keys'],
             ['install', 'Install'],
             ['session', 'Session'],
@@ -72,6 +75,8 @@ export function AccountView({ account, purchase, keys, usage = null, fromCheckou
         />
         <div className="grid min-w-0 gap-6">
           <Membership purchase={purchase} usage={usage} arriving={fromCheckout && !purchase} thanks={fromCheckout} />
+
+          {ask && <FeedbackCard given={feedback} />}
 
           <SettingsCard
             id="keys"
@@ -119,7 +124,7 @@ export function AccountView({ account, purchase, keys, usage = null, fromCheckou
             foot={
               <>
                 The whole guide is on{' '}
-                <Link href="/pro#install" className={LINK}>
+                <Link href="/docs#pro" className={LINK}>
                   Install
                 </Link>
               </>

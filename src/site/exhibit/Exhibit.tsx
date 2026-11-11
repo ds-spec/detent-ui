@@ -212,7 +212,12 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
       <div className="pb-6 sm:pb-8">
       <header className="flex flex-col gap-4 pt-7 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
         <div className="min-w-0">
-          {side && <p className="mb-2 text-[13px] text-ink-3">{family.name}</p>}
+          {side && (
+            <p className="mb-2 flex items-center gap-2 text-[13px] text-ink-3">
+              {family.name}
+              {pro && <ProTag />}
+            </p>
+          )}
           <h1 className="text-[clamp(32px,3.8vw,48px)] font-normal leading-[1.08] tracking-[-0.045em] text-ink">
             <span className="relative block h-[1.2em] overflow-hidden">
               <Glide k={e.id} dir={dir}>
@@ -302,6 +307,8 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
         </div>
       </div>
 
+      {pro && <ProPitch id={e.id} near />}
+
       <div className="contents" style={{ visibility: id === at ? undefined : 'hidden' }}>
         {children}
       </div>
@@ -334,7 +341,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
 
       {BESIDE[e.id] && <Beside key={`beside-${e.id}`} id={BESIDE[e.id]} />}
 
-      <ProPitch id={e.id} />
+      {!pro && <ProPitch id={e.id} />}
 
       <MoreLike key={`more-${e.id}`} shelf="components" id={e.id} />
 

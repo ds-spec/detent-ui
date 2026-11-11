@@ -23,7 +23,7 @@ const COLUMNS: { title: string; items: Item[] }[] = [
     title: 'Pro',
     items: [
       { href: '/pro', label: 'Pricing' },
-      { href: '/pro#install', label: 'Install' },
+      { href: '/docs#pro', label: 'Install' },
       { href: '/account', label: 'Account' },
     ],
   },

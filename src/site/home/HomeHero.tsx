@@ -12,6 +12,7 @@ import { Announcement } from '@/lab/components/announce/Announcement'
 import { ArrowRight, ArrowUpRight, Chart, Note, Play, Prompt } from '@/lab/icons'
 import { Fit } from '@/site/Fit'
 import { CopyCommand } from '@/site/parts'
+import { InDirectory } from '@/site/Directory'
 import { ForPlan } from '@/site/Owned'
 import { Price } from '@/site/Promo'
 import { REFUND_DAYS } from '@/catalog/trust'
@@ -71,7 +72,10 @@ export function HomeHero({ lib, fresh }: { lib: LibItem[]; fresh: Latest }) {
                 }
               />
             </div>
-            <ForPlan none={<p className="rise mt-4 text-[13px] text-ink-3" style={{ animationDelay: '260ms' }}>Pro comes with a {REFUND_DAYS}-day refund.</p>} />
+            <div className="rise mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[13px] text-ink-3" style={{ animationDelay: '260ms' }}>
+              <InDirectory />
+              <ForPlan none={<span>· Pro comes with a {REFUND_DAYS}-day refund.</span>} />
+            </div>
           </div>
           <Plates lib={lib} onOpen={setOpen} className="rise mt-12 lg:mt-14 lg:h-[clamp(480px,calc(100svh-300px),620px)]" />
         </div>

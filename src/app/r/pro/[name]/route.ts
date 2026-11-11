@@ -3,7 +3,7 @@ import { hasProItems, proItemByName } from '@/catalog/pro-items'
 import { SITE } from '@/catalog/pro'
 import { recordInstall } from '@/lib/account/keys'
 
-const SETUP = `${SITE}/pro#install`
+const SETUP = `${SITE}/docs#pro`
 const answer = (status: number, error: string) => Response.json({ error }, { status, headers: { 'cache-control': 'private, no-store' } })
 
 export async function GET(req: Request, { params }: { params: Promise<{ name: string }> }) {
