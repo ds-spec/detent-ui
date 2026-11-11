@@ -93,13 +93,21 @@ export function Header() {
             <Search size={15} />
           </button>
           <GitHubStars
-            className="hidden sm:flex"
+            className="hidden sm:flex lg:hidden xl:flex"
             style={side ? undefined : { transitionTimingFunction: UI, background: stuck ? 'transparent' : 'var(--nav)', boxShadow: stuck ? 'none' : 'inset 0 0 0 1px var(--line)' }}
           />
           <ThemeButton />
           {/* Signed out: the way in and the way to start. Signed in: who it is, and their menu. Which shows is
               decided before first paint (<html data-in>), so the bar never flashes the other. */}
           <div className="when-out contents">
+          <Link
+            href="/account"
+            aria-current={here('/account', path) ? 'page' : undefined}
+            className={`ring-focus hidden h-9 items-center px-3 text-[13px] transition-[color,transform] duration-150 hover:text-ink active:scale-[0.97] sm:flex ${side ? 'rounded-[9px]' : 'rounded-full'} ${here('/account', path) ? 'text-ink' : 'text-ink-2'}`}
+            style={{ transitionTimingFunction: UI }}
+          >
+            Sign in
+          </Link>
           <Link href={FIRST_COMPONENT} className={side ? `ring-focus group/go hidden h-9 items-center gap-1.5 rounded-[9px] ${BTN.accent} pl-4 pr-3.5 text-[13px] font-medium transition-[opacity,transform] duration-150 active:scale-[0.97] sm:flex` : "ring-focus group/go hidden h-9 items-center gap-1.5 rounded-full bg-ink pl-4 pr-3.5 text-[13px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97] sm:flex"}>
             Get started
             <ArrowRight size={13} className="transition-transform duration-150 group-hover/go:translate-x-0.5" />
