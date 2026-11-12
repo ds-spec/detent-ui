@@ -65,10 +65,12 @@ export const CHECKOUT = {
   all: comeBack(process.env.NEXT_PUBLIC_CHECKOUT_ALL ?? '#checkout'),
 }
 
-export function checkoutFor(plan: keyof typeof CHECKOUT, account: { id: string; email: string } | null) {
+/** `meta` lands on the Dodo payment as metadata (Dodo reads every `metadata_*` query param). */
+export function checkoutFor(plan: keyof typeof CHECKOUT, account: { id: string; email: string } | null, meta: Record<string, string> = {}) {
   const link = CHECKOUT[plan]
   if (!/^https?:\/\//.test(link)) return null
   const url = new URL(link)
+  for (const [key, value] of Object.entries(meta)) url.searchParams.set(`metadata_${key}`, value)
   if (!account) return url.toString()
   url.searchParams.set('email', account.email)
   url.searchParams.set('disableEmail', 'true')

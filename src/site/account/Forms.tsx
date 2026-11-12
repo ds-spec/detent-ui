@@ -4,6 +4,7 @@ import { useActionState, useEffect, useId, useRef, useState, useSyncExternalStor
 import type { ReactNode } from 'react'
 import { createPortal, useFormStatus } from 'react-dom'
 import Link from 'next/link'
+import posthog from 'posthog-js'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { askForLink, deleteKey, makeKey, signInWith, type KeyState, type LinkState } from '@/app/account/actions'
@@ -544,7 +545,7 @@ export function KeySheet({ count, max, compact = false }: { count: number; max: 
                       </div>
                     </div>
                   ) : (
-                    <form action={action}>
+                    <form action={action} onSubmit={() => posthog.capture('api_key_creation_submitted')}>
                       <span className={`grid size-12 place-items-center rounded-[14px] ${ACCENT_TILE}`}>
                         <Key size={20} />
                       </span>

@@ -7,6 +7,14 @@ const proRegistry = existsSync(".detent/pro-registry.json") ? "./.detent/pro-reg
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ['@libsql/client', 'libsql'],
+  skipTrailingSlashRedirect: true,
+  async rewrites() {
+    return [
+      { source: '/ingest/static/:path*', destination: 'https://us-assets.i.posthog.com/static/:path*' },
+      { source: '/ingest/array/:path*', destination: 'https://us-assets.i.posthog.com/array/:path*' },
+      { source: '/ingest/:path*', destination: 'https://us.i.posthog.com/:path*' },
+    ]
+  },
   async redirects() {
     return [
       { source: '/components/stats', destination: '/components/metric', permanent: true },
