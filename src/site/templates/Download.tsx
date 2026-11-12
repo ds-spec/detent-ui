@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import posthog from 'posthog-js'
 import { PLANS } from '@/catalog/pro'
 import { Check } from '@/lab/icons'
 
@@ -37,6 +38,7 @@ export function DownloadStarter({ id, name }: { id: string; name: string }) {
       const a = Object.assign(document.createElement('a'), { href: url, download: `${id}-app.zip` })
       a.click()
       setTimeout(() => URL.revokeObjectURL(url), 2000)
+      posthog.capture('starter_downloaded', { starter_id: id, access_method: owns ? 'account' : 'api_key' })
       setState({ kind: 'done' })
     } catch {
       setState({ kind: 'error', text: 'Couldn’t reach the download. Check your connection and try again.' })

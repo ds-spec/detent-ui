@@ -6,11 +6,12 @@ import { starterFiles, zip } from '@/catalog/starter'
 import { getAuth } from '@/lib/account/auth'
 import { planFor, recordInstall } from '@/lib/account/keys'
 import { normalEmail } from '@/lib/account/session'
+import { capture } from '@/lib/posthog-server'
 
 const answer = (status: number, error: string) => Response.json({ error }, { status, headers: { 'cache-control': 'private, no-store' } })
 const busy = () => answer(503, 'Couldn’t check your plan just now. Try again in a minute.')
 
-async function planOf(req: Request): Promise<{ plan: Plan | null; email: string | null } | Response> {
+async function planOf(req: Request): Promise<{ plan: Plan | null; email: string | null; user?: string } | Response> {
   const key = req.headers.get('authorization')?.replace(/^Bearer\s+/i, '').trim()
   if (key) {
     try {
@@ -24,7 +25,7 @@ async function planOf(req: Request): Promise<{ plan: Plan | null; email: string 
     const session = await (await getAuth()).api.getSession({ headers: req.headers })
     const email = session?.user.emailVerified ? normalEmail(session.user.email) : null
     if (!email) return answer(401, `Sign in, or enter your key to download the project. Generate one at ${SITE}/account`)
-    return { plan: await planFor(email), email }
+    return { plan: await planFor(email), email, user: session?.user.id }
   } catch {
     return busy()
   }
@@ -39,6 +40,7 @@ async function send(req: Request, id: string) {
   if (!item || !theme) return answer(404, `There’s no ${id} template to download.`)
   if (who.email) await recordInstall(who.email, `template-${id}`, 'template').catch(() => {})
   const body = zip(starterFiles(id, item, theme), `${id}-app`)
+  await capture(who.user ?? who.email ?? '', 'starter_served', { starter_id: id, via: who.user ? 'account' : 'key' })
   return new Response(body, {
     headers: {
       'content-type': 'application/zip',

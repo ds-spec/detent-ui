@@ -5,13 +5,14 @@ import type { ComponentType, ReactNode, SVGProps } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import posthog from 'posthog-js'
 import { signOutHere } from '@/app/account/actions'
 import { Bolt, ChevronDown, Key, LogOut, Person, Terminal } from '@/lab/blocks/kit/icons'
 import { Orb } from '@/lab/ui/Orb'
 import { Spinner } from '@/lab/ui/Spinner'
 import { ProBadge } from './account/ProBadge'
 
-export type Me = { name: string; email: string; image: string | null; plan: 'pro' | 'all' | null }
+export type Me = { id: string; name: string; email: string; image: string | null; plan: 'pro' | 'all' | null }
 
 let asked: Promise<Me | null | undefined> | null = null
 const ask = () =>
@@ -38,6 +39,13 @@ export function useMe() {
       if (signedIn && found === null) {
         forget()
         document.cookie = 'detent.in=; Max-Age=0; path=/'
+      }
+      if (found) {
+        posthog.identify(found.id, {
+          email: found.email,
+          name: found.name,
+          plan: found.plan,
+        })
       }
       setMe(found)
     })
@@ -70,6 +78,7 @@ export function SignOutButton({ className, children, inMenu = false, icon = true
       onClick={async () => {
         setBusy(true)
         await signOutHere()
+        posthog.reset()
         forget()
         router.refresh()
       }}

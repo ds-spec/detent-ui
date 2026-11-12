@@ -48,7 +48,8 @@ const theme = `try{var s=localStorage.getItem('theme');var d=s==='dark'||(s==='s
 const BEACON = process.env.NEXT_PUBLIC_CF_BEACON
 const GA = process.env.NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_GA_ID : undefined
 
-const tag = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${GA}')`
+/* GA only counts the real site, and never a browser opted out with ?notrack=1 (see instrumentation-client.ts). */
+const tag = `try{if(!/(^|\\.)detentui\\.com$/.test(location.hostname)||/[?&]notrack=1/.test(location.search)||(localStorage.getItem('dt_notrack')==='1'&&!/[?&]notrack=0/.test(location.search)))window['ga-disable-${GA}']=true}catch(e){}window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${GA}')`
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (

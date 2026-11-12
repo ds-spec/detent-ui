@@ -9,5 +9,5 @@ export async function GET(req: Request) {
   const email = session?.user.emailVerified ? normalEmail(session.user.email) : null
   if (!session || !email) return Response.json(null, { status: 401, headers: PRIVATE })
   const purchase = await purchaseFor(email)
-  return Response.json({ name: session.user.name?.trim() || email.split('@')[0], email, image: session.user.image ?? null, plan: purchase?.plan ?? null }, { headers: PRIVATE })
+  return Response.json({ id: session.user.id, name: session.user.name?.trim() || email.split('@')[0], email, image: session.user.image ?? null, plan: purchase?.plan ?? null }, { headers: PRIVATE })
 }
