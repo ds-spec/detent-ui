@@ -13,6 +13,7 @@ import { BRIDGE } from '@/site/home/bridge'
 import { libraryIndex } from '@/site/home/library'
 import { Plans } from '@/site/pro/Plans'
 import { Running } from '@/site/pro/Running'
+import { Voices } from '@/site/Voices'
 import { DESCRIPTION, JsonLd, NAME, page, siteGraph } from '@/site/seo'
 
 const SHOWN = block('support-inbox')!
@@ -106,6 +107,14 @@ export default function Home() {
         </section>
       </main>
       <Footer />
+      <Voices
+        auto
+        peek={{
+          at: '#library',
+          who: 'adeline',
+          text: 'Love that the components are live on the homepage. Being able to play with them right away makes a huge difference compared to the usual screenshot galleries.',
+        }}
+      />
     </div>
   )
 }
