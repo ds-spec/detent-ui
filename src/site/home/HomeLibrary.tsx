@@ -10,7 +10,7 @@ import type { LibItem } from './library'
 
 const ROWS: [string, string][] = [
   ['region', 'popup'],
-  ['upload', 'voicenote'],
+  ['shift', 'voicenote'],
   ['halo', 'rewind'],
   ['glyph', 'threads'],
 ]

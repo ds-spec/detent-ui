@@ -70,6 +70,7 @@ export function Palette({ open, onOpenChange, sound, toggleSound }: { open: bool
   const list = useRef<HTMLDivElement>(null)
   const rows = useRef<(HTMLElement | null)[]>([])
   const mirror = useRef<HTMLSpanElement>(null)
+  const echo = useRef<HTMLSpanElement>(null)
   const typed = useRef(0)
   const mouse = useRef({ x: 0, y: 0 })
   const y = useMotionValue(0)
@@ -195,6 +196,12 @@ export function Palette({ open, onOpenChange, sound, toggleSound }: { open: bool
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query])
 
+  const sync = () => {
+    const f = field.current
+    if (f && echo.current) echo.current.style.transform = `translateX(${-f.scrollLeft}px)`
+  }
+  useLayoutEffect(sync, [query, place])
+
   function fold(p: Place) {
     typed.current = query.length
     setPlace(p)
@@ -272,11 +279,11 @@ export function Palette({ open, onOpenChange, sound, toggleSound }: { open: bool
                       )}
                     </AnimatePresence>
                     <span className="relative min-w-0 flex-1">
-                      <span aria-hidden className="pointer-events-none absolute inset-0 flex items-center overflow-hidden whitespace-pre text-[13.5px]">
-                        <span ref={mirror} className="invisible">
-                          {query}
+                      <span aria-hidden className="pointer-events-none absolute inset-0 flex items-center overflow-hidden whitespace-pre text-[16px] sm:text-[13.5px]">
+                        <span ref={echo} className="whitespace-pre will-change-transform">
+                          <span ref={mirror}>{query}</span>
+                          <span style={{ color: FAINT }}>{ghost}</span>
                         </span>
-                        <span style={{ color: FAINT }}>{ghost}</span>
                       </span>
                       <input
                         ref={field}
@@ -287,11 +294,13 @@ export function Palette({ open, onOpenChange, sound, toggleSound }: { open: bool
                         aria-activedescendant={items[at] ? `palette-${items[at].id}` : undefined}
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
+                        onScroll={sync}
+                        onSelect={sync}
                         onKeyDown={keys}
                         spellCheck={false}
                         autoComplete="off"
                         placeholder={place ? '' : 'Search'}
-                        className="relative w-full bg-transparent text-[16px] outline-none placeholder:text-[var(--p3)] sm:text-[13.5px]"
+                        className="relative w-full bg-transparent text-[16px] text-transparent outline-none [caret-color:var(--p1)] placeholder:text-[var(--p3)] selection:bg-[color-mix(in_oklch,var(--accent)_28%,transparent)] sm:text-[13.5px]"
                       />
                     </span>
                     <motion.span aria-hidden className="absolute bottom-0 left-0 h-px w-32 -translate-x-1/2" style={{ x: beam, opacity: glow, background: 'linear-gradient(90deg,transparent,var(--beam),transparent)' }} />
@@ -353,7 +362,7 @@ export function Palette({ open, onOpenChange, sound, toggleSound }: { open: bool
                   </div>
                 </motion.div>
               </div>
-              <div className="flex h-8 items-center justify-between px-3.5 text-[12px]" style={{ color: SOFT }}>
+              <div className="flex h-8 items-center justify-between px-3.5 text-[12px] pointer-coarse:hidden" style={{ color: SOFT }}>
                 <span>↑↓ To navigate</span>
                 <span>↵ To select</span>
               </div>
