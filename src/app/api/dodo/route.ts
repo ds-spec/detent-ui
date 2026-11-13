@@ -2,7 +2,9 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 import { planOfProduct } from '@/catalog/licence'
 import { getAuth } from '@/lib/account/auth'
 import { emailOfAccount, recordPurchase } from '@/lib/account/keys'
+import { deliver } from '@/lib/account/mail'
 import { normalEmail } from '@/lib/account/session'
+import { welcomeMail } from '@/lib/account/welcome'
 import { capture } from '@/lib/posthog-server'
 
 const TOLERANCE = 300
@@ -45,8 +47,9 @@ function sourceOfPayment(metadata: Record<string, unknown> | null | undefined) {
   return out
 }
 
-async function welcome(email: string) {
+async function welcome(email: string, signedIn: boolean) {
   try {
+    if (signedIn) return await deliver({ to: email, ...welcomeMail({ signedIn: true }) })
     const auth = await getAuth()
     await auth.api.signInMagicLink({ body: { email, callbackURL: '/account' }, headers: new Headers({ 'cf-connecting-ip': 'purchase', 'x-detent-purchase': '1' }) })
   } catch (error) {
@@ -83,7 +86,7 @@ export async function POST(req: Request) {
       $set: { email, customer: true, plan },
       $set_once: { first_source: from.source, first_campaign: from.campaign, first_referrer: from.referrer, bought_from: from.last_source ?? from.source },
     })
-    if (!account) await welcome(email)
+    await welcome(email, !!account)
   } else if (type === 'dispute.lost' || (type === 'refund.succeeded' && !data?.is_partial)) {
     if (!id) return Response.json({ error: 'No payment.' }, { status: 422 })
     await recordPurchase({ id, email, plan: 'pro', refunded: true })
