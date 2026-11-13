@@ -122,6 +122,11 @@ export function MobileBuy() {
     return () => window.removeEventListener('scroll', on)
   }, [])
   const hidden = owned || !['/', '/components', '/blocks', '/templates', '/docs'].includes(path)
+  const shown = down && !hidden
+  useEffect(() => {
+    document.documentElement.toggleAttribute('data-buybar', shown)
+    return () => document.documentElement.removeAttribute('data-buybar')
+  }, [shown])
   return (
     <AnimatePresence>
       {down && !hidden && (

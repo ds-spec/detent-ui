@@ -9,8 +9,10 @@ import { Check } from '@/lab/icons'
 import { BigBuy, BuyBar, BuyNote, BuyProvider, HeroHead, WideStage } from '@/site/pro/Buy'
 import { Compare, Inside } from '@/site/pro/Inside'
 import { Install } from '@/site/pro/Install'
+import { Keys } from '@/site/pro/Keys'
 import { Quotes } from '@/site/pro/Quotes'
 import { Touch } from '@/site/pro/Touch'
+import { Voices } from '@/site/Voices'
 import { JsonLd, page, proGraph } from '@/site/seo'
 import { SitePage } from '@/site/sheets'
 
@@ -44,7 +46,7 @@ export default function ProPage() {
       <BuyProvider>
         <section id="pricing" className="mx-auto max-w-[1360px] scroll-mt-24 px-5 pt-12 sm:px-6 sm:pt-16">
           <HeroHead />
-          <div className="rise mt-9" style={{ animationDelay: '200ms' }}>
+          <div data-dock-dodge="" className="rise mt-9" style={{ animationDelay: '200ms' }}>
             <BuyBar />
           </div>
           <div className="rise mt-12 sm:mt-14" style={{ animationDelay: '320ms' }}>
@@ -64,13 +66,16 @@ export default function ProPage() {
 
         <section aria-labelledby="quotes-title" className="mx-auto mt-28 max-w-[1360px] px-5 sm:mt-36 sm:px-6">
           <h2 id="quotes-title" className={H2}>
-            Made for people who notice.
-            <span className="block text-quiet">A few of them said so.</span>
+            People write to me about Detent.
+            <span className="block text-quiet">I kept a few.</span>
           </h2>
-          <div className="mt-10 sm:mt-14">
+          <div className="mt-10 md:hidden">
             <Quotes />
           </div>
-          <p className="mt-8 text-[15px] leading-[1.6] text-ink-3">
+          <div className="mt-16 hidden md:block">
+            <Keys />
+          </div>
+          <p className="mt-10 text-[15px] leading-[1.6] text-ink-3 md:mt-16">
             <span className="text-ink">Over 1,000 people bookmarked the Onboarding block on X.</span>{' '}
             <a href="https://x.com/next_gendev/status/2119335361554030899" target="_blank" rel="noopener noreferrer" className="ring-focus rounded-[4px] text-ink-2 underline decoration-[var(--line-strong)] underline-offset-[3px] transition-colors duration-150 hover:text-ink hover:decoration-ink">
               See the post
@@ -153,6 +158,15 @@ export default function ProPage() {
           <BuyNote />
         </section>
       </BuyProvider>
+      <Voices
+        hideAt="footer, [aria-labelledby='quotes-title']"
+        dodge="[data-dock-dodge]"
+        peek={{
+          at: '#install',
+          who: 'adeline',
+          text: 'The shadcn install and the MCP setup are a really smart move too.',
+        }}
+      />
     </SitePage>
   )
 }
