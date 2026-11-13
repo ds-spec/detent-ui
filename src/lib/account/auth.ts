@@ -8,6 +8,8 @@ import { nextCookies } from 'better-auth/next-js'
 import { lastLoginMethod, magicLink } from 'better-auth/plugins'
 import { SITE } from '@/catalog/site'
 import { db } from './db'
+import { deliver } from './mail'
+import { welcomeMail } from './welcome'
 import { safeNext } from './next'
 
 export const COOKIE_PREFIX = 'detent'
@@ -30,21 +32,6 @@ async function allowed(bucket: string, limit: number) {
     'write',
   )
   return true
-}
-
-async function deliver(email: string, subject: string, text: string) {
-  const key = process.env.RESEND_API_KEY
-  if (!key) {
-    if (!dev) throw new Error('RESEND_API_KEY isn’t set')
-    console.log(`\n[detent] ${subject} for ${email}:\n${text}\n`)
-    return
-  }
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
-    body: JSON.stringify({ from: process.env.DETENT_MAIL_FROM ?? 'Detent <hello@detentui.com>', to: email, subject, text }),
-  })
-  if (!res.ok) throw new Error(`Resend answered ${res.status}`)
 }
 
 export function socialProviders() {
@@ -92,10 +79,10 @@ const create = (client: Client) =>
           const next = safeNext(verify.searchParams.get('callbackURL'))
           const link = `${verify.origin}/account/confirm#${new URLSearchParams({ token, email, next })}`
           if (!ctx?.request && headers?.get('x-detent-purchase')) {
-            await deliver(email, 'You’re in: Detent Pro', `Thank you for buying Detent Pro.\n\nSign in to get your key:\n\n${link}\n\nThe link lasts ${LINK_MINUTES} minutes and works once. If it runs out, sign in at ${verify.origin}/account with this email and Pro is there.`)
+            await deliver({ to: email, ...welcomeMail({ link, minutes: LINK_MINUTES }) })
             return
           }
-          await deliver(email, 'Sign in to Detent', `Sign in to Detent:\n\n${link}\n\nThe link lasts ${LINK_MINUTES} minutes and works once. If you didn’t ask for it, you can ignore this email.`)
+          await deliver({ to: email, subject: 'Sign in to Detent', text: `Sign in to Detent:\n\n${link}\n\nThe link lasts ${LINK_MINUTES} minutes and works once. If you didn’t ask for it, you can ignore this email.` })
         },
       }),
       lastLoginMethod({ cookieName: LAST_USED, maxAge: 180 * 86_400 }),
