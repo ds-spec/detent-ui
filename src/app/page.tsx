@@ -9,6 +9,7 @@ import { Footer } from '@/site/Footer'
 import { Header } from '@/site/Header'
 import { HomeHero } from '@/site/home/HomeHero'
 import { HomeLibrary } from '@/site/home/HomeLibrary'
+import { HomeScreens } from '@/site/home/HomeScreens'
 import { BRIDGE } from '@/site/home/bridge'
 import { libraryIndex } from '@/site/home/library'
 import { Plans } from '@/site/pro/Plans'
@@ -16,7 +17,7 @@ import { Running } from '@/site/pro/Running'
 import { Voices } from '@/site/Voices'
 import { DESCRIPTION, JsonLd, NAME, page, siteGraph } from '@/site/seo'
 
-const SHOWN = block('support-inbox')!
+const SHOWN = block('settings')!
 
 export const metadata: Metadata = page({ title: `${NAME} — premium React components`, absolute: true, description: DESCRIPTION, path: '/' })
 
@@ -29,7 +30,10 @@ export default function Home() {
         <JsonLd data={siteGraph()} />
         <HomeHero lib={lib} fresh={latest()} />
         <div style={{ height: BRIDGE }} />
-        <HomeLibrary lib={lib} />
+        <HomeScreens />
+        <div className="mt-3">
+          <HomeLibrary lib={lib} />
+        </div>
 
         {AI_SDK && (
           <>

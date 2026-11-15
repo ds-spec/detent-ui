@@ -49,15 +49,15 @@ export function HomeHero({ lib, fresh }: { lib: LibItem[]; fresh: Latest }) {
               {fresh.text}
             </Announcement>
             <h1 className="focus-in mt-7 text-[clamp(36px,5vw,74px)] font-normal leading-[1.01] tracking-[-0.055em] text-ink">
-              Make your product
+              The hard parts of an AI product,
               <br />
               <span className="text-quiet">
-                feel{' '}
-                <DitherWord color={dot ?? 'currentColor'}>expensive</DitherWord>.
+                already{' '}
+                <DitherWord color={dot ?? 'currentColor'}>built</DitherWord>.
               </span>
             </h1>
             <p className="rise mt-6 max-w-[540px] text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
-              Well-made React components for your product. Installed with shadcn, styled by your theme, yours to{'\u00a0'}change.
+              Agent runs, approvals, streaming answers and charts that explain themselves. Every state worked out, installed with shadcn, styled by your{'\u00a0'}theme.
             </p>
             <div className="rise mt-8 flex items-center gap-2.5" style={{ animationDelay: '200ms' }}>
               <Link href={FIRST_COMPONENT} className={side ? `ring-focus group/go flex h-11 items-center whitespace-nowrap gap-1.5 rounded-[11px] ${BTN.accent} pl-5 pr-4 text-[14px] font-medium transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] active:scale-[0.97] max-[359px]:pl-4 max-[359px]:pr-3` : "ring-focus group/go flex h-11 items-center whitespace-nowrap gap-1.5 rounded-full bg-ink pl-5 pr-4 text-[14px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.97] max-[359px]:pl-4 max-[359px]:pr-3"}>
