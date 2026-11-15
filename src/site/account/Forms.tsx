@@ -17,6 +17,7 @@ import { ease } from '@/lab/lib/motion'
 import { DetentMark } from '@/lab/ui/DetentMark'
 import { Bloom, DrawnCheck } from '@/lab/ui/Outcome'
 import { Spinner } from '@/lab/ui/Spinner'
+import { PriceNow } from '@/site/Promo'
 import { BTN } from '@/site/shell/side'
 import { Light } from './Light'
 import { SMALL } from './Settings'
@@ -87,7 +88,7 @@ function Split({ plan, children }: { plan?: Buying; children: ReactNode }) {
             <span className="text-white/70">Next, checkout</span>
             <span className="text-white/40">·</span>
             <span className="font-medium">{plan.name}</span>
-            <span className="tnum text-white/70">${plan.price}</span>
+            <span className="tnum text-white/70"><PriceNow value={plan.price} /></span>
           </p>
         )}
         <div className="overflow-hidden rounded-[16px] bg-surface text-ink shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_28px_70px_-24px_rgb(2_6_40/0.7),0_10px_24px_-12px_rgb(2_6_40/0.4)]">{children}</div>

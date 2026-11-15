@@ -4,7 +4,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { PLANS } from '@/catalog/pro'
 import { usePathname } from 'next/navigation'
-import { PROMO } from '@/catalog/promo'
+import { PROMO, promoLive } from '@/catalog/promo'
 import { REFUND_DAYS } from '@/catalog/trust'
 import type { Promo } from '@/catalog/promo'
 import { ArrowRight } from '@/lab/icons'
@@ -20,7 +20,7 @@ const tick = (go: () => void) => {
 const second = () => Math.floor(Date.now() / 1000)
 
 export function usePromo(): Promo | null {
-  const live = useSyncExternalStore(tick, () => !!PROMO && Date.now() < PROMO.ends, () => !!PROMO)
+  const live = useSyncExternalStore(tick, () => promoLive(PROMO), () => !!PROMO)
   return live ? PROMO : null
 }
 
@@ -73,8 +73,10 @@ export function PromoStrip() {
           </span>
         </span>
         {left && (
-          <span className="hidden whitespace-nowrap tabular-nums text-white/45 md:inline">
-            ends in <span className="text-white/80">{left}</span>
+          <span className="whitespace-nowrap tabular-nums text-white/45">
+            <span className="hidden md:inline">ends in </span>
+            <span className="sr-only md:hidden">ends in </span>
+            <span className="text-white/80">{left}</span>
           </span>
         )}
         <a

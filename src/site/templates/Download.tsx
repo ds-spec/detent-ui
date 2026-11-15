@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import posthog from 'posthog-js'
 import { PLANS } from '@/catalog/pro'
+import { PriceNow } from '../Promo'
 import { Check } from '@/lab/icons'
 
 type Owner = 'all' | 'pro' | null
@@ -78,7 +79,7 @@ export function DownloadStarter({ id, name }: { id: string; name: string }) {
             <Link href="/pro" className="ring-focus rounded-[4px] font-medium text-ink underline-offset-2 hover:underline">
               {plan.name}
             </Link>{' '}
-            · ${plan.price}
+            · <PriceNow value={plan.price} />
           </p>
           {open ? (
             <form
