@@ -32,7 +32,7 @@ Usage: node --network-family-autoselection-attempt-timeout=500 scripts/broadcast
   --to       send only to this one address (a test to yourself), not recorded
   --footer   line before the unsubscribe link (default "One email a week.")
 
-  The D mark, the "— Deep from Detent" signature and the unsubscribe footer are added for you.
+  The "— Deep from Detent" signature and the unsubscribe footer are added for you.
 `)
   process.exit(1)
 }
@@ -83,7 +83,6 @@ const mail = (email) => {
 <body style="margin:0;padding:0;background:#ffffff;-webkit-font-smoothing:antialiased">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff"><tr><td align="center" style="padding:48px 20px 40px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px"><tr><td style="font-family:${font}">
-<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 26px"><tr><td width="28" height="28" align="center" valign="middle" style="width:28px;height:28px;border-radius:8px;background:#1c1b19;color:#ffffff;font-family:${font};font-size:15px;font-weight:700;line-height:28px">D</td></tr></table>
 ${body}
 <p style="margin:0;font-size:15px;line-height:24px;color:#1c1b19">— Deep from Detent</p>
 <div style="height:1px;background:#eeede9;margin:36px 0 14px"></div>

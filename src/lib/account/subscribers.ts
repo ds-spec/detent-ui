@@ -109,7 +109,6 @@ export function welcomeSubscriber(email: string) {
 <div style="display:none;max-height:0;overflow:hidden">One new component, every Friday.</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff"><tr><td align="center" style="padding:44px 20px 36px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px"><tr><td style="font-family:${font}">
-<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 26px"><tr><td width="28" height="28" align="center" valign="middle" style="width:28px;height:28px;border-radius:8px;background:#1c1b19;color:#ffffff;font-family:${font};font-size:15px;font-weight:700;line-height:28px">D</td></tr></table>
 <p style="${p}">Hey,</p>
 <p style="${p}">Thanks for signing up. Every Friday you’ll get one new free component from Detent: what it does, a short clip, and the one command to install it.</p>
 <p style="${p}">Black Friday is close too. On <strong style="font-weight:600">Nov 24</strong> you’ll hear about the deal before anyone else.</p>
