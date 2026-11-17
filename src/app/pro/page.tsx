@@ -15,7 +15,6 @@ import { Touch } from '@/site/pro/Touch'
 import { Voices } from '@/site/Voices'
 import { JsonLd, page, proGraph } from '@/site/seo'
 import { SitePage } from '@/site/sheets'
-import { Subscribe } from '@/site/Subscribe'
 
 export const metadata: Metadata = page({
   title: 'Detent Pro — make your app feel expensive',
@@ -48,12 +47,6 @@ export default function ProPage() {
           <HeroHead />
           <div data-dock-dodge="" className="rise mt-9" style={{ animationDelay: '200ms' }}>
             <BuyBar />
-          </div>
-          <div className="rise mx-auto mt-10 flex max-w-[420px] flex-col items-center" style={{ animationDelay: '260ms' }}>
-            <p className="text-center text-[13px] text-ink">
-              Not ready yet? <span className="text-ink-3">Get the Black Friday deal first.</span>
-            </p>
-            <Subscribe source="pro" size="sm" label="Notify me" center className="mt-3" note="Black Friday deal, then one free component a week. Unsubscribe anytime." />
           </div>
           <div className="rise mt-12 sm:mt-14" style={{ animationDelay: '320ms' }}>
             <WideStage />

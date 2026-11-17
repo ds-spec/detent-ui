@@ -6,7 +6,6 @@ import { PRO_BLOCK_COUNT, PRO_COMPONENTS } from '@/catalog/pro'
 import { Live } from '@/site/ai/Live'
 import { AI_SDK } from '@/catalog/site'
 import { Footer } from '@/site/Footer'
-import { Subscribe } from '@/site/Subscribe'
 import { Header } from '@/site/Header'
 import { HomeHero } from '@/site/home/HomeHero'
 import { HomeLibrary } from '@/site/home/HomeLibrary'
@@ -110,23 +109,8 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        <section aria-labelledby="friday-title" className="mx-auto mt-20 max-w-[1360px] px-5 sm:mt-28 sm:px-6">
-          <div className="grid gap-x-10 gap-y-7 pb-14 shadow-[inset_0_-1px_0_var(--line)] lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:items-end">
-            <h2 id="friday-title" className="text-[clamp(26px,2.4vw,32px)] font-normal leading-[1.12] tracking-[-0.04em] text-ink">
-              A new component every Friday.
-              <span className="block text-quiet">Free, in your inbox.</span>
-            </h2>
-            <div className="max-w-[420px]">
-              <p className="mb-4 text-[13px] leading-[1.55] text-ink-3">MIT licensed, live on the site, and one shadcn command to install.</p>
-              <Subscribe source="home" note="One email a week. Unsubscribe anytime." />
-            </div>
-          </div>
-        </section>
       </main>
-      <div className="[&>footer]:mt-14">
-        <Footer />
-      </div>
+      <Footer />
       <Voices
         auto
         peek={{
