@@ -1,7 +1,7 @@
 import { ENTRIES, entry } from '@/catalog/meta'
 import { BLOCKS } from '@/catalog/blocks'
 import { TEMPLATES, TEMPLATE_COUNT } from '@/catalog/templates'
-import { RELEASES, CONTACT, REFUND_DAYS, TRIAL_INSTALLS } from '@/catalog/trust'
+import { RELEASES, CONTACT } from '@/catalog/trust'
 import { FREE_BLOCKS, ON_SALE, PLANS, PRO_COMPONENTS, PRO_BLOCK_COUNT, SITE, installCommand, isProBlock, isProComponent } from '@/catalog/pro'
 import { NAME, DESCRIPTION, TAGLINE, FREE_COUNT } from '@/site/seo'
 import { abs, envelope, fmtDate, itemList, kvTable, today } from './format'
@@ -301,9 +301,13 @@ function renderRefunds(): string {
   const body = [
     '## Refund policy',
     '',
-    `Try up to ${TRIAL_INSTALLS} Pro components or blocks in your first ${REFUND_DAYS} days. If Pro isn’t right for you, email us within those ${REFUND_DAYS} days for a full refund. You don’t need a reason.`,
+    'All sales are final. Detent Pro gives you the full source code the moment you buy, and code can’t be returned, so we don’t offer refunds.',
     '',
-    `Past ${TRIAL_INSTALLS} installs or ${REFUND_DAYS} days, the purchase is final. Templates are final once downloaded. If something doesn’t work as described, write anyway and we’ll make it right.`,
+    'Installing any Pro component or block with the CLI, copying its code, or downloading a template counts as using it. Every Pro piece and the template run live on detentui.com, so you can try them before you buy.',
+    '',
+    '## Support',
+    '',
+    'If a component or the template doesn’t work in your project, email us and we’ll help you fix it.',
     '',
     `Contact: ${CONTACT}`,
   ].join('\n')
@@ -584,7 +588,7 @@ const STATIC_ROUTES: Record<string, { render: () => string | null; desc: string;
   '/changelog':   { render: renderChangelog,  desc: 'Every update, newest first',                      isStatic: false },
   '/licence':     { render: renderLicence,    desc: 'Licence terms and key conditions',                isStatic: true },
   '/terms':       { render: renderTerms,      desc: 'Terms of service',                                isStatic: true },
-  '/refunds':     { render: renderRefunds,    desc: `Refund policy: ${REFUND_DAYS} days, up to ${TRIAL_INSTALLS} components or blocks`,      isStatic: true },
+  '/refunds':     { render: renderRefunds,    desc: 'Refund policy: all sales are final',      isStatic: true },
   '/privacy':     { render: renderPrivacy,    desc: 'What we keep, who helps run it, and how to remove it', isStatic: true },
 }
 

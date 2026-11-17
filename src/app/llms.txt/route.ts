@@ -60,7 +60,7 @@ export function GET() {
     `- [Changelog](${SITE}/changelog.md): Release history, component updates, and new features`,
     `- [Licence](${SITE}/licence.md): MIT and Pro license terms`,
     `- [Terms](${SITE}/terms.md): Terms of service`,
-    `- [Refunds](${SITE}/refunds.md): 14-day refund policy`,
+    `- [Refunds](${SITE}/refunds.md): all sales are final`,
     `- [Privacy](${SITE}/privacy.md): What we keep and how to have it removed`,
   ]
 

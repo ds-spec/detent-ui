@@ -8,9 +8,8 @@ import { BLOCKS } from '@/catalog/blocks'
 import { PLANS, PRO_BLOCK_COUNT, PRO_COMPONENTS } from '@/catalog/pro'
 import type { Plan } from '@/catalog/pro'
 import { TEMPLATES, TEMPLATE_COUNT } from '@/catalog/templates'
-import { REFUND_DAYS } from '@/catalog/trust'
 import { priceWith, usePromo } from '../Promo'
-import { ArrowRight, ArrowUpRight, Check, Code, Refresh, Undo } from '@/lab/icons'
+import { ArrowRight, ArrowUpRight, Check, Code, Refresh } from '@/lab/icons'
 import { RollingText } from '@/lab/ui/RollingText'
 import { BLOCK_VIEWS, TEMPLATE_VIEWS } from '@pro'
 import { Backdrop, Window } from '../blocks/Studio'
@@ -180,7 +179,6 @@ function Tile({ name, on, disabled = false, short = false, onPick, title, price,
 const PROMISES = [
   [<Check key="c" size={14} />, 'One payment, no subscription'],
   [<Refresh key="r" size={14} />, 'Every update, for life'],
-  [<Undo key="u" size={14} />, `${REFUND_DAYS}-day refund`],
   [<Code key="o" size={14} />, 'The source is yours to change'],
 ] as const
 
@@ -309,7 +307,7 @@ export function BuyBar() {
         </div>
       </div>
       <p className="mt-4 text-balance px-4 text-center text-[13px] leading-[1.7] text-ink-3">
-        {what} · Every update for life · {REFUND_DAYS}-day refund
+        {what} · Every update for life
       </p>
     </div>
   )

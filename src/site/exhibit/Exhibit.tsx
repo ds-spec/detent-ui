@@ -34,6 +34,7 @@ import { BTN, useSideNew } from '../shell/side'
 import type { RailGroup } from './Rail'
 import { CategoryIcon } from '../icons'
 import { wellOf } from '../wells'
+import { Subscribe } from '../Subscribe'
 import type { Tone } from '../home/lights'
 
 if (typeof window !== 'undefined') preloadDemo(location.pathname.split('/')[2] ?? '')
@@ -308,6 +309,15 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
       </div>
 
       {pro && <ProPitch id={e.id} near />}
+
+      {!pro && (
+        <div className="mt-1 flex flex-col gap-3 px-1 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
+          <p className="text-[13px] leading-5 text-ink sm:pt-2">
+            Liked this? <span className="text-ink-3">Get the next one in your inbox, every Friday.</span>
+          </p>
+          <Subscribe source={`component:${e.id}`} size="sm" className="sm:w-[320px] sm:shrink-0" />
+        </div>
+      )}
 
       <div className="contents" style={{ visibility: id === at ? undefined : 'hidden' }}>
         {children}

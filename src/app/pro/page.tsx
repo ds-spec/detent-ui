@@ -4,7 +4,7 @@ import { BLOCKS } from '@/catalog/blocks'
 import { ENTRIES } from '@/catalog/meta'
 import { PRO_COMPONENTS } from '@/catalog/pro'
 import { TEMPLATE_COUNT, TEMPLATES } from '@/catalog/templates'
-import { CONTACT, REFUND_DAYS, TRIAL_INSTALLS } from '@/catalog/trust'
+import { CONTACT } from '@/catalog/trust'
 import { Check } from '@/lab/icons'
 import { BigBuy, BuyBar, BuyNote, BuyProvider, HeroHead, WideStage } from '@/site/pro/Buy'
 import { Compare, Inside } from '@/site/pro/Inside'
@@ -15,6 +15,7 @@ import { Touch } from '@/site/pro/Touch'
 import { Voices } from '@/site/Voices'
 import { JsonLd, page, proGraph } from '@/site/seo'
 import { SitePage } from '@/site/sheets'
+import { Subscribe } from '@/site/Subscribe'
 
 export const metadata: Metadata = page({
   title: 'Detent Pro — make your app feel expensive',
@@ -29,13 +30,12 @@ const FAQ: [string, string][] = [
   ['Will it match my design?', 'Installed with shadcn, Detent takes on your theme: your primary becomes its accent, it uses your background, borders and muted text, and .dark turns it dark. Your fonts stay yours.'],
   ['Can I change the code?', 'Yes. Every piece lands in your project as source files, the same way shadcn components do. Restyle it, cut it down, rename it. It’s yours.'],
   ['Can I use it for client work?', 'Yes, in as many projects as you like, commercial ones included. What you can’t do is resell or redistribute the components themselves.'],
-  ['What if it’s not right for me?', `Try up to ${TRIAL_INSTALLS} components or blocks in your first ${REFUND_DAYS} days. If it isn’t right, email us and you get every cent back, no form, no questions.`],
   ['How do I install Pro?', 'With the shadcn CLI, from Detent’s private registry. Sign in with your email, generate a key, add it and the registry to the project once, as in Set up once below, then install like anything else: npx shadcn add @detent-pro/glyph. The source lands in your project.'],
   ['Can my team share one licence?', 'A licence is for one person, so each person building with it needs their own. Your keys work in CI and shared repos.'],
   ['What if I get stuck?', `Write to ${CONTACT}. You’ll hear back from the person who built it.`],
 ]
 
-const INCLUDED = [`All ${ENTRIES.length} components`, `All ${BLOCKS.length} blocks`, ...TEMPLATES.map((t) => `The ${t.name} template`), 'Every update, for life', 'Unlimited projects', `${REFUND_DAYS}-day refund`]
+const INCLUDED = [`All ${ENTRIES.length} components`, `All ${BLOCKS.length} blocks`, ...TEMPLATES.map((t) => `The ${t.name} template`), 'Every update, for life', 'Unlimited projects']
 
 const H2 = 'text-[clamp(32px,3.4vw,48px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink'
 
@@ -48,6 +48,12 @@ export default function ProPage() {
           <HeroHead />
           <div data-dock-dodge="" className="rise mt-9" style={{ animationDelay: '200ms' }}>
             <BuyBar />
+          </div>
+          <div className="rise mx-auto mt-10 flex max-w-[420px] flex-col items-center" style={{ animationDelay: '260ms' }}>
+            <p className="text-center text-[13px] text-ink">
+              Not ready yet? <span className="text-ink-3">Get the Black Friday deal first.</span>
+            </p>
+            <Subscribe source="pro" size="sm" label="Notify me" center className="mt-3" note="Black Friday deal, then one free component a week. Unsubscribe anytime." />
           </div>
           <div className="rise mt-12 sm:mt-14" style={{ animationDelay: '320ms' }}>
             <WideStage />

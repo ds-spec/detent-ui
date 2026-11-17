@@ -5,7 +5,6 @@ import { block } from '@/catalog/blocks'
 import { entry } from '@/catalog/meta'
 import { PLANS, PRO_BLOCK_COUNT, PRO_COMPONENTS, isProBlock, isProComponent } from '@/catalog/pro'
 import { TEMPLATE_COUNT } from '@/catalog/templates'
-import { REFUND_DAYS } from '@/catalog/trust'
 import { ArrowRight, ArrowUpRight } from '@/lab/icons'
 import { ForPlan } from './Owned'
 import { Price } from './Promo'
@@ -61,7 +60,6 @@ export function ProPitch({ id, shelf = 'components', near = false }: { id: strin
                 Get Pro
                 <ArrowRight size={14} className="transition-transform duration-150 group-hover/buy:translate-x-0.5" />
               </a>
-              <p className="text-[12.5px] text-ink-3">{REFUND_DAYS}-day refund while you try it.</p>
             </div>
           </div>
         </section>

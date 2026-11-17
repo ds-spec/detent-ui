@@ -12,7 +12,7 @@ export const trialFor = (since: number) => (since < EARLY_TRIAL.before ? EARLY_T
 
 export const UPDATED = '2026-11-02'
 
-export const REFUND_RULE_UPDATED = '2026-11-11'
+export const REFUND_RULE_UPDATED = '2026-11-17'
 
 export const updated = (on = UPDATED) => new Date(`${on}T00:00:00`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
 

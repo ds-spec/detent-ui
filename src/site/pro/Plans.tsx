@@ -1,7 +1,6 @@
-import { Check, Code, Refresh, Undo } from '@/lab/icons'
+import { Check, Code, Refresh } from '@/lab/icons'
 import { ON_SALE } from '@/catalog/pro'
 import type { Plan } from '@/catalog/pro'
-import { REFUND_DAYS } from '@/catalog/trust'
 import { PlanButton } from '../Owned'
 import { Price } from '../Promo'
 
@@ -13,12 +12,11 @@ export function Plans({ compact = false }: { compact?: boolean }) {
           <PlanCard key={p.id} plan={p} compact={compact} />
         ))}
       </div>
-      <ul className={`mx-auto mt-3 grid gap-x-6 gap-y-3 rounded-[22px] px-6 py-5 text-[13.5px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)] sm:grid-cols-2 ${ON_SALE.length > 1 ? 'max-w-[860px] lg:grid-cols-4' : 'max-w-[520px]'}`}>
+      <ul className={`mx-auto mt-3 grid gap-x-6 gap-y-3 rounded-[22px] px-6 py-5 text-[13.5px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)] sm:grid-cols-3 ${ON_SALE.length > 1 ? 'max-w-[860px]' : 'max-w-[640px]'}`}>
         {(
           [
             [<Check key="c" size={14} />, 'Pay once, no subscription'],
             [<Refresh key="r" size={14} />, 'Every update, for life'],
-            [<Undo key="u" size={14} />, `${REFUND_DAYS}-day refund`],
             [<Code key="o" size={14} />, 'Source code, yours to edit'],
           ] as const
         ).map(([icon, text]) => (
@@ -49,7 +47,6 @@ function PlanCard({ plan, compact }: { plan: Plan; compact: boolean }) {
         <span className={`text-[13.5px] ${ink ? 'text-surface/60' : 'text-ink-3'}`}>once, for {plan.seats}</span>
       </p>
       <PlanButton plan={plan} className={`ring-focus mt-8 flex h-11 items-center justify-center rounded-full text-[14px] font-medium transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.98] ${ink ? 'bg-surface text-ink' : 'bg-ink text-surface'}`} />
-      <p className={`mt-3 text-center text-[12.5px] ${ink ? 'text-surface/55' : 'text-ink-3'}`}>{REFUND_DAYS}-day refund while you try it.</p>
       {!compact && (
         <ul className={`mt-8 flex flex-col gap-3 pt-7 text-[14px] ${ink ? 'text-surface/85 shadow-[inset_0_1px_0_rgb(255_255_255/0.14)]' : 'text-ink-2 shadow-[inset_0_1px_0_var(--line)]'}`}>
           {features.map((f) => (

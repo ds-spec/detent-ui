@@ -15,7 +15,6 @@ import { CopyCommand } from '@/site/parts'
 import { InDirectory } from '@/site/Directory'
 import { ForPlan } from '@/site/Owned'
 import { Price } from '@/site/Promo'
-import { REFUND_DAYS } from '@/catalog/trust'
 import { BRIDGE, CARDS, GRAIN, LAYER, useWide } from './lights'
 import type { Card } from './lights'
 import { BTN, useSideNew } from '../shell/side'
@@ -74,7 +73,6 @@ export function HomeHero({ lib, fresh }: { lib: LibItem[]; fresh: Latest }) {
             </div>
             <div className="rise mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[13px] text-ink-3" style={{ animationDelay: '260ms' }}>
               <InDirectory />
-              <ForPlan none={<span>· Pro comes with a {REFUND_DAYS}-day refund.</span>} />
             </div>
           </div>
           <Plates lib={lib} onOpen={setOpen} className="rise mt-12 lg:mt-14 lg:h-[clamp(480px,calc(100svh-300px),620px)]" />

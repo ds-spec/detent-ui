@@ -4,7 +4,6 @@ import { PRO_BLOCKS } from '@/catalog/effort'
 import { ENTRIES, entry } from '@/catalog/meta'
 import { FREE_BLOCKS, PLANS, PRO_COMPONENTS } from '@/catalog/pro'
 import { TEMPLATES } from '@/catalog/templates'
-import { REFUND_DAYS } from '@/catalog/trust'
 import { ArrowRight, Check } from '@/lab/icons'
 import { ForPlan } from '../Owned'
 import { Price } from '../Promo'
@@ -65,7 +64,6 @@ const PRO_ROWS: Row[] = [
   ...(template ? [{ title: `The ${template.name} template`, line: `A full ${template.kind.toLowerCase()} to start from` }] : []),
   { title: 'Every new piece, as it ships' },
   { title: 'Unlimited projects, client work too' },
-  { title: `${REFUND_DAYS}-day refund` },
 ]
 
 function Rows({ rows, lit = false }: { rows: Row[]; lit?: boolean }) {

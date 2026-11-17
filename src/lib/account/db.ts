@@ -22,6 +22,8 @@ const SCHEMA = [
   `create table if not exists free_installer (item text not null, day text not null, who text not null, primary key (item, day, who))`,
   `create table if not exists free_fetch (item text not null, day text not null, via text not null, n integer not null, primary key (item, day, via))`,
   `create table if not exists install_salt (day text primary key, value text not null)`,
+  `create table if not exists subscriber (email text primary key, source text, created_at integer not null, unsubscribed_at integer, country text)`,
+  `create table if not exists broadcast_sent (slug text not null, email text not null, at integer not null, primary key (slug, email))`,
 ]
 
 let ready: Promise<Client> | undefined

@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from 'motion/react'
 import { PLANS } from '@/catalog/pro'
 import { usePathname } from 'next/navigation'
 import { PROMO, promoLive } from '@/catalog/promo'
-import { REFUND_DAYS } from '@/catalog/trust'
 import type { Promo } from '@/catalog/promo'
 import { ArrowRight } from '@/lab/icons'
 import { useOwned } from './Owned'
@@ -141,7 +140,6 @@ export function MobileBuy() {
         >
           <span className="min-w-0 flex-1">
             <span className="block text-[13px] font-medium leading-4">Detent Pro</span>
-            <span className="block text-[12px] leading-4 text-white/55">{REFUND_DAYS}-day refund</span>
           </span>
           <span className="tnum text-[17px] tracking-[-0.02em] [&_s]:text-white/45">
             <Price value={PLANS[0].price} />
