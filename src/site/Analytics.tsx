@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import posthog from 'posthog-js'
 import { PLANS } from '@/catalog/pro'
 import { PROMO, promoLive } from '@/catalog/promo'
 import { track } from './track'
@@ -12,6 +13,8 @@ export function Analytics() {
       const href = link?.getAttribute('href')
       if (!href) return
       const plan = PLANS.find((p) => p.href === href)
+      const sid = posthog.get_session_id?.()
+      if (sid) document.cookie = `dt_ph=${encodeURIComponent(sid)}; path=/checkout; max-age=120; samesite=lax; secure`
       track('begin_checkout', { plan: plan?.id ?? href, value: plan && promoLive(PROMO) && PROMO.price < plan.price ? PROMO.price : plan?.price, currency: 'USD', cta: link?.getAttribute('data-cta') ?? undefined })
     }
     document.addEventListener('click', buy, true)

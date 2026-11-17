@@ -57,13 +57,20 @@ void main(){
   gl_FragColor=vec4(c*a,a);
 }`
 
+const tints = new Map<string, number[]>()
 const rgb = (color: string) => {
-  const x = document.createElement('canvas').getContext('2d')!
+  const hit = tints.get(color)
+  if (hit) return hit
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = 1
+  const x = canvas.getContext('2d', { willReadFrequently: true })!
   x.fillStyle = '#000'
   x.fillStyle = color
-  const v = x.fillStyle
-  if (v.startsWith('#')) return [1, 3, 5].map((i) => parseInt(v.slice(i, i + 2), 16) / 255)
-  return (v.match(/[\d.]+/g) ?? ['0', '0', '0']).slice(0, 3).map((n) => Number(n) / 255)
+  x.fillRect(0, 0, 1, 1)
+  const [r, g, b] = x.getImageData(0, 0, 1, 1).data
+  const v = [r / 255, g / 255, b / 255]
+  tints.set(color, v)
+  return v
 }
 
 const living = (tape: RewindCell[]) => tape.filter((m) => m.died === NEVER)
