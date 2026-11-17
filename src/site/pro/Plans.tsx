@@ -1,64 +1,70 @@
-import { Check, Code, Refresh } from '@/lab/icons'
+import Link from 'next/link'
+import { ArrowRight, Check, Code, Refresh } from '@/lab/icons'
 import { ON_SALE } from '@/catalog/pro'
 import type { Plan } from '@/catalog/pro'
 import { PlanButton } from '../Owned'
 import { Price } from '../Promo'
 
+const PROMISES = [
+  [<Check key="c" size={13} />, 'No subscription, ever'],
+  [<Refresh key="r" size={13} />, 'Every update, for life'],
+  [<Code key="o" size={13} />, 'Full source, yours to edit'],
+] as const
+
+const COVERED = ['Every update, for life', 'Unlimited projects', 'Source in your project, yours to change']
+
 export function Plans({ compact = false }: { compact?: boolean }) {
   return (
-    <div>
-      <div className={`mx-auto grid gap-3 ${ON_SALE.length > 1 ? 'max-w-[860px] md:grid-cols-2' : 'max-w-[520px]'}`}>
-        {ON_SALE.map((p) => (
-          <PlanCard key={p.id} plan={p} compact={compact} />
-        ))}
-      </div>
-      <ul className={`mx-auto mt-3 grid gap-x-6 gap-y-3 rounded-[22px] px-6 py-5 text-[13.5px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)] sm:grid-cols-3 ${ON_SALE.length > 1 ? 'max-w-[860px]' : 'max-w-[640px]'}`}>
-        {(
-          [
-            [<Check key="c" size={14} />, 'Pay once, no subscription'],
-            [<Refresh key="r" size={14} />, 'Every update, for life'],
-            [<Code key="o" size={14} />, 'Source code, yours to edit'],
-          ] as const
-        ).map(([icon, text]) => (
-          <li key={text} className="flex items-start gap-2.5 leading-[20px]">
-            <span className="flex h-5 shrink-0 items-center text-ink-3">{icon}</span>
-            {text}
-          </li>
-        ))}
-      </ul>
+    <div className="mx-auto flex max-w-[860px] flex-col gap-3">
+      {ON_SALE.map((p) => (
+        <PlanCard key={p.id} plan={p} compact={compact} />
+      ))}
     </div>
   )
 }
 
 function PlanCard({ plan, compact }: { plan: Plan; compact: boolean }) {
-  const ink = plan.best
-  const features = plan.features.filter((f) => f !== 'Every update, for life' && f !== 'Unlimited projects')
+  const features = plan.features.filter((f) => !COVERED.includes(f))
   return (
-    <div className={`relative flex flex-col rounded-[28px] p-7 sm:p-8 ${ink ? 'bg-ink text-surface shadow-modal' : 'bg-surface text-ink shadow-[var(--card-edge)]'}`}>
-      <div className="flex h-6 items-center justify-between gap-4">
-        <p className="text-[17px] tracking-[-0.01em]">{plan.name}</p>
-        {ink && <span className="rounded-full bg-surface/15 px-2.5 text-[12px] font-medium leading-6">Everything</span>}
-      </div>
-      <p className={`mt-1 text-[14.5px] ${ink ? 'text-surface/60' : 'text-ink-3'}`}>{plan.line}</p>
-      <p className="mt-8 flex items-baseline gap-2">
-        <span className="tnum text-[56px] font-normal leading-none tracking-[-0.055em]">
-          <Price value={plan.price} />
-        </span>
-        <span className={`text-[13.5px] ${ink ? 'text-surface/60' : 'text-ink-3'}`}>once, for {plan.seats}</span>
-      </p>
-      <PlanButton plan={plan} className={`ring-focus mt-8 flex h-11 items-center justify-center rounded-full text-[14px] font-medium transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.98] ${ink ? 'bg-surface text-ink' : 'bg-ink text-surface'}`} />
-      {!compact && (
-        <ul className={`mt-8 flex flex-col gap-3 pt-7 text-[14px] ${ink ? 'text-surface/85 shadow-[inset_0_1px_0_rgb(255_255_255/0.14)]' : 'text-ink-2 shadow-[inset_0_1px_0_var(--line)]'}`}>
+    <div className="grid gap-2 rounded-[28px] bg-surface p-2 text-ink shadow-[var(--card-edge)] md:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="flex flex-col p-6">
+        <p className="text-[17px] tracking-[-0.01em]">Detent {plan.name}</p>
+        <p className="mt-1 text-[13.5px] text-ink-3">{plan.line}</p>
+        <ul className="mt-7 flex flex-col gap-3 text-[13.5px] text-ink-2">
           {features.map((f) => (
-            <li key={f} className="flex gap-3">
-              <span className={`mt-[3px] grid size-4 shrink-0 place-items-center rounded-full ${ink ? 'bg-surface/15' : 'bg-surface-2'}`}>
+            <li key={f} className="flex gap-3 leading-[20px]">
+              <span className="mt-[2px] grid size-4 shrink-0 place-items-center rounded-full bg-surface-2 text-ink-2">
                 <Check size={10} strokeWidth={3} />
               </span>
               {f}
             </li>
           ))}
         </ul>
-      )}
+        {!compact && (
+          <Link href="/pro" className="ring-focus group mt-auto inline-flex w-fit items-center gap-1.5 rounded-[6px] pt-8 text-[13px] text-ink-3 transition-colors hover:text-ink">
+            Every piece runs live on the site. See all of Pro
+            <ArrowRight size={12} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+          </Link>
+        )}
+      </div>
+      <div className="flex flex-col rounded-[20px] bg-surface-2 p-6">
+        <p className="flex items-baseline gap-2">
+          <span className="tnum text-[52px] leading-none tracking-[-0.055em]">
+            <Price value={plan.price} />
+          </span>
+          <span className="text-[13px] text-ink-3">once</span>
+        </p>
+        <p className="mt-2 text-[12.5px] text-ink-3">For {plan.seats}. Tax added at checkout.</p>
+        <PlanButton plan={plan} className="ring-focus mt-6 flex h-11 items-center justify-center rounded-full bg-ink text-[14px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]" />
+        <ul className="mt-6 flex flex-col gap-2.5 pt-5 text-[12.5px] text-ink-2 shadow-[inset_0_1px_0_var(--line)]">
+          {PROMISES.map(([icon, text]) => (
+            <li key={text} className="flex items-center gap-2.5">
+              <span className="text-ink-3">{icon}</span>
+              {text}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }

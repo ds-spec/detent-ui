@@ -299,17 +299,26 @@ function renderTerms(): string {
 
 function renderRefunds(): string {
   const body = [
-    '## Refund policy',
+    '## No refunds',
     '',
-    'All sales are final. Detent Pro gives you the full source code the moment you buy, and code can’t be returned, so we don’t offer refunds.',
+    'All Detent Pro sales are final. When you buy, you get the full source code of every Pro component, block and the template straight away, and code that’s been delivered can’t be handed back. So once your payment goes through, we don’t issue refunds.',
     '',
-    'Installing any Pro component or block with the CLI, copying its code, or downloading a template counts as using it. Every Pro piece and the template run live on detentui.com, so you can try them before you buy.',
+    '## What counts as using Pro',
+    '',
+    'Pro counts as used as soon as its code reaches you, by any of these routes:',
+    '',
+    '- Installing any Pro component, block or the template with the shadcn CLI.',
+    '- Getting Pro code through an AI agent, an MCP tool or any other assistant connected to your key.',
+    '- Copying code from the site or the docs.',
+    '- Downloading the template.',
+    '',
+    'It’s the same whether you take one component or the whole library.',
+    '',
+    `That’s why everything is out in the open first. Every Pro piece and the template run live on detentui.com, and ${FREE_COUNT} components are free to install, so you can see how it looks and works in your own project before you pay. Buying and accessing Pro means you agree to this policy.`,
     '',
     '## Support',
     '',
-    'If a component or the template doesn’t work in your project, email us and we’ll help you fix it.',
-    '',
-    `Contact: ${CONTACT}`,
+    `If a component or the template doesn’t work in your project, email ${CONTACT} with what you installed and what you’re seeing, and we’ll help you fix it. When the problem is on our side, the fix ships as an update, so everyone who owns Pro gets it.`,
   ].join('\n')
 
   return envelope({
