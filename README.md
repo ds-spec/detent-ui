@@ -93,7 +93,7 @@ Point Cursor, Claude Code or any agent at [`detentui.com/llms.txt`](https://dete
 
 ## Detent Pro
 
-19 more components, 12 whole-screen blocks and a full app template, with more on the way. One payment, every update for life. See [detentui.com/pro](https://detentui.com/pro).
+19 more components, among them MCP install, which writes the real config for Cursor, Claude Code, Windsurf and Zed. Plus 12 whole-screen blocks and a full app template, with more on the way. One payment, every update for life. See [detentui.com/pro](https://detentui.com/pro).
 
 Pro source lives in a private repository. Without it, this one still builds and runs: each Pro preview becomes a locked stand-in from `src/locked`.
 
