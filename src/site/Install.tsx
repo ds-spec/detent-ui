@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import LINES from '@/catalog/lines.json'
 import { installCommand } from '@/catalog/site'
 import { piecePrompt } from '@/catalog/prompts'
-import { Check, Copy } from '@/lab/icons'
+import { ArrowRight, Check, Copy } from '@/lab/icons'
 import { CopyCommand } from './parts'
 import { useOwned } from './Owned'
 import { BTN, useSideNew } from './shell/side'
@@ -34,7 +34,18 @@ export function Install({ id, free, bare = false }: { id: string; free: boolean;
   /* Agent first: the prompt is the way in, the command stays beside it for people who run it themselves */
   const row = (
     <div className="flex w-full min-w-0 items-center gap-2">
-      {prompt && <CopyPrompt id={id} prompt={prompt} />}
+      {prompt &&
+        (free || has ? (
+          <CopyPrompt id={id} prompt={prompt} />
+        ) : owned === null ? (
+          <GetPro />
+        ) : (
+          /* not known yet: signed out sees Get Pro, signed in sees the prompt until the plan loads */
+          <>
+            <GetPro className="when-out" />
+            <CopyPrompt id={id} prompt={prompt} className="when-in" />
+          </>
+        ))}
       <div className="min-w-0 flex-1">
         <CopyCommand fill command={installCommand(id, free)} onCopy={free ? undefined : note} />
       </div>
@@ -88,7 +99,23 @@ export function Install({ id, free, bare = false }: { id: string; free: boolean;
 }
 
 /* Copies the prompt a coding agent follows to add this piece: it fetches the piece's markdown and its steps */
-export function CopyPrompt({ id, prompt }: { id: string; prompt: string }) {
+const primary = (side: boolean) =>
+  side
+    ? `ring-focus flex h-10 shrink-0 items-center gap-2 rounded-[11px] ${BTN.accent} pl-3.5 pr-4 text-[13px] font-medium transition-transform duration-150 active:scale-[0.97]`
+    : 'ring-focus flex h-10 shrink-0 items-center gap-2 rounded-full bg-ink pl-3.5 pr-4 text-[13px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]'
+
+/* A Pro piece for someone without Pro: the agent would only stop and ask for a key, so the way in is Pro itself */
+function GetPro({ className = '' }: { className?: string }) {
+  const side = useSideNew()
+  return (
+    <Link href="/pro" data-cta="install-get-pro" className={`${primary(side)} pr-3.5 ${className}`}>
+      Get Pro
+      <ArrowRight size={13} />
+    </Link>
+  )
+}
+
+export function CopyPrompt({ id, prompt, className = '' }: { id: string; prompt: string; className?: string }) {
   const side = useSideNew()
   const [copied, setCopied] = useState(0)
   const timer = useRef(0)
@@ -108,7 +135,7 @@ export function CopyPrompt({ id, prompt }: { id: string; prompt: string }) {
       onClick={copy}
       title={prompt}
       aria-label={copied ? 'Prompt copied' : 'Copy a prompt for your coding agent'}
-      className={side ? `ring-focus flex h-10 shrink-0 items-center gap-2 rounded-[11px] ${BTN.accent} pl-3.5 pr-4 text-[13px] font-medium transition-transform duration-150 active:scale-[0.97]` : 'ring-focus flex h-10 shrink-0 items-center gap-2 rounded-full bg-ink pl-3.5 pr-4 text-[13px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]'}
+      className={`${primary(side)} ${className}`}
     >
       <span className="relative flex size-3.5 items-center justify-center">
         <AnimatePresence initial={false} mode="popLayout">
