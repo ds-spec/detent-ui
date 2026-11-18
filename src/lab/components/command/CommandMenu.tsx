@@ -58,13 +58,25 @@ export function CommandMenu({
   const returnTo = useRef<HTMLElement | null>(null)
   const id = useId()
   const [opened, setOpened] = useState(open)
+  const [wasInline, setWasInline] = useState(inline)
   const [instant, setInstant] = useState(byKey)
-  if (open !== opened) {
+  if (open !== opened || inline !== wasInline) {
+    if (open !== opened && open) setInstant(byKey())
     setOpened(open)
-    if (open) setInstant(byKey())
+    setWasInline(inline)
+    // A fresh open starts from an empty search.
+    if (open && !inline) {
+      setQuery('')
+      setActive(0)
+    }
   }
 
   const q = query.trim().toLowerCase()
+  const [lastQ, setLastQ] = useState(q)
+  if (q !== lastQ) {
+    setLastQ(q)
+    setActive(0)
+  }
   const results = useMemo(() => commands.map((c) => ({ c, ...match(c, q) })).filter((r) => r.hit), [commands, q])
   const { rows, end } = useMemo(() => {
     const out: (({ kind: 'group'; label: string } | { kind: 'item'; r: (typeof results)[number]; index: number }) & { y: number })[] = []
@@ -90,14 +102,9 @@ export function CommandMenu({
 
   useEffect(() => {
     if (inline) return
-    if (open) {
-      returnTo.current = document.activeElement as HTMLElement
-      setQuery('')
-      setActive(0)
-    } else returnTo.current?.focus?.({ preventScroll: true })
+    if (open) returnTo.current = document.activeElement as HTMLElement
+    else returnTo.current?.focus?.({ preventScroll: true })
   }, [open, inline])
-
-  useEffect(() => setActive(0), [q])
 
   useLayoutEffect(() => {
     if (!(open || inline) || via !== 'keys') return

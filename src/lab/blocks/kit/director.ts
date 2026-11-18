@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import type { PointerEvent } from 'react'
 import { pressed } from '@/lab/lib/hand'
 
 export const STOP = Symbol('stop')
@@ -45,7 +46,10 @@ export function useDirector(script: (wait: Wait, pass: number) => Promise<void>,
     if (!touched.current) onTakeOver?.()
     touched.current = true
   }
-  return { ...pressed(takeOver), onKeyDownCapture: takeOver, touched }
+  // Build the press handlers per event so takeOver is only handed over outside render.
+  const onPointerDownCapture = (e?: PointerEvent) => pressed(takeOver).onPointerDownCapture(e)
+  const onPointerUpCapture = (e?: PointerEvent) => pressed(takeOver).onPointerUpCapture(e)
+  return { onPointerDownCapture, onPointerUpCapture, onKeyDownCapture: takeOver, touched }
 }
 
 export const sleeper = (ok: () => boolean) => (ms: number) => new Promise<void>((r, x) => setTimeout(() => (ok() ? r() : x(STOP)), ms))

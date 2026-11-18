@@ -102,7 +102,7 @@ export function Carousel({ slides, autoplay = 5000, aspect = '16 / 8.4', label =
   }
   const dial = useDetent({
     value: 0,
-    stops: stops.current,
+    stops: () => stops.current,
     reach: 0.16,
     throw: 0.28,
     spring: { w: 14, z: 0.96 },
@@ -164,11 +164,6 @@ export function Carousel({ slides, autoplay = 5000, aspect = '16 / 8.4', label =
     step.current = go
   })
 
-  useEffect(() => {
-    if (!autoplay || reduce || hover || !seen || moving) return
-    const c = animate(clock, 1, { duration: ((1 - clock.get()) * autoplay) / 1000, ease: 'linear', onComplete: () => autoStep.current() })
-    return () => c.stop()
-  }, [i, autoplay, reduce, hover, seen, moving, clock])
   const autoStep = useRef(() => {})
   useEffect(() => {
     autoStep.current = () => {
@@ -187,6 +182,12 @@ export function Carousel({ slides, autoplay = 5000, aspect = '16 / 8.4', label =
   })
 
   useEffect(() => {
+    if (!autoplay || reduce || hover || !seen || moving) return
+    const c = animate(clock, 1, { duration: ((1 - clock.get()) * autoplay) / 1000, ease: 'linear', onComplete: () => autoStep.current() })
+    return () => c.stop()
+  }, [i, autoplay, reduce, hover, seen, moving, clock])
+
+  useEffect(() => {
     const w = words.current
     const el = w?.children[i] as HTMLElement | undefined
     if (w && el) w.scrollTo({ left: el.offsetLeft - 8, behavior: reduce ? 'auto' : 'smooth' })
@@ -195,10 +196,15 @@ export function Carousel({ slides, autoplay = 5000, aspect = '16 / 8.4', label =
   useImperativeHandle(ref, () => ({ go: (k) => step.current(k), next: () => step.current(i + 1), prev: () => step.current(i - 1) }), [i])
 
   const [drag] = useState(() =>
-    dragProps(dial, () => {
-      const w = frame.current?.clientWidth || 1
-      return { box: () => frame.current, units: -w / (w + GAP), muted: true, onGrab: () => setMoving(true) }
-    }),
+    dragProps(dial, () => ({
+      box: () => frame.current,
+      units: () => {
+        const w = frame.current?.clientWidth || 1
+        return -w / (w + GAP)
+      },
+      muted: true,
+      onGrab: () => setMoving(true),
+    })),
   )
   const onDown = (e: PointerEvent) => {
     if (!(e.target as Element).closest?.(CONTROL)) drag.onPointerDown(e)

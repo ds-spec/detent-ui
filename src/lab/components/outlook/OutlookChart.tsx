@@ -1,9 +1,10 @@
 'use client'
 
-import { useId, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react'
+import { useId, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent, Ref } from 'react'
 import { smooth } from '@/lab/components/charts/parts'
 import { at as lerpAt, clamp, dragProps, useDetent } from '@/lab/lib/detent'
+import type { DragConfig } from '@/lab/lib/detent'
 import { useSize } from '@/lab/lib/hooks'
 import { INK, InkDefs } from '@/lab/ui/ink'
 
@@ -43,8 +44,7 @@ export function OutlookChart({ history, forecast, format = (n) => n.toLocaleStri
     setAt(k)
     onRead?.(k)
   }
-  const stops = useRef<number[]>([])
-  if (stops.current.length !== ahead) stops.current = Array.from({ length: ahead }, (_, i) => i)
+  const stops = useMemo(() => Array.from({ length: ahead }, (_, i) => i), [ahead])
   const reader = useRef<SVGGElement>(null)
   const span = useRef<SVGLineElement>(null)
   const capTop = useRef<SVGLineElement>(null)
@@ -61,9 +61,11 @@ export function OutlookChart({ history, forecast, format = (n) => n.toLocaleStri
     capLow.current?.setAttribute('y1', lo.toFixed(2))
     capLow.current?.setAttribute('y2', lo.toFixed(2))
   }
+  const byHand = useRef(false)
+  const latest = useRef({ n, edge, ahead, pick })
   const dial = useDetent({
     value: ahead - 1,
-    stops: stops.current,
+    stops,
     magnet: 0.5,
     reach: 0.35,
     throw: 0.08,
@@ -74,10 +76,14 @@ export function OutlookChart({ history, forecast, format = (n) => n.toLocaleStri
       if (byHand.current) latest.current.pick(i)
     },
   })
-  const byHand = useRef(false)
   const toAhead = (f: number) => clamp(f * (latest.current.n - 1) - latest.current.edge - 1, 0, latest.current.ahead - 1)
-  const [hand] = useState(() =>
-    dragProps(dial, () => ({
+  // The drag reads its config through a closure, set after each commit.
+  const [[hand, aim]] = useState(() => {
+    let read: () => DragConfig
+    return [dragProps(dial, () => read()), (next: () => DragConfig) => (read = next)] as const
+  })
+  useLayoutEffect(() => {
+    aim(() => ({
       box: () => box.current,
       units: latest.current.n - 1,
       absolute: toAhead,
@@ -93,8 +99,8 @@ export function OutlookChart({ history, forecast, format = (n) => n.toLocaleStri
         latest.current.pick(i)
       },
       release: () => ({ flick: false }),
-    })),
-  )
+    }))
+  })
   useImperativeHandle(ref, () => ({
     read: (i) => {
       byHand.current = false
@@ -121,7 +127,6 @@ export function OutlookChart({ history, forecast, format = (n) => n.toLocaleStri
   const labels = [...history.map((p) => p.label), ...forecast.map((p) => p.label)]
   const room = Math.max(1, Math.ceil(n / (w / 92 || 1)))
   const every = Math.ceil(room / 7) * 7
-  const latest = useRef({ n, edge, ahead, pick })
   useLayoutEffect(() => {
     latest.current = { n, edge, ahead, pick }
   })

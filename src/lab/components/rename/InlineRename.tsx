@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useImperativeHandle, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
 import type { Ref } from 'react'
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from 'motion/react'
 import { Check, Pencil } from '../../icons'
@@ -8,6 +8,11 @@ import { ease } from '../../lib/motion'
 import { Spinner } from '../../ui/Spinner'
 
 type Status = 'idle' | 'saving' | 'saved'
+
+// Read once on the client, like a mount check; the server and hydration pass see false.
+const still = () => () => {}
+const isCoarse = () => window.matchMedia('(pointer: coarse)').matches
+const notCoarse = () => false
 export type RenameHandle = { edit(): void; type(text: string): void; commit(): void; cancel(): void }
 
 export function InlineRename({
@@ -44,13 +49,13 @@ export function InlineRename({
   const shake = useAnimationControls()
   const reduce = useReducedMotion()
   const touched = useRef(false)
-  const [coarse, setCoarse] = useState(false)
-  useEffect(() => setCoarse(window.matchMedia('(pointer: coarse)').matches), [])
+  const coarse = useSyncExternalStore(still, isCoarse, notCoarse)
 
-  useEffect(() => {
+  const [was, setWas] = useState(value)
+  if (value !== was) {
+    setWas(value)
     if (!editing && status === 'idle') setShown(value)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value])
+  }
   useEffect(() => () => clearTimeout(timer.current), [])
 
   const dot = keepExtension ? shown.lastIndexOf('.') : -1

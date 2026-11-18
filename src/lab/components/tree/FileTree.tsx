@@ -57,7 +57,6 @@ export function FileTree({
   const [focused, setFocused] = useState(false)
   const [fresh, setFresh] = useState<Set<string>>(new Set())
   const known = useRef(new Set(allPaths(nodes)))
-  const shown = useRef(new Set<string>())
   const typed = useRef({ text: '', at: 0 })
   const reduce = useReducedMotion()
   const id = useId()
@@ -84,10 +83,13 @@ export function FileTree({
     return () => clearTimeout(t)
   }, [nodes])
 
-  const entering = rows.filter((r) => !shown.current.has(r.path)).map((r) => r.path)
-  useEffect(() => {
-    shown.current = new Set(rows.map((r) => r.path))
-  })
+  // Rows new since the last row list get staggered in.
+  const [entry, setEntry] = useState(() => ({ rows, paths: rows.map((r) => r.path) }))
+  if (entry.rows !== rows) {
+    const was = new Set(entry.rows.map((r) => r.path))
+    setEntry({ rows, paths: rows.filter((r) => !was.has(r.path)).map((r) => r.path) })
+  }
+  const entering = entry.paths
 
   const toggle = (path: string) =>
     setOpen((o) => {

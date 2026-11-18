@@ -103,14 +103,14 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
   const steps = useRef(seed.steps)
   const tape = useRef(seed.tape)
   const nextId = useRef(seed.tape.reduce((a, m) => Math.max(a, m.id + 1), 0))
-  const [count, setCount] = useState(seed.steps.length)
+  // Render reads this copy; the refs stay the live source for handlers and frames.
+  const [snap, setSnap] = useState<RewindHistory>(seed)
   const [version, setVersion] = useState(0)
-  const last = count - 1
+  const last = snap.steps.length - 1
   const marks = useMemo(() => {
-    const h = steps.current
+    const h = snap.steps
     return h.flatMap((s, i) => (i === 0 || i === h.length - 1 || h[i + 1]?.t - s.t > PAUSE ? [i] : []))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [count])
+  }, [snap.steps])
 
   const box = useRef<HTMLTextAreaElement>(null)
   const view = useRef<HTMLDivElement>(null)
@@ -142,7 +142,7 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
   const composing = useRef(false)
   const edge = reduce ? 1 : EDGE
   const rest = at === last && !live
-  const words = useMemo(() => (rest ? [] : tokens(tape.current)), [version, rest]) // eslint-disable-line react-hooks/exhaustive-deps
+  const words = useMemo(() => (rest ? [] : tokens(snap.tape)), [snap.tape, rest])
   const ready = useRef(false)
   const quiet = useRef(false)
 
@@ -317,8 +317,6 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
     setAt(i)
     paint(i)
   }
-  const latest = useRef({ show, draw, settle, glide: (_: number) => {} })
-  latest.current = { ...latest.current, show, draw, settle }
   const goal = useRef(seed.steps.length - 1)
   const soft = useRef(seed.steps.length - 1)
   const trail = useRef(0)
@@ -331,7 +329,11 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
     latest.current.show(soft.current)
     trail.current = soft.current === goal.current ? 0 : requestAnimationFrame(latest.current.glide)
   }
-  latest.current.glide = glide
+  const latest = useRef({ show, draw, settle, glide })
+  // Frame loops call through this, so it picks up each commit's closures before any paint below.
+  useLayoutEffect(() => {
+    latest.current = { show, draw, settle, glide }
+  })
   const follow = (x: number) => {
     goal.current = x
     if (reduce || quiet.current) {
@@ -513,7 +515,7 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
     }
     steps.current = keep
     shown.current = keep.length - 1
-    setCount(keep.length)
+    setSnap({ steps: keep, tape: tape.current })
     setAt(keep.length - 1)
     setVersion((v) => v + 1)
     quiet.current = true
@@ -591,7 +593,7 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
     keys(e)
   }
 
-  const word = at === last ? 'Now' : ago(steps.current[last].t - steps.current[at].t)
+  const word = at === last ? 'Now' : ago(snap.steps[last].t - snap.steps[at].t)
   return (
     <div onPointerDownCapture={touched} onKeyDownCapture={stopIntro} className={`w-full ${className}`}>
       <div className="relative">
@@ -603,10 +605,10 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
         >
           <div ref={page} className="relative" style={{ minHeight: `${rows * 1.4}em` }}>
             <div ref={layer} aria-hidden className={`pointer-events-none min-h-[1lh] whitespace-pre-wrap break-words ${plain && !rest ? '' : 'text-transparent'}`}>
-              {rest && steps.current[at].text}
+              {rest && snap.steps[at].text}
               {words.map((w, n) => (
                 <span
-                  key={tape.current[w.cells[0]].id}
+                  key={snap.tape[w.cells[0]].id}
                   ref={(el) => {
                     wordEls.current[n] = el
                   }}
@@ -614,12 +616,12 @@ export function Rewind({ value, defaultValue = '', onChange, history: saved, onH
                 >
                   {w.cells.map((k) => (
                     <span
-                      key={tape.current[k].id}
+                      key={snap.tape[k].id}
                       ref={(el) => {
                         cells.current[k] = el
                       }}
                     >
-                      {tape.current[k].c}
+                      {snap.tape[k].c}
                     </span>
                   ))}
                 </span>

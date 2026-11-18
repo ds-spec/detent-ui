@@ -1,7 +1,7 @@
 'use client'
 
 import { tap } from '../../lib/feel'
-import { useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react'
 import type { Ref } from 'react'
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from 'motion/react'
 import { Minus, Plus } from '../../icons'
@@ -29,7 +29,9 @@ export function Stepper({
   ref?: Ref<StepperHandle>
 }) {
   const current = useRef(value)
-  current.current = value
+  useLayoutEffect(() => {
+    current.current = value
+  })
   const timer = useRef(0)
   const nudge = useAnimationControls()
   const reduce = useReducedMotion()
@@ -166,11 +168,9 @@ export function Stepper({
 export function Ticker({ value }: {
   value: number
 }) {
-  const last = useRef(value)
-  const dir = value >= last.current ? 1 : -1
-  useEffect(() => {
-    last.current = value
-  }, [value])
+  const [seen, setSeen] = useState({ value, dir: 1 })
+  if (value !== seen.value) setSeen({ value, dir: value >= seen.value ? 1 : -1 })
+  const dir = seen.dir
   const chars = String(value).split('')
   return (
     <span className="tnum relative flex overflow-hidden" style={{ height: '1.3em', lineHeight: '1.3em' }}>

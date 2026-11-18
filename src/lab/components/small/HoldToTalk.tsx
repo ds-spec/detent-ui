@@ -53,6 +53,7 @@ export function HoldToTalk({
   const hint = useRef<HTMLSpanElement>(null)
   const knobbed = useRef<HTMLSpanElement>(null)
   const waveAt = useRef(-HINT)
+  const [binFrom, setBinFrom] = useState(-HINT)
 
   const paint = (x: number) => {
     const live = stage.current === 'holding'
@@ -133,6 +134,7 @@ export function HoldToTalk({
     wasArmed.current = false
     setArmed(false)
     if (cancel) {
+      setBinFrom(waveAt.current)
       setState('binning')
       onCancel?.()
       window.setTimeout(() => setShut(true), 440)
@@ -238,7 +240,7 @@ export function HoldToTalk({
             <span ref={wave} className="absolute inset-0 block">
             <motion.span
               className="absolute inset-0 flex items-center justify-end gap-[2.5px] overflow-hidden"
-              animate={state === 'binning' ? { x: -96 - waveAt.current, scale: 0.15, opacity: 0 } : { x: 0, scale: 1, opacity: 1 }}
+              animate={state === 'binning' ? { x: -96 - binFrom, scale: 0.15, opacity: 0 } : { x: 0, scale: 1, opacity: 1 }}
               transition={state === 'binning' ? { duration: reduce ? 0 : 0.42, ease: ease.inOut } : { duration: 0 }}
               style={{ transformOrigin: '0% 50%' }}
             >

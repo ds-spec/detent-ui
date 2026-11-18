@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import type { KeyboardEvent, PointerEvent as ReactPointerEvent } from 'react'
 import { useReducedMotion } from 'motion/react'
 
@@ -150,9 +150,13 @@ export type FrameInfo = {
 }
 export type Mode = 'rest' | 'held' | 'coast' | 'settle' | 'sweep'
 
+/* a value, or a function read when the detent needs it, for values that live in a ref */
+type Live<T> = T | (() => T)
+const now = <T,>(v: Live<T>): T => (typeof v === 'function' ? (v as () => T)() : v)
+
 export type DetentOptions = {
   value: number
-  stops?: number[]
+  stops?: Live<number[]>
   min?: number
   max?: number
   magnet?: number
@@ -161,7 +165,7 @@ export type DetentOptions = {
   spring?: Spring
   catch?: Spring
   muted?: boolean
-  reduce?: boolean
+  reduce?: Live<boolean>
   onFrame: (x: number, v: number, info: FrameInfo) => boolean | void
   onStop?: (i: number) => void
   onRest?: (x: number, i: number) => void
@@ -193,7 +197,8 @@ export function createDetent(read: () => DetentOptions) {
   let keyAt = 0
 
   const span = () => {
-    const o = read()
+    const given = read()
+    const o = { ...given, stops: given.stops === undefined ? undefined : now(given.stops), reduce: given.reduce === undefined ? undefined : now(given.reduce) }
     const s = o.stops
     return { o, s, lo: o.min ?? s?.[0] ?? -Infinity, hi: o.max ?? s?.[s.length - 1] ?? Infinity, m: o.reduce ? 0 : o.magnet ?? 0, reach: o.reach ?? ((s && s.length > 1 ? s[1] - s[0] : 1) * 0.5) }
   }
@@ -432,11 +437,14 @@ export function createDetent(read: () => DetentOptions) {
 
 export function useDetent(options: Omit<DetentOptions, 'reduce'>) {
   const reduce = !!useReducedMotion()
-  const latest = useRef<DetentOptions>({ ...options, reduce })
-  useLayoutEffect(() => {
-    latest.current = { ...options, reduce }
+  // The detent reads options through a closure, refreshed after each commit.
+  const [[d, update]] = useState(() => {
+    let latest: DetentOptions = { ...options, reduce }
+    return [createDetent(() => latest), (next: DetentOptions) => (latest = next)] as const
   })
-  const [d] = useState(() => createDetent(() => latest.current))
+  useLayoutEffect(() => {
+    update({ ...options, reduce })
+  })
   useLayoutEffect(() => () => d.dispose(), [d])
   return d
 }
@@ -444,7 +452,7 @@ export function useDetent(options: Omit<DetentOptions, 'reduce'>) {
 export type DragConfig = {
   axis?: 'x' | 'y'
   box: () => HTMLElement | null
-  units: number
+  units: Live<number>
   absolute?: (fraction: number) => number
   hover?: boolean
   follow?: boolean
@@ -466,7 +474,7 @@ export function dragProps(d: Detent, read: () => DragConfig) {
     const horizontal = (c.axis ?? 'x') === 'x'
     const size = (horizontal ? r.width : r.height) || 1
     const px = horizontal ? e.clientX : e.clientY
-    return { fraction: (px - (horizontal ? r.left : r.top)) / size, px, unit: size / c.units, c }
+    return { fraction: (px - (horizontal ? r.left : r.top)) / size, px, unit: size / now(c.units), c }
   }
   const hand = (e: ReactPointerEvent) => {
     const p = place(e)

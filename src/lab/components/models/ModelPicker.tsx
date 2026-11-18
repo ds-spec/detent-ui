@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent, Ref } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Check, ChevronDown } from '@/lab/icons'
@@ -49,8 +49,7 @@ export function ModelPicker({ models, value, onChange, efforts = EFFORTS, defaul
   const say = (v: ModelValue) => onChange(v)
 
   const n = efforts.length
-  const stops = useRef(Array.from({ length: n }, (_, i) => i))
-  if (stops.current.length !== n) stops.current = Array.from({ length: n }, (_, i) => i)
+  const stops = useMemo(() => Array.from({ length: n }, (_, i) => i), [n])
   const [first] = useState(value.effort)
   const plate = useRef<HTMLSpanElement>(null)
   const track = useRef<HTMLDivElement>(null)
@@ -89,7 +88,7 @@ export function ModelPicker({ models, value, onChange, efforts = EFFORTS, defaul
   }
   const dial = useDetent({
     value: value.effort,
-    stops: stops.current,
+    stops,
     magnet: 0.42,
     reach: 0.08,
     throw: 0.14,
@@ -114,7 +113,7 @@ export function ModelPicker({ models, value, onChange, efforts = EFFORTS, defaul
   const [drag] = useState(() =>
     dragProps(dial, () => ({
       box: () => track.current,
-      units: latest.current.efforts.length,
+      units: () => latest.current.efforts.length,
       muted,
       onGrab: () => (byHand.current = true),
       onTap: (f) => {

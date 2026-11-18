@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react'
-import type { Ref } from 'react'
+import type { Ref, RefObject } from 'react'
 import { AnimatePresence, animate, motion, useMotionValue, useMotionValueEvent, useReducedMotion } from 'motion/react'
 import type { MotionValue } from 'motion/react'
 import { Bin, Undo } from '../icons'
@@ -49,7 +49,9 @@ export function UndoList({
   const left = useMotionValue(1)
   const pausedRef = useRef(false)
   const trashRef = useRef(trash)
-  trashRef.current = trash
+  useLayoutEffect(() => {
+    trashRef.current = trash
+  })
   const rows = useRef<Record<string, HTMLDivElement | null>>({})
   const badges = useRef<Record<string, HTMLSpanElement | null>>({})
   const from = useRef(new Map<string, DOMRect>())
@@ -248,7 +250,7 @@ export function UndoList({
         <div className="absolute left-3 top-1/2 h-[28px] w-[48px] -translate-y-1/2">
           <AnimatePresence>
             {binned.slice(-3).map((it, i, all) => (
-              <Thumb key={it.id} item={it} slot={i} total={all.length} from={from.current} />
+              <Thumb key={it.id} item={it} slot={i} total={all.length} from={from} />
             ))}
           </AnimatePresence>
         </div>
@@ -300,7 +302,7 @@ export function UndoList({
   )
 }
 
-function Thumb({ item, slot, total, from }: { item: Entry; slot: number; total: number; from: Map<string, DOMRect> }) {
+function Thumb({ item, slot, total, from }: { item: Entry; slot: number; total: number; from: RefObject<Map<string, DOMRect>> }) {
   const ref = useRef<HTMLSpanElement>(null)
   const reduce = useReducedMotion()
   const x = useMotionValue(0)
@@ -308,9 +310,9 @@ function Thumb({ item, slot, total, from }: { item: Entry; slot: number; total: 
   const s = useMotionValue(1)
 
   useLayoutEffect(() => {
-    const start = from.get(item.id)
+    const start = from.current.get(item.id)
     const el = ref.current
-    from.delete(item.id)
+    from.current.delete(item.id)
     if (!start || !el || reduce) return
     const me = el.getBoundingClientRect()
     const k = me.width / THUMB_W || 1

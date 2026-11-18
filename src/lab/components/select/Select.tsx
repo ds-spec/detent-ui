@@ -36,6 +36,7 @@ export function Select({
   const [via, setVia] = useState<'pointer' | 'keys'>('pointer')
   const [place, setPlace] = useState<{ top: number; origin: number } | null>(null)
   const [width, setWidth] = useState<number>()
+  const [triggerWidth, setTriggerWidth] = useState(0)
   const [dir, setDir] = useState(1)
   const trigger = useRef<HTMLButtonElement>(null)
   const panel = useRef<HTMLDivElement>(null)
@@ -76,6 +77,10 @@ export function Select({
     setOpen(false)
     if (!quiet.current) trigger.current?.focus()
   }
+
+  useLayoutEffect(() => {
+    if (open && trigger.current) setTriggerWidth(trigger.current.offsetWidth)
+  }, [open, width])
 
   useLayoutEffect(() => {
     if (!open || !panel.current || !trigger.current) return
@@ -253,7 +258,7 @@ export function Select({
             style={{
               top: place?.top ?? 0,
               left: -2,
-              minWidth: (trigger.current?.offsetWidth ?? 0) + 4,
+              minWidth: triggerWidth + 4,
               visibility: place ? 'visible' : 'hidden',
               transformOrigin: `50% ${place?.origin ?? 0}px`,
             }}

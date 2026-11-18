@@ -4,6 +4,7 @@ import { useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useRef
 import type { KeyboardEvent, Ref } from 'react'
 import { smooth } from '@/lab/components/charts/parts'
 import { at as lerpAt, clamp, dragProps, useDetent } from '@/lab/lib/detent'
+import type { DragConfig } from '@/lab/lib/detent'
 import { useSize } from '@/lab/lib/hooks'
 import { INK, InkDefs } from '@/lab/ui/ink'
 
@@ -36,8 +37,7 @@ export function BaselineChart({ data, start = 0, format = (n) => n.toLocaleStrin
   const last = data.length - 1
   const [from, setFrom] = useState(Math.min(start, last))
   const [at, setAt] = useState<number | null>(null)
-  const stops = useRef<number[]>([])
-  if (stops.current.length !== last + 1) stops.current = data.map((_, i) => i)
+  const stops = useMemo(() => Array.from({ length: last + 1 }, (_, i) => i), [last])
   const byHand = useRef(false)
   const shapeEl = useRef<(SVGPathElement | null)[]>([])
   const clips = useRef<(SVGRectElement | null)[]>([])
@@ -80,7 +80,7 @@ export function BaselineChart({ data, start = 0, format = (n) => n.toLocaleStrin
   }
   const reading = useDetent({
     value: last,
-    stops: stops.current,
+    stops,
     magnet: 0.3,
     reach: 0.8,
     spring: FOLLOW,
@@ -103,8 +103,6 @@ export function BaselineChart({ data, start = 0, format = (n) => n.toLocaleStrin
     seatI.to(from, { spring: GLIDE })
     seatV.to(data[from].value, { spring: GLIDE })
   }, [from, data, seatI, seatV])
-
-  useImperativeHandle(ref, () => ({ start: (i) => setFrom(Math.max(0, Math.min(last, i))), read: point }), [last])
 
   const choose = (i: number) => {
     setFrom(i)
@@ -135,9 +133,15 @@ export function BaselineChart({ data, start = 0, format = (n) => n.toLocaleStrin
   useLayoutEffect(() => {
     latest.current = { last, choose, point }
   })
+  useImperativeHandle(ref, () => ({ start: (i) => setFrom(Math.max(0, Math.min(last, i))), read: (i) => latest.current.point(i) }), [last])
   const toIndex = (f: number) => clamp(f, 0, 1) * latest.current.last
-  const [hand] = useState(() =>
-    dragProps(reading, () => ({
+  // The drag reads its config through a closure, set after each commit.
+  const [[hand, aim]] = useState(() => {
+    let read: () => DragConfig
+    return [dragProps(reading, () => read()), (next: () => DragConfig) => (read = next)] as const
+  })
+  useLayoutEffect(() => {
+    aim(() => ({
       box: () => box.current,
       units: latest.current.last,
       absolute: (f) => {
@@ -156,8 +160,8 @@ export function BaselineChart({ data, start = 0, format = (n) => n.toLocaleStrin
       },
       onLeave: () => latest.current.point(null),
       release: () => ({ flick: false }),
-    })),
-  )
+    }))
+  })
   useLayoutEffect(() => {
     paintSeat()
     paintRead(reading.get())

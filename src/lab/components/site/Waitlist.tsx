@@ -43,6 +43,7 @@ export function Waitlist({
   const input = useRef<HTMLInputElement>(null)
   const valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)
   const quiet = useRef(false)
+  const [quietly, setQuietly] = useState(false)
 
   useEffect(() => {
     if (state !== 'done') return
@@ -70,11 +71,13 @@ export function Waitlist({
   useImperativeHandle(ref, () => ({
     type: (e) => {
       quiet.current = true
+      setQuietly(true)
       setEmail(e)
       setError(false)
     },
     submit: () => {
       quiet.current = true
+      setQuietly(true)
       latest.current()
     },
     reset: () => {
@@ -98,7 +101,7 @@ export function Waitlist({
           className="relative flex h-[52px] items-center overflow-hidden bg-surface p-1.5"
           style={{
             borderRadius: 26,
-            boxShadow: error ? 'var(--elev-field-error), var(--elev-raised)' : focused || (quiet.current && email && state === 'idle') ? 'var(--elev-field), var(--elev-float)' : 'var(--elev-float)',
+            boxShadow: error ? 'var(--elev-field-error), var(--elev-raised)' : focused || (quietly && email && state === 'idle') ? 'var(--elev-field), var(--elev-float)' : 'var(--elev-float)',
             transition: 'box-shadow 200ms',
           }}
         >

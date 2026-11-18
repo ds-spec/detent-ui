@@ -46,7 +46,9 @@ export function Upload({
   const depth = useRef(0)
   const picker = useRef<HTMLInputElement>(null)
   const itemsRef = useRef(items)
-  itemsRef.current = items
+  useLayoutEffect(() => {
+    itemsRef.current = items
+  })
 
   useEffect(() => {
     const t = setInterval(() => {

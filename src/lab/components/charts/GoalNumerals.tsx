@@ -4,7 +4,7 @@ import { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useSt
 import type { KeyboardEvent, ReactNode, Ref } from 'react'
 import { useReducedMotion } from 'motion/react'
 import { at, clamp, createRoller, dragProps, feedback, springStep, stepKey, useDetent } from '@/lab/lib/detent'
-import type { Body } from '@/lab/lib/detent'
+import type { Body, DragConfig } from '@/lab/lib/detent'
 import { RollingText } from '@/lab/ui/RollingText'
 import { compact } from './parts'
 
@@ -288,8 +288,13 @@ function DayScrubber({ goals, days, today, day, label, dial, thumb, line, byHand
     end.current = today
     quiet.current = muted
   })
-  const [drag] = useState(() =>
-    dragProps(dial, () => ({
+  // The drag reads its config through a closure, set after each commit.
+  const [[drag, aim]] = useState(() => {
+    let read: () => DragConfig
+    return [dragProps(dial, () => read()), (next: () => DragConfig) => (read = next)] as const
+  })
+  useLayoutEffect(() => {
+    aim(() => ({
       box: () => track.current,
       units: span.current,
       absolute: (f) => f * span.current,
@@ -298,8 +303,8 @@ function DayScrubber({ goals, days, today, day, label, dial, thumb, line, byHand
       onGrab: () => (byHand.current = true),
       onTap: (f) => dial.to(Math.round(clamp(f * span.current, 0, end.current)), { spring: { w: 22, z: 1 } }),
       onLeave: () => dial.to(end.current),
-    })),
-  )
+    }))
+  })
   const key = (e: KeyboardEvent) => {
     if (stepKey(dial, e)) return
     if (e.key === 'Home') dial.to(0)

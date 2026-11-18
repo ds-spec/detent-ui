@@ -208,7 +208,7 @@ export function Integrations({
   const [drag] = useState(() =>
     dragProps(dial, () => ({
       box: () => box.current,
-      units: width.current,
+      units: () => width.current,
       muted: true,
       release: () => ({ flick: !reduce }),
       onTap: () => pick.current(),
