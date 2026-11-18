@@ -4,7 +4,13 @@ import { TEMPLATES, TEMPLATE_COUNT } from '@/catalog/templates'
 import { RELEASES, CONTACT } from '@/catalog/trust'
 import { FREE_BLOCKS, ON_SALE, PLANS, PRO_COMPONENTS, PRO_BLOCK_COUNT, SITE, installCommand, isProBlock, isProComponent } from '@/catalog/pro'
 import { NAME, DESCRIPTION, TAGLINE, FREE_COUNT } from '@/site/seo'
-import { abs, envelope, fmtDate, itemList, kvTable, today } from './format'
+import { abs, envelope, fmtDate, itemList, kvTable, cell, today } from './format'
+import { GUIDE, PRO_ENV, PRO_REGISTRY, importOf, mdOf } from '@/catalog/agent'
+import { PLACEMENT } from '@/catalog/guide'
+import { PRO_SETUP_MD, SETUP_MD, piecePrompt, proSetupPrompt, setupPrompt } from '@/catalog/prompts'
+import { apiOf } from '@/catalog/api-of'
+import type { Api, PropDoc } from '@/catalog/api'
+import { asset } from '@/lib/asset'
 
 export type MarkdownRoute = {
   path: string
@@ -474,28 +480,123 @@ function renderPrivacy(): string {
   })
 }
 
-function renderComponent(slug: string): string | null {
+export type ComponentExtra = { api?: Api | null; example?: string | null }
+
+function guideLines(id: string): string {
+  const g = GUIDE[id]
+  if (!g) return ''
+  const alt = g.instead ? (entry(g.instead) ? `[${entry(g.instead)!.name}](${mdOf('components', g.instead)})` : g.instead) : null
+  return ['## When to use', '', `- Use it for: ${g.use}`, `- Don't use it for: ${g.avoid}${alt ? ` Use ${alt} instead.` : ''}`].join('\n')
+}
+
+function usageLines(id: string, extra: ComponentExtra): string {
+  const from = importOf(id)
+  const name = extra.api?.component
+  if (extra.example)
+    return [
+      '## Example',
+      '',
+      'A working example that typechecks against the installed piece. Keep its layout as a starting point and swap the sample data for the project\'s real data. Outer wrappers like `size-full` or a dark background come from the demo stage: give the parent a real size, or drop them.',
+      '',
+      '```tsx',
+      extra.example.trim(),
+      '```',
+      ...extraPackages(extra.example),
+    ].join('\n')
+  if (!from || !name) return ''
+  const required = (extra.api?.props ?? []).filter((p) => p.required).map((p) => `${p.name}={/* ${p.type} */}`)
+  return ['## Usage', '', '```tsx', `import { ${name} } from '${from}'`, '', `<${name}${required.length ? ' ' + required.join(' ') : ''} />`, '```'].join('\n')
+}
+
+/* a picture of the piece, so an agent that can see matches the look, not just the API */
+const looksLike = (id: string, name: string) => `## Looks like\n\n![${name}](${SITE}/components/${id}/opengraph-image)\n\nThis is the example below, rendered. The live, interactive version is at ${abs(`/components/${id}`)}.`
+
+/* packages the example imports that a piece's install doesn't bring */
+const BROUGHT = /^(react|react-dom|next|motion)(\/|$)/
+function extraPackages(code: string): string[] {
+  const pkgs = [...new Set([...code.matchAll(/from '([^'.@][^']*|@[^/']+\/[^']+)'/g)].map((m) => m[1]).filter((p) => !p.startsWith('@/') && !BROUGHT.test(p)).map((p) => (p.startsWith('@') ? p.split('/').slice(0, 2).join('/') : p.split('/')[0])))]
+  return pkgs.length ? ['', `The example also uses ${pkgs.map((p) => `\`${p}\``).join(', ')}, which the install doesn't bring: \`npm i ${pkgs.join(' ')}\`, or swap in what the project already uses (for icons, its own icon set).`] : []
+}
+
+function propsLines(extra: ComponentExtra): string {
+  const props = extra.api?.props ?? []
+  if (!props.length) return ''
+  const row = (p: PropDoc) => `| \`${p.name}\`${p.required ? ' (required)' : ''} | \`${cell(p.type)}\` | ${p.default ? `\`${cell(p.default)}\`` : ''} | ${cell(p.note ?? '')} |`
+  return ['## Props', '', '| Prop | Type | Default | Description |', '| --- | --- | --- | --- |', ...props.map(row)].join('\n')
+}
+
+/* The steps an agent follows to add one piece. Commands are written out in full, with the checks before them. */
+const latest = (cmd: string) => cmd.replace('npx shadcn add', 'npx shadcn@latest add')
+
+function agentSteps(kind: 'components' | 'blocks', id: string, name: string, pro: boolean, from: string | null, extra: ComponentExtra = {}, has: { placement: boolean; example: boolean } = { placement: false, example: false }): string {
+  const required = (extra.api?.props ?? []).filter((p) => p.required).map((p) => `\`${p.name}\``)
+  const where = has.placement ? ', sized and placed as the Placement section says' : kind === 'blocks' ? ', as its own page or a full-width section' : ''
+  const start = has.example ? ` Start from the Example below${required.length ? ` (required props: ${required.join(', ')})` : ''}, keep its layout, and swap in the project's real data.` : ` Use the props table on this page and pass the project's real data, not the demo values.`
+  const steps = [
+    'Check package.json: Detent needs React 19 and Tailwind CSS v4. If either is missing or older, stop and tell the user.',
+    'If the project root has no components.json, run `npx shadcn@latest init --defaults --yes` there.',
+    ...(pro ? [`This is a Pro piece. If components.json has no "@detent-pro" registry, or .env.local has no ${PRO_ENV}, follow ${PRO_SETUP_MD} first. If the user has no Pro key, don't install it: tell them it needs Detent Pro and what it would add (this page's About), and only offer a free piece from ${abs('/agents.md')} if one genuinely does the same job.`] : []),
+    `Install it from the project root: \`${latest(installCommand(id, !pro))}\``,
+    'Make sure the root layout (in Next.js, app/layout.tsx) wraps its children once in `<MotionConfig reducedMotion="user">` from motion/react. Add it only if it is not there.',
+    `Import ${extra.api?.component ? `\`${extra.api.component}\` ` : ''}${from ? `from \`${from}\` ` : ''}and render it where the user asked${where}.${start}`,
+    'If the project has no real data for it yet, put clearly marked placeholders in one content file. Never invent customer quotes, names or numbers and present them as real.',
+    'Detent pieces are client components. If you pass them functions (format, onChange, render props), do it from a client component; a server page can only pass plain data, so load the data on the server and hand it to a small client wrapper.',
+    'Use the Detent theme tokens (like bg-surface, text-ink, text-ink-3) for anything you draw around it, and className where the piece takes one. Don\'t rewrite its motion or internals.',
+    'Run the project\'s typecheck (for example `npx tsc --noEmit`; on a fresh Next.js project run `npx next typegen` first, or it can\'t find types like LayoutProps). If you can run the app, open the page at a desktop and a phone width and check it renders with no console errors.',
+    `If AGENTS.md or CLAUDE.md has no Detent section yet, add the block from ${abs('/agents.md')} so later tasks pick the right pieces.`,
+    `Tell the user what you added, where, and anything they still need to fill in.`,
+  ]
+  return [
+    '## For agents',
+    '',
+    `Prompt to give a coding agent: "${piecePrompt(id)}"`,
+    '',
+    ...steps.map((t, i) => `${i + 1}. ${t}`),
+  ].join('\n')
+}
+
+function renderComponent(slug: string, extra: ComponentExtra = {}, compact = false): string | null {
   const e = entry(slug)
   if (!e) return null
+  const free = !isProComponent(e.id)
+  const from = importOf(e.id)
 
   const body = [
     `## About`,
     '',
     e.line,
     '',
+    guideLines(e.id),
+    '',
+    PLACEMENT[e.id] ? ['## Placement', '', PLACEMENT[e.id]].join('\n') : '',
+    '',
+    compact ? '' : agentSteps('components', e.id, e.name, !free, from, extra, { placement: !!PLACEMENT[e.id], example: !!extra.example }),
+    '',
     e.details.length > 0
       ? ['## Details', '', ...e.details.map((d) => `- ${d}`)].join('\n')
       : '',
+    '',
+    `## Install`,
+    '',
+    free ? 'Free, MIT licensed.' : `Part of Detent Pro. The \`@detent-pro\` registry must be in components.json and \`${PRO_ENV}\` set in .env.local first: ${PRO_SETUP_MD}`,
+    '',
+    '```bash',
+    installCommand(e.id, free),
+    '```',
+    '',
+    compact ? '' : `Needs React 19 and Tailwind CSS v4. The source lands in components/detent${from ? `; import it from \`${from}\`` : ''}.`,
+    '',
+    compact ? '' : looksLike(e.id, e.name),
+    '',
+    usageLines(e.id, extra),
+    '',
+    propsLines(extra),
     '',
     e.keys && e.keys.length > 0
       ? ['## Keyboard shortcuts', '', kvTable(e.keys, ['Keys', 'Action'])].join('\n')
       : '',
     '',
-    `## Install`,
-    '',
-    '```bash',
-    `npx shadcn add ${SITE}/r/${e.id}`,
-    '```',
+    compact ? '' : ['## Motion and accessibility', '', '- Wrap your root layout once in `<MotionConfig reducedMotion="user">` from motion/react; every Detent piece then respects reduced motion.', '- Style it through the Detent theme tokens and `className`, not by editing internals first.', '', `Every Detent piece, with when to use each: ${abs('/llms.txt')} · Agent rules to paste into AGENTS.md: ${abs('/agents.md')}`].join('\n'),
   ]
     .join('\n')
     .replace(/\n{3,}/g, '\n\n')
@@ -512,7 +613,17 @@ function renderComponent(slug: string): string | null {
   })
 }
 
-function renderBlock(slug: string): string | null {
+/* a block is a whole screen or section; where it goes follows from which */
+const BLOCK_PLACE: Record<string, string> = {
+  section: 'A full-width section of a landing page, in page order with the others. It brings its own surface, container and padding (about 1180 wide), so put it straight in the page, not inside your own padded container, and add no extra spacing above it. Pass every content prop; anything you leave out falls back to the demo’s sample content.',
+  app: 'Its own route, filling the area below the app header (full width, at least the viewport height). Not inside a card or beside other content.',
+  flow: 'Its own route, centred, full height, with nothing else on the screen.',
+}
+
+/* blocks may carry a recipe (a short worked example); older catalogs don't have the field */
+const recipeOf = (b: (typeof BLOCKS)[number]) => (b as typeof b & { recipe?: { label: string; code: string } }).recipe
+
+function renderBlock(slug: string, compact = false): string | null {
   const b = BLOCKS.find((b) => b.id === slug)
   if (!b) return null
   const free = !isProBlock(b.id)
@@ -530,11 +641,21 @@ function renderBlock(slug: string): string | null {
       ? ['## Keyboard shortcuts', '', kvTable(b.keys, ['Keys', 'Action'])].join('\n')
       : '',
     '',
+    ['## Placement', '', BLOCK_PLACE[b.kind] ?? BLOCK_PLACE.section].join('\n'),
+    '',
     free ? '## Install' : '## Install (Pro required)',
     '',
     '```bash',
     installCommand(b.id, free),
     '```',
+    '',
+    compact ? '' : agentSteps('blocks', b.id, b.name, !free, importOf(b.id), { api: { component: b.component, props: [] } }, { placement: true, example: !!recipeOf(b) }),
+    '',
+    !compact && recipeOf(b) ? ['## Example', '', '```tsx', recipeOf(b)!.code.trim(), '```', ...extraPackages(recipeOf(b)!.code)].join('\n') : '',
+    '',
+    !compact && b.props.length
+      ? ['## Props', '', '| Prop | Type | Default | Description |', '| --- | --- | --- | --- |', ...b.props.map((p) => `| \`${p.name}\` | \`${cell(p.type)}\` | ${p.default ? `\`${cell(p.default)}\`` : ''} | ${cell(p.note ?? '')} |`)].join('\n')
+      : '',
   ]
     .join('\n')
     .replace(/\n{3,}/g, '\n\n')
@@ -586,6 +707,91 @@ function renderTemplate(slug: string): string | null {
   })
 }
 
+/* A compact index for AGENTS.md / CLAUDE.md: Vercel's evals found a small always-loaded index beats skills */
+function renderAgents(): string {
+  const short = (t: string) => t.replace(/\.$/, '')
+  const row = (e: (typeof ENTRIES)[number]) => {
+    const g = GUIDE[e.id]
+    const tier = isProComponent(e.id) ? 'pro' : 'free'
+    return `${e.id} | ${tier} | ${g ? short(g.use) : short(e.line)} | ${g ? short(g.avoid) + (g.instead ? ` (use ${g.instead})` : '') : ''}`
+  }
+  return [
+    '<!-- detent:start -->',
+    '<!-- Detent agent rules. Keep in AGENTS.md or CLAUDE.md at the project root. Source: ' + abs('/agents.md') + ' -->',
+    '',
+    '## Detent components',
+    '',
+    `Detent (${SITE}) is a React component library installed through the shadcn CLI. Its source lives in components/detent and is ours to change.`,
+    '',
+    `IMPORTANT: prefer retrieval over memory for Detent. Before adding, using or changing a Detent piece, fetch its doc at ${SITE}/components/<id>.md (blocks: ${SITE}/blocks/<id>.md). It has when to use it, the import path, props and an example.`,
+    '',
+    `- Free install: \`npx shadcn add ${SITE}/r/<id>\``,
+    `- Pro install: \`npx shadcn add @detent-pro/<id>\`. Needs the @detent-pro registry in components.json and ${PRO_ENV} in .env.local. Setup: ${PRO_SETUP_MD}`,
+    '- Needs React 19 and Tailwind CSS v4. Wrap the root layout once in `<MotionConfig reducedMotion="user">` from motion/react.',
+    '- Use the Detent theme tokens (bg-surface, text-ink, text-ink-3) for what you draw around pieces. Don\'t rewrite a piece\'s motion or internals.',
+    '- Detent pieces are client components: pass them functions only from a client component.',
+    '- Pick by the index below. If the task matches the avoid column, do not use that piece.',
+    '- Place each piece as its page\'s Placement section says: the width and height it wants and where it sits. One hero per screen (Halo bands, Slice text and an Announcement pill together make one hero; Thread hero, Glyph art or Agent canvas each are one), 24 to 32px between pieces, and the project\'s own containers and spacing around them. Check the result at a phone width too.',
+    '',
+    'Index (id | tier | use for | avoid):',
+    ...ENTRIES.map(row),
+    '',
+    `Blocks (whole screens): ${SITE}/blocks.md · Everything: ${SITE}/llms.txt`,
+    `Setting up a new project: ${SETUP_MD} · Connecting Pro: ${PRO_SETUP_MD}`,
+    '<!-- detent:end -->',
+  ].join('\n')
+}
+
+function renderSetup(): string {
+  const steps = [
+    'Check package.json: Detent needs React 19 and Tailwind CSS v4 (Next.js is what it is tested on). If either is missing or older, stop and tell the user what to upgrade.',
+    'If the project root has no components.json, run `npx shadcn@latest init --defaults --yes` there.',
+    `Install the Detent theme, which every piece draws with: \`npx shadcn@latest add ${SITE}/r/theme\``,
+    'In the root layout (in Next.js, app/layout.tsx), wrap the children once in `<MotionConfig reducedMotion="user">` imported from motion/react, so every piece respects reduced motion. If motion isn\'t in package.json yet, run `npm i motion` first. Skip this if it is already there.',
+    `Fetch ${abs('/agents.md')}. Append its contents to the end of AGENTS.md at the project root (or CLAUDE.md if that is what the project uses). If a block between <!-- detent:start --> and <!-- detent:end --> is already there, replace it instead of adding a second one.`,
+    `If the task doesn\'t already say, ask the user if they have Detent Pro. If yes, follow ${PRO_SETUP_MD}.`,
+    `If the task already names the pieces, go on to them. Otherwise ask what they want to build first and suggest pieces from the index in AGENTS.md. Add each by fetching its page (${SITE}/components/<id>.md) and following its "For agents" steps.`,
+    'Run the project\'s typecheck (for example `npx tsc --noEmit`) and tell the user what changed.',
+  ]
+  return envelope({
+    title: `Set up ${NAME}`,
+    summary: 'Steps for a coding agent: prepare a project for Detent, install the theme, add the agent rules, and connect Pro if there is one.',
+    path: '/setup',
+    body: [
+      `Prompt to give a coding agent: "${setupPrompt()}"`,
+      '',
+      '## Steps',
+      '',
+      ...steps.map((t, i) => `${i + 1}. ${t}`),
+    ].join('\n'),
+    related: [{ label: 'Connect Pro', href: PRO_SETUP_MD }, { label: 'Agent rules', href: abs('/agents.md') }, { label: 'Every piece', href: abs('/llms.txt') }],
+  })
+}
+
+function renderProSetup(): string {
+  const steps = [
+    `Ask the user if they have a Detent Pro key. If they don't, stop here: don't make up a key or try to install Pro pieces. Tell them which pieces need Pro (${SITE}/pro), and carry on with the free pieces, or the free fallback the task named.`,
+    `Ask them to paste the key. They make one at ${SITE}/account after buying Pro (one per machine). Never print the key back, put it in a commit, a log or any file other than .env.local.`,
+    `Add \`${PRO_ENV}=<the key>\` to .env.local at the project root, creating the file if needed. Make sure .gitignore covers .env.local (add \`.env*.local\` if nothing does).`,
+    `In components.json, add the Detent Pro registry inside "registries", keeping any registries already there:\n\n\`\`\`json\n{\n  ${PRO_REGISTRY.replace(/\n/g, '\n  ')}\n}\n\`\`\``,
+    'Check the key works without writing files: `npx shadcn@latest view @detent-pro/theme`. If the CLI says DETENT_PRO_KEY is required, the key is not being read: check the variable name in .env.local and that you ran it from the project root. If it says the key was rejected, ask the user to make a new one at the account page.',
+    `Tell the user it is connected, and that ${PRO_ENV} is only needed where \`shadcn add\` runs, never in the app's runtime or client code.`,
+  ]
+  return envelope({
+    title: `Connect ${NAME} Pro`,
+    summary: 'Steps for a coding agent: connect a Detent Pro licence key so Pro pieces install by name.',
+    path: '/pro-setup',
+    body: [
+      `Prompt to give a coding agent: "${proSetupPrompt()}"`,
+      '',
+      '## Steps',
+      '',
+      ...steps.map((t, i) => `${i + 1}. ${t}`),
+    ].join('\n'),
+    related: [{ label: 'Set up Detent', href: SETUP_MD }, { label: 'Pro', href: abs('/pro') }],
+  })
+}
+
 const STATIC_ROUTES: Record<string, { render: () => string | null; desc: string; isStatic: boolean }> = {
   '/':            { render: renderHome,       desc: `${NAME} — premium React components`,              isStatic: true },
   '/pro':         { render: renderPro,        desc: `Pro components, blocks and templates`,              isStatic: true },
@@ -598,7 +804,20 @@ const STATIC_ROUTES: Record<string, { render: () => string | null; desc: string;
   '/licence':     { render: renderLicence,    desc: 'Licence terms and key conditions',                isStatic: true },
   '/terms':       { render: renderTerms,      desc: 'Terms of service',                                isStatic: true },
   '/refunds':     { render: renderRefunds,    desc: 'Refund policy: all sales are final',      isStatic: true },
+  '/setup':       { render: renderSetup,      desc: 'For coding agents: set up a project for Detent in one go', isStatic: true },
+  '/pro-setup':   { render: renderProSetup,   desc: 'For coding agents: connect a Detent Pro key', isStatic: true },
+  '/agents':      { render: renderAgents,     desc: 'Agent rules for AGENTS.md: when to use each piece, how to install', isStatic: true },
   '/privacy':     { render: renderPrivacy,    desc: 'What we keep, who helps run it, and how to remove it', isStatic: true },
+}
+
+/* The per-page markdown, with what only the build data knows: a component's props and its example */
+export async function renderMarkdownRich(canonicalPath: string): Promise<{ content: string | null; isStatic: boolean }> {
+  const block = canonicalPath.match(/^\/blocks\/([^/]+)$/)
+  if (block) return { content: renderBlock(block[1]), isStatic: true }
+  const m = canonicalPath.match(/^\/components\/([^/]+)$/)
+  if (!m || !entry(m[1])) return renderMarkdown(canonicalPath)
+  const [api, example] = await Promise.all([apiOf(m[1]), asset<{ code: string }>(`usage/${m[1]}.json`)])
+  return { content: renderComponent(m[1], { api, example: example?.code ?? null }), isStatic: true }
 }
 
 export function renderMarkdown(canonicalPath: string): { content: string | null; isStatic: boolean } {
@@ -609,12 +828,12 @@ export function renderMarkdown(canonicalPath: string): { content: string | null;
 
   const componentMatch = canonicalPath.match(/^\/components\/([^/]+)$/)
   if (componentMatch) {
-    return { content: renderComponent(componentMatch[1]), isStatic: true }
+    return { content: renderComponent(componentMatch[1], {}, true), isStatic: true }
   }
 
   const blockMatch = canonicalPath.match(/^\/blocks\/([^/]+)$/)
   if (blockMatch) {
-    return { content: renderBlock(blockMatch[1]), isStatic: true }
+    return { content: renderBlock(blockMatch[1], true), isStatic: true }
   }
 
   const templateMatch = canonicalPath.match(/^\/templates\/([^/]+)$/)

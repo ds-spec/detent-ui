@@ -18,6 +18,9 @@ const { isProBlock, isProComponent } = await jiti.import('../src/catalog/pro.ts'
 const { apiFromSource } = await jiti.import('../src/catalog/api.ts')
 const notes = JSON.parse(readFileSync(path.join(root, 'src/catalog/notes.json'), 'utf8'))
 const { freeNames, registryItem, registryTheme, registryIndex } = await jiti.import('../src/catalog/registry.ts')
+const { demoMap, demoSource } = await jiti.import('../src/catalog/demo-source.ts')
+const { AGENT_EXAMPLES } = await jiti.import('../src/catalog/agent-examples.ts')
+const { ENTRIES } = await jiti.import('../src/catalog/meta.ts')
 
 const source = {}
 const api = {}
@@ -57,4 +60,20 @@ put('ai-files.json', aiFiles)
 for (const [id, code] of Object.entries(EXAMPLES)) {
   put(`examples/${id}.json`, { code, html: await codeToHtml(code, { lang: 'tsx', themes: { light: 'github-light', dark: 'github-dark-default' }, defaultColor: false }) })
 }
-console.log(`Site data: ${Object.keys(source).length} sources, ${Object.keys(items).length} free items.`)
+/* the example each piece's markdown shows an agent: a written one, else the site demo when it has no autoplay */
+const demos = demoMap()
+const SCRIPTED = /lib\/hand|blocks\/kit\/director|ui\/Orb|ui\/DetentMark/
+let shown = 0
+for (const e of ENTRIES) {
+  let code = EXAMPLES[e.id] ?? AGENT_EXAMPLES[e.id] ?? null
+  if (!code && demos[e.id]) {
+    const name = `${e.name.replace(/[^A-Za-z0-9]+(.)?/g, (_, c) => (c ? c.toUpperCase() : '')).replace(/^./, (c) => c.toUpperCase())}Example`
+    const demo = demoSource(demos[e.id].rel, demos[e.id].name, name)
+    if (demo && !SCRIPTED.test(demo)) code = demo
+  }
+  if (code) {
+    put(`usage/${e.id}.json`, { code })
+    shown++
+  }
+}
+console.log(`Site data: ${Object.keys(source).length} sources, ${Object.keys(items).length} free items, ${shown} usage examples.`)

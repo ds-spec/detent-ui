@@ -2,11 +2,15 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { motion } from 'motion/react'
+import { AnimatePresence, motion } from 'motion/react'
 import LINES from '@/catalog/lines.json'
 import { installCommand } from '@/catalog/site'
+import { piecePrompt } from '@/catalog/prompts'
+import { Check, Copy } from '@/lab/icons'
 import { CopyCommand } from './parts'
 import { useOwned } from './Owned'
+import { BTN, useSideNew } from './shell/side'
+import { track } from './track'
 
 const link = 'ring-focus rounded-[4px] underline-offset-2 hover:text-ink hover:underline'
 const strong = `${link} font-medium text-ink-2`
@@ -26,10 +30,20 @@ export function Install({ id, free, bare = false }: { id: string; free: boolean;
   const has = owned === 'all' || owned === 'pro'
   const lines = (LINES as Record<string, number>)[id]
   const plan = 'Pro'
-  if (bare) return <CopyCommand fill command={installCommand(id, free)} onCopy={free ? undefined : note} />
+  const prompt = piecePrompt(id)
+  /* Agent first: the prompt is the way in, the command stays beside it for people who run it themselves */
+  const row = (
+    <div className="flex w-full min-w-0 items-center gap-2">
+      {prompt && <CopyPrompt id={id} prompt={prompt} />}
+      <div className="min-w-0 flex-1">
+        <CopyCommand fill command={installCommand(id, free)} onCopy={free ? undefined : note} />
+      </div>
+    </div>
+  )
+  if (bare) return row
   return (
     <div className="w-full">
-      <CopyCommand fill command={installCommand(id, free)} onCopy={free ? undefined : note} />
+      {row}
       <p className="mt-2 flex h-4 items-center gap-1 whitespace-nowrap px-1 text-caption text-ink-3 sm:justify-end">
         {free ? (
           <>
@@ -70,5 +84,40 @@ export function Install({ id, free, bare = false }: { id: string; free: boolean;
         )}
       </p>
     </div>
+  )
+}
+
+/* Copies the prompt a coding agent follows to add this piece: it fetches the piece's markdown and its steps */
+export function CopyPrompt({ id, prompt }: { id: string; prompt: string }) {
+  const side = useSideNew()
+  const [copied, setCopied] = useState(0)
+  const timer = useRef(0)
+  useEffect(() => () => clearTimeout(timer.current), [])
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(prompt)
+    } catch {}
+    setCopied((n) => n + 1)
+    track('copy_prompt', { item: id, page: location.pathname })
+    clearTimeout(timer.current)
+    timer.current = window.setTimeout(() => setCopied(0), 1600)
+  }
+  return (
+    <button
+      type="button"
+      onClick={copy}
+      title={prompt}
+      aria-label={copied ? 'Prompt copied' : 'Copy a prompt for your coding agent'}
+      className={side ? `ring-focus flex h-10 shrink-0 items-center gap-2 rounded-[11px] ${BTN.accent} pl-3.5 pr-4 text-[13px] font-medium transition-transform duration-150 active:scale-[0.97]` : 'ring-focus flex h-10 shrink-0 items-center gap-2 rounded-full bg-ink pl-3.5 pr-4 text-[13px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]'}
+    >
+      <span className="relative flex size-3.5 items-center justify-center">
+        <AnimatePresence initial={false} mode="popLayout">
+          <motion.span key={copied ? 'ok' : 'copy'} className="flex" initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.6 }} transition={{ duration: 0.16 }}>
+            {copied ? <Check size={14} strokeWidth={2.6} /> : <Copy size={14} style={{ ['--icon-cutout' as string]: side ? 'var(--accent)' : 'var(--ink)' }} />}
+          </motion.span>
+        </AnimatePresence>
+      </span>
+      <span className="tnum">{copied ? 'Copied' : 'Copy prompt'}</span>
+    </button>
   )
 }

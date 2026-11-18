@@ -108,8 +108,9 @@ export function Header() {
           >
             Sign in
           </Link>
-          <Link href={FIRST_COMPONENT} className={side ? `ring-focus group/go hidden h-9 items-center gap-1.5 rounded-[9px] ${BTN.accent} pl-4 pr-3.5 text-[13px] font-medium transition-[opacity,transform] duration-150 active:scale-[0.97] sm:flex` : "ring-focus group/go hidden h-9 items-center gap-1.5 rounded-full bg-ink pl-4 pr-3.5 text-[13px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97] sm:flex"}>
-            Get started
+          {/* The bar's one button points at Pro everywhere but on the Pro page itself, where it starts the library */}
+          <Link href={here('/pro', path) ? FIRST_COMPONENT : '/pro'} data-cta={here('/pro', path) ? undefined : 'header'} className={side ? `ring-focus group/go hidden h-9 items-center gap-1.5 rounded-[9px] ${BTN.accent} pl-4 pr-3.5 text-[13px] font-medium transition-[opacity,transform] duration-150 active:scale-[0.97] sm:flex` : "ring-focus group/go hidden h-9 items-center gap-1.5 rounded-full bg-ink pl-4 pr-3.5 text-[13px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97] sm:flex"}>
+            {here('/pro', path) ? 'Get started' : 'Get Pro'}
             <ArrowRight size={13} className="transition-transform duration-150 group-hover/go:translate-x-0.5" />
           </Link>
           </div>
@@ -168,6 +169,7 @@ function Links({ stuck, path }: { stuck: boolean; path: string }) {
       {NAV.map((n, i) => (
         <Link
           key={n.href}
+          data-cta={n.href === '/pro' ? 'nav' : undefined}
           ref={(el) => {
             links.current[i] = el
           }}
@@ -201,7 +203,7 @@ function Menu({ path, onClose }: { path: string; onClose: () => void }) {
       transition={{ type: 'spring', stiffness: 520, damping: 38 }}
     >
       {NAV.map((n) => (
-        <Link key={n.href} href={n.href} onClick={onClose} aria-current={here(n.section, path) ? 'page' : undefined} className={`ring-focus flex h-12 items-center rounded-[14px] px-3.5 text-[17px] tracking-[-0.01em] hover:bg-[var(--line)] active:bg-[var(--line)] ${here(n.section, path) ? 'text-ink' : 'text-ink-2'}`}>
+        <Link key={n.href} href={n.href} data-cta={n.href === '/pro' ? 'menu' : undefined} onClick={onClose} aria-current={here(n.section, path) ? 'page' : undefined} className={`ring-focus flex h-12 items-center rounded-[14px] px-3.5 text-[17px] tracking-[-0.01em] hover:bg-[var(--line)] active:bg-[var(--line)] ${here(n.section, path) ? 'text-ink' : 'text-ink-2'}`}>
           {n.label}
         </Link>
       ))}

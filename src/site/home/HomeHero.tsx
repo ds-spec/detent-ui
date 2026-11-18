@@ -6,19 +6,16 @@ import Link from 'next/link'
 import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react'
 import type { MotionValue } from 'motion/react'
 import { DEMOS } from '@/catalog/demos'
-import { PLANS, installCommand, isProComponent } from '@/catalog/pro'
-import { FIRST_COMPONENT } from '@/catalog/site'
+import { installCommand, isProComponent } from '@/catalog/pro'
 import { Announcement } from '@/lab/components/announce/Announcement'
-import { ArrowRight, ArrowUpRight, Chart, Note, Play, Prompt } from '@/lab/icons'
+import { ArrowUpRight, Chart, Note, Play, Prompt } from '@/lab/icons'
 import { Fit } from '@/site/Fit'
 import { CopyCommand } from '@/site/parts'
 import { InDirectory } from '@/site/Directory'
-import { ForPlan } from '@/site/Owned'
-import { Price } from '@/site/Promo'
 import { BRIDGE, CARDS, GRAIN, LAYER, useWide } from './lights'
 import type { Card } from './lights'
-import { BTN, useSideNew } from '../shell/side'
 import { DitherWord } from '../Dither'
+import { WhatBuilding } from './WhatBuilding'
 import type { LibItem } from './library'
 import type { Latest } from '@/catalog/latest'
 
@@ -36,7 +33,6 @@ const widthOf = (open: number) => `calc(${UNIT} * ${(1 + GROW * open).toFixed(4)
 const ICON: Record<string, ReactNode> = { prompt: <Prompt size={15} />, models: <Note size={15} />, voicenote: <Play size={15} />, metric: <Chart size={15} /> }
 
 export function HomeHero({ lib, fresh }: { lib: LibItem[]; fresh: Latest }) {
-  const side = useSideNew()
   const [open, setOpen] = useState(CARDS[0].id)
   const dot = CARDS.find((c) => c.id === open)?.dot
   return (
@@ -58,20 +54,10 @@ export function HomeHero({ lib, fresh }: { lib: LibItem[]; fresh: Latest }) {
             <p className="rise mt-6 max-w-[540px] text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
               Agent runs, approvals, streaming answers and charts that explain themselves. Every state worked out, installed with shadcn, styled by your{'\u00a0'}theme.
             </p>
-            <div className="rise mt-8 flex items-center gap-2.5" style={{ animationDelay: '200ms' }}>
-              <Link href={FIRST_COMPONENT} className={side ? `ring-focus group/go flex h-11 items-center whitespace-nowrap gap-1.5 rounded-[11px] ${BTN.accent} pl-5 pr-4 text-[14px] font-medium transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] active:scale-[0.97] max-[359px]:pl-4 max-[359px]:pr-3` : "ring-focus group/go flex h-11 items-center whitespace-nowrap gap-1.5 rounded-full bg-ink pl-5 pr-4 text-[14px] font-medium text-surface transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:opacity-90 active:scale-[0.97] max-[359px]:pl-4 max-[359px]:pr-3"}>
-                Browse components
-                <ArrowRight size={14} className="transition-transform duration-150 group-hover/go:translate-x-0.5" />
-              </Link>
-              <ForPlan
-                none={
-                  <Link href="/pro" className={side ? `ring-focus flex h-11 items-center whitespace-nowrap rounded-[11px] ${BTN.plate} px-5 text-[14px] font-medium transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4` : "ring-focus flex h-11 items-center whitespace-nowrap rounded-full bg-surface px-5 text-[14px] font-medium text-ink shadow-raised transition-[box-shadow,transform] duration-150 [transition-timing-function:cubic-bezier(0.2,0,0,1)] hover:shadow-[var(--elev-raised-hover)] active:scale-[0.97] max-[359px]:px-4"}>
-                    Get Pro<span className="hidden sm:inline">&nbsp;· <Price value={PLANS[0].price} /></span>
-                  </Link>
-                }
-              />
+            <div className="rise mt-8 flex w-full justify-center" style={{ animationDelay: '180ms' }}>
+              <WhatBuilding />
             </div>
-            <div className="rise mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[13px] text-ink-3" style={{ animationDelay: '260ms' }}>
+            <div className="rise mt-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[13px] text-ink-3" style={{ animationDelay: '240ms' }}>
               <InDirectory />
             </div>
           </div>

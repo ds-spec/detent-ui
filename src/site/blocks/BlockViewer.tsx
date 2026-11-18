@@ -124,7 +124,7 @@ function BlockViewer({ b, go }: { b: Block; go: (id: string) => void }) {
             </p>
             <h1 className="text-[clamp(32px,3.8vw,48px)] font-normal leading-[1.08] tracking-[-0.045em] text-ink">{b.name}</h1>
           </div>
-          <div className="min-w-0 lg:w-[360px]">
+          <div className="min-w-0 lg:w-[480px]">
             <Install id={b.id} free={!isProBlock(b.id)} bare />
           </div>
         </header>

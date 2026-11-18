@@ -9,13 +9,20 @@ import { track } from './track'
 export function Analytics() {
   useEffect(() => {
     const buy = (e: MouseEvent) => {
-      const link = (e.target as Element | null)?.closest?.('a[href^="/checkout/"]')
+      const target = e.target as Element | null
+      /* A way to Pro taken: which surface sent them (data-cta) and from where, so the funnel can be split by it */
+      const toPro = target?.closest?.('a[href="/pro"], a[href^="/pro#"], a[href^="/pro?"]')
+      if (toPro) {
+        track('pro_click', { cta: toPro.getAttribute('data-cta') ?? 'link', page: location.pathname })
+        return
+      }
+      const link = target?.closest?.('a[href^="/checkout/"]')
       const href = link?.getAttribute('href')
       if (!href) return
       const plan = PLANS.find((p) => p.href === href)
       const sid = posthog.get_session_id?.()
       if (sid) document.cookie = `dt_ph=${encodeURIComponent(sid)}; path=/checkout; max-age=120; samesite=lax; secure`
-      track('begin_checkout', { plan: plan?.id ?? href, value: plan && promoLive(PROMO) && PROMO.price < plan.price ? PROMO.price : plan?.price, currency: 'USD', cta: link?.getAttribute('data-cta') ?? undefined })
+      track('begin_checkout', { plan: plan?.id ?? href, value: plan && promoLive(PROMO) && PROMO.price < plan.price ? PROMO.price : plan?.price, currency: 'USD', cta: link?.getAttribute('data-cta') ?? undefined, page: location.pathname })
     }
     document.addEventListener('click', buy, true)
     return () => document.removeEventListener('click', buy, true)

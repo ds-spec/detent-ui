@@ -1,5 +1,5 @@
 import type { NextRequest } from 'next/server'
-import { listMarkdownRoutes, renderMarkdown } from '@/lib/md/registry'
+import { listMarkdownRoutes, renderMarkdownRich } from '@/lib/md/registry'
 import { notFound, options, respond } from '@/lib/md/http'
 import { abs, mdAbs, today } from '@/lib/md/format'
 
@@ -41,7 +41,7 @@ export async function GET(
   }
 
   const path = canonicalPath(segments)
-  const { content, isStatic } = renderMarkdown(path)
+  const { content, isStatic } = await renderMarkdownRich(path)
   if (content === null) return notFound(path)
   return respond(content, path, { isStatic })
 }
@@ -57,7 +57,7 @@ export async function HEAD(
   }
 
   const path = canonicalPath(segments)
-  const { content, isStatic } = renderMarkdown(path)
+  const { content, isStatic } = await renderMarkdownRich(path)
   if (content === null) return notFound(path)
   const full = respond(content, path, { isStatic })
   return new Response(null, { status: full.status, headers: full.headers })

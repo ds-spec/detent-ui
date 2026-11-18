@@ -16,6 +16,8 @@ export function GET() {
     '',
     `${NAME} is a library of premium React components for products and websites: everyday controls, live charts, whole-screen blocks and app templates, each with its motion and states worked out. They install with the shadcn CLI as source you own. Built with React 19, Tailwind CSS v4, and Motion. Free components are open-source under the MIT license; Pro is a one-time purchase with every update for life. Contact: ${CONTACT}.`,
     '',
+    'For coding agents: before using a piece, fetch its page with `.md` appended (it has when to use it, the import path, props and an example). Free pieces install from the URLs below; Pro pieces need the @detent-pro registry and DETENT_PRO_KEY (see Get started). Setting up a project for Detent: follow ' + `${SITE}/setup.md` + '. Connecting a Pro key: ' + `${SITE}/pro-setup.md` + '. Rules to keep in AGENTS.md or CLAUDE.md: ' + `${SITE}/agents.md` + '.',
+    '',
     '## Core pages',
     `- [Home](${SITE}/index.md): ${NAME} — ${TAGLINE}`,
     `- [Pro](${SITE}/pro.md): Pro components, whole-screen blocks, and production templates with lifetime updates`,
@@ -26,6 +28,9 @@ export function GET() {
     '## Docs & Guides',
     `- [Get started](${SITE}/docs.md): Set up a project, install a first component, connect Pro, and hand it to a coding agent`,
     `- [Design System](${SITE}/system.md): Tokens, typography, layout principles, and styling rules`,
+    `- [Set up with an agent](${SITE}/setup.md): Steps a coding agent follows to prepare a project, install the theme, add the agent rules and connect Pro`,
+    `- [Connect Pro](${SITE}/pro-setup.md): Steps a coding agent follows to connect a Detent Pro key`,
+    `- [Agent rules](${SITE}/agents.md): A compact index to paste into AGENTS.md or CLAUDE.md: when to use each piece, when not to, and how to install it`,
     '',
     '## Free components',
     ...free.map(

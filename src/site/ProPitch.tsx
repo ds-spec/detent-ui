@@ -67,3 +67,20 @@ export function ProPitch({ id, shelf = 'components', near = false }: { id: strin
     />
   )
 }
+
+/* Under a free piece's stage: one quiet line, so the first screen says Pro exists before the reader leaves. */
+export function ProNote() {
+  return (
+    <ForPlan
+      none={
+        <p className="mt-3 px-1 text-[14px] leading-[1.6] text-ink-3 sm:mt-4">
+          Free under MIT.{' '}
+          <Link href="/pro" data-cta="piece-note" className="ring-focus group/note rounded-[4px] text-ink-2 transition-colors duration-150 hover:text-ink">
+            Pro has {PRO_COMPONENTS.length} more components, {PRO_BLOCK_COUNT} whole screens and {TEMPLATE_COUNT}
+            <ArrowRight size={12} className="ml-1 inline-block align-[-1px] transition-transform duration-150 group-hover/note:translate-x-0.5" />
+          </Link>
+        </p>
+      }
+    />
+  )
+}

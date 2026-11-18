@@ -6,6 +6,7 @@ import { ENTRIES } from './meta'
 import { FILES } from './source'
 import { FREE_BLOCKS, SITE, isProBlock, isProComponent } from './pro'
 import { TEMPLATES } from './templates'
+import { GUIDE, installDocs, mdOf } from './agent'
 
 const ROOT = process.cwd()
 const SRC = path.join(ROOT, 'src')
@@ -25,6 +26,8 @@ export type RegistryItem = {
   files: RegistryFile[]
   css?: CssTree
   docs?: string
+  categories?: string[]
+  meta?: Record<string, string>
 }
 type CssTree = { [key: string]: string | CssTree }
 
@@ -117,7 +120,7 @@ const targetOf = (rel: string) =>
     .replace(/^pro\/ai\//, 'ai/')}`
 
 const EXT = ['', '.tsx', '.ts', '/index.tsx', '/index.ts']
-function resolveLocal(from: string, spec: string): string | null {
+export function resolveLocal(from: string, spec: string): string | null {
   let abs: string
   if (spec.startsWith('@/')) abs = path.join(SRC, spec.slice(2))
   else if (spec.startsWith('.')) abs = path.join(SRC, path.dirname(from), spec)
@@ -155,7 +158,8 @@ async function gather(entry: string[]) {
   return { files, deps }
 }
 
-const rewrite = (rel: string, code: string) =>
+/* imports written for this repo, rewritten to where an install puts them */
+export const rewrite = (rel: string, code: string) =>
   code.replace(SPEC, (all, lead: string, q: string, spec: string) => {
     const local = resolveLocal(rel, spec)
     if (!local) return all
@@ -193,6 +197,20 @@ const describe = (name: string) => {
   return null
 }
 
+/* What an agent sees around an install: the docs line the shadcn CLI prints, and where the full doc lives */
+function agentFields(name: string): Pick<RegistryItem, 'docs' | 'categories' | 'meta'> {
+  if (name.startsWith('template-')) return { meta: { tier: 'pro' } }
+  const e = ENTRIES.find((x) => x.id === name)
+  const kind = e ? 'components' : 'blocks'
+  const tier = (e ? isProComponent(name) : isProBlock(name)) ? 'pro' : 'free'
+  const g = GUIDE[name]
+  return {
+    docs: installDocs(kind, name),
+    ...(e ? { categories: [e.category] } : {}),
+    meta: { tier, docs: mdOf(kind, name), ...(g ? { useWhen: g.use, avoidWhen: g.avoid } : {}) },
+  }
+}
+
 export const itemUrl = (name: string) => `${SITE}/r/${name}.json`
 
 async function build(name: string, theme: string): Promise<RegistryItem | null> {
@@ -209,6 +227,7 @@ async function build(name: string, theme: string): Promise<RegistryItem | null> 
     dependencies: [...deps].sort(),
     registryDependencies: [theme],
     files: [...files].map(([rel, code]) => shipped(rel, curved(brand(rewrite(rel, code))), about.type)),
+    ...agentFields(name),
   }
 }
 

@@ -9,7 +9,7 @@ import { BESIDE } from '@/catalog/beside'
 import { DEMOS, preloadDemo } from '@/catalog/demos'
 import { CATEGORIES, ENTRIES } from '@/catalog/meta'
 import { SIZE } from '@/catalog/sizes'
-import { ProPitch } from '@/site/ProPitch'
+import { ProNote, ProPitch } from '@/site/ProPitch'
 import { isProComponent } from '@/catalog/pro'
 import { track } from '@/site/track'
 import { Code as CodeIcon, Expand, Eye, Moon, Refresh, Sun } from '@/lab/icons'
@@ -227,7 +227,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
           </h1>
         </div>
         <div className="flex min-w-0 items-center gap-2">
-          <div className="min-w-0 flex-1 lg:w-[300px] lg:flex-none">
+          <div className="min-w-0 flex-1 lg:w-[440px] lg:flex-none">
             <Install id={e.id} free={!pro} bare />
           </div>
         </div>
@@ -307,7 +307,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
         </div>
       </div>
 
-      {pro && <ProPitch id={e.id} near />}
+      {pro ? <ProPitch id={e.id} near /> : <ProNote />}
 
       <div className="contents" style={{ visibility: id === at ? undefined : 'hidden' }}>
         {children}

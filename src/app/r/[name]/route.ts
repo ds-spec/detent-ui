@@ -1,5 +1,6 @@
 import { freeNames, isProName } from '@/catalog/registry'
 import { asset } from '@/lib/asset'
+import { SITE } from '@/catalog/pro'
 import { countFreeFetch } from '@/lib/account/installs'
 
 export async function GET(req: Request, { params }: { params: Promise<{ name: string }> }) {
@@ -11,6 +12,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ name: st
     await countFreeFetch(name, req).catch(() => {})
     return Response.json(item)
   }
-  if (isProName(name)) return Response.json({ error: `${name} is part of Detent Pro. Install it from the Pro registry with your key: npx shadcn add @detent-pro/${name}` }, { status: 403 })
-  return Response.json({ error: `There's no ${name} in Detent.` }, { status: 404 })
+  if (isProName(name)) {
+    const message = `${name} is part of Detent Pro, so it isn't on the free registry. Install it with: npx shadcn add @detent-pro/${name} (needs the @detent-pro registry in components.json and DETENT_PRO_KEY in .env.local, see ${SITE}/docs.md)`
+    return Response.json({ error: 'Pro piece', message, code: 'PRO_ONLY' }, { status: 403 })
+  }
+  const message = `There's no ${name} in Detent. Every piece and its install name: ${SITE}/agents.md`
+  return Response.json({ error: 'Not in Detent', message, code: 'NOT_FOUND' }, { status: 404 })
 }
