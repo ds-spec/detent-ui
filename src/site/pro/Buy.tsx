@@ -277,7 +277,7 @@ export function HeroHead() {
         </span>
       </h1>
       <p className="rise mt-6 max-w-[560px] text-balance text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
-        Components and full product screens you won’t find in shadcn. They install with the shadcn CLI, take on your theme, and the code is yours to change.
+        Components and full product screens you won’t find in shadcn. Tell your coding agent what you’re building and it installs them with the shadcn CLI, on your theme, as code that’s yours to change.
       </p>
     </div>
   )

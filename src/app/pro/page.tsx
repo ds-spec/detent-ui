@@ -30,11 +30,12 @@ const FAQ: [string, string][] = [
   ['Can I change the code?', 'Yes. Every piece lands in your project as source files, the same way shadcn components do. Restyle it, cut it down, rename it. It’s yours.'],
   ['Can I use it for client work?', 'Yes, in as many projects as you like, commercial ones included. What you can’t do is resell or redistribute the components themselves.'],
   ['How do I install Pro?', 'With the shadcn CLI, from Detent’s private registry. Sign in with your email, generate a key, add it and the registry to the project once, as in Set up once below, then install like anything else: npx shadcn add @detent-pro/glyph. The source lands in your project.'],
+  ['Can my coding agent do it for me?', 'Yes, that’s how Detent is made to be used. Copy the prompt under Set up once into Claude Code, Cursor or Codex and it connects Pro. Then say what you’re building. Every piece has a page written for agents, with where it goes, a working example and its props, so your agent places it well instead of guessing.'],
   ['Can my team share one licence?', 'A licence is for one person, so each person building with it needs their own. Your keys work in CI and shared repos.'],
   ['What if I get stuck?', `Write to ${CONTACT}. You’ll hear back from the person who built it.`],
 ]
 
-const INCLUDED = [`All ${ENTRIES.length} components`, `All ${BLOCKS.length} blocks`, ...TEMPLATES.map((t) => `The ${t.name} template`), 'Every update, for life', 'Unlimited projects']
+const INCLUDED = [`All ${ENTRIES.length} components`, `All ${BLOCKS.length} blocks`, ...TEMPLATES.map((t) => `The ${t.name} template`), 'Set up by your coding agent', 'Every update, for life', 'Unlimited projects']
 
 const H2 = 'text-[clamp(32px,3.4vw,48px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink'
 
@@ -129,7 +130,7 @@ export default function ProPage() {
         <section id="install" aria-labelledby="install-title" className="mx-auto mt-28 max-w-[1360px] scroll-mt-24 px-5 sm:mt-36 sm:px-6">
           <h2 id="install-title" className={H2}>
             Set up once.
-            <span className="block text-quiet">Then it’s just shadcn.</span>
+            <span className="block text-quiet">Then just ask your agent.</span>
           </h2>
           <div className="mt-10 sm:mt-14">
             <Install />
