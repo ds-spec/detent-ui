@@ -11,6 +11,17 @@ export type Voice = {
 }
 
 export const VOICES: Voice[] = [
+  /* A paying customer, quoted word for word from his email, with his permission (Nov 18 2026). First, so the
+     keyboard plays it first and the phone layout leads with it. */
+  {
+    id: 'josh',
+    name: 'Josh Valdez',
+    handle: 'nuanced',
+    role: 'Pro customer, Nuanced',
+    key: 'n',
+    photo: '/media/quotes/joshvaldez.jpg',
+    text: 'Detent is helping Nuanced ship rich UI experiences faster for users. It’s easy to signup and use within your app!',
+  },
   {
     id: 'adeline',
     name: 'Adeline',

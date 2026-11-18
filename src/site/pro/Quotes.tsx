@@ -2,7 +2,7 @@ import { Face, QuoteMark, VoiceRail } from '../VoiceRail'
 import { ArrowUpRight } from '@/lab/icons'
 import { VOICES, byline, source, voice } from '../quotes'
 
-const LEAD = voice('adeline')
+const LEAD = voice('josh')
 const LINE = LEAD.short ?? LEAD.text
 const REST = VOICES.filter((v) => v.id !== LEAD.id)
 

@@ -115,8 +115,8 @@ export default function Home() {
         auto
         peek={{
           at: '#library',
-          who: 'adeline',
-          text: 'Love that the components are live on the homepage. Being able to play with them right away makes a huge difference compared to the usual screenshot galleries.',
+          who: 'josh',
+          text: 'Detent is helping Nuanced ship rich UI experiences faster for users. It’s easy to signup and use within your app!',
         }}
       />
     </div>
