@@ -11,8 +11,6 @@ export type Voice = {
 }
 
 export const VOICES: Voice[] = [
-  /* A paying customer, quoted word for word from his email, with his permission (Nov 18 2026). First, so the
-     keyboard plays it first and the phone layout leads with it. */
   {
     id: 'josh',
     name: 'Josh Valdez',
