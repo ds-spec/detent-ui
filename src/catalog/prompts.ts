@@ -42,17 +42,40 @@ const goalOf = (goal: string) =>
 const FINISH =
   "Fit it into this project's own routes, layout and spacing. Wire it to the project's real data; where there is none yet, put typed sample data in one clearly marked file, never made-up quotes, names or customers. Give it loading, empty and error states that keep the same layout, and check it at a phone width and in dark mode. Then tell me what you built, section by section, and anything you left as a placeholder."
 
+const PRO_GOAL = (what: string) =>
+  `Build the whole ${what} in this project, finished and working, at the quality of Detent's own demos: every section in place, Detent components doing the heavy lifting, and everything else styled to match them. Go beyond the basics. It should look like a product someone paid for, not a starter template.`
+
+const PRO_SETUP = [
+  `If Detent isn't set up in this project yet, follow ${SETUP_MD}.`,
+  `If the @detent-pro registry isn't connected yet, follow ${PRO_SETUP_MD} (ask me for my key).`,
+]
+
+const PRODUCT = [
+  '<my_product>',
+  "Shape it to what I described: keep the structure, and change sections, labels, metrics and sample data to fit my product. If this repo already has an app, fit into its routes, layout and data. If my product isn't clear from my words or the repo, make a sensible choice and tell me what you assumed.",
+  '</my_product>',
+]
+
+const REPORT = "When you're done, tell me what you built section by section, which Detent pieces are on the page, what is still sample data or a placeholder, and paste the output of the checks you ran."
+
 export function planPrompt(goal: string, plan: { id: string; name: string; noun: string }): string {
   return [
-    `I'm building: ${goalOf(goal)}. Build the whole ${plan.noun}, finished and working, not just the components. Use the Detent component library for it.`,
+    `I'm building: ${goalOf(goal)}. I have Detent Pro.`,
     '',
-    `If Detent isn't set up in this project yet, fetch ${SETUP_MD} and follow it first.`,
-    `I have Detent Pro. If the @detent-pro registry isn't set up here yet, follow ${PRO_SETUP_MD} first (ask me for my key).`,
+    '<goal>',
+    PRO_GOAL(plan.noun),
+    '</goal>',
     '',
-    `Then run \`npx shadcn@latest add @detent-pro/plan-${plan.id}\`. It adds .detent/plans/${plan.id}.md, Detent's plan for ${/^[aeiou]/i.test(plan.name) ? 'an' : 'a'} ${plan.name.toLowerCase()}: the sections in order, a layout sketch, which piece goes where, and what to build yourself. Read it, then shape it to what I described: keep the structure, and change the sections, labels and metrics to fit my product.`,
-    'Build it section by section. Install each piece the plan names and size it as its page\'s Placement section says. Build the parts the plan leaves to you with this project\'s own components, styled with the Detent theme tokens so the whole thing reads as one product.',
+    '<steps>',
+    `1. ${PRO_SETUP.join(' ')}`,
+    `2. Run \`npx shadcn@latest add @detent-pro/plan-${plan.id}\`. It adds .detent/plans/${plan.id}.md, Detent's plan for ${/^[aeiou]/i.test(plan.name) ? 'an' : 'a'} ${plan.name.toLowerCase()}. Read it in full before writing code: it is the spec for the layout, the Detent piece in each section, the Detent look, the sample data and the checks for done.`,
+    '3. Write down the sections you will build, shaped to my product, in a few lines. Then build them in order, installing each Detent piece the plan names.',
+    "4. Run the checks in the plan's “Before you say it's done” section and fix whatever fails.",
+    '</steps>',
     '',
-    FINISH,
+    ...PRODUCT,
+    '',
+    REPORT,
   ].join('\n')
 }
 
@@ -65,34 +88,40 @@ export function buildPrompt(goal: string, picks: Chosen[], hasPro = false): stri
   const without = allPro && !alts.length
     ? `- If I don't, don't install ${picks.length === 1 ? 'it' : 'them'} or make up a key. Build what I described with this project's own components instead, and tell me in one line what ${picks.length === 1 ? 'it' : 'the Pro pieces'} would have added (${SITE}/pro).`
     : `- If I don't, don't install the Pro ones or make up a key: ${alts.length ? 'use the free fallback where one is listed, ' : ''}build the rest with the free pieces and this project's own components, and at the end tell me in one line what each skipped piece would have added (its page says what it does).`
-  const pro = hasPro
-    ? [`I have Detent Pro. If the @detent-pro registry isn't set up here yet, follow ${PRO_SETUP_MD} first (ask me for my key).`]
-    : !pros.length
-      ? []
-      : [`${allPro ? (picks.length === 1 ? 'This is' : 'These are all') : 'Some of these are'} Detent Pro (marked Pro below). Ask me if I have a Detent Pro key.`, `- If I do, follow ${PRO_SETUP_MD} first.`, without]
+  const pro = !pros.length
+    ? []
+    : [`${allPro ? (picks.length === 1 ? 'This is' : 'These are all') : 'Some of these are'} Detent Pro (marked Pro below). Ask me if I have a Detent Pro key.`, `- If I do, follow ${PRO_SETUP_MD} first.`, without]
+  if (hasPro)
+    return [
+      `I'm building: ${goalOf(goal)}. I have Detent Pro.`,
+      '',
+      '<goal>',
+      PRO_GOAL('thing'),
+      '</goal>',
+      '',
+      '<steps>',
+      `1. ${PRO_SETUP.join(' ')}`,
+      "2. Run `npx shadcn@latest add @detent-pro/plans` and read .detent/plans/guide.md in full. If one of its page plans is close to what I described, install that plan too and follow it. If none is, plan the sections the way the guide says.",
+      `3. These Detent pieces fit what I described, so use them, plus any others from ${SITE}/agents.md that fit a section. Install each by fetching its page and following its "For agents" and Placement sections:`,
+      ...picks.map((p) => `   ${line(p)}`),
+      '4. Write down the sections you will build, in a few lines, then build them in order.',
+      "5. Run the checks in the guide's “Before you say it's done” section and fix whatever fails.",
+      '</steps>',
+      '',
+      ...PRODUCT,
+      '',
+      REPORT,
+    ].join('\n')
   return [
-    hasPro
-      ? `I'm building: ${goalOf(goal)}. Build the whole thing, finished and working, not just the components. Use the Detent component library for it.`
-      : `I'm building: ${goalOf(goal)}. Build what I described, finished and working, using the Detent component library for it.`,
+    `I'm building: ${goalOf(goal)}. Build what I described, finished and working, using the Detent component library for it.`,
     '',
     `If Detent isn't set up in this project yet, fetch ${SETUP_MD} and follow it first.`,
     ...pro,
     '',
-    ...(hasPro
-      ? [
-          `Run \`npx shadcn@latest add @detent-pro/plans\` and read .detent/plans/guide.md first. If one of its page plans is close to what I described, install that plan and follow it. If none is, plan the sections yourself the way the guide says.`,
-          '',
-          `These Detent pieces fit it. Use them, and add any others from ${SITE}/agents.md that fit a section. Install each by fetching its page and following its "For agents" steps:`,
-          ...picks.map(line),
-          '',
-          "Build every section. Place each piece as its page's Placement section says, and build the parts Detent has no piece for with this project's own components, styled with the Detent theme tokens so it reads as one product.",
-        ]
-      : [
-          'These Detent pieces fit it. Fetch each page and follow its "For agents" steps:',
-          ...picks.map(line),
-          '',
-          "Place each one as its page's Placement section says, inside this project's own layout.",
-        ]),
+    'These Detent pieces fit it. Fetch each page and follow its "For agents" steps:',
+    ...picks.map(line),
+    '',
+    "Place each one as its page's Placement section says, inside this project's own layout.",
     '',
     FINISH,
   ]
@@ -101,24 +130,32 @@ export function buildPrompt(goal: string, picks: Chosen[], hasPro = false): stri
 }
 
 export function openPrompt(goal: string, hasPro = false): string {
+  if (hasPro)
+    return [
+      `I'm building: ${goalOf(goal)}. I have Detent Pro.`,
+      '',
+      '<goal>',
+      PRO_GOAL('thing'),
+      '</goal>',
+      '',
+      '<steps>',
+      `1. ${PRO_SETUP.join(' ')}`,
+      `2. Run \`npx shadcn@latest add @detent-pro/plans\` and read .detent/plans/guide.md in full. If one of its page plans is close to what I described, install that plan too and follow it. If none is, plan the sections the way the guide says and pick the Detent pieces for them from ${SITE}/agents.md.`,
+      '3. Write down the sections and the Detent piece for each, in a few lines, then build them in order, installing each piece by fetching its page and following its "For agents" and Placement sections.',
+      "4. Run the checks in the guide's “Before you say it's done” section and fix whatever fails.",
+      '</steps>',
+      '',
+      ...PRODUCT,
+      '',
+      REPORT,
+    ].join('\n')
   return [
-    hasPro
-      ? `I'm building: ${goalOf(goal)}. Build the whole thing, finished and working, not just the components. Use the Detent component library for it.`
-      : `I'm building: ${goalOf(goal)}. Build what I described, finished and working, using the Detent component library where it fits.`,
+    `I'm building: ${goalOf(goal)}. Build what I described, finished and working, using the Detent component library where it fits.`,
     '',
     `If Detent isn't set up in this project yet, fetch ${SETUP_MD} and follow it first.`,
-    ...(hasPro
-      ? [
-          `I have Detent Pro. If the @detent-pro registry isn't set up here yet, follow ${PRO_SETUP_MD} first (ask me for my key).`,
-          '',
-          `Run \`npx shadcn@latest add @detent-pro/plans\` and read .detent/plans/guide.md. If one of its page plans is close to what I described, install that plan and follow it, shaped to my product. If none is, plan the sections yourself the way the guide says and pick pieces from ${SITE}/agents.md.`,
-          'Build every section. Install each piece by fetching its page and following its "For agents" steps, and build the parts Detent has no piece for with this project\'s own components, styled with the Detent theme tokens.',
-        ]
-      : [
-          `Then read ${SITE}/agents.md and pick the free Detent pieces that fit what I'm building. Tell me which ones you chose and why before adding them.`,
-          `If any that fit are Detent Pro, ask me if I have a key. If I don't, use free pieces only, and tell me in one line what the Pro ones would have added (${SITE}/pro).`,
-          'Add each piece by fetching its page and following its "For agents" steps.',
-        ]),
+    `Then read ${SITE}/agents.md and pick the free Detent pieces that fit what I'm building. Tell me which ones you chose and why before adding them.`,
+    `If any that fit are Detent Pro, ask me if I have a key. If I don't, use free pieces only, and tell me in one line what the Pro ones would have added (${SITE}/pro).`,
+    'Add each piece by fetching its page and following its "For agents" steps.',
     '',
     FINISH,
   ].join('\n')
