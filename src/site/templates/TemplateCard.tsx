@@ -51,7 +51,7 @@ export function TemplateCard({ t }: { t: Template }) {
           <Window title={t.window} chrome="browser">
             <TemplateFrame>
               <div ref={page} data-template-scroller className="h-full overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {near ? <TemplateBody id={t.id} theme={app ? scheme : undefined} /> : null}
+                {near ? <TemplateBody id={t.id} theme={scheme} /> : null}
               </div>
             </TemplateFrame>
           </Window>

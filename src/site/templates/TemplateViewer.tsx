@@ -149,13 +149,13 @@ function TemplateViewer({ id, go }: { id: string; go: (id: string) => void }) {
             onReplay={() => (setRun((r) => r + 1), setAt(t.parts[0].anchor))}
             onFull={() => window.open(`/templates/${t.id}/live`, '_blank', 'noopener')}
             run={run}
-            view={<Page key={run} id={t.id} scroller={scroller} onScroll={onScroll} theme={app ? shown : undefined} />}
+            view={<Page key={run} id={t.id} scroller={scroller} onScroll={onScroll} theme={shown} />}
             code={<Code id={`template-${t.id}`} />}
           />
-          {present && <Desk title={t.window} chrome="browser" run={run} mode={mode} theme={stageTheme} present onExit={() => setPresent(false)} view={<Page key={run} id={t.id} scroller={scroller} onScroll={onScroll} theme={app ? shown : undefined} />} code={<Code id={`template-${t.id}`} />} />}
+          {present && <Desk title={t.window} chrome="browser" run={run} mode={mode} theme={stageTheme} present onExit={() => setPresent(false)} view={<Page key={run} id={t.id} scroller={scroller} onScroll={onScroll} theme={shown} />} code={<Code id={`template-${t.id}`} />} />}
         </>
       ) : (
-        <Desk title={t.window} chrome="browser" run={run} mode={mode} theme={stageTheme} present={present} onExit={() => setPresent(false)} view={<Page key={run} id={t.id} scroller={scroller} onScroll={onScroll} theme={app ? shown : undefined} />} code={<Code id={`template-${t.id}`} />} />
+        <Desk title={t.window} chrome="browser" run={run} mode={mode} theme={stageTheme} present={present} onExit={() => setPresent(false)} view={<Page key={run} id={t.id} scroller={scroller} onScroll={onScroll} theme={shown} />} code={<Code id={`template-${t.id}`} />} />
       )}
 
       <div className={side ? 'hidden' : 'mt-5 flex justify-center'}>
