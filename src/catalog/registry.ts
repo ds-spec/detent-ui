@@ -7,6 +7,7 @@ import { FILES } from './source'
 import { FREE_BLOCKS, SITE, isProBlock, isProComponent } from './pro'
 import { TEMPLATES } from './templates'
 import { GUIDE, installDocs, mdOf } from './agent'
+import { searchPhrase } from './search'
 
 const ROOT = process.cwd()
 const SRC = path.join(ROOT, 'src')
@@ -185,15 +186,21 @@ function entryOf(name: string): string[] | null {
   return listed.map((f) => path.normalize(path.join('lab', f)))
 }
 
+/* `shadcn search`, the shadcn MCP and agents match on the description, so it leads with what the piece is ("React Radar Chart for shadcn") and our own line follows. */
+const lead = (id: string, line: string) => {
+  const what = searchPhrase(id)
+  return what ? `${what}. ${line}` : line
+}
+
 const describe = (name: string) => {
   if (name.startsWith('template-')) {
     const t = TEMPLATES.find((x) => `template-${x.id}` === name)
-    return { title: t?.name ?? name.slice(9), description: t?.line ?? 'A Detent template.', type: 'registry:block' }
+    return { title: t?.name ?? name.slice(9), description: lead(name.slice(9), t?.line ?? 'A Detent template.'), type: 'registry:block' }
   }
   const e = ENTRIES.find((x) => x.id === name)
-  if (e) return { title: e.name, description: e.line, type: 'registry:component' }
+  if (e) return { title: e.name, description: lead(e.id, e.line), type: 'registry:component' }
   const b = BLOCKS.find((x) => x.id === name)
-  if (b) return { title: b.name, description: b.line, type: 'registry:block' }
+  if (b) return { title: b.name, description: lead(b.id, b.line), type: 'registry:block' }
   return null
 }
 
