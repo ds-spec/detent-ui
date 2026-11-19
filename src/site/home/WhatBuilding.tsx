@@ -137,7 +137,7 @@ export function WhatBuilding() {
     const result = recipe ? recipePicks(recipe) : match(goal, 6)
     if (tracked.current !== goal) {
       tracked.current = goal
-      track('build_match', { found: result.length, plan: recipe?.id ?? 'none', picks: result.map((p) => p.id).join(',') || 'none' })
+      track('build_match', { query: goal.slice(0, 200), empty: result.length ? 'no' : 'yes', found: result.length, plan: recipe?.id ?? 'none', picks: result.map((p) => p.id).join(',') || 'none', pro: hasPro ? 'owner' : 'free' })
     }
     later(() => {
       if (me !== run.current) return
@@ -310,6 +310,14 @@ export function WhatBuilding() {
                 <div className="px-4 py-3.5">
                   <p className="text-[13.5px] font-medium text-[var(--i-t1)]">Your agent will choose the pieces</p>
                   <p className="mt-1 text-[12.5px] leading-[1.5] text-[var(--i-t3)]">The prompt has it read Detent’s index, pick what fits what you’re building, and check with you before adding anything.</p>
+                  <p className="mt-3 text-[12px] text-[var(--i-t3)]">Or start from one Detent knows well</p>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {IDEAS.map((idea) => (
+                      <button key={idea} type="button" onClick={() => pickIdea(idea)} className={`h-7 rounded-full bg-[var(--i-tray)] px-3 text-[12.5px] text-[var(--i-t2)] transition-colors duration-150 hover:text-[var(--i-t1)] ${FOCUS}`}>
+                        {idea}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
               {gated && plan && (
