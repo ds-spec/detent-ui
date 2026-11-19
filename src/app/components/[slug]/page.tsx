@@ -7,7 +7,9 @@ import { Example } from '@/site/bench/Example'
 import { PropsPanel } from '@/site/bench/Panel'
 import { isProComponent } from '@/catalog/pro'
 import { asset } from '@/lib/asset'
-import { JsonLd, crumbs, page, short } from '@/site/seo'
+import { JsonLd, crumbs, faqPage, page, short } from '@/site/seo'
+import { SEARCH, searchDescription } from '@/catalog/search'
+import { DOCS } from '@/catalog/docs'
 
 export function generateStaticParams() {
   return ENTRIES.map((e) => ({ slug: e.id }))
@@ -18,8 +20,7 @@ export async function generateMetadata({ params }: PageProps<'/components/[slug]
   const e = entry(slug)
   if (!e) return {}
   const pro = isProComponent(e.id)
-  const said = `${e.line} ${pro ? 'Part of Detent Pro.' : 'Free under MIT.'}`
-  return page({ title: `${e.name} — React component`, description: short(said.length <= 160 ? said : e.line), path: `/components/${e.id}` })
+  return page({ title: SEARCH[e.id] ?? `${e.name}: React component`, description: short(searchDescription(e.id, e.line, pro)), path: `/components/${e.id}` })
 }
 
 export default function ComponentPage({ params }: PageProps<'/components/[slug]'>) {
@@ -38,6 +39,7 @@ async function Props({ params }: { params: PageProps<'/components/[slug]'>['para
   return (
     <>
       <JsonLd data={crumbs([[e.name, `/components/${e.id}`]])} />
+      {DOCS[e.id]?.faq.length ? <JsonLd data={faqPage(DOCS[e.id].faq)} /> : null}
       {api?.props.length ? <PropsPanel id={slug} api={api} /> : null}
       {example ? <Example {...example} /> : null}
     </>

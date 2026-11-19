@@ -27,6 +27,7 @@ import { useSite } from '../Providers'
 import { BenchProvider } from '../bench/state'
 import { ProTag } from '../blocks/ProTag'
 import { Beside } from './Beside'
+import { Examples, Lede, Questions } from './Docs'
 import { MoreLike } from '../library/Library'
 import { Rail } from './Rail'
 import { Shell, Trail, scroller } from '../shell/Shell'
@@ -225,6 +226,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
               </Glide>
             </span>
           </h1>
+          <Lede key={`lede-${e.id}`} id={e.id} />
         </div>
         <div className="flex min-w-0 items-center gap-2">
           <div className="min-w-0 flex-1 lg:w-[440px] lg:flex-none">
@@ -312,6 +314,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
       <div className="contents" style={{ visibility: id === at ? undefined : 'hidden' }}>
         {children}
       </div>
+      <Examples key={`examples-${e.id}`} id={e.id} tone={FAMILY_TONE[family.id] ?? 'blue'} />
       </div>
       </BenchProvider>
 
@@ -339,6 +342,7 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
         </section>
       )}
 
+      <Questions key={`questions-${e.id}`} id={e.id} />
       {BESIDE[e.id] && <Beside key={`beside-${e.id}`} id={BESIDE[e.id]} />}
 
       {!pro && <ProPitch id={e.id} />}

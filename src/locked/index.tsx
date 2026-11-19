@@ -21,6 +21,8 @@ export const PRO_DEMOS: Record<string, ComponentType> = each(PRO_COMPONENTS, Loc
 
 export const preloadProDemo = (id: string) => void id
 
+export const PRO_EXAMPLES: Record<string, ComponentType> = {}
+
 export const SPOTS: Record<string, ComponentType> = {}
 
 export const BLOCK_VIEWS: Record<string, ComponentType<{ autoplay?: boolean }>> = { ...each(BLOCKS.map((b) => b.id), Locked), ...FREE_BLOCK_VIEWS }

@@ -15,11 +15,11 @@ import { libraryIndex } from '@/site/home/library'
 import { Plans } from '@/site/pro/Plans'
 import { Running } from '@/site/pro/Running'
 import { Voices } from '@/site/Voices'
-import { DESCRIPTION, JsonLd, NAME, page, siteGraph } from '@/site/seo'
+import { BRAND, DESCRIPTION, JsonLd, page, siteGraph } from '@/site/seo'
 
 const SHOWN = block('settings')!
 
-export const metadata: Metadata = page({ title: `${NAME} — premium React components`, absolute: true, description: DESCRIPTION, path: '/' })
+export const metadata: Metadata = page({ title: `${BRAND}: React Components for shadcn and AI Apps`, absolute: true, description: DESCRIPTION, path: '/' })
 
 export default function Home() {
   const lib = libraryIndex()

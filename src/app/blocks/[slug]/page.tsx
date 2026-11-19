@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { BLOCKS, block } from '@/catalog/blocks'
 import { isProBlock } from '@/catalog/pro'
 import { JsonLd, crumbs, page, short } from '@/site/seo'
+import { SEARCH, searchDescription } from '@/catalog/search'
 
 export function generateStaticParams() {
   return BLOCKS.map((b) => ({ slug: b.id }))
@@ -12,7 +13,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<'/blocks/[slug]'>): Promise<Metadata> {
   const { slug } = await params
   const b = block(slug)
-  return b ? page({ title: `${b.name} — premium React block`, description: short(`${b.line} ${isProBlock(b.id) ? 'A Detent Pro block.' : 'Free under MIT.'}`), path: `/blocks/${b.id}` }) : {}
+  return b ? page({ title: SEARCH[b.id] ?? `${b.name}: React block`, description: short(searchDescription(b.id, b.line, isProBlock(b.id))), path: `/blocks/${b.id}` }) : {}
 }
 
 export default function BlockPage({ params }: PageProps<'/blocks/[slug]'>) {

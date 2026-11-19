@@ -5,6 +5,8 @@ import { BLOCKS } from '@/catalog/blocks'
 import { TEMPLATE_COUNT } from '@/catalog/templates'
 
 export const NAME = 'Detent'
+/** What titles and share cards say: "Detent" alone collides with other products in search. */
+export const BRAND = 'Detent UI'
 export const TAGLINE = 'Make your product feel expensive.'
 export const FREE_COUNT = ENTRIES.length - PRO_COMPONENTS.length
 
@@ -15,11 +17,11 @@ export const url = (path = '/') => `${SITE}${path === '/' ? '' : path}`
 export const short = (s: string, n = 158) => (s.length <= n ? s : `${s.slice(0, s.lastIndexOf(' ', n - 1)).replace(/[,;:]$/, '')}…`)
 
 export function page({ title, description, path, absolute = false, noindex = false, image }: { title: string; description: string; path: string; absolute?: boolean; noindex?: boolean; image?: string }): Metadata {
-  const full = absolute ? title : `${title} · ${NAME}`
+  const full = absolute ? title : `${title} · ${BRAND}`
   const images = image ? { images: [{ url: image, width: 1200, height: 630, alt: full }] } : {}
   const mdUrl = path === '/' ? `${SITE}/index.md` : `${SITE}${path}.md`
   return {
-    title: absolute ? { absolute: title } : title,
+    title: { absolute: full },
     description,
     alternates: {
       canonical: path,
@@ -30,7 +32,7 @@ export function page({ title, description, path, absolute = false, noindex = fal
     other: {
       'ai-summary': description,
     },
-    openGraph: { title: full, description, url: path, siteName: NAME, type: 'website', locale: 'en_US', ...images },
+    openGraph: { title: full, description, url: path, siteName: BRAND, type: 'website', locale: 'en_US', ...images },
     twitter: { card: 'summary_large_image', site: '@next_gendev', creator: '@next_gendev', title: full, description, ...images },
     ...(noindex ? { robots: { index: false, follow: true } } : {}),
   }
@@ -40,13 +42,13 @@ export function JsonLd({ data }: { data: object }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, '\\u003c') }} />
 }
 
-const org = { '@type': 'Organization', '@id': `${url()}/#organization`, name: NAME, url: url(), logo: url('/icon.svg'), sameAs: ['https://x.com/next_gendev', 'https://github.com/ds-spec/detent-ui'] }
+const org = { '@type': 'Organization', '@id': `${url()}/#organization`, name: NAME, alternateName: BRAND, url: url(), logo: url('/icon.svg'), sameAs: ['https://x.com/next_gendev', 'https://github.com/ds-spec/detent-ui'] }
 
 export const siteGraph = () => ({
   '@context': 'https://schema.org',
   '@graph': [
     org,
-    { '@type': 'WebSite', '@id': `${url()}/#website`, name: NAME, url: url(), description: DESCRIPTION, publisher: { '@id': `${url()}/#organization` }, inLanguage: 'en' },
+    { '@type': 'WebSite', '@id': `${url()}/#website`, name: NAME, alternateName: BRAND, url: url(), description: DESCRIPTION, publisher: { '@id': `${url()}/#organization` }, inLanguage: 'en' },
     {
       '@type': 'SoftwareApplication',
       name: NAME,
@@ -83,6 +85,13 @@ export const list = (name: string, items: { name: string; path: string }[]) => (
   name,
   numberOfItems: items.length,
   itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, name: it.name, url: url(it.path) })),
+})
+
+/** FAQPage for questions shown on the page; the text must match what's visible. */
+export const faqPage = (faq: [string, string][]) => ({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a.replace(/`/g, '') } })),
 })
 
 export const crumbs = (trail: [string, string][]) => ({
