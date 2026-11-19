@@ -5,10 +5,17 @@ import { RELEASES } from '@/catalog/trust'
 import { BLOCKS } from '@/catalog/blocks'
 import { url } from '@/site/seo'
 import { TEMPLATES } from '@/catalog/templates'
+// Filled from git by scripts/build-lastmod.mjs at deploy; empty in the repo, so dev falls back to the last release.
+import LASTMOD from '@/catalog/lastmod.json'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date(`${RELEASES[0].date}T00:00:00Z`)
-  const at = (path: string, priority: number, changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'] = 'weekly') => ({ url: url(path), lastModified, changeFrequency, priority })
+  const days: Record<string, string> = LASTMOD
+  const at = (path: string, priority: number, changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'] = 'weekly') => ({
+    url: url(path),
+    lastModified: new Date(`${days[path] ?? RELEASES[0].date}T00:00:00Z`),
+    changeFrequency,
+    priority,
+  })
   return [
     at('/', 1, 'daily'),
     at('/pro', 0.9),
