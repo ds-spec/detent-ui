@@ -41,11 +41,7 @@ export function useMe() {
         document.cookie = 'detent.in=; Max-Age=0; path=/'
       }
       if (found) {
-        posthog.identify(found.id, {
-          email: found.email,
-          name: found.name,
-          plan: found.plan,
-        })
+        posthog.identify(found.id, { plan: found.plan })
       }
       setMe(found)
     })

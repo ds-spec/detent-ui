@@ -137,7 +137,7 @@ export function WhatBuilding() {
     const result = recipe ? recipePicks(recipe) : match(goal, 6)
     if (tracked.current !== goal) {
       tracked.current = goal
-      track('build_match', { query: goal.slice(0, 200), empty: result.length ? 'no' : 'yes', found: result.length, plan: recipe?.id ?? 'none', picks: result.map((p) => p.id).join(',') || 'none', pro: hasPro ? 'owner' : 'free' })
+      track('build_match', { query: goal.replace(/\S+@\S+/g, '[email]').replace(/\+?\d[\d\s-]{6,}\d/g, '[number]').slice(0, 200), empty: result.length ? 'no' : 'yes', found: result.length, plan: recipe?.id ?? 'none', picks: result.map((p) => p.id).join(',') || 'none', pro: hasPro ? 'owner' : 'free' })
     }
     later(() => {
       if (me !== run.current) return

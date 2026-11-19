@@ -66,9 +66,9 @@ export async function POST(req: Request) {
   const account = typeof data?.metadata?.detent_user === 'string' ? await emailOfAccount(data.metadata.detent_user) : null
   const email = account ?? normalEmail(data?.customer?.email) ?? ''
   /* Signed-in buyer: their account id. Guest: the PostHog visitor id from checkout, so the purchase joins
-     the same person as their page views. Email only when neither exists. */
+     the same person as their page views. Neither: the payment id, never the email. */
   const visitor = typeof data?.metadata?.visitor === 'string' ? data.metadata.visitor : null
-  const person = typeof data?.metadata?.detent_user === 'string' ? data.metadata.detent_user : (visitor ?? email)
+  const person = typeof data?.metadata?.detent_user === 'string' ? data.metadata.detent_user : (visitor ?? `payment-${id ?? 'unknown'}`)
   const from = sourceOfPayment(data?.metadata)
 
   if (type === 'payment.succeeded') {
@@ -83,7 +83,7 @@ export async function POST(req: Request) {
       revenue: typeof cents === 'number' ? cents / 100 : undefined,
       currency: data?.settlement_currency ?? data?.currency,
       ...from,
-      $set: { email, customer: true, plan },
+      $set: { customer: true, plan },
       $set_once: { first_source: from.source, first_campaign: from.campaign, first_referrer: from.referrer, bought_from: from.last_source ?? from.source },
     })
     await welcome(email, !!account)
