@@ -55,16 +55,6 @@ export default function ProPage() {
           </div>
         </section>
 
-        <section id="touch" aria-labelledby="touch-title" className="mx-auto mt-28 max-w-[1360px] scroll-mt-24 px-5 sm:mt-36 sm:px-6">
-          <h2 id="touch-title" className={H2}>
-            Take a closer look.
-            <span className="block text-quiet">These are yours with Pro.</span>
-          </h2>
-          <div className="mt-10 sm:mt-14">
-            <Touch />
-          </div>
-        </section>
-
         <section id="built" aria-labelledby="built-title" className="mx-auto mt-28 max-w-[1360px] scroll-mt-24 px-5 sm:mt-36 sm:px-6">
           <h2 id="built-title" className={H2}>
             One prompt. The whole page.
@@ -72,6 +62,16 @@ export default function ProPage() {
           </h2>
           <div className="mt-10 sm:mt-14">
             <Built />
+          </div>
+        </section>
+
+        <section id="touch" aria-labelledby="touch-title" className="mx-auto mt-28 max-w-[1360px] scroll-mt-24 px-5 sm:mt-36 sm:px-6">
+          <h2 id="touch-title" className={H2}>
+            Take a closer look.
+            <span className="block text-quiet">These are yours with Pro.</span>
+          </h2>
+          <div className="mt-10 sm:mt-14">
+            <Touch />
           </div>
         </section>
 
