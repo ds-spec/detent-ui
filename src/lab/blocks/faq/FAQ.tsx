@@ -23,20 +23,22 @@ export type FAQProps = BlockProps & {
   subline?: string
   questions?: Question[]
   multiple?: boolean
+  contact?: { title: string; line: string; action: string; name?: string } | false
   onAsk?: (query: string) => void
   onContact?: () => void
   onFeedback?: (id: string, helpful: boolean) => void
 }
 
 export function FAQ({
-  autoplay = true,
+  autoplay = false,
   accent,
   product = 'Detent',
   eyebrow = 'Questions',
   title = ['Everything you’d ask', 'before you start.'],
-  subline = 'Search, or browse by topic. If it isn’t here, a person on the team will answer, usually within the hour.',
+  subline = 'Search, or browse by topic. If it isn’t here, ask the team.',
   questions: given,
   multiple = false,
+  contact = { title: 'Still stuck?', line: 'Ask the team and a person will answer.', action: 'Talk to a person' },
   onAsk,
   onContact,
   onFeedback,
@@ -132,16 +134,18 @@ export function FAQ({
             {words.length ? (shown.length ? `${shown.length} ${shown.length === 1 ? 'answer' : 'answers'} for “${query.trim()}”` : `Nothing for “${query.trim()}” yet`) : `${questions.length} questions`}
           </p>
 
-          <div className="mt-8 flex items-start gap-3 rounded-[16px] bg-[var(--card)] p-4 shadow-[0_0_0_1px_var(--line)]">
-            <Orb seed="Maya Chen" hue={150} size={32} />
-            <div className="min-w-0 flex-1">
-              <p className="text-callout font-medium text-ink">Still stuck?</p>
-              <p className="mt-0.5 text-footnote text-ink-2">Maya and the team answer in under an hour on weekdays.</p>
-              <motion.button type="button" whileTap={press} onClick={() => (tap(), calls.current.onContact?.())} className={`${btn.secondary} mt-3`}>
-                Talk to a person
-              </motion.button>
+          {contact && (
+            <div className="mt-8 flex items-start gap-3 rounded-[16px] bg-[var(--card)] p-4 shadow-[0_0_0_1px_var(--line)]">
+              <Orb seed={contact.name ?? product} hue={150} size={32} />
+              <div className="min-w-0 flex-1">
+                <p className="text-callout font-medium text-ink">{contact.title}</p>
+                <p className="mt-0.5 text-footnote text-ink-2">{contact.line}</p>
+                <motion.button type="button" whileTap={press} onClick={() => (tap(), calls.current.onContact?.())} className={`${btn.secondary} mt-3`}>
+                  {contact.action}
+                </motion.button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="min-w-0">

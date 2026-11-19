@@ -24,7 +24,7 @@ export type TestimonialsProps = BlockProps & {
 }
 
 export function Testimonials({
-  autoplay = true,
+  autoplay = false,
   accent,
   product = 'Detent',
   eyebrow = 'Customers',

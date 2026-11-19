@@ -45,7 +45,7 @@ export function MetricExplainer({
   defaultMetric?: string
   onMetricChange?: (id: string) => void
   period?: string
-  width?: number
+  width?: number | string
   footer?: ReactNode
   highlight?: string | null
   tabs?: boolean

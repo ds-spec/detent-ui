@@ -126,7 +126,7 @@ export function OutlookChart({ history, forecast, format = (n) => n.toLocaleStri
   const range = `${format(f.low)} to ${format(f.high)}${unit ? ` ${unit}` : ''}`
   const labels = [...history.map((p) => p.label), ...forecast.map((p) => p.label)]
   const room = Math.max(1, Math.ceil(n / (w / 92 || 1)))
-  const every = Math.ceil(room / 7) * 7
+  const every = n <= 7 ? room : Math.ceil(room / 7) * 7
   useLayoutEffect(() => {
     latest.current = { n, edge, ahead, pick }
   })
@@ -190,7 +190,7 @@ export function OutlookChart({ history, forecast, format = (n) => n.toLocaleStri
               <line x1={0} x2={w} y1={H - B + 0.5} y2={H - B + 0.5} stroke="var(--line)" />
               {labels.map((l, i) =>
                 i % every === 0 ? (
-                  <text key={l} x={X(i)} y={H - 4} textAnchor={i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'} className={AXIS}>
+                  <text key={i} x={X(i)} y={H - 4} textAnchor={i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'} className={AXIS}>
                     {l}
                   </text>
                 ) : null,

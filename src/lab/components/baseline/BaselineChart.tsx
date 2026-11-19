@@ -128,7 +128,7 @@ export function BaselineChart({ data, start = 0, format = (n) => n.toLocaleStrin
   const said = back ? `${data[end].label} was ${than} than ${data[from].label}` : `Since ${data[from].label}, ${word} by ${data[end].label}`
   const filter = (name: string) => (look === 'ink' ? `url(#${id}${name})` : undefined)
   const room = Math.max(1, Math.ceil((last + 1) / (w / 92 || 1)))
-  const every = Math.ceil(room / 7) * 7
+  const every = last + 1 <= 7 ? room : Math.ceil(room / 7) * 7
   const latest = useRef({ last, choose, point })
   useLayoutEffect(() => {
     latest.current = { last, choose, point }
@@ -229,7 +229,7 @@ export function BaselineChart({ data, start = 0, format = (n) => n.toLocaleStrin
               <line x1={0} x2={w} y1={H - B + 0.5} y2={H - B + 0.5} stroke="var(--line)" />
               {data.map((d, i) =>
                 i % every === 0 ? (
-                  <text key={d.label} x={X(i)} y={H - 4} textAnchor={i === 0 ? 'start' : i === last ? 'end' : 'middle'} className={AXIS}>
+                  <text key={i} x={X(i)} y={H - 4} textAnchor={i === 0 ? 'start' : i === last ? 'end' : 'middle'} className={AXIS}>
                     {d.label}
                   </text>
                 ) : null,

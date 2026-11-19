@@ -71,6 +71,7 @@ export function Shift({
   defaultView = 'list',
   onViewChange,
   format = count,
+  width = 380,
 }: {
   title: string
   items: ShiftItem[]
@@ -82,6 +83,7 @@ export function Shift({
   defaultView?: ShiftView
   onViewChange?: (view: ShiftView) => void
   format?: (n: number) => string
+  width?: number | string
 }) {
   const [own, setOwn] = useState<ShiftView>(defaultView)
   const view = controlled ?? own
@@ -112,7 +114,7 @@ export function Shift({
 
   return (
     <MotionConfig transition={reduce ? { duration: 0 } : MOVE}>
-      <div className="w-full max-w-[380px] rounded-[22px] bg-[light-dark(#f4f4f5,#1c1c1f)] p-1.5 shadow-[0_0_0_1px_light-dark(rgb(0_0_0/.06),rgb(255_255_255/.06))]">
+      <div style={{ maxWidth: width }} className="w-full rounded-[22px] bg-[light-dark(#f4f4f5,#1c1c1f)] p-1.5 shadow-[0_0_0_1px_light-dark(rgb(0_0_0/.06),rgb(255_255_255/.06))]">
         <div className="flex items-center justify-between gap-3 py-1 pl-3 pr-0.5">
           <h3 className="truncate text-[13px] font-medium text-ink">{title}</h3>
           <Switch view={view} set={set} scope={scope} />

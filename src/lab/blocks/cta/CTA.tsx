@@ -38,13 +38,21 @@ export type CTAProps = BlockProps & {
   action?: string
   note?: string
   tickets?: Ticket[]
+  assurances?: { label: string; icon?: 'shield' | 'lock' | 'check' }[]
+  queueLabel?: string
+  resolved?: number
+  sentTitle?: string
+  sentLine?: string
+  failed?: string
   onSubmit?: (email: string) => Promise<void> | void
 }
+
+const MARK = { shield: Shield, lock: Lock, check: Check }
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
 export function CTA({
-  autoplay = true,
+  autoplay = false,
   accent,
   product = 'Detent',
   title = ['Give it your queue.', 'Keep your weekends.'],
@@ -53,6 +61,12 @@ export function CTA({
   action = 'Start free',
   note = 'Free for 500 conversations a month. No card needed.',
   tickets = TICKETS,
+  assurances = [],
+  queueLabel = 'Example queue',
+  resolved,
+  sentTitle = 'You’re on the list',
+  sentLine = 'We’ll be in touch at',
+  failed = 'That didn’t go through. Try again in a moment.',
   onSubmit,
   className = '',
 }: CTAProps) {
@@ -64,6 +78,7 @@ export function CTA({
   const [email, setEmail] = useState('')
   const [phase, setPhase] = useState<'idle' | 'sending' | 'sent'>('idle')
   const [bad, setBad] = useState(false)
+  const [error, setError] = useState(false)
   const [pressed, setPressed] = useState(false)
   const shake = useAnimationControls()
 
@@ -75,8 +90,14 @@ export function CTA({
       return
     }
     setPhase('sending')
-    await Promise.all([handed.current ? calls.current.onSubmit?.(email) : undefined, new Promise((r) => setTimeout(r, 900))])
-    setPhase('sent')
+    setError(false)
+    try {
+      await Promise.all([handed.current ? calls.current.onSubmit?.(email) : undefined, new Promise((r) => setTimeout(r, 900))])
+      setPhase('sent')
+    } catch {
+      setPhase('idle')
+      setError(true)
+    }
   }
   const latest = useRef(submit)
   useLayoutEffect(() => {
@@ -142,6 +163,7 @@ export function CTA({
                     onChange={(e) => {
                       setEmail(e.target.value)
                       setBad(false)
+                      setError(false)
                     }}
                     placeholder={placeholder}
                     aria-label="Work email"
@@ -164,9 +186,9 @@ export function CTA({
                 <div aria-live="polite" className={`${cell(phase === 'sent')} flex min-h-12 items-center gap-3`}>
                   <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[var(--ok)] text-white">{phase === 'sent' && <DrawnCheck size={15} strokeWidth={3} />}</span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-callout font-medium text-ink">Check your inbox</span>
+                    <span className="block text-callout font-medium text-ink">{sentTitle}</span>
                     <span className="block text-footnote text-ink-2 @3xl:truncate">
-                      Your sign-in link is on its way to <span className="text-ink">{email}</span>
+                      {sentLine} <span className="text-ink">{email}</span>
                     </span>
                   </span>
                   <button type="button" tabIndex={phase === 'sent' ? 0 : -1} onClick={() => (tap(), reset())} className={`${btn.ghost} shrink-0`}>
@@ -174,22 +196,23 @@ export function CTA({
                   </button>
                 </div>
               </div>
-              <p className="mt-3 min-h-5 text-caption @4xl:h-5 @4xl:px-5">{bad ? <span className="text-[color-mix(in_oklch,var(--warn)_70%,var(--ink))]">That doesn’t look like an email yet.</span> : <span className="text-ink-3">{note}</span>}</p>
+              <p className="mt-3 min-h-5 text-caption @4xl:h-5 @4xl:px-5">{bad || error ? <span role={error ? 'alert' : undefined} className="text-[color-mix(in_oklch,var(--warn)_70%,var(--ink))]">{bad ? 'That doesn’t look like an email yet.' : failed}</span> : <span className="text-ink-3">{note}</span>}</p>
 
-              <ul className="mt-8 flex flex-col gap-x-5 gap-y-2.5 text-footnote leading-5 text-ink-3 @md:flex-row @md:flex-wrap [&_svg]:shrink-0">
-                <li className="flex items-center gap-1.5">
-                  <Shield size={15} /> SOC 2 Type II
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <Lock size={15} /> Never trains on your data
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <Check size={15} /> Cancel any time
-                </li>
-              </ul>
+              {assurances.length > 0 && (
+                <ul className="mt-8 flex flex-col gap-x-5 gap-y-2.5 text-footnote leading-5 text-ink-3 @md:flex-row @md:flex-wrap [&_svg]:shrink-0">
+                  {assurances.map(({ label, icon = 'check' }) => {
+                    const Icon = MARK[icon]
+                    return (
+                      <li key={label} className="flex items-center gap-1.5">
+                        <Icon size={15} /> {label}
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
             </div>
 
-            <Queue tickets={tickets} product={product} />
+            <Queue tickets={tickets} product={product} label={queueLabel} resolved={resolved} />
           </div>
         </section>
       </div>
@@ -202,7 +225,7 @@ const AREA = 336
 const LINE = 176
 const SPEED = 26
 
-function Queue({ tickets, product }: { tickets: Ticket[]; product: string }) {
+function Queue({ tickets, product, label, resolved }: { tickets: Ticket[]; product: string; label: string; resolved?: number }) {
   const reduce = useReducedMotion()
   const box = useRef<HTMLDivElement>(null)
   const seen = useInView(box)
@@ -211,7 +234,7 @@ function Queue({ tickets, product }: { tickets: Ticket[]; product: string }) {
   const loop = tickets.length * ROW
   const over = (d: number) => Math.floor((LINE + d - 20) / ROW)
   const last = useRef(over(0))
-  const [count, setCount] = useState(1284)
+  const [count, setCount] = useState(resolved ?? 0)
   useAnimationFrame((_, delta) => {
     if (reduce || !seen) return
     dist.current += (Math.min(delta, 64) * SPEED) / 1000
@@ -228,14 +251,18 @@ function Queue({ tickets, product }: { tickets: Ticket[]; product: string }) {
     <div className="relative flex flex-col shadow-[inset_0_1px_0_var(--line)] @4xl:shadow-[inset_1px_0_0_var(--line)]" style={{ background: fade }}>
       <div className="flex h-12 items-center justify-between px-5 text-footnote">
         <span className="text-ink-3">
-          Resolved today
-          <span className="tnum ml-1.5 font-medium text-ink">
-            <Count value={count} format={(n) => Math.round(n).toLocaleString('en-US')} duration={0.4} />
+          {label}
+          {resolved !== undefined && (
+            <span className="tnum ml-1.5 font-medium text-ink">
+              <Count value={count} format={(n) => Math.round(n).toLocaleString('en-US')} duration={0.4} />
+            </span>
+          )}
+        </span>
+        {resolved !== undefined && (
+          <span className="flex items-center gap-1.5 text-caption text-ink-3">
+            <span className="size-1.5 rounded-full bg-[var(--ok)] motion-safe:animate-pulse" /> Live
           </span>
-        </span>
-        <span className="flex items-center gap-1.5 text-caption text-ink-3">
-          <span className="size-1.5 rounded-full bg-[var(--ok)] motion-safe:animate-pulse" /> Live
-        </span>
+        )}
       </div>
       <div ref={box} aria-hidden className="relative my-auto overflow-hidden" style={{ height: AREA }}>
         <div className="absolute inset-x-0 top-0 overflow-hidden" style={{ height: LINE }}>

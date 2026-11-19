@@ -154,6 +154,7 @@ export const BLOCKS: Block[] = [
     ],
     keys: [['← →', 'Next or previous customer']],
     props: [
+      { name: 'autoplay', type: 'boolean', default: 'false', note: 'Plays the scripted demo the site shows. Leave it off on a real page.' },
       { ...product, default: "'Detent'", note: 'The product’s name, on the after side of each receipt.' },
       { name: 'stories', type: 'Story[]', note: 'The featured customers: name, role, company, hue, quote, and the metric with its before and after. In a quote, {braces} mark the phrase to highlight.' },
       { name: 'quotes', type: 'Short[]', note: 'The wall: name, role, company, hue, a short quote and its result.' },
@@ -183,6 +184,7 @@ export const BLOCKS: Block[] = [
       ['Esc', 'Clear the search'],
     ],
     props: [
+      { name: 'autoplay', type: 'boolean', default: 'false', note: 'Plays the scripted demo the site shows. Leave it off on a real page.' },
       { ...product, note: 'The product’s name, wherever the default questions name it.' },
       { name: 'questions', type: '{ id, topic, q, a }[]', note: 'The questions. Topics come from them, in the order they first appear.' },
       { name: 'multiple', type: 'boolean', default: 'false', note: 'Let more than one answer be open at once.' },
@@ -190,6 +192,7 @@ export const BLOCKS: Block[] = [
       { name: 'title', type: '[string, string]', note: 'The heading, set in two tones.' },
       { name: 'subline', type: 'string', note: 'One sentence under the heading.' },
       { name: 'onAsk', type: '(query: string) => void', note: 'Called with what a person searched for when nothing answers it.' },
+      { name: 'contact', type: '{ title, line, action, name? } | false', note: 'The card under the search: its heading, one line on how to reach a person, and the button. Say only what is true of your team. false hides it.' },
       { name: 'onContact', type: '() => void', note: 'Called when a person asks to talk to someone.' },
       { name: 'onFeedback', type: '(id: string, helpful: boolean) => void', note: 'Called when a person says whether an answer helped. The script doesn’t call it.' },
     ],
@@ -211,6 +214,7 @@ export const BLOCKS: Block[] = [
       'Below 896px the queue sits under the form. With reduced motion it holds still.',
     ],
     props: [
+      { name: 'autoplay', type: 'boolean', default: 'false', note: 'Plays the scripted demo the site shows. Leave it off on a real page.' },
       { ...product, default: "'Detent'", note: 'The product’s name, on its line through the queue and in the sentence under the heading.' },
       { name: 'title', type: '[string, string]', note: 'The heading, set in two tones.' },
       { name: 'subline', type: 'string', note: 'One sentence under the heading.' },
@@ -218,7 +222,13 @@ export const BLOCKS: Block[] = [
       { name: 'placeholder', type: 'string', default: "'you@company.com'", note: 'Shown in the field while it’s empty.' },
       { name: 'note', type: 'string', note: 'The small line under the field.' },
       { name: 'tickets', type: '{ from, hue, text, outcome, handed? }[]', note: 'The tickets in the queue: who, what they asked, and how it ended.' },
-      { name: 'onSubmit', type: '(email: string) => Promise<void> | void', note: 'Called with the email a person starts with. Return a promise to keep the button busy until it settles.' },
+      { name: 'assurances', type: "{ label, icon?: 'shield' | 'lock' | 'check' }[]", default: '[]', note: 'Short promises under the field, like “Cancel any time”. List only what is true; empty shows none.' },
+      { name: 'queueLabel', type: 'string', default: "'Example queue'", note: 'The heading over the queue.' },
+      { name: 'resolved', type: 'number', note: 'A real count to show beside the heading, with a Live dot. Leave it out unless the number is real.' },
+      { name: 'sentTitle', type: 'string', default: "'You’re on the list'", note: 'The heading once the email is sent.' },
+      { name: 'sentLine', type: 'string', default: "'We’ll be in touch at'", note: 'The line before the email once it is sent, like “Your sign-in link is on its way to”.' },
+      { name: 'failed', type: 'string', note: 'Shown under the field when onSubmit rejects; the field is ready to try again.' },
+      { name: 'onSubmit', type: '(email: string) => Promise<void> | void', note: 'Called with the email a person starts with. Return a promise to keep the button busy until it settles; reject it and the field says it failed.' },
     ],
   },
   {
