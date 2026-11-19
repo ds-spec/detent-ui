@@ -65,23 +65,34 @@ export function buildPrompt(goal: string, picks: Chosen[], hasPro = false): stri
   const without = allPro && !alts.length
     ? `- If I don't, don't install ${picks.length === 1 ? 'it' : 'them'} or make up a key. Build what I described with this project's own components instead, and tell me in one line what ${picks.length === 1 ? 'it' : 'the Pro pieces'} would have added (${SITE}/pro).`
     : `- If I don't, don't install the Pro ones or make up a key: ${alts.length ? 'use the free fallback where one is listed, ' : ''}build the rest with the free pieces and this project's own components, and at the end tell me in one line what each skipped piece would have added (its page says what it does).`
-  const pro = !pros.length
-    ? []
-    : hasPro
-      ? [`I have Detent Pro. If the @detent-pro registry isn't set up here yet, follow ${PRO_SETUP_MD} first (ask me for my key).`]
+  const pro = hasPro
+    ? [`I have Detent Pro. If the @detent-pro registry isn't set up here yet, follow ${PRO_SETUP_MD} first (ask me for my key).`]
+    : !pros.length
+      ? []
       : [`${allPro ? (picks.length === 1 ? 'This is' : 'These are all') : 'Some of these are'} Detent Pro (marked Pro below). Ask me if I have a Detent Pro key.`, `- If I do, follow ${PRO_SETUP_MD} first.`, without]
   return [
-    `I'm building: ${goalOf(goal)}. Build what I described, finished and working, using the Detent component library for it.`,
+    hasPro
+      ? `I'm building: ${goalOf(goal)}. Build the whole thing, finished and working, not just the components. Use the Detent component library for it.`
+      : `I'm building: ${goalOf(goal)}. Build what I described, finished and working, using the Detent component library for it.`,
     '',
     `If Detent isn't set up in this project yet, fetch ${SETUP_MD} and follow it first.`,
     ...pro,
     '',
-    'These Detent pieces fit it. Fetch each page and follow its "For agents" steps:',
-    ...picks.map(line),
-    '',
-    hasPro
-      ? `If what I described is a page, a flow or an app, build all of it: run \`npx shadcn@latest add @detent-pro/plans\` and follow .detent/plans/guide.md for the layout and the parts these pieces don't cover.`
-      : "Place each one as its page's Placement section says, inside this project's own layout.",
+    ...(hasPro
+      ? [
+          `Run \`npx shadcn@latest add @detent-pro/plans\` and read .detent/plans/guide.md first. If one of its page plans is close to what I described, install that plan and follow it. If none is, plan the sections yourself the way the guide says.`,
+          '',
+          `These Detent pieces fit it. Use them, and add any others from ${SITE}/agents.md that fit a section. Install each by fetching its page and following its "For agents" steps:`,
+          ...picks.map(line),
+          '',
+          "Build every section. Place each piece as its page's Placement section says, and build the parts Detent has no piece for with this project's own components, styled with the Detent theme tokens so it reads as one product.",
+        ]
+      : [
+          'These Detent pieces fit it. Fetch each page and follow its "For agents" steps:',
+          ...picks.map(line),
+          '',
+          "Place each one as its page's Placement section says, inside this project's own layout.",
+        ]),
     '',
     FINISH,
   ]
@@ -91,16 +102,23 @@ export function buildPrompt(goal: string, picks: Chosen[], hasPro = false): stri
 
 export function openPrompt(goal: string, hasPro = false): string {
   return [
-    `I'm building: ${goalOf(goal)}. Build what I described, finished and working, using the Detent component library where it fits.`,
+    hasPro
+      ? `I'm building: ${goalOf(goal)}. Build the whole thing, finished and working, not just the components. Use the Detent component library for it.`
+      : `I'm building: ${goalOf(goal)}. Build what I described, finished and working, using the Detent component library where it fits.`,
     '',
     `If Detent isn't set up in this project yet, fetch ${SETUP_MD} and follow it first.`,
-    hasPro
-      ? `I have Detent Pro. Run \`npx shadcn@latest add @detent-pro/plans\` and read .detent/plans/guide.md: it lists Detent's page plans and how to build a whole page. If one plan is close to what I described, install it and follow it, shaped to my product. If none is, plan the sections yourself and pick pieces from ${SITE}/agents.md. Tell me the sections and pieces you chose in a few lines, then build it.`
-      : `Then read ${SITE}/agents.md and pick the free Detent pieces that fit what I'm building. Tell me which ones you chose and why before adding them.`,
-    hasPro
-      ? `If the @detent-pro registry isn't set up here yet, follow ${PRO_SETUP_MD} first (ask me for my key).`
-      : `If any that fit are Detent Pro, ask me if I have a key. If I don't, use free pieces only, and tell me in one line what the Pro ones would have added (${SITE}/pro).`,
-    'Add each piece by fetching its page and following its "For agents" steps.',
+    ...(hasPro
+      ? [
+          `I have Detent Pro. If the @detent-pro registry isn't set up here yet, follow ${PRO_SETUP_MD} first (ask me for my key).`,
+          '',
+          `Run \`npx shadcn@latest add @detent-pro/plans\` and read .detent/plans/guide.md. If one of its page plans is close to what I described, install that plan and follow it, shaped to my product. If none is, plan the sections yourself the way the guide says and pick pieces from ${SITE}/agents.md.`,
+          'Build every section. Install each piece by fetching its page and following its "For agents" steps, and build the parts Detent has no piece for with this project\'s own components, styled with the Detent theme tokens.',
+        ]
+      : [
+          `Then read ${SITE}/agents.md and pick the free Detent pieces that fit what I'm building. Tell me which ones you chose and why before adding them.`,
+          `If any that fit are Detent Pro, ask me if I have a key. If I don't, use free pieces only, and tell me in one line what the Pro ones would have added (${SITE}/pro).`,
+          'Add each piece by fetching its page and following its "For agents" steps.',
+        ]),
     '',
     FINISH,
   ].join('\n')
