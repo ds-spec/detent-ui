@@ -7,6 +7,7 @@ import { TEMPLATE_COUNT, TEMPLATES } from '@/catalog/templates'
 import { CONTACT } from '@/catalog/trust'
 import { Check } from '@/lab/icons'
 import { BigBuy, BuyBar, BuyNote, BuyProvider, HeroHead, WideStage } from '@/site/pro/Buy'
+import { Built } from '@/site/pro/Built'
 import { Compare, Inside } from '@/site/pro/Inside'
 import { Install } from '@/site/pro/Install'
 import { Keys } from '@/site/pro/Keys'
@@ -61,6 +62,16 @@ export default function ProPage() {
           </h2>
           <div className="mt-10 sm:mt-14">
             <Touch />
+          </div>
+        </section>
+
+        <section id="built" aria-labelledby="built-title" className="mx-auto mt-28 max-w-[1360px] scroll-mt-24 px-5 sm:mt-36 sm:px-6">
+          <h2 id="built-title" className={H2}>
+            One prompt. The whole page.
+            <span className="block text-quiet">Your agent gets the plan, the pieces and the finish.</span>
+          </h2>
+          <div className="mt-10 sm:mt-14">
+            <Built />
           </div>
         </section>
 
