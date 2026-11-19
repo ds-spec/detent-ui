@@ -8,6 +8,7 @@ import { match, moreInPro, recipeFor, recipePicks } from '@/catalog/match'
 import type { Pick } from '@/catalog/match'
 import { buildPrompt, openPrompt, partsPrompt, planPrompt } from '@/catalog/prompts'
 import type { Recipe } from '@/catalog/recipes'
+import { builtFor } from '@/catalog/built'
 import { ArrowUpRight, Check, Copy, Prompt } from '@/lab/icons'
 import { PLANS } from '@/catalog/pro'
 import { useOwned } from '../Owned'
@@ -46,6 +47,27 @@ function Tag({ pro }: { pro: boolean }) {
     <span className={`inline-flex h-[18px] items-center rounded-[5px] px-1.5 text-[11px] font-medium ${pro ? 'bg-[var(--i-ink)] text-[var(--i-ink-on)]' : 'bg-[var(--i-tray)] text-[var(--i-t2)]'}`}>
       {pro ? 'Pro' : 'Free'}
     </span>
+  )
+}
+
+function SeeBuilt({ plan }: { plan: Recipe }) {
+  const { example, exact } = builtFor(plan.id)
+  return (
+    <Link
+      href={`/pro?built=${example.plan}#built`}
+      data-cta="build-see-built"
+      className={`group/see mx-1.5 mb-1.5 flex items-center gap-3 rounded-[14px] px-3 py-2 transition-colors duration-150 hover:bg-[var(--i-hover)] ${FOCUS}`}
+    >
+      <span className="relative h-9 w-14 shrink-0 overflow-hidden rounded-[6px] bg-[var(--i-sheet)] shadow-[0_0_0_0.5px_var(--i-edge)]">
+        <img src={example.shot.light} alt="" width={56} height={36} loading="lazy" decoding="async" className="size-full object-cover object-top dark:hidden" />
+        <img src={example.shot.dark} alt="" width={56} height={36} loading="lazy" decoding="async" className="hidden size-full object-cover object-top dark:block" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[12.5px] font-medium text-[var(--i-t1)]">{exact ? 'See what Pro builds from this' : 'See a page Pro built from one prompt'}</span>
+        <span className="block truncate text-[12px] text-[var(--i-t3)]">{exact ? `The whole ${plan.noun}, from the same words` : `${example.label}, from one prompt`}</span>
+      </span>
+      <ArrowUpRight size={12} className="shrink-0 text-[var(--i-t3)] transition-transform duration-150 group-hover/see:-translate-y-px group-hover/see:translate-x-px" />
+    </Link>
   )
 }
 
@@ -290,8 +312,11 @@ export function WhatBuilding() {
                   <p className="mt-1 text-[12.5px] leading-[1.5] text-[var(--i-t3)]">The prompt has it read Detent’s index, pick what fits what you’re building, and check with you before adding anything.</p>
                 </div>
               )}
-              {gated && (
-                <p className="mx-3 mb-3 rounded-[12px] bg-[var(--i-tray)] px-3 py-2 text-[12.5px] leading-[1.5] text-[var(--i-t2)]">All free and MIT, nothing to buy.</p>
+              {gated && plan && (
+                <>
+                  <p className="mx-3 mb-1.5 rounded-[12px] bg-[var(--i-tray)] px-3 py-2 text-[12.5px] leading-[1.5] text-[var(--i-t2)]">All free and MIT, nothing to buy.</p>
+                  <SeeBuilt plan={plan} />
+                </>
               )}
               {!gated && picks.length > 0 && !pros && (
                 <p className="mx-3 mb-3 rounded-[12px] bg-[var(--i-tray)] px-3 py-2 text-[12.5px] leading-[1.5] text-[var(--i-t2)]">
