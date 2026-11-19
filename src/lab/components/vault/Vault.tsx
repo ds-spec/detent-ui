@@ -64,13 +64,14 @@ export function Vault({
   const [mode, setMode] = useState<Mode>('deposit')
   const [menu, setMenu] = useState(false)
   const [linked, setLinked] = useState(connected)
-  const t = list[ti]
+  const [before, setBefore] = useState<Token[] | null>(null)
+  const [phase, setPhase] = useState<Phase>('idle')
+  const t = (phase === 'done' && before ? before : list)[ti]
   const half = (cap: number, tok: Token) => Math.floor(cap / 2 / tok.step) * tok.step
   const cap = (m: Mode, tok: Token) => (m === 'deposit' ? Math.max(0, Math.floor((tok.wallet - (tok.reserve ?? 0)) / tok.step) * tok.step) : tok.vault)
   const nice = (m: Mode, tok: Token) => Math.min(cap(m, tok), half(m === 'deposit' ? tok.wallet : tok.vault, tok))
   const [amount, setAmount] = useState(nice('deposit', t))
   const [draft, setDraft] = useState<string | null>(null)
-  const [phase, setPhase] = useState<Phase>('idle')
   const [tx, setTx] = useState('')
   const [tick, setTick] = useState(0)
   const track = useRef<HTMLDivElement>(null)
@@ -130,6 +131,10 @@ export function Vault({
     const tok = l[i]
     setAmount(nice(m, tok))
     setDraft(null)
+    if (phase === 'done') {
+      setPhase('idle')
+      setBefore(null)
+    }
   }
 
   const submit = async () => {
@@ -147,13 +152,13 @@ export function Vault({
       return
     }
     const sign = mode === 'deposit' ? 1 : -1
+    setBefore(list)
     setList((l) => l.map((x, i) => (i === ti ? { ...x, vault: +(x.vault + sign * amount).toFixed(6), wallet: +(x.wallet - sign * amount).toFixed(6) } : x)))
     setTx(`${Math.random().toString(36).slice(2, 6)}…${Math.random().toString(36).slice(2, 6)}`)
     setPhase('done')
   }
 
   const finish = () => {
-    setPhase('idle')
     reset(mode, ti)
   }
 
@@ -198,7 +203,7 @@ export function Vault({
   const hint = !linked
     ? `Connect to deposit from your ${walletName} wallet`
     : phase === 'done'
-      ? `Vault now ${fmt(t.vault, t.dp)} ${t.sym}`
+      ? `Vault now ${fmt(list[ti].vault, t.dp)} ${t.sym}`
       : atMax
         ? `Max keeps ${t.reserve} ${t.sym} for network fees`
         : mode === 'deposit'
