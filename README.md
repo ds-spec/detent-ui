@@ -72,6 +72,9 @@ All 18 are MIT licensed.
 | [Slice text](https://detentui.com/components/slices) | Strips fly in and align into letters, then cut apart around the pointer | `slices` |
 | [Shift](https://detentui.com/components/shift) | Where your visitors come from, as a list, bars or change, with every number moving to its new place | `shift` |
 | [Live list](https://detentui.com/components/livelist) | A checklist your whole team writes in at once, each item arriving with who added it | `livelist` |
+| [AI calendar](https://detentui.com/components/week) | A compact week where you add events by typing them, with a live draft and clash warnings | `week` |
+| [Buddy](https://detentui.com/components/buddy) | A small face for your AI with moods that follow what people do | `buddy` |
+| [Vault](https://detentui.com/components/vault) | A web3 deposit and withdraw card with every wallet and chain state handled | `vault` |
 
 Swap the name into the command: `npx shadcn add https://detentui.com/r/<name>`.
 

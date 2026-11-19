@@ -33,6 +33,8 @@ const PRO_CODE = [
   'agent-canvas',
   'emoji',
   'mcp',
+  'agent-wallet',
+  'support-chat',
   'dotlight',
 ]
 

@@ -76,6 +76,9 @@ const FREE: Record<string, ComponentType> = {
   phrase: lazy('phrase', () => import('@/lab/demos/phrase').then((m) => m.PhraseDemo)),
   shift: lazy('shift', () => import('@/lab/demos/shift').then((m) => m.ShiftDemo)),
   livelist: lazy('livelist', () => import('@/lab/demos/livelist').then((m) => m.LiveListDemo)),
+  week: lazy('week', () => import('@/lab/demos/week').then((m) => m.WeekDemo)),
+  buddy: lazy('buddy', () => import('@/lab/demos/buddy').then((m) => m.BuddyDemo)),
+  vault: lazy('vault', () => import('@/lab/demos/vault').then((m) => m.VaultDemo)),
 }
 
 export const preloadDemo = (id: string) => void (loads[id] ?? (() => preloadProDemo(id)))()

@@ -866,5 +866,41 @@
     "onCreateKey": "Makes a key when \"Create one\" is pressed; return it and it lands in the config.",
     "defaultTransport": "Start on remote or local.",
     "defaultScope": "Start on this project or everywhere."
+  },
+  "week": {
+    "month": "The month label shown above the week.",
+    "dates": "The seven dates of the week shown, Monday first.",
+    "today": "Which of the seven days is today, 0 for Monday.",
+    "now": "The current time in minutes after midnight, for the Now line.",
+    "people": "People events can be with, keyed by the name typed: name, photo, tint and online.",
+    "events": "The events to start with: id, day 0 to 6, start and length in minutes, title, who and where.",
+    "onAdd": "Called with the new event when someone presses Enter on a draft."
+  },
+  "buddy": {
+    "size": "Width and height in pixels.",
+    "mood": "idle follows the pointer, listening looks down, thinking scans, happy smiles, sleepy droops.",
+    "tone": "ink, paper or blue.",
+    "label": "Text for screen readers. Leave it out when Buddy is decorative."
+  },
+  "vault": {
+    "tokens": "The tokens on offer with their price, wallet and vault balances, step, decimals, fee and explorer.",
+    "wallet": "The connected wallet address, shortened.",
+    "walletName": "The wallet app's name, used in Connect and signing text.",
+    "connected": "Whether the wallet starts connected.",
+    "apy": "The yearly rate used to show what a deposit earns.",
+    "onSubmit": "Runs the deposit or withdrawal and returns ok, declined or failed."
+  },
+  "agent-wallet": {
+    "agent": "The agent's name.",
+    "role": "What the agent does, under its name.",
+    "card": "The agent's virtual card, shortened."
+  },
+  "support-chat": {
+    "brand": "Your product's name, used in the greeting and placeholder.",
+    "name": "The signed-in person's first name for the greeting.",
+    "team": "The people a chat can be handed to: name, role, tint and photo.",
+    "examples": "Example questions that rotate on the welcome screen.",
+    "ask": "Answers a question with text, sources, follow-ups, an action or a handoff.",
+    "side": "Which bottom corner the launcher sits in."
   }
 }

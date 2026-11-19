@@ -69,6 +69,11 @@ const HINTS: [string[], Record<string, number>][] = [
   [['announcement', 'new', 'release', 'changelog'], { announce: 3 }],
   [['headline', 'title', 'typography', 'heading'], { slices: 3 }],
   [['glow', 'background', 'gradient', 'light'], { halo: 3 }],
+  [['calendar', 'schedule', 'event', 'meeting', 'week', 'planner'], { week: 4 }],
+  [['avatar', 'assistant', 'mascot', 'face', 'character'], { buddy: 3 }],
+  [['crypto', 'web3', 'wallet', 'deposit', 'withdraw', 'token', 'defi'], { vault: 4, 'agent-wallet': 1 }],
+  [['agent', 'budget', 'spend', 'payments', 'approve', 'limit'], { 'agent-wallet': 4 }],
+  [['support', 'help', 'helpdesk', 'intercom', 'widget', 'customer'], { 'support-chat': 4 }],
 ]
 
 /* A hint key of four letters or more also matches longer words it starts ("pric" catches pricing and price) */
