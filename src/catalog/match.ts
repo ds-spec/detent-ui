@@ -4,6 +4,8 @@ import { GUIDE } from './guide'
 import { BLOCKS } from './blocks'
 import { CATEGORIES, ENTRIES } from './meta'
 import { isProBlock, isProComponent } from './pro'
+import { RECIPES } from './recipes'
+import type { Recipe } from './recipes'
 
 export type Alt = { id: string; kind: 'components' | 'blocks'; name: string }
 export type Pick = { id: string; kind: 'components' | 'blocks'; name: string; pro: boolean; why: string; score: number; group: string; alt?: Alt }
@@ -12,8 +14,8 @@ type Doc = { id: string; kind: 'components' | 'blocks'; name: string; pro: boole
 
 const STOP = new Set('a an and app the for of to in on with my our your i we is it that this some page screen site want need build building make like using use where who what can into from just something thing'.split(' '))
 
-const stem = (w: string) => w.replace(/(ies)$/, 'y').replace(/(ing|ed|es|s)$/, '').replace(/'s$/, '')
-const words = (t: string) =>
+export const stem = (w: string) => w.replace(/(ies)$/, 'y').replace(/(ing|ed|es|s)$/, '').replace(/'s$/, '')
+export const words = (t: string) =>
   t
     .toLowerCase()
     .split(/[^a-z0-9]+/)
@@ -155,4 +157,32 @@ export function moreInPro(picks: Pick[]): { count: number; label: string } | nul
   }
   const blocks = BLOCKS.filter((b) => isProBlock(b.id)).length
   return blocks ? { count: blocks, label: 'whole screens' } : null
+}
+
+const hits = (w: string, k: string) => {
+  const sk = stem(k)
+  return w === sk || (sk.length >= 4 && w.startsWith(sk))
+}
+
+export function recipeFor(text: string): Recipe | null {
+  const asked = [...new Set(words(text))]
+  if (!asked.length) return null
+  let best: Recipe | null = null
+  let top = 0
+  for (const r of RECIPES) {
+    let s = 0
+    for (const [k, n] of Object.entries(r.triggers)) if (asked.some((w) => hits(w, k))) s += n
+    if (s > top) {
+      best = r
+      top = s
+    }
+  }
+  return top >= 3 ? best : null
+}
+
+export function recipePicks(r: Recipe): Pick[] {
+  return r.pieces.flatMap((id) => {
+    const d = DOCS.find((x) => x.id === id)
+    return d ? [{ id: d.id, kind: d.kind, name: d.name, pro: d.pro, why: d.why, score: 0, group: d.group }] : []
+  })
 }

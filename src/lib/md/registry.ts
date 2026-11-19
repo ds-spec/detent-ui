@@ -746,11 +746,13 @@ function renderSetup(): string {
   const steps = [
     'Check package.json: Detent needs React 19 and Tailwind CSS v4 (Next.js is what it is tested on). If either is missing or older, stop and tell the user what to upgrade.',
     'If the project root has no components.json, run `npx shadcn@latest init --defaults --yes` there.',
+    'Open the global stylesheet (in Next.js, app/globals.css). If shadcn init left `--font-sans: var(--font-sans)` (it points at itself, so the app font stops applying), set it to the font variable the root layout defines, for example `var(--font-geist-sans)`. Do the same for `--font-mono`.',
     `Install the Detent theme, which every piece draws with: \`npx shadcn@latest add ${SITE}/r/theme\``,
     'In the root layout (in Next.js, app/layout.tsx), wrap the children once in `<MotionConfig reducedMotion="user">` imported from motion/react, so every piece respects reduced motion. If motion isn\'t in package.json yet, run `npm i motion` first. Skip this if it is already there.',
+    'Detent and shadcn go dark from a `.dark` class on <html>. If nothing in the project sets it yet (look for next-themes or a theme script), install next-themes and wrap the root layout\'s children in `<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>`, with `suppressHydrationWarning` on <html>. Skip this if the project already handles its theme.',
     `Fetch ${abs('/agents.md')}. Append its contents to the end of AGENTS.md at the project root (or CLAUDE.md if that is what the project uses). If a block between <!-- detent:start --> and <!-- detent:end --> is already there, replace it instead of adding a second one.`,
     `If the task doesn\'t already say, ask the user if they have Detent Pro. If yes, follow ${PRO_SETUP_MD}.`,
-    `If the task already names the pieces, go on to them. Otherwise ask what they want to build first and suggest pieces from the index in AGENTS.md. Add each by fetching its page (${SITE}/components/<id>.md) and following its "For agents" steps.`,
+    `If the task names a Detent Pro plan or the pieces, go on to them. Otherwise ask what they want to build first and suggest pieces from the index in AGENTS.md. Add each by fetching its page (${SITE}/components/<id>.md) and following its "For agents" steps.`,
     'Run the project\'s typecheck (for example `npx tsc --noEmit`) and tell the user what changed.',
   ]
   return envelope({
@@ -791,6 +793,7 @@ function renderProSetup(): string {
     related: [{ label: 'Set up Detent', href: SETUP_MD }, { label: 'Pro', href: abs('/pro') }],
   })
 }
+
 
 const STATIC_ROUTES: Record<string, { render: () => string | null; desc: string; isStatic: boolean }> = {
   '/':            { render: renderHome,       desc: `${NAME} — premium React components`,              isStatic: true },

@@ -3,6 +3,7 @@ import { hasProItems, proItemByName } from '@/catalog/pro-items'
 import { SITE } from '@/catalog/pro'
 import { PRO_ENV, PRO_REGISTRY } from '@/catalog/agent'
 import { recordInstall } from '@/lib/account/keys'
+import { planItem } from '@pro-server'
 
 const SETUP = `${SITE}/docs.md`
 /* Written for the coding agent that usually runs the install: what went wrong and the exact fix. The shadcn CLI
@@ -24,6 +25,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ name: st
     return answer(503, 'Couldn’t check the Detent Pro key just now. Wait a minute and run the same install again.', 'KEY_CHECK_UNAVAILABLE')
   }
   if (!check.ok) return answer(403, `${check.reason} Make or copy a working key at ${SITE}/account, put it in ${PRO_ENV} in .env.local, and run the install again. Still stuck: hello@detentui.com`, 'PRO_KEY_REJECTED')
+  const plan = planItem(name)
+  if (plan) return Response.json(plan, { headers: { 'cache-control': 'private, no-store' } })
   const item = proItemByName(name)
   if (!item) return answer(404, hasProItems() ? `There’s no ${name} in Detent Pro. Every piece and its install name: ${SITE}/agents.md` : 'The Pro registry isn’t available on this build.', 'NOT_FOUND')
   const kind = name.startsWith('template-') ? 'template' : item.type === 'registry:component' || item.type === 'registry:block' ? 'component' : null

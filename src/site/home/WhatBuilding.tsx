@@ -4,9 +4,10 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { match, moreInPro } from '@/catalog/match'
+import { match, moreInPro, recipeFor, recipePicks } from '@/catalog/match'
 import type { Pick } from '@/catalog/match'
-import { buildPrompt, openPrompt } from '@/catalog/prompts'
+import { buildPrompt, openPrompt, partsPrompt, planPrompt } from '@/catalog/prompts'
+import type { Recipe } from '@/catalog/recipes'
 import { ArrowUpRight, Check, Copy, Prompt } from '@/lab/icons'
 import { PLANS } from '@/catalog/pro'
 import { useOwned } from '../Owned'
@@ -35,7 +36,7 @@ const SHEET = 'rounded-[20px] bg-[var(--i-sheet)] shadow-[inset_0_1px_0_rgb(255_
 const PAUSE = 550
 const READ = 450
 
-type Found = { goal: string; picks: Pick[] }
+type Found = { goal: string; picks: Pick[]; plan: Recipe | null }
 type AskState = 'idle' | 'writing' | 'sending' | 'sent' | 'noted' | 'failed'
 
 const list = (names: string[]) => (names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`)
@@ -80,10 +81,14 @@ export function WhatBuilding() {
   const asked = text.trim()
 
   const picks = found?.picks ?? []
+  const plan = found?.plan ?? null
   const pros = picks.filter((p) => p.pro).length
   const alts = picks.filter((p) => p.pro && p.alt).map((p) => p.alt!.name)
   const more = found && picks.length && !pros && !hasPro ? moreInPro(picks) : null
-  const prompt = found ? (picks.length ? buildPrompt(found.goal, picks, hasPro) : openPrompt(found.goal, hasPro)) : ''
+  const gated = !!plan && !hasPro
+  const freePicks = picks.filter((p) => !p.pro)
+  const shown = gated ? freePicks : picks
+  const prompt = found ? (plan ? (gated ? partsPrompt(found.goal, plan, freePicks, picks.filter((p) => p.pro)) : planPrompt(found.goal, plan)) : picks.length ? buildPrompt(found.goal, picks, hasPro) : openPrompt(found.goal, hasPro)) : ''
 
   useEffect(() => () => (timers.current.forEach(clearTimeout), clearTimeout(pause.current)), [])
   /* the box grows with what is written, up to four lines */
@@ -105,14 +110,16 @@ export function WhatBuilding() {
     setEmail('')
     setDraft('')
     setEnd(false)
-    const result = match(goal, 6)
+    const found = recipeFor(goal)
+    const recipe = found && (hasPro || recipePicks(found).some((p) => !p.pro)) ? found : null
+    const result = recipe ? recipePicks(recipe) : match(goal, 6)
     if (tracked.current !== goal) {
       tracked.current = goal
-      track('build_match', { found: result.length, picks: result.map((p) => p.id).join(',') || 'none' })
+      track('build_match', { found: result.length, plan: recipe?.id ?? 'none', picks: result.map((p) => p.id).join(',') || 'none' })
     }
     later(() => {
       if (me !== run.current) return
-      setFound({ goal, picks: result })
+      setFound({ goal, picks: result, plan: recipe })
       setPhase('done')
     }, reduce ? 0 : READ)
   }
@@ -123,7 +130,7 @@ export function WhatBuilding() {
       await navigator.clipboard.writeText(prompt)
     } catch {}
     setCopied((n) => n + 1)
-    track('copy_prompt', { item: picks.length ? 'build' : 'build-open', picks: picks.map((p) => p.id).join(','), pro: hasPro ? 'owner' : pros ? 'needs' : 'free', page: location.pathname })
+    track('copy_prompt', { item: plan ? `plan-${plan.id}` : picks.length ? 'build' : 'build-open', picks: picks.map((p) => p.id).join(','), pro: hasPro ? 'owner' : pros ? 'needs' : 'free', page: location.pathname })
     later(() => setCopied(0), 1600)
   }
 
@@ -186,7 +193,7 @@ export function WhatBuilding() {
             Build it with your agent
           </span>
           <span className={`tnum truncate text-[var(--i-t3)] ${phase === 'done' ? '' : 'max-sm:hidden'}`}>
-            {phase === 'done' ? (picks.length ? `${picks.length} piece${picks.length === 1 ? '' : 's'}${pros ? ` · ${pros} Pro` : ''}` : 'Agent picks') : 'For Cursor, Claude Code, Codex'}
+            {phase === 'done' ? (gated ? `${freePicks.length} free piece${freePicks.length === 1 ? '' : 's'}` : plan ? `Whole ${plan.noun} · ${picks.length} piece${picks.length === 1 ? '' : 's'}${pros ? ` · ${pros} Pro` : ''}` : picks.length ? `${picks.length} piece${picks.length === 1 ? '' : 's'}${pros ? ` · ${pros} Pro` : ''}` : 'Agent picks') : 'For Cursor, Claude Code, Codex'}
           </span>
         </div>
 
@@ -245,16 +252,24 @@ export function WhatBuilding() {
             </motion.div>
           ) : found ? (
             <motion.div key={`done-${found.goal}`} initial={reduce ? { opacity: 0 } : { opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.1 } }} transition={{ duration: 0.2, ease }} className={`mt-1.5 overflow-hidden transition-opacity duration-200 ${phase === 'done' ? '' : 'opacity-55'} ${SHEET}`}>
-              {picks.length ? (
+              {plan && !gated && (
+                <div className="px-4 pb-1 pt-3.5">
+                  <p className="text-[13.5px] font-medium text-[var(--i-t1)]">Your agent builds the whole {plan.name.toLowerCase()}</p>
+                  <p className="mt-1 text-[12.5px] leading-[1.5] text-[var(--i-t3)]">
+                    Laid out from Detent’s plan and shaped to what you wrote. These pieces go in it:
+                  </p>
+                </div>
+              )}
+              {shown.length ? (
                 <ul
-                  className={`p-1.5 ${picks.length > 4 ? 'max-h-[268px] overflow-y-auto overscroll-contain [scrollbar-width:thin]' : ''}`}
+                  className={`p-1.5 ${shown.length > 4 ? 'max-h-[268px] overflow-y-auto overscroll-contain [scrollbar-width:thin]' : ''}`}
                   /* a fade says there is more below, and lifts once the last piece is in view */
                   onScroll={(e) => setEnd(e.currentTarget.scrollTop + e.currentTarget.clientHeight >= e.currentTarget.scrollHeight - 4)}
-                  style={picks.length > 4 && !end ? { maskImage: 'linear-gradient(to bottom, #000 calc(100% - 28px), transparent)', WebkitMaskImage: 'linear-gradient(to bottom, #000 calc(100% - 28px), transparent)' } : undefined}
-                  tabIndex={picks.length > 4 ? 0 : undefined}
-                  aria-label={picks.length > 4 ? `${picks.length} pieces, scroll for more` : undefined}
+                  style={shown.length > 4 && !end ? { maskImage: 'linear-gradient(to bottom, #000 calc(100% - 28px), transparent)', WebkitMaskImage: 'linear-gradient(to bottom, #000 calc(100% - 28px), transparent)' } : undefined}
+                  tabIndex={shown.length > 4 ? 0 : undefined}
+                  aria-label={shown.length > 4 ? `${shown.length} pieces, scroll for more` : undefined}
                 >
-                  {picks.map((p) => (
+                  {shown.map((p) => (
                     <li key={p.id}>
                       <Link href={`/${p.kind}/${p.id}`} className={`group/pick flex items-center gap-3 rounded-[14px] px-3 py-2.5 transition-colors duration-150 hover:bg-[var(--i-hover)] ${FOCUS}`}>
                         <span className="min-w-0 flex-1">
@@ -275,7 +290,10 @@ export function WhatBuilding() {
                   <p className="mt-1 text-[12.5px] leading-[1.5] text-[var(--i-t3)]">The prompt has it read Detent’s index, pick what fits what you’re building, and check with you before adding anything.</p>
                 </div>
               )}
-              {picks.length > 0 && !pros && (
+              {gated && (
+                <p className="mx-3 mb-3 rounded-[12px] bg-[var(--i-tray)] px-3 py-2 text-[12.5px] leading-[1.5] text-[var(--i-t2)]">All free and MIT, nothing to buy.</p>
+              )}
+              {!gated && picks.length > 0 && !pros && (
                 <p className="mx-3 mb-3 rounded-[12px] bg-[var(--i-tray)] px-3 py-2 text-[12.5px] leading-[1.5] text-[var(--i-t2)]">
                   {hasPro ? (
                     'All in your plan.'
@@ -295,7 +313,7 @@ export function WhatBuilding() {
                   )}
                 </p>
               )}
-              {pros > 0 && !hasPro && pros < picks.length && (
+              {pros > 0 && !hasPro && !plan && pros < picks.length && (
                 <p className="mx-3 mb-3 rounded-[12px] bg-[var(--i-tray)] px-3 py-2 text-[12.5px] leading-[1.5] text-[var(--i-t2)]">
                   No Pro? Your agent builds the free part and tells you what{' '}
                   <Link href="/pro" data-cta="build" className={`rounded-[4px] font-medium text-[var(--i-t1)] underline-offset-2 hover:underline ${FOCUS}`}>
@@ -304,7 +322,7 @@ export function WhatBuilding() {
                   would add.
                 </p>
               )}
-              {pros > 0 && !hasPro && pros === picks.length && (
+              {pros > 0 && !hasPro && !plan && pros === picks.length && (
                 <div className="mx-3 mb-3 flex items-center gap-3 rounded-[12px] bg-[var(--i-tray)] py-2 pl-3 pr-2 max-sm:flex-col max-sm:items-start">
                   <p className="min-w-0 flex-1 text-[12.5px] leading-[1.5] text-[var(--i-t2)]">
                     {picks.length === 1 ? 'This is in Pro.' : 'All of these are in Pro.'}{' '}
