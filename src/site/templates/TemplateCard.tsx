@@ -7,6 +7,7 @@ import type { AnimationPlaybackControls } from 'motion/react'
 import { ArrowUpRight } from '@/lab/icons'
 import { useTheme } from '@/lab/lib/hooks'
 import { TemplateBody } from '@pro'
+import { TemplateFrame } from './Frame'
 import type { Template } from '@/catalog/templates'
 import { Backdrop, Window } from '../blocks/Studio'
 import { useNear } from '../near'
@@ -48,9 +49,11 @@ export function TemplateCard({ t }: { t: Template }) {
         <Backdrop tone={TONE[t.id] ?? 'rose'} />
         <div ref={box} className="relative h-[clamp(520px,58vw,780px)]" inert>
           <Window title={t.window} chrome="browser">
-            <div ref={page} className="h-full overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {near ? <TemplateBody id={t.id} theme={app ? scheme : undefined} /> : null}
-            </div>
+            <TemplateFrame>
+              <div ref={page} data-template-scroller className="h-full overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {near ? <TemplateBody id={t.id} theme={app ? scheme : undefined} /> : null}
+              </div>
+            </TemplateFrame>
           </Window>
         </div>
       </div>

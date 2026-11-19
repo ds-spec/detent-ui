@@ -5,6 +5,7 @@ import type { ComponentType, ReactNode } from 'react'
 import Link from 'next/link'
 import { motion, useReducedMotion } from 'motion/react'
 import { BLOCK_VIEWS, TemplateBody } from '@pro'
+import { TemplateFrame } from '../templates/Frame'
 import { BLOCK_ORDER, KINDS } from '@/catalog/blocks'
 import { DEMOS } from '@/catalog/demos'
 import { CATEGORIES, ENTRIES } from '@/catalog/meta'
@@ -245,7 +246,11 @@ export function BlockPiece({ id, onReady }: { id: string; onReady?: () => void }
 export function TemplatePiece({ id, onReady }: { id: string; onReady?: () => void }) {
   return (
     <ScreenPiece onReady={onReady}>
-      <TemplateBody id={id} />
+      <TemplateFrame>
+        <div data-template-scroller className="h-full overflow-hidden">
+          <TemplateBody id={id} />
+        </div>
+      </TemplateFrame>
     </ScreenPiece>
   )
 }

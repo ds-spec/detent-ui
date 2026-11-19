@@ -9,6 +9,7 @@ import { ArrowRight, Check, Copy, Expand, Moon, Refresh, Sun } from '@/lab/icons
 import { useTheme } from '@/lab/lib/hooks'
 import { tap } from '@/lab/lib/feel'
 import { TemplateBody } from '@pro'
+import { TemplateFrame } from './Frame'
 import { TEMPLATES, template } from '@/catalog/templates'
 import { START } from '@/catalog/template-start'
 import type { Step } from '@/catalog/template-start'
@@ -31,9 +32,11 @@ import { wellOf } from '../wells'
 
 const Page = memo(function Page({ id, scroller, onScroll, theme }: { id: string; scroller: RefObject<HTMLDivElement | null>; onScroll: () => void; theme?: 'light' | 'dark' }) {
   return (
-    <div ref={scroller} onScroll={onScroll} className="h-full overflow-y-auto [scrollbar-width:thin]">
-      <TemplateBody id={id} theme={theme} />
-    </div>
+    <TemplateFrame>
+      <div ref={scroller} onScroll={onScroll} data-template-scroller className="h-full overflow-y-auto [scrollbar-width:thin]">
+        <TemplateBody id={id} theme={theme} />
+      </div>
+    </TemplateFrame>
   )
 })
 
