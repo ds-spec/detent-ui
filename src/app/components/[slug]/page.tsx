@@ -7,9 +7,8 @@ import { Example } from '@/site/bench/Example'
 import { PropsPanel } from '@/site/bench/Panel'
 import { isProComponent } from '@/catalog/pro'
 import { asset } from '@/lib/asset'
-import { JsonLd, crumbs, faqPage, page, short } from '@/site/seo'
+import { JsonLd, crumbs, page, short } from '@/site/seo'
 import { SEARCH, searchDescription } from '@/catalog/search'
-import { DOCS } from '@/catalog/docs'
 
 export function generateStaticParams() {
   return ENTRIES.map((e) => ({ slug: e.id }))
@@ -39,7 +38,6 @@ async function Props({ params }: { params: PageProps<'/components/[slug]'>['para
   return (
     <>
       <JsonLd data={crumbs([[e.name, `/components/${e.id}`]])} />
-      {DOCS[e.id]?.faq.length ? <JsonLd data={faqPage(DOCS[e.id].faq)} /> : null}
       {api?.props.length ? <PropsPanel id={slug} api={api} /> : null}
       {example ? <Example {...example} /> : null}
     </>

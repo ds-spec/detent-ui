@@ -27,7 +27,7 @@ import { useSite } from '../Providers'
 import { BenchProvider } from '../bench/state'
 import { ProTag } from '../blocks/ProTag'
 import { Beside } from './Beside'
-import { Examples, Lede, Questions } from './Docs'
+import { Examples, Lede } from './Docs'
 import { MoreLike } from '../library/Library'
 import { Rail } from './Rail'
 import { Shell, Trail, scroller } from '../shell/Shell'
@@ -342,7 +342,6 @@ function Shown({ at, children }: { at: string; children: ReactNode }) {
         </section>
       )}
 
-      <Questions key={`questions-${e.id}`} id={e.id} />
       {BESIDE[e.id] && <Beside key={`beside-${e.id}`} id={BESIDE[e.id]} />}
 
       {!pro && <ProPitch id={e.id} />}

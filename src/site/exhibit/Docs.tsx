@@ -111,30 +111,3 @@ function Near({ children }: { children: React.ReactNode }) {
     </div>
   )
 }
-
-/** Questions, closed by default, in the Pro page's style. FAQPage JSON-LD for them is written by the server page. */
-export function Questions({ id }: { id: string }) {
-  const d = DOCS[id]
-  if (!d?.faq.length) return null
-  return (
-    <section aria-labelledby="questions" className="mt-12">
-      <h2 id="questions" className="text-[18px] font-medium tracking-[-0.015em] text-ink">Questions</h2>
-      <div className="mt-3">
-        {d.faq.map(([q, a]) => (
-          <details key={q} className="group/q shadow-[inset_0_1px_0_var(--line)] last:shadow-[inset_0_1px_0_var(--line),inset_0_-1px_0_var(--line)]">
-            <summary className="ring-focus flex cursor-pointer list-none items-center justify-between gap-6 rounded-[6px] py-4 text-[15px] tracking-[-0.01em] text-ink transition-colors duration-150 hover:text-ink-2 [&::-webkit-details-marker]:hidden">
-              {q}
-              <span aria-hidden className="relative size-3 shrink-0 text-ink-3">
-                <span className="absolute inset-x-0 top-1/2 h-[1.5px] -translate-y-1/2 rounded-full bg-current" />
-                <span className="absolute inset-y-0 left-1/2 w-[1.5px] -translate-x-1/2 rounded-full bg-current transition-transform duration-200 group-open/q:scale-y-0" />
-              </span>
-            </summary>
-            <p className="max-w-[640px] pb-5 text-[14px] leading-[1.6] text-ink-3">
-              <Rich text={a} />
-            </p>
-          </details>
-        ))}
-      </div>
-    </section>
-  )
-}

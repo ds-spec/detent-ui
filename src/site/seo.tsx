@@ -87,13 +87,6 @@ export const list = (name: string, items: { name: string; path: string }[]) => (
   itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, name: it.name, url: url(it.path) })),
 })
 
-/** FAQPage for questions shown on the page; the text must match what's visible. */
-export const faqPage = (faq: [string, string][]) => ({
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a.replace(/`/g, '') } })),
-})
-
 export const crumbs = (trail: [string, string][]) => ({
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
