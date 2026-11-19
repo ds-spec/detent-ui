@@ -14,61 +14,30 @@ export type Template = {
 
 const ALL: Template[] = [
   {
-    id: 'lumen',
-    name: 'Lumen',
-    kind: 'AI support agent',
-    suits: 'an AI support agent',
-    window: 'lumen.ai',
-    line: 'The landing page for an AI product that acts for you. The product works in the hero, every claim is shown live, and the story is about asking before it acts.',
+    id: 'dusk',
+    name: 'Dusk',
+    kind: 'Security agent',
+    suits: 'a backend and security agent',
+    window: 'dusk.dev',
+    line: 'The landing page for an agent that guards what AI writes: one dusk sky lights the hero, the night falls as you reach the end, and the product works in every section, finding, fixing and waiting for a yes.',
     parts: [
-      { anchor: 'top', name: 'Hero', line: 'A headline whose last word acts itself out, over a ticket answered live with its sources.', uses: ['Acting word', 'Living orb', 'Live conversation'] },
-      { anchor: 'channels', name: 'Channels', line: 'Every channel round the assistant, each answered in turn.', uses: ['Rings', 'Living orb'] },
-      { anchor: 'features', name: 'Features', line: 'Five live tiles: resolving, languages, hand-offs, metrics and tone.', uses: ['Live features'] },
-      { anchor: 'approvals', name: 'Approvals', line: 'A wire from ticket to customer that waits on a person’s yes.', uses: ['Wire diagram'] },
-      { anchor: 'insights', name: 'Insights', line: 'What it noticed, floating over the real dashboard.', uses: ['Agent analytics'] },
-      { anchor: 'results', name: 'Results', line: 'Four numbers, each with the customer it changed for.', uses: ['Type cuts'] },
-      { anchor: 'customers', name: 'Customers', line: 'A quote that writes itself in, over a wall of short ones.', uses: ['Testimonials'] },
-      { anchor: 'pricing', name: 'Pricing', line: 'Usage pricing with a slider that prices every plan.', uses: ['Metered pricing'] },
-      { anchor: 'faq', name: 'Questions', line: 'Search as you type, topics, and a person to ask.', uses: ['FAQ'] },
-      { anchor: 'start', name: 'Call to action', line: 'An email to start with, beside the queue it clears.', uses: ['Call to action'] },
-      { anchor: 'footer', name: 'Footer', line: 'Where to go, the small print, a live count and the theme.', uses: ['Landing kit'] },
+      { anchor: 'top', name: 'Hero', line: 'The whole hero is an evening sky: the headline under a glass pill with a light running round its edge, one bright dock, the teams on the horizon, and the product window, revealed by its own border drawing in as the page loads.', uses: ['Living sky', 'Border reveal', 'Live app window'] },
+      { anchor: 'promises', name: 'Promises', line: 'Three promises in an open row, each told as a flow: what was asked or found, the steps on one wire, and the card it lands on, which lights once as the wire reaches it.', uses: ['Flows'] },
+      { anchor: 'product', name: 'How it works', line: 'One investigation window with its evidence, then a fix tested on a shadow branch and a change that waits for a person.', uses: ['Investigation', 'Fix pill'] },
+      { anchor: 'security', name: 'What it watches', line: 'Four tabs in a bezel: policies, secrets, migrations and deploys, each with the run that caught it and the code it wrote.', uses: ['Tabbed product', 'Run log'] },
+      { anchor: 'customers', name: 'Customers', line: 'Five teams in a row: the open card spreads out over a live silk shader in its own colour, with the quote, the person and what Dusk did for them.', uses: ['Testimonials', 'Silk shader'] },
+      { anchor: 'pricing', name: 'Pricing', line: 'Three plans in an open row ruled by hairlines, the one most teams pick lit from its top edge.', uses: ['Pricing'] },
+      { anchor: 'faq', name: 'Questions', line: 'The heading holds still on the left while tall rows of questions run down the right, the first one open.', uses: ['FAQ'] },
+      { anchor: 'start', name: 'Call to action', line: 'One row to close: the line on the left, the two buttons on the right, then the link bar.', uses: ['Call to action'] },
+      { anchor: 'footer', name: 'Footer', line: 'The page lifts off a still footer with the wordmark standing in the night sky, then slides back over it.', uses: ['Sheet over footer'] },
     ],
     details: [
-      'It argues in order: what it is, everywhere it works, what it does, how it asks before it acts, what it notices, what it changed, then price, questions and a way in.',
-      'Every claim is shown, not told. The hero answers a real ticket, the channels light up one by one, and the approval waits on a yes before anything is sent.',
-      'Live parts start when they scroll into view and hold their place when they leave, with their animations paused, so a long page stays light.',
-      'Motion ends. The headline goes round its words once, the rings turn a few times, and each diagram plays its story, then rests. Point at the headline for more.',
-      'Every word lives in one content file. Change the product, its copy and its demo data there, and the sections follow.',
-      'Not one layout shift from top to bottom, at any width, in light and dark.',
-    ],
-  },
-  {
-    id: 'kiln',
-    name: 'Kiln',
-    kind: 'Developer tool',
-    suits: 'a developer tool',
-    window: 'kiln.dev',
-    line: 'The landing page for a coding agent, painted in ink: mountains washed onto paper in code, a red sun, and kilns on the hills that fire while the agent works. The page goes from first light to dusk, and the product stands in every scene.',
-    parts: [
-      { anchor: 'top', name: 'Hero', line: 'Ink mountains at first light with the product standing in them. The kiln on the far hill fires with the run in the window, and the hills drift as you scroll.', uses: ['Ink landscape', 'Live app window'] },
-      { anchor: 'proof', name: 'Proof', line: 'Customers set in type and three numbers as rounded dot-matrix readouts.', uses: ['Doto', 'Count'] },
-      { anchor: 'run', name: 'How a run goes', line: 'A handscroll: the section holds and scrolling unrolls one ink landscape sideways through four scenes, a red sun crossing the sky and the branch filling in below.', uses: ['Scroll set piece', 'Split terminal'] },
-      { anchor: 'parallel', name: 'Parallel runs', line: 'Ten kilns on a hill under the moon, one over each run, firing and cooling as you scroll.', uses: ['Scroll set piece', 'Ink landscape'] },
-      { anchor: 'try', name: 'Try one', line: 'Type an issue or pick one: it travels into a kiln between the two cards and comes out the other side as a pull request.', uses: ['Live preview', 'Ink landscape'] },
-      { anchor: 'features', name: 'Bento', line: 'Six live pieces of the product, and a typo Kiln fixes in front of you.', uses: ['Bento'] },
-      { anchor: 'sandbox', name: 'Security', line: 'The sandbox and a wall drawn as one dry-brush stroke: requests to allowed hosts pass through gaps, blocked ones spatter red, and every host keeps count.', uses: ['Live diagram'] },
-      { anchor: 'pricing', name: 'Pricing', line: 'Dot-matrix prices, and the plan most teams pick with a small night of its own that fires on hover.', uses: ['Count', 'Ink landscape'] },
-      { anchor: 'faq', name: 'Questions', line: 'Search as you type, topics, and someone to ask.', uses: ['FAQ'] },
-      { anchor: 'start', name: 'Call to action', line: 'The hills at dusk and a terminal you can use; every command stokes the kiln, and the install command lands.', uses: ['Interactive terminal', 'Ink landscape'] },
-      { anchor: 'footer', name: 'Footer', line: 'Where to go, the status, today’s count and the version.', uses: ['Landing kit'] },
-    ],
-    details: [
-      'One medium runs through the page: an ink landscape painted in code, each ridge thickest at its crest and thinning into mist, with a dry brush’s grain through it and a red sun over it. Each ridge is its own canvas, painted once per size and theme and only when it’s near the screen; only the smoke and a kiln’s glow are drawn again, while on screen.',
-      'The kilns answer the product. The one behind the hero fires while the agent works in the window and cools once the pull request merges; ten more fire and cool as you scroll through the parallel runs; one takes your issue in and gives a pull request back; the last flares each time you run a command.',
-      'How a run goes is a handscroll: the section holds while you scroll and one continuous landscape unrolls sideways through the four scenes, with the day passing over it. On a phone the scenes stack as plates.',
-      'The page itself is white paper and neutral greys; the colour comes from the paintings and one oxblood. In a dark theme it’s the same hills at night, under the moon.',
-      'Headlines are tight Geist, numbers are Doto, labels are in brackets, and buttons show the key that presses them.',
-      'Every word and every demo’s data lives in one content file, and the whole page is free of layout shift at every width, in light and dark.',
+      'One light runs through the page: a dusk sky behind the hero, the same blue lighting the flows, the stories and the plan most teams pick, and night by the closing and the footer.',
+      'Colour means something. Red is exposed, amber is waiting for a yes, green is fixed, blue is Dusk reading. Everything else is ink and grey.',
+      'The product is in every section: a finding in the hero, an investigation, a fix on a shadow branch, the run behind each tab, and the night it reads at the end.',
+      'The page closes on one quiet row, then lifts off a still footer as a sheet, which slides back over it once you stop.',
+      'The privacy policy, the terms and the 404 are built from the same parts, so the whole site reads as one: the same bar, hairlines, headings and footer.',
+      'Dark by default with a light theme one click away, and every word, quote, price and log line lives in one content file.',
     ],
   },
   {
@@ -102,7 +71,7 @@ const ALL: Template[] = [
   },
 ]
 
-export const PARKED = ['lumen', 'kiln']
+export const PARKED: string[] = []
 
 export const TEMPLATES: Template[] = ALL.filter((t) => !PARKED.includes(t.id))
 export const TEMPLATE_COUNT = `${TEMPLATES.length} template${TEMPLATES.length === 1 ? '' : 's'}`
