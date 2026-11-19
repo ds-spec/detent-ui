@@ -13,7 +13,8 @@ export function RollingText({ text, className = '', proportional = false, still 
   useLayoutEffect(() => {
     if (!proportional || !probe.current) return
     const read = () => {
-      const box = probe.current!
+      const box = probe.current
+      if (!box) return
       const z = box.offsetWidth ? box.getBoundingClientRect().width / box.offsetWidth : 1
       const em = parseFloat(getComputedStyle(box).fontSize) || 16
       setWidths([...box.children].map((c) => (c as HTMLElement).getBoundingClientRect().width / z / em))
