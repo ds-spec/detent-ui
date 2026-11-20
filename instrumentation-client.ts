@@ -1,3 +1,4 @@
+import './src/site/translate-safe'
 import posthog from 'posthog-js'
 import { NOTRACK, rememberSource, setVisitor } from './src/site/source'
 
