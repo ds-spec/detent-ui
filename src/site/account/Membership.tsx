@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
-import { PLANS, PRO_BLOCK_COUNT, PRO_COMPONENTS } from '@/catalog/pro'
+import { ON_SALE, PRO_BLOCK_COUNT, PRO_COMPONENTS } from '@/catalog/pro'
 import type { Plan } from '@/catalog/licence'
 import { TEMPLATES } from '@/catalog/templates'
 import type { Usage } from '@/lib/account/keys'
@@ -68,7 +68,7 @@ export function Membership({ purchase, arriving, thanks }: { purchase: { plan: P
       foot="One payment, every update for life"
       action={
         <div className="flex flex-wrap gap-2">
-          {[...PLANS].reverse().map((plan) => (
+          {ON_SALE.map((plan) => (
             <a key={plan.id} href={plan.href} className={plan.best ? SMALL : SMALL_QUIET}>
               Get {plan.name}
               <span className="tnum opacity-60">
