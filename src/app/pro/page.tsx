@@ -6,8 +6,8 @@ import { PRO_COMPONENTS } from '@/catalog/pro'
 import { TEMPLATE_COUNT, TEMPLATES } from '@/catalog/templates'
 import { CONTACT } from '@/catalog/trust'
 import { Check } from '@/lab/icons'
-import { BigBuy, BuyBar, BuyNote, BuyProvider, HeroHead, WideStage } from '@/site/pro/Buy'
-import { Built } from '@/site/pro/Built'
+import { BigBuy, BuyBar, BuyNote, BuyProvider } from '@/site/pro/Buy'
+import { Gallery, ProHero, Terms } from '@/site/pro/Gallery'
 import { Compare, Inside } from '@/site/pro/Inside'
 import { Install } from '@/site/pro/Install'
 import { Keys } from '@/site/pro/Keys'
@@ -18,7 +18,7 @@ import { JsonLd, page, proGraph } from '@/site/seo'
 import { SitePage } from '@/site/sheets'
 
 export const metadata: Metadata = page({
-  title: 'Detent Pro — make your app feel expensive',
+  title: 'Detent Pro: make your app feel expensive · Detent UI',
   absolute: true,
   description: `${PRO_COMPONENTS.length} React components, ${PRO_BLOCKS.length} whole screens and ${TEMPLATE_COUNT}, installed as source you own. One payment, for life.`,
   path: '/pro',
@@ -46,22 +46,12 @@ export default function ProPage() {
       <JsonLd data={proGraph(FAQ)} />
       <BuyProvider>
         <section id="pricing" className="mx-auto max-w-[1360px] scroll-mt-24 px-5 pt-12 sm:px-6 sm:pt-16">
-          <HeroHead />
+          <ProHero />
           <div data-dock-dodge="" className="rise mt-9" style={{ animationDelay: '200ms' }}>
-            <BuyBar />
+            <BuyBar terms={<Terms />} />
           </div>
-          <div className="rise mt-12 sm:mt-14" style={{ animationDelay: '320ms' }}>
-            <WideStage />
-          </div>
-        </section>
-
-        <section id="built" aria-labelledby="built-title" className="mx-auto mt-28 max-w-[1360px] scroll-mt-24 px-5 sm:mt-36 sm:px-6">
-          <h2 id="built-title" className={H2}>
-            One prompt. The whole page.
-            <span className="block text-quiet">Your agent gets the plan, the pieces and the finish.</span>
-          </h2>
-          <div className="mt-10 sm:mt-14">
-            <Built />
+          <div className="rise mt-14 sm:mt-16" style={{ animationDelay: '320ms' }}>
+            <Gallery />
           </div>
         </section>
 

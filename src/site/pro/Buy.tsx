@@ -283,7 +283,7 @@ export function HeroHead() {
   )
 }
 
-export function BuyBar() {
+export function BuyBar({ terms }: { terms?: ReactNode } = {}) {
   const side = useSideNew()
   const { plan, buyable } = useChoice()
   const promo = usePromo()
@@ -306,9 +306,11 @@ export function BuyBar() {
           </a>}
         </div>
       </div>
-      <p className="mt-4 text-balance px-4 text-center text-[13px] leading-[1.7] text-ink-3">
-        {what} · Every update for life
-      </p>
+      {terms ?? (
+        <p className="mt-4 text-balance px-4 text-center text-[13px] leading-[1.7] text-ink-3">
+          {what} · Every update for life
+        </p>
+      )}
     </div>
   )
 }

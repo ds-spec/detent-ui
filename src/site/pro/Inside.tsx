@@ -61,7 +61,6 @@ const FREE_ROWS: Row[] = [
 const PRO_ROWS: Row[] = [
   { title: `All ${ENTRIES.length} components`, line: `${PRO_COMPONENTS.length} of them only in Pro, like ${entry('region')?.name ?? 'Region wheel'} and ${entry('glyph')?.name ?? 'Glyph art'}` },
   { title: `All ${BLOCKS.length} blocks`, line: `Whole product screens, like ${listed(['support-inbox', 'evals', 'task-to-merge'])}` },
-  { title: 'A whole page from one prompt', line: 'Your agent builds dashboards, pricing pages and more from Detent’s plans' },
   ...(template ? [{ title: `The ${template.name} template`, line: `A full ${template.kind.toLowerCase()} to start from` }] : []),
   { title: 'Every new piece, as it ships' },
   { title: 'Unlimited projects, client work too' },

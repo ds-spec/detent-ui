@@ -146,13 +146,13 @@ type Item = { id: string; name: string; line: string; pro: boolean; href: string
 const FAMILY_TONE: Record<string, Tone> = { agents: 'blue', data: 'amber', inputs: 'rose', feedback: 'violet', essentials: 'violet', overlays: 'rose', marketing: 'amber' }
 const KIND_TONE: Record<string, Tone> = { app: 'blue', flow: 'violet', section: 'amber' }
 
-function Piece({ id, onReady }: { id: string; onReady?: () => void }) {
+export function Piece({ id, onReady, max = 0.75 }: { id: string; onReady?: () => void; max?: number }) {
   const Demo = DEMOS[id]
   const e = ENTRIES.find((x) => x.id === id)
   if (!Demo || !e) return null
   const size = TILE[id] ?? SIZE[id]
   return (
-    <Mini pad={22} max={0.75} onReady={onReady}>
+    <Mini pad={22} max={max} onReady={onReady}>
       {e.bleed && size ? (
         <div className="relative" style={{ width: size[0], height: size[1] }}>
           <Demo />
