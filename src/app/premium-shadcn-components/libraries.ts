@@ -16,6 +16,11 @@ export type Library = {
   code: string
   licence: string
   updates: string
+  tw4: string
+  stack: string
+  agents: string
+  screens: string
+  interactive: string
   line: string
   good: string[]
   watch: string[]
@@ -38,6 +43,11 @@ export const LIBRARIES: Library[] = [
     code: 'shadcn CLI or copy and paste',
     licence: 'Unlimited end products, client work allowed, no reselling',
     updates: 'Lifetime',
+    tw4: 'Yes',
+    stack: 'Next.js, Vite, Astro, Remix; Vue as a separate site',
+    agents: 'shadcn MCP server, IDE extension for VS Code, Cursor and Windsurf',
+    screens: 'Yes: dashboards, app shell, settings, auth, data tables, an AI chat app',
+    interactive: 'A drag-and-drop page builder; little else stated',
     line: 'If you want a section for almost every page a SaaS site has, this is the deepest shelf. You pick a block, install it, and edit it.',
     good: ['By far the most components and blocks here', 'Lifetime updates and client work on every plan'],
     watch: ['The $149 plan has no templates; they start at $299', 'With thousands of options, finding the right one takes time'],
@@ -57,6 +67,11 @@ export const LIBRARIES: Library[] = [
     code: 'shadcn CLI or copy and paste',
     licence: 'One person, unlimited projects and clients, no reselling',
     updates: 'Lifetime',
+    tw4: 'Yes',
+    stack: 'Next.js, Astro, Vite, React Router, TanStack Start',
+    agents: 'Own MCP server, llms.txt',
+    screens: 'Yes: dashboards and app shells, data tables, eCommerce',
+    interactive: 'Data tables with export and grouping, a page builder',
     line: 'A large library with a matching Figma kit and a theme generator, so designers and developers work from the same parts.',
     good: ['Figma and code stay in step', 'Lifetime updates and client work allowed'],
     watch: ['The Basic plan is marked “Limited”, so the full catalog costs more', 'Big and broad rather than focused on one kind of product'],
@@ -76,6 +91,11 @@ export const LIBRARIES: Library[] = [
     code: 'shadcn CLI or copy and paste',
     licence: 'Unlimited end products for you or clients, no reselling',
     updates: '1 year, or lifetime on the higher plan',
+    tw4: 'Yes, for the free library; not stated for Pro',
+    stack: 'React, Next.js',
+    agents: 'Works with Claude Code, Codex, Cursor and MCP agents, llms.txt',
+    screens: 'Mostly marketing; sidebars, login and empty states',
+    interactive: 'Animations and sliders; not stated beyond that',
     line: 'Known for motion-heavy hero sections and backgrounds. It is the library people reach for when a landing page has to look loud on launch day.',
     good: ['A strong free tier to try before you buy', 'Lots of ready animated sections and templates'],
     watch: ['The cheaper plan stops updating after a year', 'Built for landing pages more than the inside of a product'],
@@ -94,6 +114,11 @@ export const LIBRARIES: Library[] = [
     code: 'Downloaded templates you own',
     licence: 'Personal or commercial use, no reselling',
     updates: 'Lifetime, per the homepage',
+    tw4: 'Implied for the free library; not stated for Pro',
+    stack: 'React, Next.js',
+    agents: 'MCP server and llms.txt for the free library; not stated for Pro',
+    screens: 'No: page sections, plus an AI agent template',
+    interactive: 'Not stated',
     line: 'The paid side of Magic UI: full landing page sections and templates built on the same animated components the free library is known for.',
     good: ['One clear price, paid once', 'The free library lets you judge the style first'],
     watch: ['Its licence says updates are at their discretion, though the homepage promises lifetime', 'Focused on marketing pages, not app screens'],
@@ -112,6 +137,11 @@ export const LIBRARIES: Library[] = [
     code: 'Not stated',
     licence: 'No licence page we could find',
     updates: '“Regular updates”',
+    tw4: 'Yes',
+    stack: 'Next.js App Router',
+    agents: 'shadcn MCP docs',
+    screens: 'No: marketing blocks',
+    interactive: 'Not stated',
     line: 'Quiet, well-spaced marketing sections that look calm instead of flashy, for sites that want to feel like a serious product.',
     good: ['A calm default look that is easy to make your own', 'Free blocks to judge the quality first'],
     watch: ['No published counts or licence page, so value is hard to compare', 'Marketing pages only'],
@@ -130,6 +160,11 @@ export const LIBRARIES: Library[] = [
     code: '“Code lives in your repo”',
     licence: 'Individual is non-commercial; Team ($99 a month) and up allow it',
     updates: 'While you subscribe, or lifetime from $899',
+    tw4: 'Yes',
+    stack: 'React, Vue, Svelte, Solid; templates on Next.js',
+    agents: 'Own MCP server, llms.txt',
+    screens: 'Yes: dashboards, settings, login, tables, AI chat',
+    interactive: 'Guides for data tables, charts and streaming chat',
     line: 'A very large catalog you pay for monthly or yearly. Every plan gets every block and template; the plans differ in licence and seats.',
     good: ['The largest block count we found', 'Every plan includes the whole catalog'],
     watch: ['The $49 Individual plan doesn’t allow commercial use', 'Cancel the subscription and updates stop'],
@@ -148,6 +183,11 @@ export const LIBRARIES: Library[] = [
     code: 'shadcn CLI, source in your project',
     licence: 'One person, unlimited projects and client work, no reselling',
     updates: 'Lifetime',
+    tw4: 'Yes',
+    stack: 'React; tested on Next.js',
+    agents: 'A page for agents per piece, llms.txt, one setup prompt for Claude Code, Cursor and Codex; no MCP server of its own',
+    screens: 'Yes: inbox, evals, task to merge and more, plus a full agent app',
+    interactive: 'Yes: charts you ask, radars you compare, runs that stream; each one live on its page',
     line: 'Ours. A small set of components that do something when you touch them, whole product screens built from them, and a complete agent app. Every piece runs live on its page, and below.',
     good: ['The lowest one-time price here, with lifetime updates', 'Built for the inside of a product, not only landing pages', 'Installs with the shadcn CLI and takes your theme'],
     watch: ['The smallest catalog in this list', 'A new library, launched in 2026', 'No Figma kit'],

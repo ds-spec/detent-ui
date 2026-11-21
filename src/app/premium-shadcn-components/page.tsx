@@ -50,6 +50,16 @@ const COLS: { label: string; width: string; strong?: boolean; cell: (l: Library)
   { label: 'Best for', width: 'w-[190px]', cell: (l) => l.bestFor },
 ]
 
+const FCOLS: { label: string; width: string; cell: (l: Library) => ReactNode }[] = [
+  { label: 'Library', width: '', cell: (l) => l.name },
+  { label: 'Interactive pieces', width: 'w-[220px]', cell: (l) => l.interactive },
+  { label: 'Product screens', width: 'w-[230px]', cell: (l) => l.screens },
+  { label: 'Code you own', width: 'w-[160px]', cell: (l) => l.code },
+  { label: 'Tailwind v4', width: 'w-[150px]', cell: (l) => l.tw4 },
+  { label: 'Stack', width: 'w-[180px]', cell: (l) => l.stack },
+  { label: 'Coding agents', width: 'w-[230px]', cell: (l) => l.agents },
+]
+
 const FAQ: [string, string][] = [
   ['Is shadcn/ui itself free?', 'Yes. shadcn/ui is free and open source under MIT. The libraries here sell extra components, blocks and templates built for it, installed the same way, as code in your project.'],
   ['One-time or subscription: which is better?', 'For most solo developers and small teams, one-time. You pay once and keep the code and the updates. A subscription makes sense when you need a very large catalog for a short project, or team seats billed monthly.'],
@@ -161,6 +171,41 @@ export default function PremiumShadcnComponents() {
         </p>
       </section>
 
+      <section aria-labelledby="built" className="mx-auto mt-16 max-w-[1360px] px-5 sm:px-6">
+        <h2 id="built" className={`${H2} mx-auto max-w-[712px]`}>
+          What each one is built for
+        </h2>
+        <p className="mx-auto mt-3 max-w-[712px] text-[14px] leading-[1.6] text-ink-3">Counts don’t tell you whether a library fits your product. This is what each one says it supports, from its own pages on {CHECKED}. Most of them now work with coding agents through MCP; Detent doesn’t have its own MCP server yet.</p>
+        <div className="mt-6 overflow-x-auto rounded-[20px] bg-surface shadow-[var(--card-edge)]">
+          <table className="w-full min-w-[1180px] text-left text-[13.5px] leading-[1.5]">
+            <thead>
+              <tr className="text-[12.5px] text-ink-3">
+                {FCOLS.map((c, k) => (
+                  <th key={c.label} scope="col" className={`px-4 py-3.5 font-normal ${k === 0 ? 'sticky left-0 z-10 bg-surface' : ''}`}>
+                    {c.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {ROWS.map((l) => (
+                <tr key={l.id} className="align-top [&>*]:shadow-[inset_0_1px_0_var(--line)]">
+                  <th scope="row" className={`sticky left-0 z-10 w-[150px] px-4 py-4 font-normal text-ink ${l.ours ? 'bg-[color-mix(in_oklab,var(--accent)_6%,var(--surface))]' : 'bg-surface'}`}>
+                    {l.name}
+                    {l.ours ? <span className="mt-0.5 block text-[12px] text-ink-3">Ours</span> : null}
+                  </th>
+                  {FCOLS.slice(1).map((c) => (
+                    <td key={c.label} className={`px-4 py-4 text-ink-3 ${c.width} ${l.ours ? 'bg-[color-mix(in_oklab,var(--accent)_6%,var(--surface))]' : ''}`}>
+                      {c.cell(l)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <article className="mx-auto max-w-[760px] px-5 sm:px-6">
         <section aria-labelledby="premium" className="mt-16">
           <h2 id="premium" className={H2}>
@@ -222,7 +267,7 @@ export default function PremiumShadcnComponents() {
           {l.ours ? <Showcase /> : null}
           <div className="mx-auto max-w-[760px] px-5 sm:px-6">
             <dl className="mt-6 grid grid-cols-[110px_minmax(0,1fr)] gap-x-4 gap-y-2 text-[14.5px]">
-              {COLS.slice(1, -1).map((c) => (
+              {[...COLS.slice(1, -1), ...FCOLS.slice(1).filter((c) => c.label !== 'Code you own')].map((c) => (
                 <div key={c.label} className="contents">
                   <dt className="text-ink-3">{c.label}</dt>
                   <dd className="text-ink-2">{c.cell(l)}</dd>
@@ -263,7 +308,7 @@ export default function PremiumShadcnComponents() {
             How to choose
           </h2>
           <p className={P}>
-            <span className="text-ink">Start from the job.</span> A marketing site needs sections: shadcnblocks and shadcn.io have the most, Tailark the calmest, Aceternity and Magic UI the most motion. The inside of a product needs components people use every day: charts, inputs, agent views. That is where Detent sits.
+            <span className="text-ink">Start from the job.</span> A marketing site needs sections: shadcnblocks and shadcn.io have the most, Tailark the calmest, Aceternity and Magic UI the most motion. The inside of a product needs screens and components people use every day. shadcnblocks, shadcn studio and shadcn.io all sell dashboards, settings and tables. Detent has far fewer, and puts its effort into pieces that respond: charts you ask, runs you watch, comparisons you pick.
           </p>
           <p className={P}>
             <span className="text-ink">Then the way you pay.</span> One payment suits a solo developer or a small team that builds for years. A subscription suits a big catalog for a short project. Read the licence for seats and client work before you buy.
