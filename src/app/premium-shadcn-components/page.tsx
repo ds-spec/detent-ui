@@ -16,7 +16,7 @@ import { Toc } from './Toc'
 
 const PATH = '/premium-shadcn-components'
 const TITLE = 'Best Premium shadcn/ui Component Libraries (2026), Compared'
-const LEDE = `Seven paid shadcn/ui libraries side by side: price, licence, updates, size, what each is best for and where each falls short. Prices checked ${CHECKED}.`
+const LEDE = `Seven libraries of premium shadcn components, side by side: price, licence, updates, size and where each falls short. Prices checked ${CHECKED}.`
 
 export const metadata: Metadata = page({ title: TITLE, absolute: true, description: LEDE, path: PATH })
 
@@ -200,7 +200,7 @@ export default function PremiumShadcnComponents() {
           <section aria-labelledby="table-title" id="table" className="mt-16 scroll-mt-28">
             <div className={TEXT}>
               <h2 id="table-title" className={H2}>
-                Side by side
+                Premium shadcn libraries, side by side
               </h2>
               <p className="mt-3 text-[13.5px] leading-[1.6] text-ink-3">Last verified {CHECKED}, from each library’s own pricing and licence pages. Prices in USD for one person; sales were running that week. — means it isn’t stated on their pages.</p>
             </div>
@@ -242,12 +242,12 @@ export default function PremiumShadcnComponents() {
               <p className={P}>
                 Ask Claude, Cursor or v0 for a pricing page and you get one in a minute. It usually works, and it usually looks like every other page the same model made that day: the default spacing, the default card, no states for loading or errors, nothing that responds when you press it.
               </p>
-              <blockquote className="my-8 text-[clamp(20px,2vw,24px)] leading-[1.35] tracking-[-0.025em] text-ink">“The first screen is easy. The tenth screen matching the first one is the hard part.”</blockquote>
+              <blockquote className="my-8 text-[clamp(20px,2vw,24px)] leading-[1.35] tracking-[-0.025em] text-ink">The first screen is easy. The tenth screen matching the first one is the hard part.</blockquote>
               <p className={P}>
-                That is what a good library still sells: a set of pieces that already agree with each other, interactions someone has tested on a phone and with a keyboard, and patterns your agent can reuse instead of reinventing. The useful question isn’t “AI or a library” but “what does my agent build with?” Give it well-made parts and the screens it writes come out better.
+                That is what a good library still sells: a set of pieces that already agree with each other, interactions someone has tested on a phone and with a keyboard, and patterns your agent can reuse instead of reinventing. So the question to ask is what your agent builds with. Give it well-made parts and the screens it writes come out better.
               </p>
               <p className={P}>
-                Detent leans into that. Every piece has a page written for coding agents, with where it goes, a working example and its props, and one prompt connects Claude Code, Cursor or Codex to it. You can try it with a free piece like the <Out href="/components/prompt">Prompt box</Out> before paying for anything.
+                Detent is built for this. Every piece has a page written for coding agents, with where it goes, a working example and its props, and one prompt connects Claude Code, Cursor or Codex to it. You can try it with a free piece like the <Out href="/components/prompt">Prompt box</Out> before paying for anything.
               </p>
             </section>
 

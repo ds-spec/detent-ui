@@ -121,7 +121,7 @@ export const LIBRARIES: Library[] = [
     interactive: 'Not stated',
     line: 'The paid side of Magic UI: full landing page sections and templates built on the same animated components the free library is known for.',
     good: ['One clear price, paid once', 'The free library lets you judge the style first'],
-    watch: ['Its licence says updates are at their discretion, though the homepage promises lifetime', 'Focused on marketing pages, not app screens'],
+    watch: ['Its licence says updates are at their discretion, though the homepage promises lifetime', 'Focused on marketing pages'],
   },
   {
     id: 'tailark',
@@ -189,7 +189,7 @@ export const LIBRARIES: Library[] = [
     screens: 'Yes: inbox, evals, task to merge and more, plus a full agent app',
     interactive: 'Yes: charts you ask, radars you compare, runs that stream; each one live on its page',
     line: 'A small set of components that do something when you touch them, whole product screens built from them, and a complete agent app. Every piece runs live on its page, and below.',
-    good: ['The lowest one-time price here, with lifetime updates', 'Built for the inside of a product, not only landing pages', 'Installs with the shadcn CLI and takes your theme'],
+    good: ['The lowest one-time price here, with lifetime updates', 'Made for the inside of a product: dashboards, agents, data', 'Installs with the shadcn CLI and takes your theme'],
     watch: ['The smallest catalog in this list', 'A new library, launched in 2026', 'No Figma kit'],
     ours: true,
   },
@@ -199,8 +199,8 @@ export type Mark = 'yes' | 'some' | 'no' | 'unknown'
 export type FitKey = 'interactive' | 'screens' | 'code' | 'tw4' | 'agents'
 
 export const FIT_ROWS: { key: FitKey; name: string; line: string }[] = [
-  { key: 'interactive', name: 'Interactive pieces', line: 'Components with working state, not only layout and motion' },
-  { key: 'screens', name: 'Product screens', line: 'Dashboards, settings, tables and inboxes, not only marketing' },
+  { key: 'interactive', name: 'Interactive pieces', line: 'Components with working state, like tables, charts or live updates' },
+  { key: 'screens', name: 'Product screens', line: 'Dashboards, settings, tables and inboxes' },
   { key: 'code', name: 'Code you own', line: 'Source in your project that you can change' },
   { key: 'tw4', name: 'Tailwind v4', line: 'Stated support for current shadcn/ui and Tailwind' },
   { key: 'agents', name: 'Coding agents', line: 'MCP, llms.txt or docs written for agents' },

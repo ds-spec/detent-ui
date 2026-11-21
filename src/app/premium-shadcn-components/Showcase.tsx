@@ -13,7 +13,7 @@ const LINE = 'mt-1.5 max-w-[560px] text-[15px] leading-[1.6] text-ink-3'
 const TREE = ['components/', '  ui/', '    button.tsx', '  detent/components/', '    askchart/AskChart.tsx', '    viz/RadarCompare.tsx']
 
 const WHY: [string, string][] = [
-  ['Interactive', 'Pieces that answer, compare and stream, not static layouts'],
+  ['Interactive', 'Pieces that answer, compare and stream as you use them'],
   ['Product screens', 'Blocks that already work, like an inbox or an eval run'],
   ['Tailwind v4', 'Built on current shadcn/ui and its CSS variables'],
   ['Yours', 'Source files in your project, change anything'],
@@ -63,7 +63,7 @@ export function Showcase() {
         <div className="flex flex-col rounded-[24px] bg-surface p-2 shadow-[var(--card-edge)]">
           <div className="px-4 pb-5 pt-4">
             <p className={LABEL}>Own it</p>
-            <p className="mt-1 text-[17px] tracking-[-0.015em] text-ink">Source files in your project, not a package</p>
+            <p className="mt-1 text-[17px] tracking-[-0.015em] text-ink">Source files that live in your project</p>
             <p className="mt-1.5 text-[14px] leading-[1.6] text-ink-3">Everything lands next to your own components. Rename it, restyle it, delete the parts you don’t need.</p>
           </div>
           <pre className="mt-auto overflow-x-auto rounded-[16px] bg-surface-2 px-4 py-4 font-mono text-[12.5px] leading-[20px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)]" translate="no">
