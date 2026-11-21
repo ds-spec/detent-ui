@@ -794,10 +794,41 @@ function renderProSetup(): string {
   })
 }
 
+function renderPremium(): string {
+  const pro = PRO_COMPONENTS.map((id) => entry(id)).filter((e) => e !== null)
+  const body = [
+    `${PRO_COMPONENTS.length} premium React components for shadcn/ui. Each one installs with the shadcn CLI, reads your theme's tokens (your --primary becomes its accent, .dark turns it dark) and lands in your project as source you own.`,
+    '',
+    '## Install',
+    '',
+    '```bash',
+    'npx shadcn add @detent-pro/region',
+    '```',
+    '',
+    `Pro installs from a private registry with a licence key: ${PRO_SETUP_MD}. ${FREE_COUNT} components are free under MIT and install without one.`,
+    '',
+    `## Every Pro component (${pro.length})`,
+    '',
+    itemList(pro.map((e) => ({ label: e.name, href: abs(`/components/${e.id}`), desc: e.line }))),
+    '',
+    '## Price',
+    '',
+    `$${PLANS[0].price}, once, with every update for life and unlimited projects.`,
+  ].join('\n')
+  return envelope({
+    title: 'Premium shadcn components',
+    summary: `${PRO_COMPONENTS.length} premium React components for shadcn/ui, installed with the shadcn CLI as source you own.`,
+    path: '/premium-shadcn-components',
+    body,
+    related: [{ label: 'Pro', href: abs('/pro') }, { label: 'Components', href: abs('/components') }],
+  })
+}
+
 
 const STATIC_ROUTES: Record<string, { render: () => string | null; desc: string; isStatic: boolean }> = {
   '/':            { render: renderHome,       desc: `${NAME} — premium React components`,              isStatic: true },
   '/pro':         { render: renderPro,        desc: `Pro components, blocks and templates`,              isStatic: true },
+  '/premium-shadcn-components': { render: renderPremium, desc: 'Every Pro component, for shadcn/ui', isStatic: true },
   '/components':  { render: renderComponents, desc: `All ${ENTRIES.length} components, by category`,    isStatic: true },
   '/blocks':      { render: renderBlocks,     desc: `All ${BLOCKS.length} whole-screen blocks`,         isStatic: true },
   '/templates':   { render: renderTemplates,  desc: `Every template`,                isStatic: true },

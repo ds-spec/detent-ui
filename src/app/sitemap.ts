@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     at('/pro', 0.9),
     at('/components', 0.9),
     at('/blocks', 0.8),
+    at('/premium-shadcn-components', 0.8),
     at('/templates', 0.8),
     ...(AI_SDK ? [at('/ai-sdk', 0.8)] : []),
     ...ENTRIES.map((e) => at(`/components/${e.id}`, 0.7)),
