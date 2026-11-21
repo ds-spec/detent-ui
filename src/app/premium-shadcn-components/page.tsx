@@ -6,24 +6,49 @@ import { ENTRIES } from '@/catalog/meta'
 import { FREE_BLOCKS, PRO_COMPONENTS } from '@/catalog/pro'
 import { TEMPLATE_COUNT } from '@/catalog/templates'
 import { ArrowUpRight } from '@/lab/icons'
-import { BuyBar, BuyProvider } from '@/site/pro/Buy'
 import { JsonLd, NAME, crumbs, page, url } from '@/site/seo'
 import { SitePage } from '@/site/sheets'
 import { CHECKED, CHECKED_ISO, LIBRARIES } from './libraries'
 import type { Library } from './libraries'
-import { Pieces } from './Pieces'
+import { ProCta, Showcase } from './Showcase'
 
 const PATH = '/premium-shadcn-components'
 const TITLE = 'Best Premium shadcn/ui Component Libraries (2026), Compared'
-const LEDE = `Seven paid shadcn/ui libraries side by side: price, licence, size, what each is best for and where each falls short. Prices checked ${CHECKED}.`
+const LEDE = `Seven paid shadcn/ui libraries side by side: price, licence, updates, size, what each is best for and where each falls short. Prices checked ${CHECKED}.`
 
 export const metadata: Metadata = page({ title: TITLE, absolute: true, description: LEDE, path: PATH })
 
 const FREE = ENTRIES.length - PRO_COMPONENTS.length
 
 const ROWS: Library[] = LIBRARIES.map((l) =>
-  l.ours ? { ...l, free: `${FREE} components and ${FREE_BLOCKS.length} blocks, MIT`, size: `${ENTRIES.length} components, ${BLOCKS.length} blocks, ${TEMPLATE_COUNT}` } : l,
+  l.ours
+    ? { ...l, free: `${FREE} components and ${FREE_BLOCKS.length} blocks, MIT`, components: `${ENTRIES.length}, ${PRO_COMPONENTS.length} of them Pro`, blocks: `${BLOCKS.length}`, templates: TEMPLATE_COUNT.replace(/ templates?$/, '') + ', a full app' }
+    : l,
 )
+
+const COLS: { label: string; width: string; strong?: boolean; cell: (l: Library) => ReactNode }[] = [
+  { label: 'Library', width: '', cell: (l) => l.name },
+  {
+    label: 'Price',
+    width: 'w-[170px]',
+    strong: true,
+    cell: (l) => (
+      <>
+        <span className="tnum">{l.price}</span>
+        {l.sale ? <span className="mt-0.5 block text-[12.5px] text-ink-3">On sale: {l.sale}</span> : null}
+      </>
+    ),
+  },
+  { label: 'Pay', width: 'w-[110px]', strong: true, cell: (l) => l.model },
+  { label: 'Components', width: 'w-[130px]', cell: (l) => l.components },
+  { label: 'Blocks', width: 'w-[120px]', cell: (l) => l.blocks },
+  { label: 'Templates', width: 'w-[140px]', cell: (l) => l.templates },
+  { label: 'Code', width: 'w-[160px]', cell: (l) => l.code },
+  { label: 'Licence', width: 'w-[200px]', cell: (l) => l.licence },
+  { label: 'Updates', width: 'w-[150px]', cell: (l) => l.updates },
+  { label: 'Free tier', width: 'w-[170px]', cell: (l) => l.free },
+  { label: 'Best for', width: 'w-[190px]', cell: (l) => l.bestFor },
+]
 
 const FAQ: [string, string][] = [
   ['Is shadcn/ui itself free?', 'Yes. shadcn/ui is free and open source under MIT. The libraries here sell extra components, blocks and templates built for it, installed the same way, as code in your project.'],
@@ -76,7 +101,7 @@ export default function PremiumShadcnComponents() {
           <h1 className="mt-4 text-[clamp(34px,4.4vw,56px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink">{TITLE}</h1>
           <p className="mt-6 text-[18px] leading-[1.6] text-ink-2">{LEDE}</p>
           <p className="mt-6 rounded-[16px] bg-surface-2 px-5 py-4 text-[14.5px] leading-[1.6] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)]">
-            <span className="text-ink">We make Detent UI, one of the seven.</span> It is in the list with the same template as the others, its weak spots included, and it is not ranked first. Every other library’s price and size comes from its own pricing page on {CHECKED}.
+            <span className="text-ink">We make Detent UI, one of the seven.</span> It is in the list with the same template as the others, its weak spots included, and it is not ranked first. Every other library’s price and size comes from its own pricing page on {CHECKED}. None of the links here are affiliate links: we earn nothing if you buy another library.
           </p>
         </header>
 
@@ -97,41 +122,40 @@ export default function PremiumShadcnComponents() {
         </section>
       </article>
 
-      <section aria-labelledby="table" className="mx-auto mt-14 max-w-[1100px] px-5 sm:px-6">
+      <section aria-labelledby="table" className="mx-auto mt-14 max-w-[1360px] px-5 sm:px-6">
         <h2 id="table" className={`${H2} mx-auto max-w-[712px]`}>
           Side by side
         </h2>
+        <p className="mx-auto mt-3 max-w-[712px] text-[14px] text-ink-3">Last verified {CHECKED}, from each library’s own pricing and licence pages. Scroll sideways for every column.</p>
         <div className="mt-6 overflow-x-auto rounded-[20px] bg-surface shadow-[var(--card-edge)]">
-          <table className="w-full min-w-[860px] text-left text-[14px]">
+          <table className="w-full min-w-[1480px] text-left text-[13.5px] leading-[1.5]">
             <thead>
               <tr className="text-[12.5px] text-ink-3">
-                {['Library', 'Price', 'Pay', 'Free tier', 'Size', 'Best for'].map((h) => (
-                  <th key={h} scope="col" className="px-5 py-3.5 font-normal">
-                    {h}
+                {COLS.map((c, k) => (
+                  <th key={c.label} scope="col" className={`px-4 py-3.5 font-normal ${k === 0 ? 'sticky left-0 z-10 bg-surface' : ''}`}>
+                    {c.label}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {ROWS.map((l) => (
-                <tr key={l.id} className={`align-top shadow-[inset_0_1px_0_var(--line)] ${l.ours ? 'bg-[color-mix(in_oklab,var(--accent)_5%,transparent)]' : ''}`}>
-                  <th scope="row" className="px-5 py-4 font-normal text-ink">
+                <tr key={l.id} className="align-top [&>*]:shadow-[inset_0_1px_0_var(--line)]">
+                  <th scope="row" className={`sticky left-0 z-10 w-[150px] px-4 py-4 font-normal text-ink ${l.ours ? 'bg-[color-mix(in_oklab,var(--accent)_6%,var(--surface))]' : 'bg-surface'}`}>
                     {l.name}
+                    {l.ours ? <span className="mt-0.5 block text-[12px] text-ink-3">Ours</span> : null}
                   </th>
-                  <td className="px-5 py-4 text-ink-2">
-                    <span className="tnum">{l.price}</span>
-                    {l.sale ? <span className="mt-0.5 block text-[12.5px] text-ink-3">On sale: {l.sale}</span> : null}
-                  </td>
-                  <td className="px-5 py-4 text-ink-2">{l.model}</td>
-                  <td className="px-5 py-4 text-ink-3">{l.free}</td>
-                  <td className="px-5 py-4 text-ink-3">{l.size}</td>
-                  <td className="px-5 py-4 text-ink-3">{l.bestFor}</td>
+                  {COLS.slice(1).map((c) => (
+                    <td key={c.label} className={`px-4 py-4 ${c.width} ${l.ours ? 'bg-[color-mix(in_oklab,var(--accent)_6%,var(--surface))]' : ''} ${c.strong ? 'text-ink-2' : 'text-ink-3'}`}>
+                      {c.cell(l)}
+                    </td>
+                  ))}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <p className="mx-auto mt-3 max-w-[712px] text-[12.5px] text-ink-3">Prices in USD for one person, from each library’s pricing page on {CHECKED}. Sale prices were running that week and will change.</p>
+        <p className="mx-auto mt-3 max-w-[712px] text-[12.5px] text-ink-3">Prices in USD for one person. Sale prices were running that week and will change. “Not stated” means we couldn’t find it on the library’s own pages.</p>
       </section>
 
       <article className="mx-auto max-w-[760px] px-5 sm:px-6">
@@ -152,33 +176,36 @@ export default function PremiumShadcnComponents() {
             How we compared them
           </h2>
           <p className={P}>
-            We read each library’s pricing page, licence and public demos on {CHECKED}, and noted the price for one person, whether you pay once or every month, what is free, and how much you get. The “good” and “watch out” notes come from those pages and demos. Detent is the only one we have built with day to day, so read its section knowing that.
+            <span className="text-ink">Which libraries.</span> Paid libraries built for shadcn/ui that show up when you search for premium shadcn components, still selling and updated in 2026, and that install as code in your own project. We left out general React kits that don’t use shadcn/ui.
+          </p>
+          <p className={P}>
+            <span className="text-ink">What we compared.</span> Price for one person, whether you pay once or every month, what is free, how many components, blocks and templates you get, the licence and how long updates last.
+          </p>
+          <p className={P}>
+            <span className="text-ink">How.</span> We read each library’s own pricing page, licence and public demos on {CHECKED}. We did not buy every library, so the notes on the others come from what they publish and show. Detent is the only one we build with every day, so read its section knowing that.
           </p>
         </section>
+      </article>
 
-        {ROWS.map((l, i) => (
-          <section key={l.id} id={l.id} aria-labelledby={`${l.id}-title`} className="mt-16 scroll-mt-24">
+      {ROWS.map((l, i) => (
+        <section key={l.id} id={l.id} aria-labelledby={`${l.id}-title`} className="mt-16 scroll-mt-24">
+          <div className="mx-auto max-w-[760px] px-5 sm:px-6">
             <p className="tnum text-[13px] text-ink-3">{i + 1} of {ROWS.length}</p>
             <h2 id={`${l.id}-title`} className={`${H2} mt-1`}>
               {l.name}
               <span className="block text-quiet">{l.bestFor}</span>
             </h2>
             <p className={P}>{l.line}</p>
-            {l.ours ? (
-              <div className="-mx-5 mt-8 sm:-mx-[120px]">
-                <Pieces />
-              </div>
-            ) : null}
+          </div>
+          {l.ours ? <Showcase /> : null}
+          <div className="mx-auto max-w-[760px] px-5 sm:px-6">
             <dl className="mt-6 grid grid-cols-[110px_minmax(0,1fr)] gap-x-4 gap-y-2 text-[14.5px]">
-              <dt className="text-ink-3">Price</dt>
-              <dd className="text-ink-2">
-                {l.price}, {l.model.toLowerCase()}
-                {l.sale ? ` (on sale for ${l.sale} on ${CHECKED})` : ''}
-              </dd>
-              <dt className="text-ink-3">Free</dt>
-              <dd className="text-ink-2">{l.free}</dd>
-              <dt className="text-ink-3">Size</dt>
-              <dd className="text-ink-2">{l.size}</dd>
+              {COLS.slice(1, -1).map((c) => (
+                <div key={c.label} className="contents">
+                  <dt className="text-ink-3">{c.label}</dt>
+                  <dd className="text-ink-2">{c.cell(l)}</dd>
+                </div>
+              ))}
             </dl>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <div className="rounded-[16px] bg-surface p-5 shadow-[var(--card-edge)]">
@@ -198,23 +225,17 @@ export default function PremiumShadcnComponents() {
                 </ul>
               </div>
             </div>
-            {l.ours ? (
-              <div className="mt-6 overflow-hidden rounded-[16px] bg-surface-2 shadow-[inset_0_0_0_1px_var(--line)]">
-                <p className="px-4 pt-3 font-mono text-[11.5px] text-ink-3">terminal</p>
-                <pre className="overflow-x-auto px-4 pb-4 pt-2 font-mono text-[12.5px] leading-[20px] text-ink-2" translate="no">
-                  npx shadcn add @detent-pro/region
-                </pre>
-              </div>
-            ) : null}
-            <p className="mt-5 text-[14.5px]">
-              <Out href={l.url}>
-                {l.ours ? 'See everything in Detent Pro' : `Visit ${l.name}`}
-              </Out>
-              {l.ours ? null : <ArrowUpRight size={12} className="ml-1 inline text-ink-3" />}
-            </p>
-          </section>
-        ))}
+            {l.ours ? <ProCta /> : (
+              <p className="mt-5 text-[14.5px]">
+                <Out href={l.url}>Visit {l.name}</Out>
+                <ArrowUpRight size={12} className="ml-1 inline text-ink-3" />
+              </p>
+            )}
+          </div>
+        </section>
+      ))}
 
+      <article className="mx-auto max-w-[760px] px-5 sm:px-6">
         <section aria-labelledby="choose" className="mt-20">
           <h2 id="choose" className={H2}>
             How to choose
@@ -261,12 +282,16 @@ export default function PremiumShadcnComponents() {
         </section>
       </article>
 
-      <BuyProvider>
-        <section className="mx-auto mt-24 max-w-[1360px] px-5 pb-8 sm:px-6">
-          <p className="mb-6 text-center text-[15px] text-ink-3">If Detent fits what you’re building:</p>
-          <BuyBar />
-        </section>
-      </BuyProvider>
+      <aside aria-labelledby="author" className="mx-auto mt-20 max-w-[760px] px-5 pb-8 sm:px-6">
+        <div className="rounded-[20px] bg-surface-2 p-6 shadow-[inset_0_0_0_1px_var(--line)]">
+          <p id="author" className="text-[13px] text-ink-3">
+            About the author
+          </p>
+          <p className="mt-2 text-[15px] leading-[1.65] text-ink-2">
+            I’m a design engineer and I build Detent UI on my own: every component, block and template, and the site you are reading. I work in React, Tailwind CSS v4 and shadcn/ui every day and post what I make on <Out href="https://x.com/next_gendev">X</Out>. If a price or detail here is out of date, tell me there and I’ll fix it.
+          </p>
+        </div>
+      </aside>
     </SitePage>
   )
 }
