@@ -8,11 +8,8 @@ import { wellOf } from '@/site/wells'
 import type { Tone } from '@/site/home/lights'
 
 const PIECES: { id: string; tone: Tone; bleed?: boolean; className: string }[] = [
-  { id: 'askchart', tone: 'blue', className: 'h-[560px] lg:col-span-7 lg:h-[620px]' },
-  { id: 'radar', tone: 'violet', className: 'h-[560px] lg:col-span-5 lg:h-[620px]' },
-  { id: 'region', tone: 'blue', bleed: true, className: 'h-[580px] sm:h-[640px] lg:col-span-12 lg:h-[700px]' },
-  { id: 'find', tone: 'amber', className: 'h-[520px] lg:col-span-5 lg:h-[600px]' },
-  { id: 'glyph', tone: 'rose', className: 'h-[520px] lg:col-span-7 lg:h-[600px]' },
+  { id: 'askchart', tone: 'blue', className: 'h-[540px] lg:col-span-7' },
+  { id: 'radar', tone: 'violet', className: 'h-[540px] lg:col-span-5' },
 ]
 
 export function Pieces() {

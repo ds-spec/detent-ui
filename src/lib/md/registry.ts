@@ -11,6 +11,7 @@ import { PRO_SETUP_MD, SETUP_MD, piecePrompt, proSetupPrompt, setupPrompt } from
 import { apiOf } from '@/catalog/api-of'
 import type { Api, PropDoc } from '@/catalog/api'
 import { asset } from '@/lib/asset'
+import { CHECKED, LIBRARIES } from '@/app/premium-shadcn-components/libraries'
 
 export type MarkdownRoute = {
   path: string
@@ -795,29 +796,22 @@ function renderProSetup(): string {
 }
 
 function renderPremium(): string {
-  const pro = PRO_COMPONENTS.map((id) => entry(id)).filter((e) => e !== null)
   const body = [
-    `${PRO_COMPONENTS.length} premium React components for shadcn/ui. Each one installs with the shadcn CLI, reads your theme's tokens (your --primary becomes its accent, .dark turns it dark) and lands in your project as source you own.`,
+    `Seven paid shadcn/ui libraries compared by price, licence, size and what each is best for. Prices checked ${CHECKED}. Written by the maker of Detent UI, which is one of the seven.`,
     '',
-    '## Install',
+    '## Side by side',
     '',
-    '```bash',
-    'npx shadcn add @detent-pro/region',
-    '```',
+    kvTable(
+      LIBRARIES.map((l) => [l.name, `${l.price}, ${l.model.toLowerCase()}${l.sale ? ` (on sale for ${l.sale})` : ''}. Best for: ${l.bestFor}`]),
+      ['Library', 'Price and best for'],
+    ),
     '',
-    `Pro installs from a private registry with a licence key: ${PRO_SETUP_MD}. ${FREE_COUNT} components are free under MIT and install without one.`,
-    '',
-    `## Every Pro component (${pro.length})`,
-    '',
-    itemList(pro.map((e) => ({ label: e.name, href: abs(`/components/${e.id}`), desc: e.line }))),
-    '',
-    '## Price',
-    '',
-    `$${PLANS[0].price}, once, with every update for life and unlimited projects.`,
+    ...LIBRARIES.flatMap((l) => [`## ${l.name}`, '', l.line, '', `Good: ${l.good.join('; ')}.`, '', `Watch out: ${l.watch.join('; ')}.`, '', `Link: ${l.url.startsWith('/') ? abs(l.url) : l.url}`, '']),
+    `Detent installs with \`npx shadcn add @detent-pro/region\` after connecting a Pro key (${PRO_SETUP_MD}). ${FREE_COUNT} components are free under MIT.`,
   ].join('\n')
   return envelope({
-    title: 'Premium shadcn components',
-    summary: `${PRO_COMPONENTS.length} premium React components for shadcn/ui, installed with the shadcn CLI as source you own.`,
+    title: 'Best premium shadcn/ui component libraries (2026), compared',
+    summary: `Seven paid shadcn/ui libraries compared by price, licence and size, checked ${CHECKED}.`,
     path: '/premium-shadcn-components',
     body,
     related: [{ label: 'Pro', href: abs('/pro') }, { label: 'Components', href: abs('/components') }],
