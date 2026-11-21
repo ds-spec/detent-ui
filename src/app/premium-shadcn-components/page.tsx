@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { BLOCKS } from '@/catalog/blocks'
 import { ENTRIES } from '@/catalog/meta'
-import { FREE_BLOCKS, PRO_COMPONENTS } from '@/catalog/pro'
+import { FREE_BLOCKS, PLANS, PRO_COMPONENTS } from '@/catalog/pro'
 import { TEMPLATE_COUNT } from '@/catalog/templates'
 import { ArrowUpRight } from '@/lab/icons'
 import { JsonLd, NAME, crumbs, page, url } from '@/site/seo'
@@ -156,6 +156,9 @@ export default function PremiumShadcnComponents() {
           </table>
         </div>
         <p className="mx-auto mt-3 max-w-[712px] text-[12.5px] text-ink-3">Prices in USD for one person. Sale prices were running that week and will change. “Not stated” means we couldn’t find it on the library’s own pages.</p>
+        <p className="mx-auto mt-6 max-w-[712px] text-[14.5px] leading-[1.6] text-ink-3">
+          Building the inside of a product rather than a landing page? <Link href="#detent" className={A}>See Detent’s section</Link>, or <Link href="/pro" data-cta="seo-premium-table" className={A}>Detent Pro</Link> at ${PLANS[0].price}, once.
+        </p>
       </section>
 
       <article className="mx-auto max-w-[760px] px-5 sm:px-6">
@@ -168,6 +171,25 @@ export default function PremiumShadcnComponents() {
           </p>
           <p className={P}>
             Whichever you pick, it should install the shadcn way, as source files in your project, and take the theme you already have. You should never be locked into a package you can’t edit.
+          </p>
+        </section>
+
+        <section aria-labelledby="ai" className="mt-16">
+          <h2 id="ai" className={H2}>
+            Are they still worth buying now that AI writes UI?
+          </h2>
+          <p className={P}>
+            Ask Claude, Cursor or v0 for a pricing page and you get one in a minute. It usually works, and it usually looks like every other page the same model made that day: the default spacing, the default card, no states for loading or errors, nothing that responds when you press it. The first screen is easy. The tenth screen matching the first one is the hard part.
+          </p>
+          <p className={P}>
+            That is what a good library still sells: a set of pieces that already agree with each other, interactions someone has tested on a phone and with a keyboard, and patterns your agent can reuse instead of reinventing. The useful question isn’t “AI or a library” but “what does my agent build with?” Give it well-made parts and the screens it writes come out better.
+          </p>
+          <p className={P}>
+            Detent leans into that. Every piece has a page written for coding agents, with where it goes, a working example and its props, and one prompt connects Claude Code, Cursor or Codex to it. You can try it with a free piece like the{' '}
+            <Link href="/components/prompt" className={A}>
+              Prompt box
+            </Link>{' '}
+            before paying for anything.
           </p>
         </section>
 
@@ -256,8 +278,7 @@ export default function PremiumShadcnComponents() {
             If you don’t want to pay yet
           </h2>
           <p className={P}>
-            <Out href="https://ui.shadcn.com">shadcn/ui</Out> covers the basics. <Out href="https://magicui.design">Magic UI</Out> and Aceternity’s free set add motion. Detent has {FREE} free components under MIT that you can{' '}
-            <Out href="/components">try live here</Out>.
+            <Out href="https://ui.shadcn.com">shadcn/ui</Out> covers the basics. <Out href="https://magicui.design">Magic UI</Out> and Aceternity’s free set add motion. Detent has {FREE} free components under MIT that you can <Out href="/components">try live here</Out>, like the <Out href="/components/diff">Diff review</Out> for showing what an agent changed, the <Out href="/components/metric">Metric explainer</Out> for a number that says why it moved, and the <Out href="/components/livelist">Live list</Out> for a shared checklist that updates as people tick it.
           </p>
         </section>
 
@@ -282,7 +303,24 @@ export default function PremiumShadcnComponents() {
         </section>
       </article>
 
-      <aside aria-labelledby="author" className="mx-auto mt-20 max-w-[760px] px-5 pb-8 sm:px-6">
+      <section aria-label="Try Detent" className="mx-auto mt-20 max-w-[760px] px-5 sm:px-6">
+        <div className="flex flex-col gap-5 rounded-[24px] bg-surface p-6 shadow-[var(--card-edge)] sm:flex-row sm:items-center sm:justify-between sm:p-7">
+          <p className="text-[17px] leading-[1.4] tracking-[-0.015em] text-ink">
+            Start with the free set, upgrade when it earns it.
+            <span className="block text-[14px] tracking-normal text-ink-3">Detent Pro is ${PLANS[0].price} once, for life.</span>
+          </p>
+          <div className="flex shrink-0 items-center gap-2">
+            <Link href="/components" className="ring-focus flex h-10 items-center rounded-full px-4 text-[14px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line)] transition-[color,transform] duration-150 hover:text-ink active:scale-[0.97]">
+              Free components
+            </Link>
+            <Link href="/pro" data-cta="seo-premium-end" className="ring-focus flex h-10 items-center rounded-full bg-ink px-4 text-[14px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]">
+              Get Detent Pro
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <aside aria-labelledby="author" className="mx-auto mt-10 max-w-[760px] px-5 pb-8 sm:px-6">
         <div className="rounded-[20px] bg-surface-2 p-6 shadow-[inset_0_0_0_1px_var(--line)]">
           <p id="author" className="text-[13px] text-ink-3">
             About the author

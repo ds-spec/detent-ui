@@ -12,9 +12,25 @@ const LINE = 'mt-1.5 max-w-[560px] text-[15px] leading-[1.6] text-ink-3'
 
 const TREE = ['components/', '  ui/', '    button.tsx', '  detent/components/', '    askchart/AskChart.tsx', '    viz/RadarCompare.tsx']
 
+const WHY: [string, string][] = [
+  ['Interactive', 'Pieces that answer, compare and stream, not static layouts'],
+  ['Product screens', 'Blocks that already work, like an inbox or an eval run'],
+  ['Tailwind v4', 'Built on current shadcn/ui and its CSS variables'],
+  ['Yours', 'Source files in your project, change anything'],
+  ['One payment', 'Every update after it, no subscription'],
+]
+
 export function Showcase() {
   return (
     <div className="mx-auto mt-10 max-w-[1100px] px-5 sm:px-6">
+      <ul className="mb-14 grid grid-cols-1 gap-px overflow-hidden rounded-[20px] bg-[var(--line)] shadow-[var(--card-edge)] sm:grid-cols-2 lg:grid-cols-5">
+        {WHY.map(([t, d]) => (
+          <li key={t} className="bg-surface px-5 py-4">
+            <p className="text-[14.5px] text-ink">{t}</p>
+            <p className="mt-1 text-[13px] leading-[1.5] text-ink-3">{d}</p>
+          </li>
+        ))}
+      </ul>
       <div>
         <p className={LABEL}>Components</p>
         <p className={HEAD}>Pieces that do something when you touch them</p>
