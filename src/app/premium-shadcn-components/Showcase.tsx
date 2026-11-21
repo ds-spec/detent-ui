@@ -22,7 +22,7 @@ const WHY: [string, string][] = [
 
 export function Showcase() {
   return (
-    <div className="mx-auto mt-10 max-w-[1100px] px-5 sm:px-6">
+    <div className="mt-8">
       <ul className="mb-14 grid grid-cols-1 gap-px overflow-hidden rounded-[20px] bg-[var(--line)] shadow-[var(--card-edge)] sm:grid-cols-2 lg:grid-cols-5">
         {WHY.map(([t, d]) => (
           <li key={t} className="bg-surface px-5 py-4">
