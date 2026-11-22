@@ -11,6 +11,7 @@ import { PRO_SETUP_MD, SETUP_MD, piecePrompt, proSetupPrompt, setupPrompt } from
 import { apiOf } from '@/catalog/api-of'
 import type { Api, PropDoc } from '@/catalog/api'
 import { asset } from '@/lib/asset'
+import { CHECKED, LIBRARIES } from '@/app/premium-shadcn-components/libraries'
 
 export type MarkdownRoute = {
   path: string
@@ -794,10 +795,34 @@ function renderProSetup(): string {
   })
 }
 
+function renderPremium(): string {
+  const body = [
+    `Seven paid shadcn/ui libraries compared by price, licence, size and what each is best for. Prices checked ${CHECKED}. Written by the maker of Detent UI, which is one of the seven.`,
+    '',
+    '## Side by side',
+    '',
+    kvTable(
+      LIBRARIES.map((l) => [l.name, `${l.price}, ${l.model.toLowerCase()}${l.sale ? ` (on sale for ${l.sale})` : ''}. Best for: ${l.bestFor}`]),
+      ['Library', 'Price and best for'],
+    ),
+    '',
+    ...LIBRARIES.flatMap((l) => [`## ${l.name}`, '', l.line, '', `Good: ${l.good.join('; ')}.`, '', `Watch out: ${l.watch.join('; ')}.`, '', `Link: ${l.url.startsWith('/') ? abs(l.url) : l.url}`, '']),
+    `Detent installs with \`npx shadcn add @detent-pro/region\` after connecting a Pro key (${PRO_SETUP_MD}). ${FREE_COUNT} components are free under MIT.`,
+  ].join('\n')
+  return envelope({
+    title: 'Best premium shadcn/ui component libraries (2026), compared',
+    summary: `Seven paid shadcn/ui libraries compared by price, licence and size, checked ${CHECKED}.`,
+    path: '/premium-shadcn-components',
+    body,
+    related: [{ label: 'Pro', href: abs('/pro') }, { label: 'Components', href: abs('/components') }],
+  })
+}
+
 
 const STATIC_ROUTES: Record<string, { render: () => string | null; desc: string; isStatic: boolean }> = {
   '/':            { render: renderHome,       desc: `${NAME} — premium React components`,              isStatic: true },
   '/pro':         { render: renderPro,        desc: `Pro components, blocks and templates`,              isStatic: true },
+  '/premium-shadcn-components': { render: renderPremium, desc: 'Every Pro component, for shadcn/ui', isStatic: true },
   '/components':  { render: renderComponents, desc: `All ${ENTRIES.length} components, by category`,    isStatic: true },
   '/blocks':      { render: renderBlocks,     desc: `All ${BLOCKS.length} whole-screen blocks`,         isStatic: true },
   '/templates':   { render: renderTemplates,  desc: `Every template`,                isStatic: true },
