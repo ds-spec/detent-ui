@@ -131,14 +131,14 @@ function Hero({ total, free, blocks, templates }: Counts) {
         <ArrowRight size={12} className="text-ink-3 transition-transform duration-150 group-hover:translate-x-0.5" />
       </Link>
       <h1 className="focus-in mt-7 text-[clamp(36px,5vw,74px)] font-normal leading-[1.01] tracking-[-0.055em] text-ink">
-        The hard parts of an AI product,
+        Make your AI product
         <br />
         <span className="text-quiet">
-          already <DitherWord color="var(--accent)">built</DitherWord>.
+          feel <DitherWord color="var(--accent)">expensive</DitherWord>.
         </span>
       </h1>
       <p className="rise mt-6 max-w-[540px] text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
-        Agent runs, approvals, streaming answers and charts that explain themselves, with every state already worked out. Ship an AI product that feels funded, this{'\u00a0'}week.
+        The hard parts, already built: agent chat, approvals, streaming answers and charts that explain themselves, with every state worked out. Your coding agent installs them{'\u00a0'}today.
       </p>
       <div className="rise mt-8 flex flex-wrap items-center justify-center gap-2" style={{ animationDelay: '180ms' }}>
         <Link href="/pro" data-cta="home-hero" className={PILL_DARK}>
@@ -154,7 +154,10 @@ function Hero({ total, free, blocks, templates }: Counts) {
       </p>
       <div className="rise mt-9 flex flex-col items-center gap-1.5 text-[13px] text-ink-3" style={{ animationDelay: '280ms' }}>
         <p className="text-balance">
-          Used by <span className="text-ink-2">Nuanced</span>. Praised by builders at <span className="text-ink-2">Amboras (YC)</span>, <span className="text-ink-2">Laravel Cloud</span> and ex-<span className="text-ink-2">Snap</span>.
+          <span className="text-ink-2">“Make your product feel expensive.”</span> That’s what sold Josh at <span className="text-ink-2">Nuanced</span>.
+        </p>
+        <p className="text-balance">
+          Praised by builders at <span className="text-ink-2">Amboras (YC)</span>, <span className="text-ink-2">Laravel Cloud</span> and ex-<span className="text-ink-2">Snap</span>.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
           <InDirectory />
