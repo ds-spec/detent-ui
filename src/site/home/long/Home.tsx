@@ -9,7 +9,7 @@ import { ENTRIES } from '@/catalog/meta'
 import { installCommand, isProBlock, isProComponent, PLANS } from '@/catalog/pro'
 import { SIZE, TILE } from '@/catalog/sizes'
 import { TEMPLATES } from '@/catalog/templates'
-import { ArrowDown, ArrowRight, ArrowUpRight, Check } from '@/lab/icons'
+import { ArrowDown, ArrowRight, ArrowUpRight } from '@/lab/icons'
 import { InPlay } from '@/lab/blocks/kit/director'
 import { InDirectory } from '@/site/Directory'
 import { DitherWord } from '@/site/Dither'
@@ -24,6 +24,7 @@ import { Mini } from '@/site/Mini'
 import { CopyCommand } from '@/site/parts'
 import { PriceNow } from '@/site/Promo'
 import { Compare } from './Compare'
+import { PricingCards } from '@/site/pro/Cards'
 import { H2, Leaf, PILL_DARK, PILL_PRO, PILL_SOFT, ProBadge, SECTION, Tabs, WRAP } from './parts'
 
 const PRICE = PLANS[0].price
@@ -80,7 +81,7 @@ export function Home(n: Counts) {
       </div>
       <div className="mt-3">
         <Leaf>
-          <Close total={n.total} pro={n.pro} blocks={n.blocks} />
+          <Close />
         </Leaf>
       </div>
       <div className="mt-3">
@@ -551,37 +552,16 @@ export function Doors({ buy = '/pro' }: { buy?: string } = {}) {
 }
 
 /* 10. The close: what one payment buys, and the button. */
-function Close({ total, pro, blocks }: { total: number; pro: number; blocks: number }) {
-  const app = TEMPLATES.find((t) => t.form === 'app')
-  const site = TEMPLATES.find((t) => t.form !== 'app')
-  const rows = [
-    `${TEMPLATES.length} templates: ${app?.name}, a full AI workspace app, and ${site?.name}, a landing page for an AI agent`,
-    `All ${blocks} blocks: agent chat, evals, support inbox, onboarding, settings and more`,
-    `All ${total} components, ${pro} of them only in Pro`,
-    'Unlimited projects',
-    'Source code you own and can change',
-    'Your coding agent sets it up from one prompt',
-  ]
+function Close() {
   return (
     <section className={`${SECTION} flex flex-col items-center px-5 text-center`}>
       <h2 className={H2}>
         Ship the AI app this week.
         <span className="block text-quiet">Skip the weeks of UI.</span>
       </h2>
-      <ul className="mt-9 grid max-w-[560px] gap-3 text-left">
-        {rows.map((r) => (
-          <li key={r} className="flex gap-3 text-[15px] leading-[1.45] text-ink-2">
-            <span className="mt-[3px] shrink-0 text-accent">
-              <Check size={15} strokeWidth={2.4} />
-            </span>
-            {r}
-          </li>
-        ))}
-      </ul>
-      <Link href="/pro" data-cta="home-close" className={`${PILL_DARK} mt-10`}>
-        Get Pro · <PriceNow value={PRICE} /> once
-      </Link>
-      <p className="mt-4 max-w-[460px] text-[13px] leading-[1.55] text-ink-3"><PriceNow value={PRICE} /> + local tax · lifetime updates · all sales final. Try every Pro screen live first.</p>
+      <div className="mt-10 w-full">
+        <PricingCards cta="home-cards" />
+      </div>
     </section>
   )
 }

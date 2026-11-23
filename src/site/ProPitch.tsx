@@ -7,7 +7,7 @@ import { PLANS, PRO_BLOCK_COUNT, PRO_COMPONENTS, isProBlock, isProComponent } fr
 import { TEMPLATE_COUNT, TEMPLATES } from '@/catalog/templates'
 import { ArrowRight, ArrowUpRight } from '@/lab/icons'
 import { ForPlan } from './Owned'
-import { BuyTerms, Price, PriceNow } from './Promo'
+import { BuyTerms, Price, PriceNow, SaleClock } from './Promo'
 
 const PICKS = ['glyph', 'region', 'threads', 'find', 'funnel', 'forecast']
 const BLOCK_PICKS = ['onboarding', 'support-inbox', 'task-to-merge', 'agent-chat', 'evals', 'calendar']
@@ -51,6 +51,7 @@ export function ProPitch({ id, shelf = 'components', near = false }: { id: strin
               </ul>
             </div>
             <div className="flex flex-col items-start gap-2 lg:items-end">
+              <SaleClock />
               <p className="flex items-baseline gap-1.5">
                 <span className="tnum text-[40px] leading-none tracking-[-0.045em] text-ink">
                   <Price value={plan.price} />

@@ -59,7 +59,7 @@ export function Header() {
     <>
     <PromoStrip />
     <MobileBuy />
-    <header className="pointer-events-none sticky top-0 z-50 h-[72px] px-2.5 sm:px-5">
+    <header className="pointer-events-none sticky top-[var(--strip,0px)] z-50 h-[72px] px-2.5 sm:px-5">
       <div className="pointer-events-auto relative mx-auto grid h-[72px] max-w-[1440px] grid-cols-[1fr_auto] items-center pl-6 pr-2.5 lg:grid-cols-[1fr_auto_1fr]">
         <span
           aria-hidden

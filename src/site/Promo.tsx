@@ -5,9 +5,10 @@ import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { PLANS } from '@/catalog/pro'
 import { usePathname } from 'next/navigation'
-import { PROMO, promoLive } from '@/catalog/promo'
+import { PROMO, REGIONAL, promoLive } from '@/catalog/promo'
 import type { Promo } from '@/catalog/promo'
 import { ArrowRight } from '@/lab/icons'
+import { RollingText } from '@/lab/ui/RollingText'
 import { useOwned } from './Owned'
 
 const BLUE = 'linear-gradient(90deg, #8fb0ff, #5b86ff 55%, #3d6dff)'
@@ -19,25 +20,74 @@ const tick = (go: () => void) => {
 }
 const second = () => Math.floor(Date.now() / 1000)
 
-export function usePromo(): Promo | null {
-  const live = useSyncExternalStore(tick, () => promoLive(PROMO), () => !!PROMO)
-  return live ? PROMO : null
+const CC_KEY = 'detent:cc'
+let country: string | null = null
+let asked = false
+const heard = new Set<() => void>()
+function listen(go: () => void) {
+  heard.add(go)
+  if (!asked) {
+    asked = true
+    try {
+      country = localStorage.getItem(CC_KEY)
+    } catch {}
+    const forced = process.env.NODE_ENV !== 'production' ? new URLSearchParams(location.search).get('cc') : null
+    if (forced) {
+      country = forced.toUpperCase()
+      return () => {
+        heard.delete(go)
+      }
+    }
+    fetch('/api/country')
+      .then((r) => r.json())
+      .then((d: { country?: string | null }) => {
+        country = d.country ?? null
+        try {
+          if (country) localStorage.setItem(CC_KEY, country)
+        } catch {}
+        heard.forEach((f) => f())
+      })
+      .catch(() => {})
+  }
+  return () => {
+    heard.delete(go)
+  }
 }
 
-function useLeft() {
+export function usePromo(): Promo | null {
+  const live = useSyncExternalStore(tick, () => promoLive(PROMO), () => !!PROMO)
+  const cc = useSyncExternalStore(listen, () => country, () => null)
+  const base = live ? PROMO : null
+  const local = cc ? REGIONAL[cc] : undefined
+  if (!local) return base
+  return { name: base?.name ?? local.name, price: local.price, off: '', until: base?.until ?? '', ends: base?.ends ?? Infinity }
+}
+
+export function useRegion() {
+  const cc = useSyncExternalStore(listen, () => country, () => null)
+  return cc ? REGIONAL[cc] : undefined
+}
+
+export function useLeft(ends?: number) {
   const now = useSyncExternalStore(tick, second, () => 0)
-  if (!PROMO || !now) return null
-  const s = Math.max(0, Math.floor(PROMO.ends / 1000) - now)
+  if (!ends || !Number.isFinite(ends) || !now) return null
+  const s = Math.max(0, Math.floor(ends / 1000) - now)
   const d = Math.floor(s / 86400)
   const h = Math.floor((s % 86400) / 3600)
   const m = Math.floor((s % 3600) / 60)
-  return d > 0 ? `${d}d ${h}h` : h > 0 ? `${h}h ${m}m` : `${m}m ${s % 60}s`
+  const two = (n: number) => String(n).padStart(2, '0')
+  return d > 0 ? `${d}d ${two(h)}h ${two(m)}m ${two(s % 60)}s` : `${two(h)}h ${two(m)}m ${two(s % 60)}s`
 }
 
 export function PromoStrip() {
   const owned = useOwned()
   const promo = usePromo()
-  const left = useLeft()
+  const left = useLeft(promo?.ends)
+  const shown = !!promo && !owned
+  useEffect(() => {
+    document.documentElement.style.setProperty('--strip', shown ? '38px' : '0px')
+    return () => document.documentElement.style.setProperty('--strip', '0px')
+  }, [shown])
   if (!promo) return null
 
   return (
@@ -49,12 +99,12 @@ export function PromoStrip() {
       aria-label="Offer"
       exit={{ height: 0, opacity: 0 }}
       transition={{ height: { type: 'spring', stiffness: 380, damping: 40 }, opacity: { duration: 0.18 } }}
-      className="relative z-[51] h-[38px] overflow-hidden bg-[#0b0b0d] text-white"
+      className="sticky top-0 z-[51] h-[38px] overflow-hidden bg-[#0b0b0d] text-white"
     >
       <div className="mx-auto flex h-[38px] max-w-[1440px] items-center justify-center gap-2.5 px-3 text-[13px] text-white/60 sm:gap-3 sm:text-[13.5px]">
         <p className="flex min-w-0 items-center gap-[0.3em] whitespace-nowrap leading-[1.25]">
           <span className="hidden sm:inline">{promo.name ? `${promo.name}:` : 'Grab'}</span>
-          <b className="font-semibold text-white">{promo.off} off</b>
+          {promo.off && <b className="font-semibold text-white">{promo.off} off</b>}
           <span className="hidden sm:inline">Detent</span>
           <span className="bg-clip-text font-semibold text-transparent" style={{ backgroundImage: BLUE }}>
             Pro
@@ -73,10 +123,10 @@ export function PromoStrip() {
           </span>
         </span>
         {left && (
-          <span className="whitespace-nowrap tabular-nums text-white/45">
-            <span className="hidden md:inline">ends in </span>
-            <span className="sr-only md:hidden">ends in </span>
-            <span className="text-white/80">{left}</span>
+          <span className="inline-flex items-center gap-[0.3em] whitespace-nowrap tabular-nums text-white/45">
+            <span className="hidden md:inline">ends in</span>
+            <span className="sr-only md:hidden">ends in</span>
+            <RollingText text={left} className="text-white/80" />
           </span>
         )}
         <a
@@ -92,6 +142,25 @@ export function PromoStrip() {
     </motion.div>
       )}
     </AnimatePresence>
+  )
+}
+
+export function SaleClock({ className = '' }: { className?: string }) {
+  const promo = usePromo()
+  const left = useLeft(promo?.ends)
+  if (!promo) return null
+  return (
+    <p className={`tnum text-balance text-[12.5px] leading-[1.4] text-ink-3 ${className}`}>
+      <span className="font-medium text-accent">
+        {promo.name ?? 'Sale'}
+        {promo.off ? ` · ${promo.off} off` : ''}
+      </span>
+      {left && (
+        <span className="ml-[0.3em] inline-flex items-center gap-[0.3em] whitespace-nowrap align-middle">
+          ends in <RollingText text={left} className="text-ink" />
+        </span>
+      )}
+    </p>
   )
 }
 

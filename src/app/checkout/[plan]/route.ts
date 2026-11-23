@@ -17,6 +17,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ plan: st
   const meta = sourceMetadata(cookies)
   const counted = !isLocal(req) && !cookieOf(cookies, NOTRACK)
   const country = req.headers.get('cf-ipcountry') ?? undefined
+  if (country) meta.country = country
   const sid = cookieOf(cookies, 'dt_ph')
   const props = { plan: asked, source: meta.source, last_source: meta.last_source, last_campaign: meta.last_campaign, country, $geoip_disable: true, $raw_user_agent: req.headers.get('user-agent') ?? undefined, ...(sid ? { $session_id: sid } : {}) }
 

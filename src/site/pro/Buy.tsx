@@ -8,7 +8,7 @@ import { BLOCKS } from '@/catalog/blocks'
 import { PLANS, PRO_BLOCK_COUNT, PRO_COMPONENTS } from '@/catalog/pro'
 import type { Plan } from '@/catalog/pro'
 import { TEMPLATES, TEMPLATE_COUNT } from '@/catalog/templates'
-import { priceWith, usePromo } from '../Promo'
+import { SaleClock, priceWith, usePromo } from '../Promo'
 import { ArrowRight, ArrowUpRight, Check, Code, Refresh } from '@/lab/icons'
 import { RollingText } from '@/lab/ui/RollingText'
 import { BLOCK_VIEWS, TEMPLATE_VIEWS } from '@pro'
@@ -291,7 +291,10 @@ export function BuyBar({ terms }: { terms?: ReactNode } = {}) {
   return (
     <div className="flex w-full flex-col items-center">
       <div className={side ? `flex w-full max-w-[600px] flex-col gap-3 rounded-[26px] bg-surface p-2 shadow-[var(--card-edge)] sm:flex-row sm:items-center sm:rounded-[18px] sm:gap-2` : "flex w-full max-w-[600px] flex-col gap-3 rounded-[26px] bg-surface p-2 shadow-[var(--card-edge)] sm:flex-row sm:items-center sm:rounded-full sm:gap-2"}>
-        <p className="px-4 pt-1 text-[15px] tracking-[-0.01em] text-ink sm:pt-0">Detent Pro</p>
+        <div className="px-4 pt-1 sm:pt-0">
+          <p className="text-[15px] tracking-[-0.01em] text-ink">Detent Pro</p>
+          <SaleClock />
+        </div>
         <div className="flex items-center gap-3 px-2 pb-1 sm:ml-auto sm:p-0">
           <p className="flex flex-1 items-baseline gap-1 sm:flex-none">
             {promo && <s className="tnum text-[14px] leading-none text-ink-3">${plan.price}</s>}

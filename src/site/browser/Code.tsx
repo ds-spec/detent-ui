@@ -9,7 +9,7 @@ import { TEMPLATES } from '@/catalog/templates'
 import type { SourceFile } from '@/catalog/source'
 import { BTN, useSideNew } from '../shell/side'
 import { ProTag } from '../blocks/ProTag'
-import { BuyTerms, PriceNow } from '../Promo'
+import { BuyTerms, PriceNow, SaleClock } from '../Promo'
 import { track } from '../track'
 
 const cache = new Map<string, Promise<SourceFile[]>>()
@@ -126,7 +126,8 @@ function Locked({ files }: { id: string; files: SourceFile[] }) {
             <p className="mx-auto mt-2 max-w-[320px] text-callout text-ink-3">
               {total.toLocaleString('en-US')} lines across {files.length === 1 ? 'one file' : `${files.length} files`}. Plus the full {app?.name ?? 'Detent'} workspace template, {PRO_BLOCK_COUNT} whole screens and {PRO_COMPONENTS.length} Pro components.
             </p>
-            <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+            <SaleClock className="mt-4" />
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:justify-center">
               <a href={plan.href} data-cta="code-lock" className={side ? `ring-focus flex h-10 items-center justify-center rounded-[10px] ${BTN.accent} px-5 text-footnote font-medium transition-[opacity,transform] duration-150 active:scale-[0.97]` : "ring-focus flex h-10 items-center justify-center rounded-full bg-ink px-5 text-footnote font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]"}>
                 {plan.cta} · <PriceNow value={plan.price} /> once
               </a>

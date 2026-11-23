@@ -5,11 +5,11 @@ import { BLOCKS } from '@/catalog/blocks'
 import { ENTRIES } from '@/catalog/meta'
 import { PLANS } from '@/catalog/pro'
 import { TEMPLATES } from '@/catalog/templates'
-import { ArrowUpRight, Check } from '@/lab/icons'
 import { Charts, Own, Tile } from '@/site/home/long/Home'
 import { H2, Leaf, PILL_DARK, PILL_SOFT, SECTION, WRAP } from '@/site/home/long/parts'
 import { TemplatePiece } from '@/site/library/Library'
 import { PriceNow } from '@/site/Promo'
+import { PricingCards } from '@/site/pro/Cards'
 
 const PRICE = PLANS[0].price
 
@@ -23,14 +23,6 @@ const QA: [string, string][] = [
 
 export function Agencies() {
   const app = TEMPLATES.find((t) => t.form === 'app')
-  const rows = [
-    `The ${app?.name ?? 'Detent'} AI workspace template, running and ready to rename`,
-    `All ${BLOCKS.length} blocks: agent chat, evals, support inbox, data table, settings and more`,
-    `All ${ENTRIES.length} components, charts that explain themselves included`,
-    'Unlimited projects',
-    'Restyled by each client’s shadcn theme',
-    'Every update, for life',
-  ]
   return (
     <div className="pb-3" style={{ background: 'var(--ground)' }}>
       <Leaf>
@@ -117,26 +109,12 @@ export function Agencies() {
               One licence.
               <span className="block text-quiet">Every client project.</span>
             </h2>
-            <ul className="mt-9 grid max-w-[560px] gap-3 text-left">
-              {rows.map((r) => (
-                <li key={r} className="flex gap-3 text-[15px] leading-[1.45] text-ink-2">
-                  <span className="mt-[3px] shrink-0 text-accent">
-                    <Check size={15} strokeWidth={2.4} />
-                  </span>
-                  {r}
-                </li>
-              ))}
-            </ul>
-            <Link href="/pro" data-cta="agencies-close" className={`${PILL_DARK} mt-10`}>
-              Get Pro · <PriceNow value={PRICE} /> once
+            <div className="mt-10 w-full">
+              <PricingCards cta="agencies-cards" />
+            </div>
+            <Link href="/templates" className="ring-focus mt-5 rounded-[4px] text-[13px] text-ink-2 underline decoration-[var(--line-strong)] underline-offset-[3px] transition-colors hover:text-ink">
+              Try every Pro screen live first
             </Link>
-            <p className="mt-4 text-[13px] text-ink-3">
-              <PriceNow value={PRICE} /> + local tax · lifetime updates · all sales final.{' '}
-              <Link href="/templates" className="ring-focus rounded-[4px] text-ink-2 underline decoration-[var(--line-strong)] underline-offset-[3px] transition-colors hover:text-ink">
-                Try every Pro screen live first
-                <ArrowUpRight size={11} className="ml-0.5 inline-block align-[-1px]" />
-              </Link>
-            </p>
           </section>
         </Leaf>
       </div>

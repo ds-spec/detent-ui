@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { planOfProduct } from '@/catalog/licence'
+import { INDIA_PRODUCT } from '@/catalog/pro'
 import { getAuth } from '@/lib/account/auth'
 import { emailOfAccount, recordPurchase } from '@/lib/account/keys'
 import { deliver } from '@/lib/account/mail'
@@ -33,6 +34,7 @@ type Event = {
     settlement_amount?: number
     settlement_currency?: string
     customer?: { email?: string | null } | null
+    billing?: { country?: string | null } | null
     product_cart?: { product_id: string }[] | null
     metadata?: Record<string, unknown> | null
   }
@@ -82,6 +84,8 @@ export async function POST(req: Request) {
       payment_id: id,
       revenue: typeof cents === 'number' ? cents / 100 : undefined,
       currency: data?.settlement_currency ?? data?.currency,
+      country: data?.billing?.country ?? (typeof data?.metadata?.country === 'string' ? data.metadata.country : undefined),
+      india_price: data?.product_cart?.some((p) => p.product_id === INDIA_PRODUCT) || undefined,
       ...from,
       $set: { customer: true, plan },
       $set_once: { first_source: from.source, first_campaign: from.campaign, first_referrer: from.referrer, bought_from: from.last_source ?? from.source },

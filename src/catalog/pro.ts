@@ -62,14 +62,17 @@ const comeBack = (link: string) => {
   return url.toString()
 }
 
+export const INDIA_PRODUCT = 'pdt_0NsYWZkMeS8m4L1Jhhwqn'
+
 export const CHECKOUT = {
   pro: comeBack(process.env.NEXT_PUBLIC_CHECKOUT_PRO ?? '#checkout'),
+  india: comeBack(`https://checkout.dodopayments.com/buy/${INDIA_PRODUCT}?quantity=1`),
   all: comeBack(process.env.NEXT_PUBLIC_CHECKOUT_ALL ?? '#checkout'),
 }
 
 /** `meta` lands on the Dodo payment as metadata (Dodo reads every `metadata_*` query param). */
 export function checkoutFor(plan: keyof typeof CHECKOUT, account: { id: string; email: string } | null, meta: Record<string, string> = {}) {
-  const link = CHECKOUT[plan]
+  const link = plan === 'pro' && meta.country === 'IN' ? CHECKOUT.india : CHECKOUT[plan]
   if (!/^https?:\/\//.test(link)) return null
   const url = new URL(link)
   for (const [key, value] of Object.entries(meta)) url.searchParams.set(`metadata_${key}`, value)

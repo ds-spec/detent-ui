@@ -8,7 +8,8 @@ import { CONTACT } from '@/catalog/trust'
 import { Check } from '@/lab/icons'
 import { BigBuy, BuyBar, BuyNote, BuyProvider } from '@/site/pro/Buy'
 import { Gallery, ProHero, Terms } from '@/site/pro/Gallery'
-import { Compare, Inside } from '@/site/pro/Inside'
+import { Inside } from '@/site/pro/Inside'
+import { PricingCards } from '@/site/pro/Cards'
 import { Install } from '@/site/pro/Install'
 import { Keys } from '@/site/pro/Keys'
 import { Quotes } from '@/site/pro/Quotes'
@@ -89,7 +90,7 @@ export default function ProPage() {
             <span className="block text-quiet">What each one gets you.</span>
           </h2>
           <div className="mt-10 sm:mt-14">
-            <Compare />
+            <PricingCards cta="pro-cards" />
           </div>
           <p className="mt-8 text-[15px] leading-[1.6] text-ink-3">
             <span className="text-ink">This is the start.</span> New components, blocks and templates are on the way, included in your plan when they land.
