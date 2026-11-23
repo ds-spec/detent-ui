@@ -53,7 +53,7 @@ export function PromoStrip() {
     >
       <div className="mx-auto flex h-[38px] max-w-[1440px] items-center justify-center gap-2.5 px-3 text-[13px] text-white/60 sm:gap-3 sm:text-[13.5px]">
         <p className="flex min-w-0 items-center gap-[0.3em] whitespace-nowrap leading-[1.25]">
-          <span className="hidden sm:inline">Grab</span>
+          <span className="hidden sm:inline">{promo.name ? `${promo.name}:` : 'Grab'}</span>
           <b className="font-semibold text-white">{promo.off} off</b>
           <span className="hidden sm:inline">Detent</span>
           <span className="bg-clip-text font-semibold text-transparent" style={{ backgroundImage: BLUE }}>
