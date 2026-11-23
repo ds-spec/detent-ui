@@ -118,7 +118,7 @@ export function ProHero() {
   return (
     <div className="flex flex-col items-center text-center">
       <h1 className="focus-in text-[clamp(36px,4.6vw,68px)] font-normal leading-[1.03] tracking-[-0.055em] text-ink">
-        Ship your AI app this week.
+        Make your AI product feel expensive.
         <span className="block text-quiet">
           {promo && <s className="decoration-[0.06em]">${plan.price}</s>} ${priceWith(promo, plan.price)} once. Yours for good.
         </span>
