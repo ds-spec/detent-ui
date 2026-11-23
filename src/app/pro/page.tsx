@@ -33,7 +33,6 @@ const FAQ: [string, string][] = [
   ['How do I install Pro?', 'With the shadcn CLI, from Detent’s private registry. Sign in with your email, generate a key, add it and the registry to the project once, as in Set up once below, then install like anything else: npx shadcn add @detent-pro/glyph. The source lands in your project.'],
   ['Can my coding agent do it for me?', 'Yes, that’s how Detent is made to be used. Copy the prompt under Set up once into Claude Code, Cursor or Codex and it connects Pro. Then say what you’re building. Every piece has a page written for agents, with where it goes, a working example and its props, so your agent places it well instead of guessing.'],
   ['Can my team share one licence?', 'A licence is for one person, so each person building with it needs their own. Your keys work in CI and shared repos.'],
-  ['Can I get a refund?', `No, every sale is final: the code is yours the moment it lands. That’s why every Pro piece and both templates run live on this site, and ${ENTRIES.length - PRO_COMPONENTS.length} components are free to install, so you can try Detent in your own project before you pay.`],
   ['What if I get stuck?', `Write to ${CONTACT}. You’ll hear back from the person who built it.`],
 ]
 

@@ -525,7 +525,7 @@ function Close({ total, pro, blocks }: { total: number; pro: number; blocks: num
       <Link href="/pro" data-cta="home-close" className={`${PILL_DARK} mt-10`}>
         Get Pro · <PriceNow value={PRICE} /> once
       </Link>
-      <p className="mt-4 max-w-[460px] text-[13px] leading-[1.55] text-ink-3">One payment, no subscription, every update for life. Sales are final, so every piece runs live here first and {total - pro} components are free to try in your own project.</p>
+      <p className="mt-4 max-w-[460px] text-[13px] leading-[1.55] text-ink-3">One payment, no subscription, every update for life. Every piece runs live on this site, and {total - pro} components are free to try in your own project.</p>
     </section>
   )
 }
