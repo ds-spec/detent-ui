@@ -13,7 +13,7 @@ import { Piece } from '@/site/home/long/Home'
 import { Tabs } from '@/site/home/long/parts'
 import { BlockPiece, TemplatePiece } from '@/site/library/Library'
 import { wellOf } from '@/site/wells'
-import { priceWith, usePromo } from '@/site/Promo'
+import { BuyTerms, priceWith, usePromo } from '@/site/Promo'
 import { useChoice } from '@/site/pro/Buy'
 
 type Item = { id: string; name: string; line: string; href: string; piece: () => ReactNode }
@@ -132,12 +132,15 @@ export function ProHero() {
 
 /** What one payment buys, said plainly, right under the button. */
 export function Terms() {
-  const terms = ['One payment, no subscription', 'Every update and new piece, for life', 'Unlimited projects, client work too', 'One licence per person']
+  const terms = ['One payment, no subscription', 'Unlimited client projects', 'One licence per person']
   return (
-    <ul className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-1.5 px-2 text-[13px] text-ink-3">
-      {terms.map((t) => (
-        <li key={t}>{t}</li>
-      ))}
-    </ul>
+    <div className="mt-5 flex flex-col items-center gap-1.5 px-2 text-center">
+      <BuyTerms />
+      <ul className="flex flex-wrap justify-center gap-x-5 gap-y-1.5 text-[13px] text-ink-3">
+        {terms.map((t) => (
+          <li key={t}>{t}</li>
+        ))}
+      </ul>
+    </div>
   )
 }

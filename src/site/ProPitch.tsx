@@ -4,10 +4,10 @@ import Link from 'next/link'
 import { block } from '@/catalog/blocks'
 import { entry } from '@/catalog/meta'
 import { PLANS, PRO_BLOCK_COUNT, PRO_COMPONENTS, isProBlock, isProComponent } from '@/catalog/pro'
-import { TEMPLATE_COUNT } from '@/catalog/templates'
+import { TEMPLATE_COUNT, TEMPLATES } from '@/catalog/templates'
 import { ArrowRight, ArrowUpRight } from '@/lab/icons'
 import { ForPlan } from './Owned'
-import { Price } from './Promo'
+import { BuyTerms, Price, PriceNow } from './Promo'
 
 const PICKS = ['glyph', 'region', 'threads', 'find', 'funnel', 'forecast']
 const BLOCK_PICKS = ['onboarding', 'support-inbox', 'task-to-merge', 'agent-chat', 'evals', 'calendar']
@@ -18,6 +18,7 @@ export function ProPitch({ id, shelf = 'components', near = false }: { id: strin
   const name = (blocks ? block(id)?.name : entry(id)?.name) ?? id
   const others = blocks ? BLOCK_PICKS.filter((p) => p !== id && isProBlock(p)).slice(0, 4) : PICKS.filter((p) => p !== id && PRO_COMPONENTS.includes(p)).slice(0, 4)
   const plan = PLANS[0]
+  const app = TEMPLATES.find((t) => t.form === 'app')
   return (
     <ForPlan
       none={
@@ -27,16 +28,16 @@ export function ProPitch({ id, shelf = 'components', near = false }: { id: strin
               <h2 id="pro-pitch" className="text-[clamp(24px,2.4vw,32px)] font-normal leading-[1.1] tracking-[-0.035em] text-ink">
                 {pro ? (
                   <>
-                    {name} is in Pro. <span className="text-quiet">So is everything else.</span>
+                    This code is yours with Pro. <span className="text-quiet">{name} and everything else.</span>
                   </>
                 ) : (
                   <>
-                    Like this one? <span className="text-quiet">Pro has {blocks ? `${PRO_BLOCK_COUNT} more screens` : `${PRO_COMPONENTS.length} more`}.</span>
+                    Like this one? <span className="text-quiet">Pro has the whole app.</span>
                   </>
                 )}
               </h2>
               <p className="mt-3 max-w-[520px] text-[15px] leading-[1.6] text-ink-3">
-                {PRO_COMPONENTS.length} Pro components, {PRO_BLOCK_COUNT} whole screens and {TEMPLATE_COUNT}. The source lands in your project, yours to change, with every update for life.
+                Plus the full {app?.name ?? 'Detent'} workspace template, {PRO_BLOCK_COUNT} whole screens and {PRO_COMPONENTS.length} Pro components. The source lands in your project, yours to change, in unlimited client projects.
               </p>
               <ul className="mt-5 flex flex-wrap gap-2">
                 {others.map((o) => (
@@ -57,9 +58,10 @@ export function ProPitch({ id, shelf = 'components', near = false }: { id: strin
                 <span className="text-[14px] text-ink-3">once</span>
               </p>
               <a href={plan.href} data-cta="piece-pitch" className="ring-focus group/buy mt-2 flex h-11 items-center gap-2 rounded-full bg-ink pl-5 pr-4 text-[14px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]">
-                Get Pro
+                Get Pro · <PriceNow value={plan.price} /> once
                 <ArrowRight size={14} className="transition-transform duration-150 group-hover/buy:translate-x-0.5" />
               </a>
+              <BuyTerms className="max-w-[260px] lg:text-right" />
             </div>
           </div>
         </section>

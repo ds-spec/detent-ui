@@ -4,11 +4,12 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'motion/react'
 import { Check, Copy } from '@/lab/icons'
-import { PLANS } from '@/catalog/pro'
+import { PLANS, PRO_BLOCK_COUNT, PRO_COMPONENTS } from '@/catalog/pro'
+import { TEMPLATES } from '@/catalog/templates'
 import type { SourceFile } from '@/catalog/source'
 import { BTN, useSideNew } from '../shell/side'
 import { ProTag } from '../blocks/ProTag'
-import { PriceNow } from '../Promo'
+import { BuyTerms, PriceNow } from '../Promo'
 import { track } from '../track'
 
 const cache = new Map<string, Promise<SourceFile[]>>()
@@ -97,6 +98,7 @@ export function Code({ id }: { id: string }) {
 function Locked({ files }: { id: string; files: SourceFile[] }) {
   const side = useSideNew()
   const plan = PLANS[0]
+  const app = TEMPLATES.find((t) => t.form === 'app')
   const total = files.reduce((n, f) => n + f.lines, 0)
   return (
     <div className="absolute inset-x-3 bottom-3 top-[68px] flex flex-col overflow-hidden rounded-[20px] bg-surface shadow-border">
@@ -120,18 +122,19 @@ function Locked({ files }: { id: string; files: SourceFile[] }) {
             transition={{ duration: 0.22, ease: [0.2, 0.9, 0.25, 1] }}
           >
             <ProTag />
-            <p className="mt-4 text-title text-ink">The source is in {plan.name}.</p>
-            <p className="mx-auto mt-2 max-w-[310px] text-callout text-ink-3">
-              {total.toLocaleString('en-US')} lines across {files.length === 1 ? 'one file' : `${files.length} files`}. Install it from the private registry and it&rsquo;s yours to read, change and keep.
+            <p className="mt-4 text-title text-ink">This code is yours with Pro.</p>
+            <p className="mx-auto mt-2 max-w-[320px] text-callout text-ink-3">
+              {total.toLocaleString('en-US')} lines across {files.length === 1 ? 'one file' : `${files.length} files`}. Plus the full {app?.name ?? 'Detent'} workspace template, {PRO_BLOCK_COUNT} whole screens and {PRO_COMPONENTS.length} Pro components.
             </p>
             <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
               <a href={plan.href} data-cta="code-lock" className={side ? `ring-focus flex h-10 items-center justify-center rounded-[10px] ${BTN.accent} px-5 text-footnote font-medium transition-[opacity,transform] duration-150 active:scale-[0.97]` : "ring-focus flex h-10 items-center justify-center rounded-full bg-ink px-5 text-footnote font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]"}>
-                {plan.cta} · <PriceNow value={plan.price} />
+                {plan.cta} · <PriceNow value={plan.price} /> once
               </a>
               <Link href="/pro" className={side ? `ring-focus flex h-10 items-center justify-center rounded-[10px] ${BTN.plate} px-5 text-footnote font-medium text-ink transition-[background-color,transform] duration-150 active:scale-[0.97]` : "ring-focus flex h-10 items-center justify-center rounded-full bg-surface-2 px-5 text-footnote font-medium text-ink transition-[background-color,transform] duration-150 hover:bg-card active:scale-[0.97]"}>
                 What&rsquo;s in Pro
               </Link>
             </div>
+            <BuyTerms className="mx-auto mt-4 max-w-[300px]" />
           </motion.div>
         </div>
       </div>

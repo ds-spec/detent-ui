@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useSyncExternalStore } from 'react'
+import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { PLANS } from '@/catalog/pro'
 import { usePathname } from 'next/navigation'
@@ -94,6 +95,14 @@ export function PromoStrip() {
   )
 }
 
+export function BuyTerms({ className = '' }: { className?: string }) {
+  return (
+    <p className={`text-[13px] leading-[1.5] text-ink-3 ${className}`}>
+      <PriceNow value={PLANS[0].price} /> + local tax · lifetime updates · all sales final. Try every Pro screen live first.
+    </p>
+  )
+}
+
 export function Price({ value, className = '' }: { value: number; className?: string }) {
   const promo = usePromo()
   if (!promo || promo.price >= value) return <>${value}</>
@@ -112,23 +121,32 @@ export function PriceNow({ value }: { value: number }) {
   return <>${priceWith(promo, value)}</>
 }
 
+const noop = () => () => {}
+
 export function MobileBuy() {
   const owned = useOwned()
   const path = usePathname()
   const [down, setDown] = useState(false)
+  const ready = useSyncExternalStore(noop, () => true, () => false)
   useEffect(() => {
-    const on = () => setDown(window.scrollY > 640)
+    const on = (e?: Event) => {
+      const t = e?.target
+      const y = t instanceof HTMLElement ? t.scrollTop : window.scrollY
+      setDown(Math.max(window.scrollY, y) > 640)
+    }
     on()
-    window.addEventListener('scroll', on, { passive: true })
-    return () => window.removeEventListener('scroll', on)
+    document.addEventListener('scroll', on, { passive: true, capture: true })
+    return () => document.removeEventListener('scroll', on, { capture: true })
   }, [])
-  const hidden = owned || !['/', '/components', '/blocks', '/templates', '/docs'].includes(path)
+  const piece = /^\/(components|blocks)\/[^/]+$/.test(path)
+  const hidden = owned || !(piece || ['/', '/components', '/blocks', '/templates', '/docs'].includes(path))
   const shown = down && !hidden
   useEffect(() => {
     document.documentElement.toggleAttribute('data-buybar', shown)
     return () => document.documentElement.removeAttribute('data-buybar')
   }, [shown])
-  return (
+  if (!ready) return null
+  return createPortal(
     <AnimatePresence>
       {down && !hidden && (
         <motion.div
@@ -136,19 +154,21 @@ export function MobileBuy() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 80, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 420, damping: 38 }}
-          className="fixed inset-x-3 bottom-[max(12px,env(safe-area-inset-bottom))] z-[60] flex h-14 items-center gap-3 rounded-[18px] bg-[#0b0b0d] pl-4 pr-2 text-white shadow-[0_12px_32px_-8px_rgb(0_0_0/0.45)] md:hidden"
+          className={`fixed inset-x-3 bottom-[max(12px,env(safe-area-inset-bottom))] z-[60] flex h-14 items-center gap-3 rounded-[18px] bg-[#0b0b0d] pl-4 pr-2 text-white shadow-[0_12px_32px_-8px_rgb(0_0_0/0.45)] ${piece ? 'md:left-0 md:right-0 md:mx-auto md:w-[460px]' : 'md:hidden'}`}
         >
           <span className="min-w-0 flex-1">
             <span className="block text-[13px] font-medium leading-4">Detent Pro</span>
+            <span className="hidden truncate text-[12px] leading-4 text-white/55 min-[420px]:block">The full app template, every screen and component</span>
           </span>
           <span className="tnum text-[17px] tracking-[-0.02em] [&_s]:text-white/45">
             <Price value={PLANS[0].price} />
           </span>
-          <a href={PLANS[0].href} data-cta="mobile-bar" className="flex h-10 items-center rounded-[12px] bg-white px-4 text-[14px] font-semibold text-[#0b0b0d] active:scale-[0.97]">
+          <a href={PLANS[0].href} data-cta={piece ? 'piece-bar' : 'mobile-bar'} className="flex h-10 items-center rounded-[12px] bg-white px-4 text-[14px] font-semibold text-[#0b0b0d] active:scale-[0.97]">
             Get Pro
           </a>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   )
 }
