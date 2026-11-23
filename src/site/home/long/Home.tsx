@@ -40,12 +40,12 @@ export function Home(n: Counts) {
       </Leaf>
       <div className="mt-3">
         <Leaf>
-          <Library {...n} />
+          <Templates />
         </Leaf>
       </div>
       <div className="mt-3">
         <Leaf>
-          <Templates />
+          <Library {...n} />
         </Leaf>
       </div>
       <div className="mt-3">
@@ -108,7 +108,7 @@ function ProBar({ pro }: { pro: number }) {
     <Link href="/pro" className="ring-focus group flex h-10 items-center justify-center gap-2 px-4 text-[13px] text-ink-2 transition-colors hover:text-ink">
       <ProBadge />
       <span className="truncate">
-        <span className="text-ink">Ask your data, Agent wallet</span> and {pro - 2} more, only in Pro
+        <span className="text-ink">The Detent app template</span>, every whole screen and {pro} more components, only in Pro
       </span>
       <ArrowUpRight size={12} className="shrink-0 transition-transform duration-150 group-hover:-translate-y-px group-hover:translate-x-px" />
     </Link>
@@ -154,7 +154,7 @@ function Hero({ total, free, blocks, templates }: Counts) {
       </p>
       <div className="rise mt-9 flex flex-col items-center gap-1.5 text-[13px] text-ink-3" style={{ animationDelay: '280ms' }}>
         <p className="text-balance">
-          <span className="text-ink-2">“Make your product feel expensive.”</span> That’s what sold Josh at <span className="text-ink-2">Nuanced</span>.
+          For founders shipping an AI product, and the agencies that build them for clients.
         </p>
         <p className="text-balance">
           Praised by builders at <span className="text-ink-2">Amboras (YC)</span>, <span className="text-ink-2">Laravel Cloud</span> and ex-<span className="text-ink-2">Snap</span>.
