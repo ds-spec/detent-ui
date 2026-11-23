@@ -5,6 +5,7 @@ export type Template = {
   form?: 'app'
   name: string
   kind: string
+  pitch: string
   suits: string
   window: string
   line: string
@@ -17,6 +18,7 @@ const ALL: Template[] = [
     id: 'dusk',
     name: 'Dusk',
     kind: 'Security agent',
+    pitch: 'The landing page for an AI agent: hero, how it works, customers, pricing and questions, with the product working in every section.',
     suits: 'a backend and security agent',
     window: 'dusk.dev',
     line: 'The landing page for an agent that guards what AI writes: one dusk sky lights the hero, the night falls as you reach the end, and the product works in every section, finding, fixing and waiting for a yes.',
@@ -45,6 +47,7 @@ const ALL: Template[] = [
     form: 'app',
     name: 'Detent',
     kind: 'Agent workspace',
+    pitch: 'The app for an AI assistant: users chat with the agent, watch every step it takes, and approve before it acts.',
     suits: 'an agent that works across your tools',
     window: 'app.detentui.com',
     line: 'The app for an AI agent that works across your tools: sessions down the side, a thread that shows its work as it goes, and a composer that takes photos, files, tools and skills, queues what you ask while it answers, and sets how hard it thinks on a ramp of dots.',

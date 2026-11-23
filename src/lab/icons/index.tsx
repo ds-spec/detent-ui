@@ -215,6 +215,13 @@ export const Mail = (p: P) => (
   </Svg>
 )
 
+export const ArrowDown = (p: P) => (
+  <Svg {...p}>
+    <path d="M12 4v9" />
+    <path d="M12 20.2 6.6 13.8h10.8z" fill="currentColor" />
+  </Svg>
+)
+
 export const ArrowUp = (p: P) => (
   <Svg {...p}>
     <path d="M12 20v-9" />

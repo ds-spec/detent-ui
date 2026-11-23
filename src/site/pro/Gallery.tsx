@@ -118,14 +118,13 @@ export function ProHero() {
   return (
     <div className="flex flex-col items-center text-center">
       <h1 className="focus-in text-[clamp(36px,4.6vw,68px)] font-normal leading-[1.03] tracking-[-0.055em] text-ink">
-        {PRO_COMPONENTS.length} components, {PRO_BLOCKS.length} screens
-        <br className="hidden sm:block" /> and {TEMPLATES.length} app templates.
+        Ship your AI app this week.
         <span className="block text-quiet">
           {promo && <s className="decoration-[0.06em]">${plan.price}</s>} ${priceWith(promo, plan.price)} once. Yours for good.
         </span>
       </h1>
-      <p className="rise mt-6 max-w-[580px] text-balance text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
-        The hard parts of an AI product, already built: agent chat, a support inbox, evals, an agent wallet and charts that explain themselves. Your coding agent installs them with the shadcn CLI, on your theme, as code you own.
+      <p className="rise mt-6 max-w-[600px] text-balance text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
+        An agent app and its landing page, {PRO_BLOCKS.length} whole screens and {PRO_COMPONENTS.length} Pro components: agent chat, a support inbox, evals and charts that explain themselves, with every state worked out. Your coding agent installs them with the shadcn CLI, on your theme, as code you own.
       </p>
     </div>
   )

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { ArrowRight } from '@/lab/icons'
 import { block } from '@/catalog/blocks'
-import { PRO_BLOCK_COUNT } from '@/catalog/pro'
+import { BLOCKS } from '@/catalog/blocks'
 import type { Tone } from '@/site/home/lights'
 import { BLOCK_VIEWS } from '@pro'
 import { Backdrop, Window } from '@/site/blocks/Studio'
@@ -13,7 +13,7 @@ import { Fit } from '@/site/Fit'
 import { useNear } from '@/site/near'
 
 const PICKS: { id: string; name: string; tone: Tone; line: string }[] = [
-  { id: 'agent-chat', name: 'Agent chat', tone: 'blue', line: 'Your useChat, drawn: streaming answers, tool calls, and a card that waits for a yes.' },
+  { id: 'agent-chat', name: 'Agent chat', tone: 'blue', line: 'Users don’t trust an AI they can’t watch. Show every step, and let them say yes before it acts.' },
   { id: 'task-to-merge', name: 'Task to merge', tone: 'violet', line: 'An agent takes a task from plan to merged pull request. Deploying waits for a person.' },
   { id: 'support-inbox', name: 'Support inbox', tone: 'rose', line: 'Every conversation sorted and every reply drafted, with the sources it came from.' },
   { id: 'evals', name: 'Evals', tone: 'amber', line: 'A new prompt against the one in production, case by case. Shipping waits on every regression.' },
@@ -54,12 +54,12 @@ export function HomeScreens() {
         <div className="mx-auto max-w-[1440px] px-3 pb-8 pt-20 sm:px-8 sm:pb-10 sm:pt-28">
           <div className="flex flex-col items-center px-2 text-center">
             <h2 id="screens-title" className="text-[clamp(38px,4.2vw,62px)] font-normal leading-[1.02] tracking-[-0.055em] text-ink">
-              Five screens you’d
+              Five screens you’d spend weeks on.
               <br />
-              <span className="text-quiet">otherwise build yourself.</span>
+              <span className="text-quiet">Already done.</span>
             </h2>
             <p className="mt-5 max-w-[500px] text-balance text-[16px] leading-[1.6] text-ink-3">
-              Running live, with every state worked out. Install one with the shadcn CLI and it takes your theme.
+              Agent chat, task to merge, support inbox, evals and a data table, running live with loading, streaming, error and empty states worked out.
             </p>
           </div>
 
@@ -112,7 +112,7 @@ export function HomeScreens() {
                   Open<span className="hidden min-[400px]:inline"> {pick.name.toLowerCase()}</span>
                 </Link>
                 <Link href="/blocks" className="ring-focus group/go flex h-10 items-center gap-1.5 whitespace-nowrap rounded-full bg-ink px-4 text-[14px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]">
-                  All {PRO_BLOCK_COUNT} blocks
+                  All {BLOCKS.length} blocks
                   <ArrowRight size={13} className="transition-transform duration-200 group-hover/go:translate-x-0.5" />
                 </Link>
               </div>

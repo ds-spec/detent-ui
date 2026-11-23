@@ -6,10 +6,10 @@ import Link from 'next/link'
 import { block } from '@/catalog/blocks'
 import { DEMOS } from '@/catalog/demos'
 import { ENTRIES } from '@/catalog/meta'
-import { installCommand, isProBlock, isProComponent } from '@/catalog/pro'
+import { installCommand, isProBlock, isProComponent, PLANS } from '@/catalog/pro'
 import { SIZE, TILE } from '@/catalog/sizes'
 import { TEMPLATES } from '@/catalog/templates'
-import { ArrowRight, ArrowUpRight } from '@/lab/icons'
+import { ArrowDown, ArrowRight, ArrowUpRight, Check } from '@/lab/icons'
 import { InPlay } from '@/lab/blocks/kit/director'
 import { InDirectory } from '@/site/Directory'
 import { DitherWord } from '@/site/Dither'
@@ -22,8 +22,11 @@ import type { Latest } from '@/catalog/latest'
 import { BlockPiece, TemplatePiece } from '@/site/library/Library'
 import { Mini } from '@/site/Mini'
 import { CopyCommand } from '@/site/parts'
+import { PriceNow } from '@/site/Promo'
 import { Compare } from './Compare'
 import { H2, Leaf, PILL_DARK, PILL_PRO, PILL_SOFT, ProBadge, SECTION, Tabs, WRAP } from './parts'
+
+const PRICE = PLANS[0].price
 
 type Counts = { total: number; free: number; blocks: number; templates: number; pro: number; fresh: Latest }
 
@@ -42,6 +45,11 @@ export function Home(n: Counts) {
       </div>
       <div className="mt-3">
         <Leaf>
+          <Templates />
+        </Leaf>
+      </div>
+      <div className="mt-3">
+        <Leaf>
           <Voices />
         </Leaf>
       </div>
@@ -49,7 +57,7 @@ export function Home(n: Counts) {
         <HomeScreens />
         <div className="flex justify-center pb-4 pt-8">
           <Link href="/pro" className={PILL_PRO}>
-            Get every screen with Pro, $99 once
+            Get every screen with Pro, <PriceNow value={PRICE} /> once
             <ArrowRight size={13} />
           </Link>
         </div>
@@ -68,9 +76,12 @@ export function Home(n: Counts) {
         <Leaf>
           <section className={SECTION}>
             <h2 className={H2}>
-              Same prompt, two builds.
-              <span className="block text-quiet">One is your agent alone.</span>
+              Your AI can copy the look.
+              <span className="block text-quiet">Not the states.</span>
             </h2>
+            <p className="mx-auto mt-5 max-w-[560px] px-5 text-center text-[16px] leading-[1.6] text-ink-3">
+              A screenshot shows one moment. A real AI product has dozens: streaming, tool calls, failures, retries, approvals, empty data. Same prompt, two builds: your agent alone, and your agent with Detent.
+            </p>
             <div className="mt-10">
               <Compare />
             </div>
@@ -79,7 +90,12 @@ export function Home(n: Counts) {
       </div>
       <div className="mt-3">
         <Leaf>
-          <Questions free={n.free} total={n.total} />
+          <Questions free={n.total - n.pro} total={n.total} />
+        </Leaf>
+      </div>
+      <div className="mt-3">
+        <Leaf>
+          <Close total={n.total} pro={n.pro} blocks={n.blocks} />
         </Leaf>
       </div>
     </div>
@@ -122,20 +138,29 @@ function Hero({ total, free, blocks, templates }: Counts) {
         </span>
       </h1>
       <p className="rise mt-6 max-w-[540px] text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
-        Agent runs, approvals, streaming answers and charts that explain themselves. Every state worked out, installed with shadcn, styled by your{'\u00a0'}theme.
+        Agent runs, approvals, streaming answers and charts that explain themselves, with every state already worked out. Ship an AI product that feels funded, this{'\u00a0'}week.
       </p>
       <div className="rise mt-8 flex flex-wrap items-center justify-center gap-2" style={{ animationDelay: '180ms' }}>
-        <Link href="/components" className={PILL_DARK}>
-          Browse components
+        <Link href="/pro" data-cta="home-hero" className={PILL_DARK}>
+          Get Pro · <PriceNow value={PRICE} /> once
         </Link>
-        <Link href="/docs" className={PILL_SOFT}>
-          Set up with your agent
-        </Link>
+        <a href="#library" className={PILL_SOFT}>
+          Try them live
+          <ArrowDown size={13} />
+        </a>
       </div>
-      <div className="rise mt-8 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[13px] text-ink-3" style={{ animationDelay: '280ms' }}>
-        <InDirectory />
-        <span aria-hidden className="hidden sm:inline">·</span>
-        <span>Featured in Shadcn Weekly #8</span>
+      <p className="rise mt-3 text-[13px] text-ink-3" style={{ animationDelay: '220ms' }}>
+        One payment. Every update for life. The code is yours.
+      </p>
+      <div className="rise mt-9 flex flex-col items-center gap-1.5 text-[13px] text-ink-3" style={{ animationDelay: '280ms' }}>
+        <p className="text-balance">
+          Used by <span className="text-ink-2">Nuanced</span>. Praised by builders at <span className="text-ink-2">Amboras (YC)</span>, <span className="text-ink-2">Laravel Cloud</span> and ex-<span className="text-ink-2">Snap</span>.
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+          <InDirectory />
+          <span aria-hidden>·</span>
+          <span>Featured in Shadcn Weekly #8</span>
+        </div>
       </div>
     </section>
   )
@@ -209,7 +234,7 @@ function Tile({ it }: { it: Item }) {
     return () => clearTimeout(t)
   }, [])
   return (
-    <Link href={it.href} className="ring-focus group block rounded-[16px] bg-[var(--mount)] p-2 shadow-[0_0_0_1px_var(--line)] transition-shadow duration-300 hover:shadow-[0_0_0_1px_var(--line-strong),0_12px_30px_-16px_rgb(0_0_0/0.18)]">
+    <div className="group relative block rounded-[16px] bg-[var(--mount)] p-2 shadow-[0_0_0_1px_var(--line)] transition-shadow duration-300 hover:shadow-[0_0_0_1px_var(--line-strong),0_12px_30px_-16px_rgb(0_0_0/0.18)]">
       <div className="relative isolate aspect-[4/3] overflow-clip rounded-[10px] shadow-[0_0_0_1px_var(--line)]" style={{ background: wellOf(it.tone) }}>
         <div aria-hidden inert className={`pointer-events-none absolute inset-0 transition-[opacity,transform] duration-500 [transition-timing-function:cubic-bezier(0.2,0.9,0.25,1)] group-hover:scale-[1.02] ${ready ? 'opacity-100' : 'opacity-0'}`}>
           <InPlay.Provider value>{it.piece(() => setReady(true))}</InPlay.Provider>
@@ -233,7 +258,8 @@ function Tile({ it }: { it: Item }) {
           <ArrowUpRight size={12} />
         </span>
       </div>
-    </Link>
+      <Link href={it.href} aria-label={`${it.name}, ${it.pro ? 'in Pro' : 'free'}`} className="ring-focus absolute inset-0 z-10 rounded-[16px]" />
+    </div>
   )
 }
 
@@ -242,7 +268,7 @@ function Library({ total, blocks, templates }: Counts) {
   const shelf = SHELVES[tab]
   const count = { components: total, blocks, templates }
   return (
-    <section className={SECTION}>
+    <section id="library" className={`${SECTION} scroll-mt-16`}>
       <h2 className={H2}>
         These aren’t screenshots.
         <span className="block text-quiet">Go on, use one.</span>
@@ -404,12 +430,14 @@ function Own() {
 /* 9. Questions. */
 function Questions({ free, total }: { free: number; total: number }) {
   const qa: [string, string][] = [
+    ['Is it a subscription?', 'No. Pay once and keep every update and every new piece, for life.'],
+    ['I’m not a designer. Will it look good?', 'Yes. Every piece is already designed, and it takes your shadcn theme and dark mode, so it matches your app out of the box.'],
     ['What is Detent?', 'React components, whole screens and templates for AI products and the app around them. They install with the shadcn CLI, land in your project as source, and take on your theme.'],
     ['Do I need shadcn or Tailwind?', 'Detent installs with the shadcn CLI into a React project with Tailwind CSS v4. Next.js is what we test on.'],
     ['How do I install a piece?', `Run the command on its page, like ${installCommand('chart', true)}, or ask your coding agent and it does it for you.`],
     ['Does it work with Claude Code, Cursor or Codex?', 'Yes. Give your agent the setup prompt once. Every piece has a page written for agents, so it places it well instead of guessing.'],
     ['Does it work in light and dark mode?', 'Yes. Every piece reads your theme tokens, and .dark turns it dark.'],
-    ['What is free and what is Pro?', `${free} of the ${total} components and five website blocks are free under MIT, for anyone. Pro adds the rest, every whole screen and both templates, for $99 once.`],
+    ['What is free and what is Pro?', `${free} of the ${total} components and five website blocks are free under MIT, for anyone. Pro adds the rest, every whole screen and both templates, for $${PRICE} once.`],
     ['What do I get with Pro?', 'Every Pro component, every whole screen (agent chat, support inbox, evals and more), both app templates, and the plans your agent builds whole pages from. One payment, every update for life.'],
     ['Can I use it in client projects?', 'Yes, in as many projects as you like, commercial ones included. You can’t resell the components themselves.'],
   ]
@@ -433,6 +461,71 @@ function Questions({ free, total }: { free: number; total: number }) {
           </details>
         ))}
       </div>
+    </section>
+  )
+}
+
+/* 5. Templates: a whole product to start from, high on the page. */
+function Templates() {
+  return (
+    <section className={SECTION}>
+      <h2 className={H2}>
+        Start from a whole product.
+        <span className="block text-quiet">Not a blank page.</span>
+      </h2>
+      <p className="mx-auto mt-5 max-w-[520px] px-5 text-center text-[16px] leading-[1.6] text-ink-3">Two templates come with Pro: the app for an AI assistant, and the landing page that sells an agent. Clone, rename, ship.</p>
+      <ul className={`${WRAP} !max-w-[1120px] mt-10 grid gap-3.5 sm:grid-cols-2`}>
+        {[...TEMPLATES].sort((a, b) => Number(b.form === 'app') - Number(a.form === 'app')).map((t) => (
+          <li key={t.id} className="min-w-0">
+            <Tile it={{ id: t.id, name: `${t.name} · ${t.form === 'app' ? 'Agent workspace app' : 'Agent landing page'}`, line: t.pitch, pro: true, href: `/templates/${t.id}`, tone: 'violet', piece: (r) => <TemplatePiece id={t.id} onReady={r} /> }} />
+          </li>
+        ))}
+      </ul>
+      <div className="mt-8 flex flex-wrap justify-center gap-2">
+        <Link href="/pro" data-cta="home-templates" className={PILL_DARK}>
+          Get both with Pro · <PriceNow value={PRICE} /> once
+        </Link>
+        <Link href="/templates" className={PILL_SOFT}>
+          Tour them live
+          <ArrowUpRight size={13} />
+        </Link>
+      </div>
+    </section>
+  )
+}
+
+/* 10. The close: what one payment buys, and the button. */
+function Close({ total, pro, blocks }: { total: number; pro: number; blocks: number }) {
+  const app = TEMPLATES.find((t) => t.form === 'app')
+  const site = TEMPLATES.find((t) => t.form !== 'app')
+  const rows = [
+    `${TEMPLATES.length} templates: ${app?.name} (agent workspace app) and ${site?.name} (agent landing page)`,
+    `All ${blocks} blocks: agent chat, evals, support inbox, onboarding, settings and more`,
+    `All ${total} components, ${pro} of them only in Pro`,
+    'Unlimited projects, client work too',
+    'Source code you own and can change',
+    'Your coding agent sets it up from one prompt',
+  ]
+  return (
+    <section className={`${SECTION} flex flex-col items-center px-5 text-center`}>
+      <h2 className={H2}>
+        Ship the AI app this week.
+        <span className="block text-quiet">Skip the weeks of UI.</span>
+      </h2>
+      <ul className="mt-9 grid max-w-[560px] gap-3 text-left">
+        {rows.map((r) => (
+          <li key={r} className="flex gap-3 text-[15px] leading-[1.45] text-ink-2">
+            <span className="mt-[3px] shrink-0 text-accent">
+              <Check size={15} strokeWidth={2.4} />
+            </span>
+            {r}
+          </li>
+        ))}
+      </ul>
+      <Link href="/pro" data-cta="home-close" className={`${PILL_DARK} mt-10`}>
+        Get Pro · <PriceNow value={PRICE} /> once
+      </Link>
+      <p className="mt-4 max-w-[460px] text-[13px] leading-[1.55] text-ink-3">One payment, no subscription, every update for life. Sales are final, so every piece runs live here first and {total - pro} components are free to try in your own project.</p>
     </section>
   )
 }

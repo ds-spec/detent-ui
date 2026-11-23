@@ -34,7 +34,7 @@ export default function Refunds() {
           title: 'No refunds',
           body: (
             <>
-              <P>All Detent Pro sales are final. When you buy, you get the full source code of every Pro component, block and the template straight away, and code that’s been delivered can’t be handed back.</P>
+              <P>All Detent Pro sales are final. When you buy, you get the full source code of every Pro component, block and template straight away, and code that’s been delivered can’t be handed back.</P>
               <P>So once your payment goes through, we don’t issue refunds.</P>
             </>
           ),
@@ -47,21 +47,21 @@ export default function Refunds() {
               <P>Pro counts as used as soon as its code reaches you, by any of these routes:</P>
               <List
                 items={[
-                  'Installing any Pro component, block or the template with the shadcn CLI.',
+                  'Installing any Pro component, block or template with the shadcn CLI.',
                   'Getting Pro code through an AI agent, an MCP tool or any other assistant connected to your key.',
                   'Copying code from the site or the docs.',
-                  'Downloading the template.',
+                  'Downloading a template.',
                 ]}
               />
               <P>It’s the same whether you take one component or the whole library.</P>
-              <P>That’s why everything is out in the open first. Every Pro piece and the template run live on detentui.com, and {FREE_COUNT} components are free to install, so you can see how it looks and works in your own project before you pay. Buying and accessing Pro means you agree to this policy.</P>
+              <P>That’s why everything is out in the open first. Every Pro piece and both templates run live on detentui.com, and {FREE_COUNT} components are free to install, so you can see how it looks and works in your own project before you pay. Buying and accessing Pro means you agree to this policy.</P>
             </>
           ),
         },
         {
           id: 'support',
           title: 'Support',
-          body: <P>If a component or the template doesn’t work in your project, email {mail} with what you installed and what you’re seeing, and we’ll help you fix it. When the problem is on our side, the fix ships as an update, so everyone who owns Pro gets it.</P>,
+          body: <P>If a component or a template doesn’t work in your project, email {mail} with what you installed and what you’re seeing, and we’ll help you fix it. When the problem is on our side, the fix ships as an update, so everyone who owns Pro gets it.</P>,
         },
       ]}
     />

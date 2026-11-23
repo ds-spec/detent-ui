@@ -42,7 +42,6 @@ export function Inside() {
 
 const [pro] = PLANS
 const FREE = ENTRIES.length - PRO_COMPONENTS.length
-const [template] = TEMPLATES
 const blockName = (id: string) => BLOCKS.find((b) => b.id === id)?.name ?? id
 const listed = (ids: string[]) => {
   const names = ids.map(blockName)
@@ -61,7 +60,7 @@ const FREE_ROWS: Row[] = [
 const PRO_ROWS: Row[] = [
   { title: `All ${ENTRIES.length} components`, line: `${PRO_COMPONENTS.length} of them only in Pro, like ${entry('region')?.name ?? 'Region wheel'} and ${entry('glyph')?.name ?? 'Glyph art'}` },
   { title: `All ${BLOCKS.length} blocks`, line: `Whole product screens, like ${listed(['support-inbox', 'evals', 'task-to-merge'])}` },
-  ...(template ? [{ title: `The ${template.name} template`, line: `A full ${template.kind.toLowerCase()} to start from` }] : []),
+  ...TEMPLATES.map((t) => ({ title: `The ${t.name} template`, line: t.pitch })),
   { title: 'Every new piece, as it ships' },
   { title: 'Unlimited projects, client work too' },
 ]
@@ -92,7 +91,7 @@ export function Compare() {
       <div className="flex flex-col rounded-[28px] bg-surface-2 p-6 max-md:order-last sm:p-8 dark:bg-transparent dark:shadow-[inset_0_0_0_1px_var(--line)]">
         <p className="text-[20px] tracking-[-0.025em] text-ink-2">Free</p>
         <p className="tnum mt-3 text-[44px] leading-none tracking-[-0.045em] text-ink">$0</p>
-        <p className="mt-3 text-[14px] text-ink-3">A good place to start.</p>
+        <p className="mt-3 text-[14px] text-ink-3">For trying Detent and adding a few pieces to your app.</p>
         <Rows rows={FREE_ROWS} />
         <div className="h-8 shrink-0" />
         <Link href="/components" className={`${BUTTON} ${BTN.plate}`}>
@@ -106,7 +105,7 @@ export function Compare() {
           <Price value={pro.price} />
           <span className="text-[15px] tracking-normal text-ink-3">once</span>
         </p>
-        <p className="mt-3 text-[14px] text-ink-3">Everything in Detent, and everything after.</p>
+        <p className="mt-3 text-[14px] text-ink-3">For shipping a whole AI product: templates, screens and every Pro piece, now and later.</p>
         <Rows rows={PRO_ROWS} lit />
         <div className="h-8 shrink-0" />
         <ForPlan
