@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { PLANS } from '@/catalog/pro'
 import { AI_SDK, FIRST_BLOCK, FIRST_COMPONENT } from '@/catalog/site'
 import { ArrowRight, Search } from '@/lab/icons'
 import { Mark, ThemeButton } from './parts'
@@ -26,6 +27,8 @@ const UI = 'cubic-bezier(0.2, 0, 0, 1)'
 const here = (section: string, path: string) => path.startsWith(section)
 const MOVE = 220
 const PILL = 1120
+const GO = 'ring-focus group/go hidden h-9 items-center gap-1.5 rounded-full bg-ink pl-4 pr-3.5 text-[13px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97] sm:flex'
+const GO_SIDE = `ring-focus group/go hidden h-9 items-center gap-1.5 rounded-[9px] ${BTN.accent} pl-4 pr-3.5 text-[13px] font-medium transition-[opacity,transform] duration-150 active:scale-[0.97] sm:flex`
 const INSET = `max(0px, (min(1440px, 100vw - 40px) - ${PILL}px) / 2)`
 
 export function Header() {
@@ -108,11 +111,17 @@ export function Header() {
           >
             Sign in
           </Link>
-          {/* The bar's one button points at Pro everywhere but on the Pro page itself, where it starts the library */}
-          <Link href={here('/pro', path) ? FIRST_COMPONENT : '/pro'} data-cta={here('/pro', path) ? undefined : 'header'} className={side ? `ring-focus group/go hidden h-9 items-center gap-1.5 rounded-[9px] ${BTN.accent} pl-4 pr-3.5 text-[13px] font-medium transition-[opacity,transform] duration-150 active:scale-[0.97] sm:flex` : "ring-focus group/go hidden h-9 items-center gap-1.5 rounded-full bg-ink pl-4 pr-3.5 text-[13px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97] sm:flex"}>
-            {here('/pro', path) ? 'Get started' : 'Get Pro'}
-            <ArrowRight size={13} className="transition-transform duration-150 group-hover/go:translate-x-0.5" />
-          </Link>
+          {here('/pro', path) ? (
+            <a href={PLANS[0].href} data-cta="header-pro" className={side ? GO_SIDE : GO}>
+              Get Pro
+              <ArrowRight size={13} className="transition-transform duration-150 group-hover/go:translate-x-0.5" />
+            </a>
+          ) : (
+            <Link href="/pro" data-cta="header" className={side ? GO_SIDE : GO}>
+              Get Pro
+              <ArrowRight size={13} className="transition-transform duration-150 group-hover/go:translate-x-0.5" />
+            </Link>
+          )}
           </div>
           <div className="when-in">
             <UserMenu />
