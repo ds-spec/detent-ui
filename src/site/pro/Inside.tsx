@@ -10,9 +10,9 @@ import { Price } from '../Promo'
 import { BTN } from '../shell/side'
 
 const GROUPS: { name: string; note?: string; items: { name: string; href: string }[] }[] = [
-  { name: 'Pro components', note: `Plus all ${ENTRIES.length - PRO_COMPONENTS.length} free ones`, items: PRO_COMPONENTS.map((id) => ({ name: entry(id)?.name ?? id, href: `/components/${id}` })) },
-  { name: 'Pro blocks', note: `Whole screens, plus the ${FREE_BLOCKS.length} free blocks`, items: PRO_BLOCKS.map((b) => ({ name: b.name, href: `/blocks/${b.id}` })) },
-  { name: TEMPLATES.length === 1 ? 'App template' : 'App templates', note: 'Included in Pro', items: TEMPLATES.map((t) => ({ name: `${t.name} · ${t.kind}`, href: `/templates/${t.id}` })) },
+  { name: 'Templates', note: 'A full AI workspace app and a landing page', items: [...TEMPLATES].sort((a, b) => Number(b.form === 'app') - Number(a.form === 'app')).map((t) => ({ name: `${t.name} · ${t.form === 'app' ? 'AI workspace app' : 'Agent landing page'}`, href: `/templates/${t.id}` })) },
+  { name: 'Whole screens', note: `Plus the ${FREE_BLOCKS.length} free website blocks`, items: PRO_BLOCKS.map((b) => ({ name: b.name, href: `/blocks/${b.id}` })) },
+  { name: 'Pro components', note: `Charts included, plus all ${ENTRIES.length - PRO_COMPONENTS.length} free ones`, items: PRO_COMPONENTS.map((id) => ({ name: entry(id)?.name ?? id, href: `/components/${id}` })) },
 ]
 
 export function Inside() {
@@ -58,11 +58,11 @@ const FREE_ROWS: Row[] = [
 ]
 
 const PRO_ROWS: Row[] = [
-  { title: `All ${ENTRIES.length} components`, line: `${PRO_COMPONENTS.length} of them only in Pro, like ${entry('region')?.name ?? 'Region wheel'} and ${entry('glyph')?.name ?? 'Glyph art'}` },
-  { title: `All ${BLOCKS.length} blocks`, line: `Whole product screens, like ${listed(['support-inbox', 'evals', 'task-to-merge'])}` },
-  ...TEMPLATES.map((t) => ({ title: `The ${t.name} template`, line: t.pitch })),
+  ...[...TEMPLATES].sort((a, b) => Number(b.form === 'app') - Number(a.form === 'app')).map((t) => ({ title: `The ${t.name} template`, line: t.pitch })),
+  { title: `All ${BLOCKS.length} blocks`, line: `Whole product screens, like ${listed(['task-to-merge', 'evals', 'data-table'])}` },
+  { title: `All ${ENTRIES.length} components`, line: `${PRO_COMPONENTS.length} of them only in Pro, like ${entry('askchart')?.name ?? 'Ask your data'} and ${entry('bridge')?.name ?? 'Revenue bridge'}` },
   { title: 'Every new piece, as it ships' },
-  { title: 'Unlimited projects, client work too' },
+  { title: 'Unlimited client projects' },
 ]
 
 function Rows({ rows, lit = false }: { rows: Row[]; lit?: boolean }) {

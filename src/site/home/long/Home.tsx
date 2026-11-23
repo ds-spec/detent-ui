@@ -524,7 +524,7 @@ const DOORS = [
     cta: 'Detent for agencies',
   },
 ]
-function Doors() {
+export function Doors({ buy = '/pro' }: { buy?: string } = {}) {
   return (
     <section className={SECTION}>
       <h2 className={H2}>
@@ -538,7 +538,7 @@ function Doors() {
             <h3 className="mt-3 text-balance text-[24px] font-normal leading-[1.15] tracking-[-0.03em] text-ink sm:text-[28px]">{d.title}</h3>
             <p className="mt-4 max-w-[440px] text-[15px] leading-[1.6] text-ink-3">{d.line}</p>
             <div className="mt-8">
-              <Link href={d.href} data-cta={`home-door-${d.href.slice(1)}`} className={PILL_DARK}>
+              <Link href={d.href === '/pro' ? buy : d.href} data-cta={`door-${d.href.slice(1)}`} className={PILL_DARK}>
                 {d.cta}
                 <ArrowRight size={13} />
               </Link>

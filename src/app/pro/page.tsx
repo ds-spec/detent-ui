@@ -12,7 +12,7 @@ import { Compare, Inside } from '@/site/pro/Inside'
 import { Install } from '@/site/pro/Install'
 import { Keys } from '@/site/pro/Keys'
 import { Quotes } from '@/site/pro/Quotes'
-import { Touch } from '@/site/pro/Touch'
+import { Charts, Doors } from '@/site/home/long/Home'
 import { Voices } from '@/site/Voices'
 import { JsonLd, page, proGraph } from '@/site/seo'
 import { SitePage } from '@/site/sheets'
@@ -25,6 +25,7 @@ export const metadata: Metadata = page({
 })
 
 const FAQ: [string, string][] = [
+  ['Who is Detent for?', 'Founders shipping an AI product who want it to look funded before users and investors see it, and agencies building AI products for their clients. One licence covers unlimited client projects.'],
   ['Is it a subscription?', 'No. You pay once and keep it, along with every update and every new piece that ships after you buy.'],
   ['Will it work in my project?', 'If you’re building in React with Tailwind CSS v4, yes: a SaaS, a dashboard, a marketplace or a website. Pro installs with the shadcn CLI into the project you already have, so there’s no new styling system to learn. Next.js is what we test on.'],
   ['Will it match my design?', 'Installed with shadcn, Detent takes on your theme: your primary becomes its accent, it uses your background, borders and muted text, and .dark turns it dark. Your fonts stay yours.'],
@@ -36,7 +37,7 @@ const FAQ: [string, string][] = [
   ['What if I get stuck?', `Write to ${CONTACT}. You’ll hear back from the person who built it.`],
 ]
 
-const INCLUDED = [`All ${ENTRIES.length} components`, `All ${BLOCKS.length} blocks`, ...TEMPLATES.map((t) => `The ${t.name} template`), 'Set up by your coding agent', 'Every update, for life', 'Unlimited projects']
+const INCLUDED = [...TEMPLATES].sort((a, b) => Number(b.form === 'app') - Number(a.form === 'app')).map((t) => `The ${t.name} template`).concat([`All ${BLOCKS.length} blocks`, `All ${ENTRIES.length} components`, 'Set up by your coding agent', 'Every update, for life', 'Unlimited client projects'])
 
 const H2 = 'text-[clamp(32px,3.4vw,48px)] font-normal leading-[1.04] tracking-[-0.05em] text-ink'
 
@@ -74,14 +75,12 @@ export default function ProPage() {
           </p>
         </section>
 
-        <section id="touch" aria-labelledby="touch-title" className="mx-auto mt-28 max-w-[1360px] scroll-mt-24 px-5 sm:mt-36 sm:px-6">
-          <h2 id="touch-title" className={H2}>
-            Take a closer look.
-            <span className="block text-quiet">These are yours with Pro.</span>
-          </h2>
-          <div className="mt-10 sm:mt-14">
-            <Touch />
-          </div>
+        <section className="mx-auto mt-16 max-w-[1360px] sm:mt-20">
+          <Doors buy="#pricing" />
+        </section>
+
+        <section id="charts" className="mx-auto max-w-[1360px] scroll-mt-24">
+          <Charts />
         </section>
 
         <section aria-labelledby="compare-title" className="mx-auto mt-28 max-w-[1360px] px-5 sm:mt-36 sm:px-6">

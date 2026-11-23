@@ -18,7 +18,20 @@ import { useChoice } from '@/site/pro/Buy'
 
 type Item = { id: string; name: string; line: string; href: string; piece: () => ReactNode }
 
+const SCREEN_FIRST = ['task-to-merge', 'evals', 'data-table', 'onboarding', 'settings', 'agent-chat', 'voice-mode', 'support-inbox', 'code-review', 'calendar']
+const rank = (id: string) => (SCREEN_FIRST.includes(id) ? SCREEN_FIRST.indexOf(id) : SCREEN_FIRST.length)
+const SCREENS = [...PRO_BLOCKS].sort((a, b) => rank(a.id) - rank(b.id))
+const APP_FIRST = [...TEMPLATES].sort((a, b) => Number(b.form === 'app') - Number(a.form === 'app'))
+
 const SHELVES = {
+  templates: {
+    label: 'Templates',
+    items: (): Item[] => APP_FIRST.map((t) => ({ id: t.id, name: t.name, line: t.pitch, href: `/templates/${t.id}`, piece: () => <TemplatePiece id={t.id} /> })),
+  },
+  screens: {
+    label: 'Screens',
+    items: (): Item[] => SCREENS.map((b) => ({ id: b.id, name: b.name, line: b.line, href: `/blocks/${b.id}`, piece: () => <BlockPiece id={b.id} /> })),
+  },
   components: {
     label: 'Components',
     items: (): Item[] =>
@@ -26,22 +39,14 @@ const SHELVES = {
         .filter((e) => !!e)
         .map((e) => ({ id: e.id, name: e.name, line: e.short ?? e.line, href: `/components/${e.id}`, piece: () => <Piece id={e.id} max={1} /> })),
   },
-  screens: {
-    label: 'Screens',
-    items: (): Item[] => PRO_BLOCKS.map((b) => ({ id: b.id, name: b.name, line: b.line, href: `/blocks/${b.id}`, piece: () => <BlockPiece id={b.id} /> })),
-  },
-  templates: {
-    label: 'Templates',
-    items: (): Item[] => TEMPLATES.map((t) => ({ id: t.id, name: t.name, line: `${t.kind}. ${t.line}`, href: `/templates/${t.id}`, piece: () => <TemplatePiece id={t.id} /> })),
-  },
 } as const
 type Shelf = keyof typeof SHELVES
 
 /** Every Pro piece, one at a time at full size, with the buy button beside it. */
 export function Gallery() {
-  const [tab, setTab] = useState<Shelf>('screens')
+  const [tab, setTab] = useState<Shelf>('templates')
   const items = SHELVES[tab].items()
-  const [pick, setPick] = useState<Record<Shelf, string>>({ components: items[0]?.id ?? '', screens: PRO_BLOCKS[0]?.id ?? '', templates: TEMPLATES[0]?.id ?? '' })
+  const [pick, setPick] = useState<Record<Shelf, string>>({ templates: items[0]?.id ?? '', screens: SCREENS[0]?.id ?? '', components: PRO_COMPONENTS[0] ?? '' })
   const it = items.find((x) => x.id === pick[tab]) ?? items[0]
   const choose = (id: string) => setPick((p) => ({ ...p, [tab]: id }))
 
@@ -124,7 +129,7 @@ export function ProHero() {
         </span>
       </h1>
       <p className="rise mt-6 max-w-[600px] text-balance text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
-        An agent app and its landing page, {PRO_BLOCKS.length} whole screens and {PRO_COMPONENTS.length} Pro components: agent chat, a support inbox, evals and charts that explain themselves, with every state worked out. Your coding agent installs them with the shadcn CLI, on your theme, as code you own.
+        A full AI workspace template, {PRO_BLOCKS.length} whole screens and charts that explain themselves, with every state worked out. For founders shipping an AI product, and agencies building them for clients. Your coding agent installs it all today.
       </p>
     </div>
   )
