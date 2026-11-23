@@ -8,7 +8,7 @@ import { SitePage } from '@/site/sheets'
 export const metadata: Metadata = page({
   title: 'Detent for agencies: AI products your clients think cost $20k · Detent UI',
   absolute: true,
-  description: `An AI workspace template, ${BLOCKS.length} screens and ${ENTRIES.length} React components for shadcn, restyled by each client's theme. Unlimited client projects, $99 once.`,
+  description: `An AI workspace template, ${BLOCKS.length} screens and ${ENTRIES.length} React components for shadcn, restyled by each client's theme. Unlimited projects, $99 once.`,
   path: '/agencies',
 })
 

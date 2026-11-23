@@ -62,7 +62,7 @@ const PRO_ROWS: Row[] = [
   { title: `All ${BLOCKS.length} blocks`, line: `Whole product screens, like ${listed(['task-to-merge', 'evals', 'data-table'])}` },
   { title: `All ${ENTRIES.length} components`, line: `${PRO_COMPONENTS.length} of them only in Pro, like ${entry('askchart')?.name ?? 'Ask your data'} and ${entry('bridge')?.name ?? 'Revenue bridge'}` },
   { title: 'Every new piece, as it ships' },
-  { title: 'Unlimited client projects' },
+  { title: 'Unlimited projects' },
 ]
 
 function Rows({ rows, lit = false }: { rows: Row[]; lit?: boolean }) {

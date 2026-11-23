@@ -27,7 +27,7 @@ export function Agencies() {
     `The ${app?.name ?? 'Detent'} AI workspace template, running and ready to rename`,
     `All ${BLOCKS.length} blocks: agent chat, evals, support inbox, data table, settings and more`,
     `All ${ENTRIES.length} components, charts that explain themselves included`,
-    'Unlimited client projects',
+    'Unlimited projects',
     'Restyled by each client’s shadcn theme',
     'Every update, for life',
   ]
@@ -40,7 +40,7 @@ export function Agencies() {
             Deliver AI products your clients think cost $20k.
           </h1>
           <p className="rise mt-6 max-w-[560px] text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
-            The Detent template, {BLOCKS.length} screens and {ENTRIES.length} components. Use them in unlimited client projects. <PriceNow value={PRICE} />{' '}once.
+            The Detent template, {BLOCKS.length} screens and {ENTRIES.length} components. Use them in unlimited projects. <PriceNow value={PRICE} />{' '}once.
           </p>
           <div className="rise mt-8 flex flex-wrap items-center justify-center gap-2" style={{ animationDelay: '180ms' }}>
             <Link href="/pro" data-cta="agencies-hero" className={PILL_DARK}>

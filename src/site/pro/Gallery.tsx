@@ -137,7 +137,7 @@ export function ProHero() {
 
 /** What one payment buys, said plainly, right under the button. */
 export function Terms() {
-  const terms = ['One payment, no subscription', 'Unlimited client projects', 'One licence per person']
+  const terms = ['One payment, no subscription', 'Unlimited projects', 'One licence per person']
   return (
     <div className="mt-5 flex flex-col items-center gap-1.5 px-2 text-center">
       <BuyTerms />

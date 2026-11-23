@@ -37,7 +37,7 @@ export function ProPitch({ id, shelf = 'components', near = false }: { id: strin
                 )}
               </h2>
               <p className="mt-3 max-w-[520px] text-[15px] leading-[1.6] text-ink-3">
-                Plus the full {app?.name ?? 'Detent'} workspace template, {PRO_BLOCK_COUNT} whole screens and {PRO_COMPONENTS.length} Pro components. The source lands in your project, yours to change, in unlimited client projects.
+                Plus the full {app?.name ?? 'Detent'} workspace template, {PRO_BLOCK_COUNT} whole screens and {PRO_COMPONENTS.length} Pro components. The source lands in your project, yours to change, in unlimited projects.
               </p>
               <ul className="mt-5 flex flex-wrap gap-2">
                 {others.map((o) => (

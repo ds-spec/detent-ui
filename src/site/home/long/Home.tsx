@@ -519,7 +519,7 @@ const DOORS = [
   {
     who: 'For agencies',
     title: 'Deliver AI products your clients think cost $20k.',
-    line: 'The template, every screen and every component, restyled to each client’s brand. Use them in unlimited client projects.',
+    line: 'The template, every screen and every component, restyled to each client’s brand. Use them in unlimited projects.',
     href: '/agencies',
     cta: 'Detent for agencies',
   },
@@ -558,7 +558,7 @@ function Close({ total, pro, blocks }: { total: number; pro: number; blocks: num
     `${TEMPLATES.length} templates: ${app?.name}, a full AI workspace app, and ${site?.name}, a landing page for an AI agent`,
     `All ${blocks} blocks: agent chat, evals, support inbox, onboarding, settings and more`,
     `All ${total} components, ${pro} of them only in Pro`,
-    'Unlimited client projects, for agencies too',
+    'Unlimited projects',
     'Source code you own and can change',
     'Your coding agent sets it up from one prompt',
   ]
