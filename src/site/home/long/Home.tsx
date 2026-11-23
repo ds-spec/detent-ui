@@ -44,19 +44,9 @@ export function Home(n: Counts) {
         </Leaf>
       </div>
       <div className="mt-3">
-        <Leaf>
-          <Library {...n} />
-        </Leaf>
-      </div>
-      <div className="mt-3">
-        <Leaf>
-          <Voices />
-        </Leaf>
-      </div>
-      <div className="mt-3">
         <HomeScreens />
         <div className="flex justify-center pb-4 pt-8">
-          <Link href="/pro" className={PILL_PRO}>
+          <Link href="/pro" data-cta="home-screens" className={PILL_PRO}>
             Get every screen with Pro, <PriceNow value={PRICE} /> once
             <ArrowRight size={13} />
           </Link>
@@ -64,12 +54,7 @@ export function Home(n: Counts) {
       </div>
       <div className="mt-3">
         <Leaf>
-          <Charts />
-        </Leaf>
-      </div>
-      <div className="mt-3">
-        <Leaf>
-          <Own />
+          <Doors />
         </Leaf>
       </div>
       <div className="mt-3">
@@ -90,12 +75,32 @@ export function Home(n: Counts) {
       </div>
       <div className="mt-3">
         <Leaf>
-          <Questions free={n.total - n.pro} total={n.total} />
+          <Voices />
         </Leaf>
       </div>
       <div className="mt-3">
         <Leaf>
           <Close total={n.total} pro={n.pro} blocks={n.blocks} />
+        </Leaf>
+      </div>
+      <div className="mt-3">
+        <Leaf>
+          <Questions free={n.total - n.pro} total={n.total} />
+        </Leaf>
+      </div>
+      <div className="mt-3">
+        <Leaf>
+          <Library {...n} />
+        </Leaf>
+      </div>
+      <div className="mt-3">
+        <Leaf>
+          <Charts />
+        </Leaf>
+      </div>
+      <div className="mt-3">
+        <Leaf>
+          <Own />
         </Leaf>
       </div>
     </div>
@@ -138,13 +143,13 @@ function Hero({ total, free, blocks, templates }: Counts) {
         </span>
       </h1>
       <p className="rise mt-6 max-w-[540px] text-[16px] leading-[1.6] text-ink-3" style={{ animationDelay: '120ms' }}>
-        The hard parts, already built: agent chat, approvals, streaming answers and charts that explain themselves, with every state worked out. Your coding agent installs them{'\u00a0'}today.
+        Agent chat, voice, evals and a full AI workspace template, with every state worked out. Ship this week. <PriceNow value={PRICE} />{'\u00a0'}once.
       </p>
       <div className="rise mt-8 flex flex-wrap items-center justify-center gap-2" style={{ animationDelay: '180ms' }}>
         <Link href="/pro" data-cta="home-hero" className={PILL_DARK}>
           Get Pro · <PriceNow value={PRICE} /> once
         </Link>
-        <a href="#library" className={PILL_SOFT}>
+        <a href="#templates" className={PILL_SOFT}>
           Try them live
           <ArrowDown size={13} />
         </a>
@@ -153,13 +158,11 @@ function Hero({ total, free, blocks, templates }: Counts) {
         One payment. Every update for life. The code is yours.
       </p>
       <div className="rise mt-9 flex flex-col items-center gap-1.5 text-[13px] text-ink-3" style={{ animationDelay: '280ms' }}>
-        <p className="text-balance">
-          For founders shipping an AI product, and the agencies that build them for clients.
-        </p>
-        <p className="text-balance">
-          Praised by builders at <span className="text-ink-2">Amboras (YC)</span>, <span className="text-ink-2">Laravel Cloud</span> and ex-<span className="text-ink-2">Snap</span>.
-        </p>
         <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+          <a href="https://x.com/next_gendev/status/2119335361554030899" target="_blank" rel="noopener noreferrer" className="ring-focus rounded-[4px] transition-colors hover:text-ink">
+            1,000+ bookmarks on X
+          </a>
+          <span aria-hidden>·</span>
           <InDirectory />
           <span aria-hidden>·</span>
           <span>Featured in Shadcn Weekly #8</span>
@@ -170,7 +173,7 @@ function Hero({ total, free, blocks, templates }: Counts) {
 }
 
 /* 3. The library, in tabs: six big live cards each. */
-type Item = { id: string; name: string; line: string; pro: boolean; href: string; tone: Tone; piece: (ready: () => void) => ReactNode }
+export type Item = { id: string; name: string; line: string; pro: boolean; href: string; tone: Tone; piece: (ready: () => void) => ReactNode }
 const FAMILY_TONE: Record<string, Tone> = { agents: 'blue', data: 'amber', inputs: 'rose', feedback: 'violet', essentials: 'violet', overlays: 'rose', marketing: 'amber' }
 const KIND_TONE: Record<string, Tone> = { app: 'blue', flow: 'violet', section: 'amber' }
 
@@ -230,7 +233,7 @@ const PRO_LINE: Record<Shelf, ReactNode> = {
 }
 
 /* A library card: a soft placeholder with the piece's name holds the space until the live piece is in. */
-function Tile({ it }: { it: Item }) {
+export function Tile({ it, wide = false }: { it: Item; wide?: boolean }) {
   const [ready, setReady] = useState(false)
   useEffect(() => {
     const t = window.setTimeout(() => setReady(true), 4000)
@@ -238,7 +241,7 @@ function Tile({ it }: { it: Item }) {
   }, [])
   return (
     <div className="group relative block rounded-[16px] bg-[var(--mount)] p-2 shadow-[0_0_0_1px_var(--line)] transition-shadow duration-300 hover:shadow-[0_0_0_1px_var(--line-strong),0_12px_30px_-16px_rgb(0_0_0/0.18)]">
-      <div className="relative isolate aspect-[4/3] overflow-clip rounded-[10px] shadow-[0_0_0_1px_var(--line)]" style={{ background: wellOf(it.tone) }}>
+      <div className={`relative isolate ${wide ? 'aspect-[4/3] sm:aspect-[16/9]' : 'aspect-[4/3]'} overflow-clip rounded-[10px] shadow-[0_0_0_1px_var(--line)]`} style={{ background: wellOf(it.tone) }}>
         <div aria-hidden inert className={`pointer-events-none absolute inset-0 transition-[opacity,transform] duration-500 [transition-timing-function:cubic-bezier(0.2,0.9,0.25,1)] group-hover:scale-[1.02] ${ready ? 'opacity-100' : 'opacity-0'}`}>
           <InPlay.Provider value>{it.piece(() => setReady(true))}</InPlay.Provider>
         </div>
@@ -322,7 +325,7 @@ function Voices() {
 
 /* 6. Charts: the part of Detent others don't have. Two free, two Pro, all live. */
 const CHARTS = ['chart', 'trend', 'askchart', 'bridge']
-function Charts() {
+export function Charts() {
   return (
     <section className={SECTION}>
       <h2 className={H2}>
@@ -356,7 +359,7 @@ const THEMES = [
 ]
 /* The AI calendar reads --accent all through, so the swatches change it for real. */
 const THEMED = 'week'
-function Own() {
+export function Own() {
   const [theme, setTheme] = useState(THEMES[0])
   const [dark, setDark] = useState(false)
   const Piece = DEMOS[THEMED]
@@ -468,31 +471,81 @@ function Questions({ free, total }: { free: number; total: number }) {
   )
 }
 
-/* 5. Templates: a whole product to start from, high on the page. */
+/* 3. The Detent workspace template, running live: what most buyers install first. */
 function Templates() {
+  const app = TEMPLATES.find((t) => t.form === 'app')
+  const site = TEMPLATES.find((t) => t.form !== 'app')
+  if (!app) return null
   return (
-    <section className={SECTION}>
+    <section id="templates" className={`${SECTION} scroll-mt-16`}>
       <h2 className={H2}>
-        Start from a whole product.
+        Start from a finished AI app.
         <span className="block text-quiet">Not a blank page.</span>
       </h2>
-      <p className="mx-auto mt-5 max-w-[520px] px-5 text-center text-[16px] leading-[1.6] text-ink-3">Two templates come with Pro: the app for an AI assistant, and the landing page that sells an agent. Clone, rename, ship.</p>
-      <ul className={`${WRAP} !max-w-[1120px] mt-10 grid gap-3.5 sm:grid-cols-2`}>
-        {[...TEMPLATES].sort((a, b) => Number(b.form === 'app') - Number(a.form === 'app')).map((t) => (
-          <li key={t.id} className="min-w-0">
-            <Tile it={{ id: t.id, name: `${t.name} · ${t.form === 'app' ? 'Agent workspace app' : 'Agent landing page'}`, line: t.pitch, pro: true, href: `/templates/${t.id}`, tone: 'violet', piece: (r) => <TemplatePiece id={t.id} onReady={r} /> }} />
-          </li>
-        ))}
-      </ul>
+      <p className="mx-auto mt-5 max-w-[540px] px-5 text-center text-[16px] leading-[1.6] text-ink-3">{app.pitch} Clone it, rename it, ship it.</p>
+      <div className={`${WRAP} !max-w-[1120px] mt-10`}>
+        <Tile wide it={{ id: app.id, name: `${app.name} · AI workspace template`, line: app.line, pro: true, href: `/templates/${app.id}`, tone: 'violet', piece: (r) => <TemplatePiece id={app.id} onReady={r} /> }} />
+      </div>
       <div className="mt-8 flex flex-wrap justify-center gap-2">
         <Link href="/pro" data-cta="home-templates" className={PILL_DARK}>
-          Get both with Pro · <PriceNow value={PRICE} /> once
+          Get it with Pro · <PriceNow value={PRICE} /> once
         </Link>
-        <Link href="/templates" className={PILL_SOFT}>
-          Tour them live
+        <Link href={`/templates/${app.id}`} className={PILL_SOFT}>
+          Try the whole app
           <ArrowUpRight size={13} />
         </Link>
       </div>
+      {site && (
+        <p className="mt-5 px-5 text-center text-[14px] text-ink-3">
+          Also in Pro:{' '}
+          <Link href={`/templates/${site.id}`} className="ring-focus rounded-[4px] text-ink-2 underline decoration-[var(--line-strong)] underline-offset-[3px] transition-colors hover:text-ink">
+            {site.name}, the landing page for an AI agent
+          </Link>
+        </p>
+      )}
+    </section>
+  )
+}
+
+/* 5. Two doors: the two kinds of people who buy Detent. */
+const DOORS = [
+  {
+    who: 'For founders',
+    title: 'Your AI product isn’t live yet. It should still look funded.',
+    line: 'Agent chat, voice, evals, onboarding and settings, every state worked out, so the first people who see it trust it.',
+    href: '/pro',
+    cta: 'Get Pro',
+  },
+  {
+    who: 'For agencies',
+    title: 'Deliver AI products your clients think cost $20k.',
+    line: 'The template, every screen and every component, restyled to each client’s brand. Use them in unlimited client projects.',
+    href: '/agencies',
+    cta: 'Detent for agencies',
+  },
+]
+function Doors() {
+  return (
+    <section className={SECTION}>
+      <h2 className={H2}>
+        Built for two kinds of team.
+        <span className="block text-quiet">Pick your door.</span>
+      </h2>
+      <ul className={`${WRAP} !max-w-[1120px] mt-10 grid gap-3.5 md:grid-cols-2`}>
+        {DOORS.map((d) => (
+          <li key={d.who} className="flex flex-col rounded-[20px] bg-[var(--mount)] p-7 shadow-[0_0_0_1px_var(--line)] sm:p-9">
+            <span className="text-[13px] text-ink-3">{d.who}</span>
+            <h3 className="mt-3 text-balance text-[24px] font-normal leading-[1.15] tracking-[-0.03em] text-ink sm:text-[28px]">{d.title}</h3>
+            <p className="mt-4 max-w-[440px] text-[15px] leading-[1.6] text-ink-3">{d.line}</p>
+            <div className="mt-8">
+              <Link href={d.href} data-cta={`home-door-${d.href.slice(1)}`} className={PILL_DARK}>
+                {d.cta}
+                <ArrowRight size={13} />
+              </Link>
+            </div>
+          </li>
+        ))}
+      </ul>
     </section>
   )
 }
@@ -502,10 +555,10 @@ function Close({ total, pro, blocks }: { total: number; pro: number; blocks: num
   const app = TEMPLATES.find((t) => t.form === 'app')
   const site = TEMPLATES.find((t) => t.form !== 'app')
   const rows = [
-    `${TEMPLATES.length} templates: ${app?.name} (agent workspace app) and ${site?.name} (agent landing page)`,
+    `${TEMPLATES.length} templates: ${app?.name}, a full AI workspace app, and ${site?.name}, a landing page for an AI agent`,
     `All ${blocks} blocks: agent chat, evals, support inbox, onboarding, settings and more`,
     `All ${total} components, ${pro} of them only in Pro`,
-    'Unlimited projects, client work too',
+    'Unlimited client projects, for agencies too',
     'Source code you own and can change',
     'Your coding agent sets it up from one prompt',
   ]
@@ -528,7 +581,7 @@ function Close({ total, pro, blocks }: { total: number; pro: number; blocks: num
       <Link href="/pro" data-cta="home-close" className={`${PILL_DARK} mt-10`}>
         Get Pro · <PriceNow value={PRICE} /> once
       </Link>
-      <p className="mt-4 max-w-[460px] text-[13px] leading-[1.55] text-ink-3">One payment, no subscription, every update for life. Every piece runs live on this site, and {total - pro} components are free to try in your own project.</p>
+      <p className="mt-4 max-w-[460px] text-[13px] leading-[1.55] text-ink-3"><PriceNow value={PRICE} /> + local tax · lifetime updates · all sales final. Try every Pro screen live first.</p>
     </section>
   )
 }

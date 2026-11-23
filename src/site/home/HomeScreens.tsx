@@ -13,11 +13,13 @@ import { Fit } from '@/site/Fit'
 import { useNear } from '@/site/near'
 
 const PICKS: { id: string; name: string; tone: Tone; line: string }[] = [
-  { id: 'agent-chat', name: 'Agent chat', tone: 'blue', line: 'Users don’t trust an AI they can’t watch. Show every step, and let them say yes before it acts.' },
   { id: 'task-to-merge', name: 'Task to merge', tone: 'violet', line: 'An agent takes a task from plan to merged pull request. Deploying waits for a person.' },
-  { id: 'support-inbox', name: 'Support inbox', tone: 'rose', line: 'Every conversation sorted and every reply drafted, with the sources it came from.' },
   { id: 'evals', name: 'Evals', tone: 'amber', line: 'A new prompt against the one in production, case by case. Shipping waits on every regression.' },
   { id: 'data-table', name: 'Data table', tone: 'blue', line: 'Sort, filter, select, and ask it a question in plain words.' },
+  { id: 'onboarding', name: 'Onboarding', tone: 'rose', line: 'A new workspace in four steps: tools connected, the team invited, a first agent created and watched doing its first job.' },
+  { id: 'settings', name: 'Settings', tone: 'violet', line: 'API keys with spend this month, members with roles, the workspace and security. Every page is real.' },
+  { id: 'agent-chat', name: 'Agent chat', tone: 'blue', line: 'Users don’t trust an AI they can’t watch. Show every step, and let them say yes before it acts.' },
+  { id: 'voice-mode', name: 'Voice mode', tone: 'amber', line: 'A voice call that writes its own notes: to-dos with an owner and a date, filled in as you talk.' },
 ]
 
 const DWELL = 10000
@@ -54,12 +56,12 @@ export function HomeScreens() {
         <div className="mx-auto max-w-[1440px] px-3 pb-8 pt-20 sm:px-8 sm:pb-10 sm:pt-28">
           <div className="flex flex-col items-center px-2 text-center">
             <h2 id="screens-title" className="text-[clamp(38px,4.2vw,62px)] font-normal leading-[1.02] tracking-[-0.055em] text-ink">
-              Five screens you’d spend weeks on.
+              Seven screens you’d spend weeks on.
               <br />
               <span className="text-quiet">Already done.</span>
             </h2>
             <p className="mt-5 max-w-[500px] text-balance text-[16px] leading-[1.6] text-ink-3">
-              Agent chat, task to merge, support inbox, evals and a data table, running live with loading, streaming, error and empty states worked out.
+              Task to merge, evals, a data table, onboarding, settings, agent chat and voice mode, running live with loading, streaming, error and empty states worked out.
             </p>
           </div>
 

@@ -19,6 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     at('/', 1, 'daily'),
     at('/pro', 0.9),
+    at('/agencies', 0.8),
     at('/components', 0.9),
     at('/blocks', 0.8),
     at('/premium-shadcn-components', 0.8),
