@@ -150,7 +150,10 @@ export const DOCS: Record<string, Doc> = {
   },
   find: {
     lede: ['Find in page that dims everything but the match.', 'The match and its sentence stay lit, one plate glides from match to match, and it starts from where you’re reading, not from the top.'],
-    examples: [],
+    examples: [
+      { key: 'transcript', title: 'Search a call transcript', line: 'Wrap the part of the page people read, here a sales call. `defaultQuery` opens it on a word, Enter steps to the next match from where you are, and Esc puts the page back.' },
+      { key: 'button', title: 'Your own button on a phone', line: 'Phones have no ⌘F, so drive `open` and `onOpenChange` from a button of your own. `shortcut={false}` leaves ⌘F alone when another find already owns it, and `placeholder` names what is searched.' },
+    ],
   },
   rewind: {
     lede: ['A textarea you can rewind.', 'Hold ⌘Z and drag, and your writing runs back under your hand, with deleted words coming back in colour. A tap steps back one thought, not one letter.'],
@@ -198,11 +201,17 @@ export const DOCS: Record<string, Doc> = {
   },
   livelist: {
     lede: ['A checklist your whole team writes in at once.', 'New items land in their group with the person’s name, ticked ones settle into Done, and while you’re reading the list waits behind a “2 new” pill.'],
-    examples: [],
+    examples: [
+      { key: 'launch', title: 'A launch day checklist', line: 'Three `people` and three `groups`, started from `defaultItems` so the list keeps its own state. Add an item and it lands in its group under the person set as `me`.' },
+      { key: 'controlled', title: 'Kept in your own state', line: 'Pass `items` and `onItemsChange` to hold the list yourself, then save it to your database or sync it to everyone else. The count under it reads from the same array.' },
+    ],
   },
   mcp: {
     lede: ['The install card for your MCP server.', 'Pick Cursor, Claude Code, Claude, Windsurf or Zed and it writes that editor’s exact config from your server’s `url`, then waits on the copy until it connects.'],
-    examples: [],
+    examples: [
+      { key: 'remote', title: 'A remote server', line: 'Only a `url`, so every editor gets the remote config, starting on Claude Code with `defaultClient`. Copying sets `status` to waiting until your server reports a connection, and then `tools` says how many it exposes.' },
+      { key: 'local', title: 'Run locally with a key', line: 'Set `pkg` and `envVar` and a Local option runs your package with npx. `onCreateKey` makes a key when someone presses Create one, and it lands straight in the config they copy.' },
+    ],
   },
   buddy: {
     lede: ['A small face for your AI, instead of an orb.', 'Idle eyes follow the pointer and blink. Listening looks down, thinking scans side to side, happy smiles and sleepy droops.'],

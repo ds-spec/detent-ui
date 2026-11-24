@@ -16,7 +16,12 @@ export async function generateMetadata({ params }: PageProps<'/blocks/[slug]'>):
   return b ? page({ title: SEARCH[b.id] ?? `${b.name}: React block`, description: short(searchDescription(b.id, b.line, isProBlock(b.id))), path: `/blocks/${b.id}` }) : {}
 }
 
-export default function BlockPage({ params }: PageProps<'/blocks/[slug]'>) {
+// The page checks its slug before streaming so an unknown one is a real 404, so it may block on navigation.
+export const instant = false
+
+export default async function BlockPage({ params }: PageProps<'/blocks/[slug]'>) {
+  // checked here, outside the Suspense, so an unknown slug answers 404 before anything streams
+  if (!block((await params).slug)) notFound()
   return (
     <Suspense fallback={null}>
       <Shown params={params} />

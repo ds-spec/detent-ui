@@ -15,7 +15,12 @@ export async function generateMetadata({ params }: PageProps<'/templates/[slug]'
   return t ? page({ title: SEARCH[t.id] ?? `${t.name}: ${t.kind} ${t.form === 'app' ? 'app' : 'landing page'} template`, description: short(t.line), path: `/templates/${t.id}` }) : {}
 }
 
-export default function TemplatePage({ params }: PageProps<'/templates/[slug]'>) {
+// The page checks its slug before streaming so an unknown one is a real 404, so it may block on navigation.
+export const instant = false
+
+export default async function TemplatePage({ params }: PageProps<'/templates/[slug]'>) {
+  // checked here, outside the Suspense, so an unknown slug answers 404 before anything streams
+  if (!template((await params).slug)) notFound()
   return (
     <Suspense fallback={null}>
       <Shown params={params} />

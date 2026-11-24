@@ -22,7 +22,12 @@ export async function generateMetadata({ params }: PageProps<'/components/[slug]
   return page({ title: SEARCH[e.id] ?? `${e.name}: React component`, description: short(searchDescription(e.id, e.line, pro)), path: `/components/${e.id}` })
 }
 
-export default function ComponentPage({ params }: PageProps<'/components/[slug]'>) {
+// The page checks its slug before streaming so an unknown one is a real 404, so it may block on navigation.
+export const instant = false
+
+export default async function ComponentPage({ params }: PageProps<'/components/[slug]'>) {
+  // checked here, outside the Suspense, so an unknown slug answers 404 before anything streams
+  if (!entry((await params).slug)) notFound()
   return (
     <Suspense fallback={null}>
       <Props params={params} />

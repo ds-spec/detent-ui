@@ -20,6 +20,8 @@ const FREE: Record<string, ComponentType> = {
   'prompt:support': dynamic(() => import('@/lab/examples/prompt').then((m) => m.PromptSupport), { ssr: false }),
   'prompt:agent': dynamic(() => import('@/lab/examples/prompt').then((m) => m.PromptAgent), { ssr: false }),
   'prompt:writer': dynamic(() => import('@/lab/examples/prompt').then((m) => m.PromptWriter), { ssr: false }),
+  'livelist:launch': dynamic(() => import('@/lab/examples/livelist').then((m) => m.LiveListLaunch), { ssr: false }),
+  'livelist:controlled': dynamic(() => import('@/lab/examples/livelist').then((m) => m.LiveListControlled), { ssr: false }),
 }
 
 export const EXAMPLE_VIEWS: Record<string, ComponentType> = { ...PRO_EXAMPLES, ...FREE }
