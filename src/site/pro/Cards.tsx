@@ -107,7 +107,7 @@ export function PricingCards({ cta = 'cards' }: { cta?: string }) {
           {promo && !region && <p className="text-ink-2">{promo.off} off for {sale ?? 'a short time'}</p>}
           {left && (
             <p className="inline-flex items-center gap-[0.3em] text-accent">
-              Ends in <RollingText text={left} className="font-medium" />
+              {promo?.until ? <>Ends {promo.until} ·</> : 'Ends in'} <RollingText text={left} className="font-medium" />
             </p>
           )}
         </div>

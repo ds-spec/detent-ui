@@ -6,6 +6,7 @@ import { asset } from '@/lib/asset'
 import { entry } from '@/catalog/meta'
 import { PLANS, isProComponent } from '@/catalog/pro'
 import { Files } from '@/site/ai/Files'
+import { PriceNow } from '@/site/Promo'
 import { Live } from '@/site/ai/Live'
 import type { RailGroup } from '@/site/exhibit/Rail'
 import { AI_SDK } from '@/catalog/site'
@@ -81,7 +82,7 @@ export default async function AiSdk() {
             <p className="text-lead text-ink-3">Reasoning, tool calls, approvals and sources each land in the component built for them, timed as they stream. The window below runs on a real AI SDK route: ask it something, or approve the refund.</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href="/pro#pricing" className="ring-focus flex h-11 items-center rounded-full bg-ink px-6 text-callout font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]">
-                {pro.cta} · ${pro.price}
+                {pro.cta} · <PriceNow value={pro.price} />
               </Link>
               <Link href="#code" className="ring-focus flex h-11 items-center rounded-full bg-surface-2 px-6 text-callout font-medium text-ink transition-colors duration-150 hover:bg-card">
                 See the code
@@ -142,7 +143,7 @@ export default async function AiSdk() {
               Open the block
             </Link>
             <Link href="/pro#pricing" className="ring-focus flex h-11 items-center rounded-full bg-ink px-6 text-callout font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]">
-              {pro.cta} · ${pro.price}
+              {pro.cta} · <PriceNow value={pro.price} />
             </Link>
           </div>
         </section>

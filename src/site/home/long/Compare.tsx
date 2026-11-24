@@ -4,9 +4,11 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import Link from 'next/link'
+import { PLANS } from '@/catalog/pro'
 import { Mark } from '@/site/parts'
 import { InPlay } from '@/lab/blocks/kit/director'
 import { BlockPiece } from '@/site/library/Library'
+import { PriceNow } from '@/site/Promo'
 import { Tabs, WRAP } from './parts'
 
 /**
@@ -265,7 +267,7 @@ export function Compare() {
         </p>
         <div className="flex flex-wrap justify-center gap-2">
           <Link href="/pro" className="ring-focus inline-flex h-[42px] items-center gap-1.5 rounded-full bg-[var(--accent)] px-5 text-[14px] text-white transition-transform duration-150 active:scale-[0.97]">
-            Get Pro, $99 once
+            Get Pro, <PriceNow value={PLANS[0].price} /> once
           </Link>
           <Link href={`/blocks/${build.id}`} className="ring-focus inline-flex h-[42px] items-center gap-1.5 rounded-full bg-[color-mix(in_oklch,var(--ink)_5%,transparent)] px-5 text-[14px] text-ink transition-transform duration-150 active:scale-[0.97]">
             Open {build.name.toLowerCase()}

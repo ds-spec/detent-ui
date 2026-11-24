@@ -22,7 +22,7 @@ import type { Latest } from '@/catalog/latest'
 import { BlockPiece, TemplatePiece } from '@/site/library/Library'
 import { Mini } from '@/site/Mini'
 import { CopyCommand } from '@/site/parts'
-import { PriceNow } from '@/site/Promo'
+import { PriceNow, priceWith, usePromo } from '@/site/Promo'
 import { Compare } from './Compare'
 import { PricingCards } from '@/site/pro/Cards'
 import { H2, Leaf, PILL_DARK, PILL_PRO, PILL_SOFT, ProBadge, SECTION, Tabs, WRAP } from './parts'
@@ -218,7 +218,7 @@ type Shelf = keyof typeof SHELVES
 const PRO_LINE: Record<Shelf, ReactNode> = {
   components: (
     <>
-      <span className="text-ink">Half of these are Pro.</span> All of them, and every one we add, for $99 once
+      <span className="text-ink">Half of these are Pro.</span> All of them, and every one we add, for <PriceNow value={PRICE} /> once
     </>
   ),
   blocks: (
@@ -436,6 +436,7 @@ export function Own() {
 
 /* 9. Questions. */
 function Questions({ free, total }: { free: number; total: number }) {
+  const promo = usePromo()
   const qa: [string, string][] = [
     ['Is it a subscription?', 'No. Pay once and keep every update and every new piece, for life.'],
     ['I’m not a designer. Will it look good?', 'Yes. Every piece is already designed, and it takes your shadcn theme and dark mode, so it matches your app out of the box.'],
@@ -444,7 +445,7 @@ function Questions({ free, total }: { free: number; total: number }) {
     ['How do I install a piece?', `Run the command on its page, like ${installCommand('chart', true)}, or ask your coding agent and it does it for you.`],
     ['Does it work with Claude Code, Cursor or Codex?', 'Yes. Give your agent the setup prompt once. Every piece has a page written for agents, so it places it well instead of guessing.'],
     ['Does it work in light and dark mode?', 'Yes. Every piece reads your theme tokens, and .dark turns it dark.'],
-    ['What is free and what is Pro?', `${free} of the ${total} components and five website blocks are free under MIT, for anyone. Pro adds the rest, every whole screen and both templates, for $${PRICE} once.`],
+    ['What is free and what is Pro?', `${free} of the ${total} components and five website blocks are free under MIT, for anyone. Pro adds the rest, every whole screen and both templates, for $${priceWith(promo, PRICE)} once.`],
     ['What do I get with Pro?', 'Every Pro component, every whole screen (agent chat, support inbox, evals and more), both app templates, and the plans your agent builds whole pages from. One payment, every update for life.'],
     ['Can I use it in client projects?', 'Yes, in as many projects as you like, commercial ones included. You can’t resell the components themselves.'],
   ]

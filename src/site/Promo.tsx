@@ -122,6 +122,7 @@ export function PromoStrip() {
             <span className="sr-only">now </span>${promo.price}
           </span>
         </span>
+        {promo.until && <span className="hidden whitespace-nowrap text-white/45 lg:inline">until {promo.until}</span>}
         {left && (
           <span className="inline-flex items-center gap-[0.3em] whitespace-nowrap tabular-nums text-white/45">
             <span className="hidden md:inline">ends in</span>
@@ -154,6 +155,7 @@ export function SaleClock({ className = '' }: { className?: string }) {
       <span className="font-medium text-accent">
         {promo.name ?? 'Sale'}
         {promo.off ? ` · ${promo.off} off` : ''}
+        {promo.until ? ` · until ${promo.until}` : ''}
       </span>
       {left && (
         <span className="ml-[0.3em] inline-flex items-center gap-[0.3em] whitespace-nowrap align-middle">

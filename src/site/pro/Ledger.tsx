@@ -9,6 +9,7 @@ import { DEMOS } from '@/catalog/demos'
 import { PRO_BLOCKS, TOTAL_DAYS, TOTAL_MONTHS, daysFor } from '@/catalog/effort'
 import { entry } from '@/catalog/meta'
 import { PLANS, PRO_COMPONENTS } from '@/catalog/pro'
+import { Price } from '../Promo'
 import { TEMPLATES } from '@/catalog/templates'
 import { ArrowRight } from '@/lab/icons'
 import { BLOCK_VIEWS, TEMPLATE_VIEWS } from '@pro'
@@ -186,7 +187,7 @@ export function Ledger() {
         <div className="flex items-center gap-4">
           <p className="text-right">
             <span className="block text-[13.5px] text-ink-3">With Pro</span>
-            <span className="tnum block text-[32px] leading-none tracking-[-0.04em] text-ink">${pro.price}</span>
+            <span className="tnum block text-[32px] leading-none tracking-[-0.04em] text-ink"><Price value={pro.price} /></span>
           </p>
           <a href="#pricing" className="ring-focus flex h-11 items-center rounded-full bg-ink px-5 text-[14px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]">
             {pro.cta}

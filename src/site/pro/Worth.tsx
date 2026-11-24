@@ -7,6 +7,7 @@ import { TOTAL_DAYS } from '@/catalog/effort'
 import { PLANS } from '@/catalog/pro'
 import { RollingText } from '@/lab/ui/RollingText'
 import { useSite } from '../Providers'
+import { Price, priceWith, usePromo } from '../Promo'
 
 const MIN = 200
 const MAX = 1500
@@ -17,8 +18,8 @@ const LABELS = [200, 500, 1000, 1500]
 const money = (n: number) => `$${n.toLocaleString('en-US')}`
 const pro = PLANS[0]
 
-function payback(day: number) {
-  const minutes = Math.ceil(pro.price / (day / 480))
+function payback(day: number, price: number) {
+  const minutes = Math.ceil(price / (day / 480))
   if (minutes < 60) return `${minutes} minutes`
   const h = Math.floor(minutes / 60)
   const m = minutes % 60
@@ -26,6 +27,7 @@ function payback(day: number) {
 }
 
 export function Worth() {
+  const promo = usePromo()
   const reduce = useReducedMotion()
   const { tick } = useSite()
   const [rate, setRate] = useState(START)
@@ -112,11 +114,11 @@ export function Worth() {
         <div>
           <p className="text-[13.5px] text-ink-3">With Detent Pro</p>
           <p className="mt-2 flex items-baseline gap-2">
-            <span className="tnum text-[clamp(44px,5vw,64px)] leading-none tracking-[-0.05em] text-ink">${pro.price}</span>
+            <span className="tnum text-[clamp(44px,5vw,64px)] leading-none tracking-[-0.05em] text-ink"><Price value={pro.price} /></span>
             <span className="text-[17px] text-ink-3">once</span>
           </p>
           <p className="mt-3 text-[15px] text-ink-2">
-            It pays for itself in the first <span className="tnum text-ink">{payback(rate)}</span> of your first day.
+            It pays for itself in the first <span className="tnum text-ink">{payback(rate, priceWith(promo, pro.price))}</span> of your first day.
           </p>
         </div>
       </div>

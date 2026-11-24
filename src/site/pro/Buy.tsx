@@ -145,10 +145,11 @@ function Shots({ shots, tone, wide = false }: { shots: Shot[]; tone: 'amber' | '
 export function Choose() {
   const { edition, setEdition } = useChoice()
   const owned = useOwned()
+  const promo = usePromo()
   return (
     <div className="flex min-w-0 flex-col gap-6">
       <Question title="Pro." quiet="Everything in Detent.">
-        <Tile name="edition" on={edition === 'pro'} onPick={() => setEdition('pro')} title="Pro" price={owned ? 'Yours' : `$${plan('pro').price}`} line={`${PRO_COMPONENTS.length} Pro components, ${PRO_BLOCK_COUNT} whole screens and ${TEMPLATE_COUNT}, already working.`} />
+        <Tile name="edition" on={edition === 'pro'} onPick={() => setEdition('pro')} title="Pro" price={owned ? 'Yours' : `$${priceWith(promo, plan('pro').price)}`} line={`${PRO_COMPONENTS.length} Pro components, ${PRO_BLOCK_COUNT} whole screens and ${TEMPLATE_COUNT}, already working.`} />
       </Question>
       <Summary />
     </div>
