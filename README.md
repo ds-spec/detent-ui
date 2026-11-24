@@ -159,20 +159,45 @@ Pro source lives in a private repository. Without it, this one still builds and 
 
 ## FAQ
 
-**Is Detent UI free?**
+<details>
+<summary><strong>Is Detent UI free?</strong></summary>
+<br />
+
 Yes. The 21 components and 5 blocks listed above are free and MIT licensed, for personal and commercial projects. Detent Pro is a one-time purchase for the additional pieces.
 
-**How is Detent UI different from shadcn/ui?**
+</details>
+
+<details>
+<summary><strong>How is Detent UI different from shadcn/ui?</strong></summary>
+<br />
+
 shadcn/ui gives you the primitives: buttons, dialogs, inputs. Detent builds on the same CLI and theme to give you the finished, interactive pieces an AI product needs, such as a prompt box, a model picker, diff review and explained charts. They work side by side in the same project.
 
-**Does it work without Next.js?**
+</details>
+
+<details>
+<summary><strong>Does it work without Next.js?</strong></summary>
+<br />
+
 Yes. The components are React 19 with Tailwind CSS v4. Next.js is what we test on; Vite with React works the same way, with the install paths adjusted.
 
-**Does it support dark mode and reduced motion?**
+</details>
+
+<details>
+<summary><strong>Does it support dark mode and reduced motion?</strong></summary>
+<br />
+
 Yes. Every piece follows your shadcn theme in light and dark, and respects `prefers-reduced-motion` through Motion's `MotionConfig`.
 
-**Can my coding agent use it?**
+</details>
+
+<details>
+<summary><strong>Can my coding agent use it?</strong></summary>
+<br />
+
 Yes. See [Use Detent UI with coding agents](#use-detent-ui-with-coding-agents).
+
+</details>
 
 ## Run the site locally
 
