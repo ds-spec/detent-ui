@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic'
 import { MotionGlobalConfig } from 'motion/react'
 import { feedback } from '@/lab/lib/detent'
 import '@/lab/lib/feel'
+import { Wish } from './Wish'
 
 const Search = dynamic(() => import('./Search').then((m) => m.Search), { ssr: false })
 
@@ -100,6 +101,7 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <SiteContext.Provider value={value}>
       {children}
+      <Wish />
       {loaded && <Search open={open} onOpenChange={setOpen} sound={sound} toggleSound={toggleSound} />}
     </SiteContext.Provider>
   )

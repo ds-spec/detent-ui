@@ -6,6 +6,19 @@
     "starters": "Offered while the thread is empty. The demo asks the first.",
     "followUps": "Offered under a finished answer; ones already asked drop out."
   },
+  "agent-dashboard": {
+    "data": "Everything it draws: runs by hour, recent runs with their steps, agents, models, tools, latency, spend, issues, deploys and logs.",
+    "state": "What to show while data is on its way, when there is none yet, or when it failed to load.",
+    "title": "The name in the header.",
+    "initialTab": "The view it opens on.",
+    "framed": "Draw its own rounded card. Turn off when it fills a page.",
+    "onRetryRun": "Called when a person approves a retry. Reject the promise and the sheet says the retry failed.",
+    "onReload": "Called from Try again in the error state.",
+    "subscribeLogs": "Stream new log lines in: call push with each line, and return a function that stops the stream.",
+    "className": "Classes for the outer element.",
+    "accent": "The main chart colour: the spend line and the first model.",
+    "autoplay": "Off by default. With no data, pass it to play the demo: live logs and a working retry."
+  },
   "analytics": {
     "product": "The product's name, in the sidebar, the chart and the feed.",
     "range": "The range it opens on.",
@@ -101,6 +114,16 @@
     "aspect": "The frame's shape.",
     "label": "Names it for screen readers.",
     "onChange": "Called with the slide it moved to."
+  },
+  "incident": {
+    "incidents": "The incidents to page through. The first one plays its events in order, runs its fix’s checks and asks to ship.",
+    "people": "Who can own an incident or comment. Each has an id, a name, and an optional photo or hue for the initial.",
+    "me": "The id of the person using it. Their changes and notes are signed with this name.",
+    "assistant": "What the watcher that notices drops and opens fixes is called.",
+    "product": "The product’s name beside its mark.",
+    "onShip": "Called once the fix is live, with the incident now marked fixed.",
+    "onStatusChange": "Called when someone picks a new status.",
+    "onComment": "Called when someone posts a note."
   },
   "phrase": {
     "parts": "The sentence, in order: plain text, a choice ({ id, options }) or a number ({ id, label, min, max, step }).",
@@ -820,7 +843,7 @@
     "productMark": "Your product's mark, drawn in white on black in the header. Card avatars come from `respond`.",
     "prompt": "The request it plays on load. Switching agents replays the latest request, including one a person typed.",
     "respond": "Turns a request into what happens: the chat `steps`, the canvas `title`, `subtitle` and `stat`, the `cards` that write themselves (title, body with **bold** and @mentions, chips), the `ask`, the `confirm` labels and the `reply`. It gets the chosen agent too, so it can route on `agent.id` to Claude, OpenAI, xAI or your own model, and it can be async. Mark a step `writes` to write the canvas during it and `counts` to roll the stat. Defaults to `relayPlan`, the Linear and Slack demo.",
-    "autoplay": "Play `prompt` on load. Set it to false to start empty and wait for someone to type.",
+    "autoplay": "Off by default, so it starts empty and waits for someone to type. Pass it to play `prompt` on load, as on a landing page.",
     "onEnable": "Called with the plan and the request when someone confirms.",
     "onDraft": "Called with the plan and the request when someone declines."
   },

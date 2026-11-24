@@ -18,6 +18,7 @@ import { BTN, useSideNew } from '../shell/side'
 import { DitherIcon } from '../Dither'
 import { InDirectory } from '../Directory'
 import { Fit } from '../Fit'
+import { TemplateFrame } from '../templates/Frame'
 
 const UI = [0.2, 0, 0, 1] as const
 
@@ -49,11 +50,19 @@ const BLOCK_SHOTS: Shot[] = ['support-inbox', 'task-to-merge', 'evals'].flatMap(
   if (!b || !View) return []
   return [{ id, name: b.name, line: b.short, count: `One of ${PRO_BLOCK_COUNT} blocks`, href: `/blocks/${id}`, title: b.window, chrome: b.chrome === 'browser' ? 'browser' : 'titled', view: () => <View autoplay /> }]
 })
-const TEMPLATE_SHOTS: Shot[] = ['detent'].flatMap((id) => {
+const TEMPLATE_SHOTS: Shot[] = ['detent', 'dusk'].flatMap((id) => {
   const t = TEMPLATES.find((x) => x.id === id)
   const View = TEMPLATE_VIEWS[id]
   if (!t || !View) return []
-  return [{ id, name: t.name, line: t.kind, count: 'The whole app', href: `/templates/${id}`, title: t.window, chrome: 'browser', view: View }]
+  const app = t.form === 'app'
+  const view = () => (
+    <TemplateFrame>
+      <div data-template-scroller className="h-full overflow-hidden">
+        <View />
+      </div>
+    </TemplateFrame>
+  )
+  return [{ id, name: t.name, line: t.kind, count: app ? 'The whole app' : 'The whole landing page', href: `/templates/${id}`, title: t.window, chrome: 'browser', view }]
 })
 
 const SHOTS = [...BLOCK_SHOTS, ...TEMPLATE_SHOTS]

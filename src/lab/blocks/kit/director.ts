@@ -9,7 +9,7 @@ export type Wait = (ms: number) => Promise<void>
 
 export const InPlay = createContext(true)
 
-export function useDirector(script: (wait: Wait, pass: number) => Promise<void>, autoplay = true, onTakeOver?: () => void) {
+export function useDirector(script: (wait: Wait, pass: number) => Promise<void>, autoplay = false, onTakeOver?: () => void) {
   const play = useContext(InPlay)
   const touched = useRef(!autoplay)
   const latest = useRef(script)

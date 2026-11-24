@@ -2,8 +2,8 @@ import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { BLOCKS, block } from '@/catalog/blocks'
-import { isProBlock } from '@/catalog/pro'
-import { JsonLd, crumbs, page, short } from '@/site/seo'
+import { installCommand, isProBlock } from '@/catalog/pro'
+import { JsonLd, crumbs, page, short, sourceCode } from '@/site/seo'
 import { SEARCH, searchDescription } from '@/catalog/search'
 
 export function generateStaticParams() {
@@ -28,12 +28,16 @@ async function Shown({ params }: { params: PageProps<'/blocks/[slug]'>['params']
   const { slug } = await params
   const b = block(slug)
   if (!b) notFound()
+  const free = !isProBlock(b.id)
   return (
-    <JsonLd
-      data={crumbs([
-        ['Blocks', '/blocks'],
-        [b.name, `/blocks/${b.id}`],
-      ])}
-    />
+    <>
+      <JsonLd
+        data={crumbs([
+          ['Blocks', '/blocks'],
+          [b.name, `/blocks/${b.id}`],
+        ])}
+      />
+      <JsonLd data={sourceCode({ name: b.name, description: searchDescription(b.id, b.line, !free), path: `/blocks/${b.id}`, free, install: installCommand(b.id, free) })} />
+    </>
   )
 }

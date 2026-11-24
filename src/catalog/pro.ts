@@ -1,5 +1,6 @@
 import { BLOCK_IDS } from './block-ids'
 import { UNLISTED } from './unlisted'
+import { TEMPLATES } from './templates'
 
 const PRO_CODE = [
   'answer',
@@ -48,7 +49,21 @@ export const isProBlock = (id: string) => (BLOCK_IDS as readonly string[]).inclu
 
 export const PRO_BLOCK_COUNT = BLOCK_IDS.length - FREE_BLOCKS.length
 
-export const isLockedSource = (slug: string, blocks: string[]) => isProComponent(slug) || (blocks.includes(slug) && !FREE_BLOCKS.includes(slug)) || slug.startsWith('template-')
+export type ProScreens = { id: string; name: string; line: string; starter: string; repo: string }
+
+export const PRO_SCREENS: ProScreens[] = [
+  {
+    id: 'agent-screens',
+    name: 'Agent workspace screens',
+    line: 'Seven more screens for the Detent Agent Starter: the agent queue, a day of runs with their traces, usage against the budget, billing as one timeline, setting up an agent, a model playground and the knowledge it reads. Copy them into components/workspace and replace screens.tsx.',
+    starter: 'Detent Agent Starter',
+    repo: 'https://github.com/ds-spec/detent-agent-starter',
+  },
+]
+
+export const isProScreens = (id: string) => PRO_SCREENS.some((s) => s.id === id)
+
+export const isLockedSource = (slug: string, blocks: string[]) => isProComponent(slug) || (blocks.includes(slug) && !FREE_BLOCKS.includes(slug)) || slug.startsWith('template-') || isProScreens(slug)
 
 import { SITE } from './site'
 
@@ -71,12 +86,20 @@ export const CHECKOUT = {
 }
 
 /** `meta` lands on the Dodo payment as metadata (Dodo reads every `metadata_*` query param). */
-export function checkoutFor(plan: keyof typeof CHECKOUT, account: { id: string; email: string } | null, meta: Record<string, string> = {}) {
+/* A guest gives their email before checkout (BuyGate), so it's locked here like a signed-in buyer's: the
+   payment lands on the address they'll sign in with. */
+export function checkoutFor(plan: keyof typeof CHECKOUT, account: { id: string; email: string } | null, meta: Record<string, string> = {}, guestEmail?: string) {
   const link = plan === 'pro' && meta.country === 'IN' ? CHECKOUT.india : CHECKOUT[plan]
   if (!/^https?:\/\//.test(link)) return null
   const url = new URL(link)
   for (const [key, value] of Object.entries(meta)) url.searchParams.set(`metadata_${key}`, value)
-  if (!account) return url.toString()
+  if (!account) {
+    if (guestEmail) {
+      url.searchParams.set('email', guestEmail)
+      url.searchParams.set('disableEmail', 'true')
+    }
+    return url.toString()
+  }
   url.searchParams.set('email', account.email)
   url.searchParams.set('disableEmail', 'true')
   url.searchParams.set('metadata_detent_user', account.id)
@@ -105,7 +128,7 @@ export const PLANS: Plan[] = [
     line: 'Everything you build the product with.',
     cta: 'Get Pro',
     href: '/checkout/pro',
-    features: [`${PRO_COMPONENTS.length} Pro components`, `${PRO_BLOCK_COUNT} blocks: whole screens, already working`, 'The Detent app template', 'Installs with the shadcn CLI', 'Source in your project, yours to change', 'Every update, for life', 'Unlimited projects'],
+    features: [`${PRO_COMPONENTS.length} Pro components`, `${PRO_BLOCK_COUNT} blocks: whole screens, already working`, `Every template: ${TEMPLATES.map((t) => t.name).join(' and ')}`, 'Installs with the shadcn CLI', 'Source in your project, yours to change', 'Every update, for life', 'Unlimited projects'],
   },
   {
     id: 'all',

@@ -28,6 +28,8 @@ export type Metric = {
 const topDrivers = (m: Metric) => [...m.drivers].sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount)).slice(0, 4)
 const plain = (n: number) => Math.round(n).toLocaleString('en-US')
 const signed = (n: number, format: (n: number) => string) => `${n < 0 ? '−' : '+'}${format(Math.abs(n))}`
+const rate = (format: (n: number) => string) => format(1).trim().endsWith('%')
+const moved = (d: number, format: (n: number) => string) => (rate(format) ? `${format(Math.abs(d)).replace(/\s*%$/, '')} pts` : format(Math.abs(d)))
 
 export function MetricExplainer({
   metrics,
@@ -129,9 +131,9 @@ export function MetricExplainer({
             ) : (
               <>
                 <span className="text-ink">
-                  {up ? 'up' : 'down'} {format(Math.abs(diff))}
+                  {up ? 'up' : 'down'} {moved(diff, format)}
                 </span>{' '}
-                on {m.vs}, {pct.toFixed(1)}% {up ? 'more' : 'less'}
+                on {m.vs}{rate(format) ? '' : `, ${pct.toFixed(1)}% ${up ? 'more' : 'less'}`}
               </>
             )}
           </p>
@@ -143,7 +145,7 @@ export function MetricExplainer({
             return (
               <Fragment key={x.id}>
                 <span aria-hidden className="invisible col-start-1 row-start-1 @min-[520px]:hidden">
-                  {d >= 0 ? 'up' : 'down'} {f(Math.abs(d))} on {x.vs}, {pc.toFixed(1)}% {d >= 0 ? 'more' : 'less'}
+                  {d >= 0 ? 'up' : 'down'} {moved(d, f)} on {x.vs}{rate(f) ? '' : `, ${pc.toFixed(1)}% ${d >= 0 ? 'more' : 'less'}`}
                 </span>
                 {top && (
                   <span aria-hidden className="invisible col-start-1 row-start-1 @min-[520px]:hidden">

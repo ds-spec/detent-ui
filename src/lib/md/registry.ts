@@ -1,5 +1,5 @@
 import { ENTRIES, entry } from '@/catalog/meta'
-import { BLOCKS } from '@/catalog/blocks'
+import { BLOCKS, propsOf } from '@/catalog/blocks'
 import { TEMPLATES, TEMPLATE_COUNT } from '@/catalog/templates'
 import { RELEASES, CONTACT } from '@/catalog/trust'
 import { FREE_BLOCKS, ON_SALE, PLANS, PRO_COMPONENTS, PRO_BLOCK_COUNT, SITE, installCommand, isProBlock, isProComponent } from '@/catalog/pro'
@@ -654,8 +654,8 @@ function renderBlock(slug: string, compact = false): string | null {
     '',
     !compact && recipeOf(b) ? ['## Example', '', '```tsx', recipeOf(b)!.code.trim(), '```', ...extraPackages(recipeOf(b)!.code)].join('\n') : '',
     '',
-    !compact && b.props.length
-      ? ['## Props', '', '| Prop | Type | Default | Description |', '| --- | --- | --- | --- |', ...b.props.map((p) => `| \`${p.name}\` | \`${cell(p.type)}\` | ${p.default ? `\`${cell(p.default)}\`` : ''} | ${cell(p.note ?? '')} |`)].join('\n')
+    !compact && propsOf(b).length
+      ? ['## Props', '', '| Prop | Type | Default | Description |', '| --- | --- | --- | --- |', ...propsOf(b).map((p) => `| \`${p.name}\` | \`${cell(p.type)}\` | ${p.default ? `\`${cell(p.default)}\`` : ''} | ${cell(p.note ?? '')} |`)].join('\n')
       : '',
   ]
     .join('\n')

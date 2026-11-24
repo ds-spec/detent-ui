@@ -187,7 +187,7 @@ export default function Docs() {
               <div className="grid gap-2 sm:grid-cols-2">
                 <Way href="/components" title="Components" line={`All ${ENTRIES.length}, running live. Each page has its command, props and code.`} />
                 <Way href="/blocks" title="Blocks" line={`${BLOCKS.length} whole screens built from the components.`} />
-                <Way href="/templates" title="Templates" line={`${TEMPLATES.length === 1 ? 'A whole app' : `${TEMPLATES.length} whole apps`} to start from.`} />
+                <Way href="/templates" title="Templates" line={`${TEMPLATES.length === 1 ? 'A template' : `${TEMPLATES.length} templates`} to start from: landing pages and apps.`} />
                 <Way href="/system" title="Design system" line="The type, materials, motion and shape every piece shares." />
               </div>
             </Section>

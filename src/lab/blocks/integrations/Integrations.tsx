@@ -40,7 +40,18 @@ function markFill(hex: string) {
   return `light-dark(${lum > 0.78 ? 'var(--ink)' : hex}, ${lum < 0.22 ? 'var(--ink)' : hex})`
 }
 
+const maps = new Map<string, string>()
+
 function capsuleMap(w: number, h: number, pad: number, density: number) {
+  const key = `${w}:${h}:${pad}:${density}`
+  const hit = maps.get(key)
+  if (hit !== undefined) return hit
+  const url = drawCapsuleMap(w, h, pad, density)
+  maps.set(key, url)
+  return url
+}
+
+function drawCapsuleMap(w: number, h: number, pad: number, density: number) {
   const W = Math.round((w + pad * 2) * density)
   const H = Math.round((h + pad * 2) * density)
   const c = document.createElement('canvas')
@@ -100,7 +111,7 @@ function Mark({ path, size, color }: { path: string; size: number; color: string
 }
 
 export function Integrations({
-  autoplay = true,
+  autoplay = false,
   accent,
   product = 'Detent',
   title = ['Plugs into the tools', 'your team lives in.'],

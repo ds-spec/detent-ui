@@ -1,11 +1,11 @@
 'use client'
 
 import type { CSSProperties, ReactNode } from 'react'
-import { siGithub, siGrafana, siIntercom, siLinear, siNotion, siPagerduty, siTypeform, siGooglemeet } from 'simple-icons'
+import { siDatadog, siFigma, siGithub, siGmail, siGooglecalendar, siGooglemeet, siGrafana, siIntercom, siJira, siLinear, siNotion, siPagerduty, siPostgresql, siSentry, siStripe, siTypeform, siVercel } from 'simple-icons'
 import { Orbit } from '@/lab/blocks/kit/icons'
 import { Orb } from '@/lab/ui/Orb'
 
-export type App = 'grafana' | 'linear' | 'github' | 'pagerduty' | 'notion' | 'meet' | 'typeform' | 'intercom' | 'agents'
+export type App = 'grafana' | 'linear' | 'github' | 'pagerduty' | 'notion' | 'meet' | 'typeform' | 'intercom' | 'agents' | 'sentry' | 'stripe' | 'figma' | 'vercel' | 'postgres' | 'datadog' | 'gmail' | 'calendar' | 'jira'
 
 type Mark = { path: string } | { glyph: (p: { size?: number }) => ReactNode }
 const APPS: Record<App, { fill: string; ink?: string; mark: Mark; scale?: number }> = {
@@ -18,9 +18,18 @@ const APPS: Record<App, { fill: string; ink?: string; mark: Mark; scale?: number
   typeform: { fill: 'linear-gradient(160deg, #3c3c3e, #262627 75%)', mark: siTypeform, scale: 0.5 },
   intercom: { fill: 'linear-gradient(160deg, #3a8dff, #1b5fe0 75%)', mark: siIntercom, scale: 0.54 },
   agents: { fill: 'linear-gradient(160deg, #b18cff, #6a3df0 75%)', mark: { glyph: Orbit } },
+  sentry: { fill: 'linear-gradient(160deg, #5b3f8c, #362d59 75%)', mark: siSentry, scale: 0.56 },
+  stripe: { fill: 'linear-gradient(160deg, #8f86ff, #635bff 75%)', mark: siStripe, scale: 0.5 },
+  figma: { fill: 'linear-gradient(160deg, #3a3a3e, #1e1e1e 75%)', mark: siFigma, scale: 0.5 },
+  vercel: { fill: 'linear-gradient(160deg, #2a2a2a, #000000 75%)', mark: siVercel, scale: 0.46 },
+  postgres: { fill: 'linear-gradient(160deg, #5a8bc4, #336791 75%)', mark: siPostgresql, scale: 0.56 },
+  datadog: { fill: 'linear-gradient(160deg, #8a5bd8, #632ca6 75%)', mark: siDatadog, scale: 0.58 },
+  gmail: { fill: 'linear-gradient(160deg, #ffffff, #f2f2f2)', ink: '#ea4335', mark: siGmail, scale: 0.52 },
+  calendar: { fill: 'linear-gradient(160deg, #ffffff, #f2f2f2)', ink: '#4285f4', mark: siGooglecalendar, scale: 0.52 },
+  jira: { fill: 'linear-gradient(160deg, #3d8bff, #0052cc 75%)', mark: siJira, scale: 0.52 },
 }
 
-export function AppIcon({ app, size = 20, className = '', style }: { app: App; size?: number; className?: string; style?: CSSProperties }) {
+export function AppIcon({ app, size = 20, className = '', style, flat = false }: { app: App; size?: number; className?: string; style?: CSSProperties; flat?: boolean }) {
   const a = APPS[app]
   const g = Math.round(size * (a.scale ?? 0.58))
   return (
@@ -33,11 +42,11 @@ export function AppIcon({ app, size = 20, className = '', style }: { app: App; s
         borderRadius: size * 0.27,
         background: a.fill,
         color: a.ink ?? '#fff',
-        boxShadow: 'inset 0 0.5px 0 rgb(255 255 255 / 0.45), 0 0 0 0.5px rgb(0 0 0 / 0.14), 0 1px 1.5px rgb(0 0 0 / 0.12)',
+        boxShadow: flat ? 'none' : 'inset 0 0.5px 0 rgb(255 255 255 / 0.45), 0 0 0 0.5px rgb(0 0 0 / 0.14), 0 1px 1.5px rgb(0 0 0 / 0.12)',
         ...style,
       }}
     >
-      <span className="absolute inset-x-0 top-0 h-1/2 bg-[linear-gradient(to_bottom,rgb(255_255_255/0.2),transparent)]" />
+      {!flat && <span className="absolute inset-x-0 top-0 h-1/2 bg-[linear-gradient(to_bottom,rgb(255_255_255/0.2),transparent)]" />}
       <span className="relative flex">
         {'path' in a.mark ? (
           <svg width={g} height={g} viewBox="0 0 24 24" fill="currentColor">
@@ -47,6 +56,21 @@ export function AppIcon({ app, size = 20, className = '', style }: { app: App; s
           <a.mark.glyph size={g} />
         )}
       </span>
+    </span>
+  )
+}
+
+export function AppMark({ app, size = 14, className = '' }: { app: App; size?: number; className?: string }) {
+  const a = APPS[app]
+  return (
+    <span aria-hidden className={`flex shrink-0 items-center justify-center ${className}`} style={{ width: size, height: size }}>
+      {'path' in a.mark ? (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+          <path d={a.mark.path} />
+        </svg>
+      ) : (
+        <a.mark.glyph size={size} />
+      )}
     </span>
   )
 }

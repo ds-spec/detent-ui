@@ -45,11 +45,13 @@ export const DAYS: Record<string, number> = {
   'task-to-merge': 15,
   'voice-mode': 15,
   evals: 12,
+  'agent-dashboard': 15,
   'support-inbox': 15,
   onboarding: 8,
   billing: 10,
   settings: 10,
   'code-review': 12,
+  incident: 10,
   detent: 24,
 }
 

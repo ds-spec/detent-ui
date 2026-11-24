@@ -17,6 +17,7 @@ export type Block = {
   details: string[]
   keys?: [string, string][]
   props: Prop[]
+  recipe?: { label: string; code: string }
 }
 
 export const KINDS: Record<BlockKind, string> = {
@@ -27,9 +28,12 @@ export const KINDS: Record<BlockKind, string> = {
 
 export const COMMON: Prop[] = [
   { name: 'accent', type: 'string', default: "'#3a5bf6'", note: 'The one accent colour. Selection, focus, links and the AI’s glow all derive from it.' },
-  { name: 'autoplay', type: 'boolean', default: 'true', note: 'Plays the scripted demo. It hands over for good the moment someone touches the block.' },
+  { name: 'autoplay', type: 'boolean', default: 'false', note: 'Plays the scripted demo the site shows: it types, clicks and, in a chat, sends and approves. Leave it off in a real app. It hands over for good the moment someone touches the block.' },
   { name: 'className', type: 'string', note: 'Added to the root. The block fills its container and lays itself out by its width.' },
 ]
+
+/* A block's own props, then the ones every block takes (accent, autoplay, className) unless it lists them itself. */
+export const propsOf = (b: Block): Prop[] => [...b.props, ...COMMON.filter((c) => !b.props.some((p) => p.name === c.name))]
 
 const assistant: Prop = { name: 'assistant', type: 'string', default: "'Detent'", note: 'What the AI is called, everywhere the screen names it.' }
 const product: Prop = { name: 'product', type: 'string', default: "'Detent'", note: 'The product’s name beside its mark.' }
@@ -414,6 +418,88 @@ export const BLOCKS: Block[] = [
     ],
   },
   {
+    id: 'agent-dashboard',
+    name: 'Agent dashboard',
+    short: 'Every agent run, log and dollar in one place',
+    component: 'AgentDashboard',
+    kind: 'app',
+    window: 'Detent Agents',
+    line: 'One page for the agents you run in production. A sentence says what happened today, the charts show where, and any failed run opens step by step with a retry you approve.',
+    details: [
+      'The top line is written from your data: how many runs, how many failed, and which tool they failed on after which deploy.',
+      'Runs by hour stack failures in red over hatched tracks for the hours still to come, with the deploy pinned on the line.',
+      'Run time draws p95 and p50 against yesterday, with your limit across it. Hover any hour for the numbers.',
+      'Models split tokens or cost by model, tools show calls and failures by hour, and each agent carries what it may do: reads, opens the form, or asks you.',
+      'A run opens in a sheet: scrub through it in time, see each step’s tokens and seconds, and approve a retry with the change spelled out before it runs.',
+      'Logs stream in live with search and level filters. Scroll down and new lines wait behind a pill instead of pushing you away. Any line opens its fields and its run.',
+      'Spend shows the day so far, the pace to midnight against your cap, and where the money went by agent and by model.',
+      'Loading, empty and error keep the exact same layout, so nothing jumps when data lands. Runs and logs are virtualized, so 10,000 rows scroll like 10.',
+      'Built for the AI SDK: register the recorder once and every generateText and streamText call lands here with its model calls, tokens, cost, tool calls and errors. Logs stream over one route.',
+      'Below 900px the side column stacks under the charts; below 640px the stats go two across and the run sheet fills the width.',
+    ],
+    keys: [
+      ['←  →', 'Scrub a run'],
+      ['Esc', 'Close a run'],
+    ],
+    props: [
+      { name: 'data', type: 'AgentDashboardData', note: 'Everything it draws: runs by hour, recent runs with their steps, agents, models, tools, latency, spend, issues, deploys and logs.' },
+      { name: 'state', type: "'live' | 'loading' | 'empty' | 'error'", default: "'live'", note: 'What to show while data is on its way, when there is none yet, or when it failed to load.' },
+      { name: 'title', type: 'string', default: "'Agents'", note: 'The name in the header.' },
+      { name: 'initialTab', type: "'Overview' | 'Logs' | 'Spend'", default: "'Overview'", note: 'The view it opens on.' },
+      { name: 'framed', type: 'boolean', default: 'true', note: 'Draw its own rounded card. Turn off when it fills a page.' },
+      { name: 'onRetryRun', type: '(run: Run) => Promise<void> | void', note: 'Called when a person approves a retry. Reject the promise and the sheet says the retry failed.' },
+      { name: 'onReload', type: '() => void', note: 'Called from Try again in the error state.' },
+      { name: 'subscribeLogs', type: '(push: PushLog) => () => void', note: 'Stream new log lines in: call push with each line, and return a function that stops the stream.' },
+    ],
+    recipe: {
+      label: 'With the AI SDK',
+      code: `// lib/agents.ts: record every generateText and streamText call
+import { registerTelemetry } from "ai"
+import { createAgentRecorder } from "@/components/detent/blocks/agent-dashboard/ai-sdk"
+
+export const agents = createAgentRecorder({
+  pricing: { "claude-sonnet-5.5": { input: 3, output: 15 } }, // $ per 1M tokens; AI Gateway cost is read on its own
+  onRecord: (run) => {}, // save finished runs to your database here
+})
+registerTelemetry(agents.telemetry)
+
+// Name each agent where you call the model
+await generateText({ model, tools, prompt, telemetry: { functionId: "Support" } })
+
+// app/api/agents/route.ts
+import { agents } from "@/lib/agents"
+export const GET = (req: Request) => {
+  const timeZone = new URL(req.url).searchParams.get("tz") ?? undefined // the viewer's day and hours, not the server's
+  return Response.json(agents.snapshot({ timeZone, cap: 40, deploys: [{ at: "2026-11-17T14:14:00Z", label: "v41" }] }))
+}
+
+// app/api/agents/logs/route.ts
+import { logStream } from "@/components/detent/blocks/agent-dashboard/ai-sdk"
+export const GET = (req: Request) => logStream(agents, req.signal, new URL(req.url).searchParams.get("tz") ?? undefined)
+
+// app/agents/page.tsx
+"use client"
+import { useEffect, useState } from "react"
+import { AgentDashboard } from "@/components/detent/blocks/agent-dashboard/AgentDashboard"
+import { subscribeToLogs } from "@/components/detent/blocks/agent-dashboard/ai-sdk"
+import type { AgentDashboardData } from "@/components/detent/blocks/agent-dashboard/types"
+
+const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+const logs = subscribeToLogs(\`/api/agents/logs?tz=\${tz}\`)
+
+export default function Page() {
+  const [data, setData] = useState<AgentDashboardData>()
+  const [failed, setFailed] = useState(false)
+  const load = () => fetch(\`/api/agents?tz=\${tz}\`).then((r) => r.json()).then(setData, () => setFailed(true))
+  useEffect(() => void load(), [])
+  return <AgentDashboard data={data} autoplay={false} state={failed ? "error" : data ? "live" : "loading"} subscribeLogs={logs} onReload={() => (setFailed(false), load())} />
+}
+
+// Runs saved elsewhere? Build the same page from them:
+// toDashboard(records, { cap: 40, yesterday })`,
+    },
+  },
+  {
     id: 'support-inbox',
     name: 'Support inbox',
     short: 'An inbox the AI went through first',
@@ -552,6 +638,39 @@ export const BLOCKS: Block[] = [
       'Below 768px the file list folds away; below 1152px the summary moves under the diff.',
     ],
     props: [assistant, { name: 'onApply', type: '() => void', note: 'Called when a person applies the suggested change.' }, { name: 'onMerge', type: '() => void', note: 'Called when a person merges, once it’s approved and every check has passed.' }],
+  },
+  {
+    id: 'incident',
+    name: 'Incident',
+    short: 'A drop, its cause and the fix on one line',
+    component: 'IssueRecord',
+    kind: 'app',
+    window: 'Harbor Incidents',
+    line: 'An incident page built around the number that broke. Every event in the activity is pinned to the line it changed, from the first drop to the fix going out.',
+    details: [
+      'The metric that broke leads the page: what it is now, what it was before the release, and the gap shaded between them.',
+      'Each event sits on the line at the moment it happened. Hover one in the activity and its point lifts with a label; hover a point and its event lights up.',
+      'The cause arrives as a sentence with the file under it, folded open on the two lines that changed.',
+      'The fix is a pull request whose checks fill one segment at a time. Only when they are green does one question appear above the composer: ship it, or not now.',
+      'Ship it and the line draws its way back up in green while the number rolls to where it was, and the status turns Fixed.',
+      'Status, priority and owner are menus, and every change you make lands in the activity with your name. J and K move between incidents.',
+      'Below 768px the two panels stack and the page scrolls as one.',
+    ],
+    keys: [
+      ['J', 'Next incident'],
+      ['K', 'Previous incident'],
+      ['Esc', 'Close a menu'],
+    ],
+    props: [
+      { name: 'incidents', type: 'Incident[]', note: 'The incidents to page through. The first one plays its events in order, runs its fix’s checks and asks to ship.' },
+      { name: 'people', type: 'IncidentPerson[]', note: 'Who can own an incident or comment. Each has an id, a name, and an optional photo or hue for the initial.' },
+      { name: 'me', type: 'string', default: "'hana'", note: 'The id of the person using it. Their changes and notes are signed with this name.' },
+      { name: 'assistant', type: 'string', default: "'Harbor'", note: 'What the watcher that notices drops and opens fixes is called.' },
+      { name: 'product', type: 'string', default: "'Harbor'", note: 'The product’s name beside its mark.' },
+      { name: 'onShip', type: '(incident: Incident) => void', note: 'Called once the fix is live, with the incident now marked fixed.' },
+      { name: 'onStatusChange', type: '(incident: Incident, status: IncidentStatus) => void', note: 'Called when someone picks a new status.' },
+      { name: 'onComment', type: '(incident: Incident, text: string) => void', note: 'Called when someone posts a note.' },
+    ],
   },
 ]
 

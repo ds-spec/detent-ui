@@ -44,7 +44,7 @@ export type SignInProps = BlockProps & {
   onComplete?: (workspace: Workspace) => void
 }
 
-export function SignIn({ autoplay = true, accent, product = 'Detent', providers = ['google', 'github'], workspaces = SPACES, waiting = WAITING, onComplete, className = '' }: SignInProps) {
+export function SignIn({ autoplay = false, accent, product = 'Detent', providers = ['google', 'github'], workspaces = SPACES, waiting = WAITING, onComplete, className = '' }: SignInProps) {
   const names = useMemo(() => ({ assistant: 'Detent', product }), [product])
   const done = useRef(onComplete)
   useLayoutEffect(() => {

@@ -6,8 +6,8 @@ import { Library } from '@/site/library/Library'
 import { JsonLd, list, page } from '@/site/seo'
 
 export const metadata: Metadata = page({
-  title: 'Templates — whole apps, ready to run',
-  description: 'A whole app to start from, built in React from Detent components. More templates are on the way.',
+  title: 'React Templates: landing pages and apps, ready to run',
+  description: 'Landing pages and apps to start from, built in React from Detent components, live in light and dark at any width. More templates are on the way.',
   path: '/templates',
 })
 

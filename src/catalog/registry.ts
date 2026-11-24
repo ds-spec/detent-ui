@@ -4,7 +4,7 @@ import path from 'node:path'
 import { BLOCKS } from '@/catalog/blocks'
 import { ENTRIES } from './meta'
 import { FILES } from './source'
-import { FREE_BLOCKS, SITE, isProBlock, isProComponent } from './pro'
+import { FREE_BLOCKS, PRO_SCREENS, SITE, isProBlock, isProComponent, isProScreens } from './pro'
 import { TEMPLATES } from './templates'
 import { GUIDE, installDocs, mdOf } from './agent'
 import { searchPhrase } from './search'
@@ -36,10 +36,10 @@ export function freeNames() {
   return [...ENTRIES.filter((e) => !isProComponent(e.id)).map((e) => e.id), ...FREE_BLOCKS]
 }
 
-export const isProName = (name: string) => isProComponent(name) || isProBlock(name) || name.startsWith('template-')
+export const isProName = (name: string) => isProComponent(name) || isProBlock(name) || name.startsWith('template-') || isProScreens(name)
 
 export function proNames() {
-  return [...ENTRIES.filter((e) => isProComponent(e.id)).map((e) => e.id), ...BLOCKS.filter((b) => isProBlock(b.id)).map((b) => b.id), ...TEMPLATES.map((t) => `template-${t.id}`)].filter((n) => !!FILES[n]?.length)
+  return [...ENTRIES.filter((e) => isProComponent(e.id)).map((e) => e.id), ...BLOCKS.filter((b) => isProBlock(b.id)).map((b) => b.id), ...TEMPLATES.map((t) => `template-${t.id}`), ...PRO_SCREENS.map((s) => s.id)].filter((n) => !!FILES[n]?.length)
 }
 
 export const brand = (text: string) =>
@@ -109,8 +109,15 @@ export const curved = (code: string) =>
 
 const ROUTE = /^pro\/(?:templates\/[^/]+|chat)\/(app\/.+)$/
 
+const SCREENS = /^pro\/screens\/[^/]+\/(.+)$/
+const screenTarget = (rel: string) => {
+  const m = rel.match(SCREENS)
+  return m ? `components/workspace/${m[1]}` : undefined
+}
+
 const targetOf = (rel: string) =>
   rel.match(ROUTE)?.[1] ??
+  screenTarget(rel) ??
   `${BASE}/${rel
     .replace(/^lab\//, '')
     .replace(/^pro\/components\//, 'components/')
@@ -193,6 +200,8 @@ const lead = (id: string, line: string) => {
 }
 
 const describe = (name: string) => {
+  const s = PRO_SCREENS.find((x) => x.id === name)
+  if (s) return { title: s.name, description: s.line, type: 'registry:block' }
   if (name.startsWith('template-')) {
     const t = TEMPLATES.find((x) => `template-${x.id}` === name)
     return { title: t?.name ?? name.slice(9), description: lead(name.slice(9), t?.line ?? 'A Detent template.'), type: 'registry:block' }
@@ -207,6 +216,8 @@ const describe = (name: string) => {
 /* What an agent sees around an install: the docs line the shadcn CLI prints, and where the full doc lives */
 function agentFields(name: string): Pick<RegistryItem, 'docs' | 'categories' | 'meta'> {
   if (name.startsWith('template-')) return { meta: { tier: 'pro' } }
+  const s = PRO_SCREENS.find((x) => x.id === name)
+  if (s) return { docs: `Drops into the ${s.starter} (${s.repo}): the files land in components/workspace and replace screens.tsx. Notes: components/workspace/${name}.md`, meta: { tier: 'pro', starter: s.repo } }
   const e = ENTRIES.find((x) => x.id === name)
   const kind = e ? 'components' : 'blocks'
   const tier = (e ? isProComponent(name) : isProBlock(name)) ? 'pro' : 'free'
@@ -226,6 +237,17 @@ async function build(name: string, theme: string): Promise<RegistryItem | null> 
   const entry = entryOf(name)
   if (!entry) return null
   const { files, deps } = await gather(entry)
+  if (isProScreens(name)) {
+    return {
+      $schema: SCHEMA,
+      name,
+      ...about,
+      author: 'Detent',
+      dependencies: [...deps].sort(),
+      files: [...files].map(([rel, code]) => ({ path: targetOf(rel), type: 'registry:file', target: targetOf(rel), content: code })),
+      ...agentFields(name),
+    }
+  }
   return {
     $schema: SCHEMA,
     name,

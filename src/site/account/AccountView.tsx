@@ -6,7 +6,8 @@ import { CONTACT } from '@/catalog/trust'
 import { Key } from '@/lab/blocks/kit/icons'
 import { KeySheet, RemoveKey, Snippet } from './Forms'
 import { Membership } from './Membership'
-import type { Feedback, Usage } from '@/lib/account/keys'
+import type { Usage } from '@/lib/account/keys'
+import type { Piece, Pulse } from '@/lib/account/pulse'
 import { FeedbackCard } from './Feedback'
 import { ProBadge } from './ProBadge'
 import { SettingsCard, SettingsNav, SMALL_QUIET } from './Settings'
@@ -44,7 +45,7 @@ const USE: Step[] = [
 
 export type AccountKey = { id: string; name: string; hint: string; createdAt: number; usedAt: number | null }
 
-export function AccountView({ account, purchase, keys, usage = null, feedback = null, fromCheckout, max = 5 }: { account: { email: string; name: string; image: string | null }; purchase: { plan: Plan; since: number } | null; keys: AccountKey[]; usage?: Usage | null; feedback?: Feedback | null; fromCheckout: boolean; max?: number }) {
+export function AccountView({ account, purchase, keys, usage = null, feedback = null, pieces = [], fromCheckout, max = 5 }: { account: { email: string; name: string; image: string | null }; purchase: { plan: Plan; since: number } | null; keys: AccountKey[]; usage?: Usage | null; feedback?: Pulse | null; pieces?: Piece[]; fromCheckout: boolean; max?: number }) {
   const MAX_KEYS = max
   const name = account.name || account.email.split('@')[0]
   const ask = !!purchase && (!!feedback || (usage?.components ?? 0) >= 2)
@@ -76,7 +77,7 @@ export function AccountView({ account, purchase, keys, usage = null, feedback = 
         <div className="grid min-w-0 gap-6">
           <Membership purchase={purchase} usage={usage} arriving={fromCheckout && !purchase} thanks={fromCheckout} />
 
-          {ask && <FeedbackCard given={feedback} />}
+          {ask && <FeedbackCard given={feedback} pieces={pieces} />}
 
           <SettingsCard
             id="keys"

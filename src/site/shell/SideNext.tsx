@@ -33,7 +33,7 @@ const GLYPH: Record<string, ReactNode> = {
   carousel: <I.Picture size={13} />, halo: <I.Sun size={13} />, announce: <I.Bell size={13} />, slices: <I.FlipH size={13} />, threads: <I.Link size={13} />,
   'live-features': <I.Spark size={13} />, pricing: <I.Card size={13} />, integrations: <I.Plug size={13} />, testimonials: <I.Bubble size={13} />, faq: <I.ChevronDown size={13} />, cta: <I.ArrowRight size={13} />,
   calendar: <I.Calendar size={13} />, 'data-table': <I.Table size={13} />, analytics: <I.Chart size={13} />, 'agent-chat': <I.Prompt size={13} />, 'task-to-merge': <I.Fork size={13} />, 'voice-mode': <I.Mic size={13} />,
-  evals: <I.Check size={13} />, 'support-inbox': <I.Mail size={13} />, settings: <I.Sliders size={13} />, 'code-review': <I.Code size={13} />,
+  evals: <I.Check size={13} />, 'support-inbox': <I.Mail size={13} />, settings: <I.Sliders size={13} />, 'code-review': <I.Code size={13} />, incident: <I.Alert size={13} />,
   onboarding: <I.Plane size={13} />, 'sign-in': <I.Shield size={13} />, billing: <I.Bag size={13} />,
 }
 

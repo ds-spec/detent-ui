@@ -2,12 +2,24 @@ import { checkoutFor } from '@/catalog/pro'
 import { getAuth } from '@/lib/account/auth'
 import { planFor } from '@/lib/account/keys'
 import { capture, isLocal } from '@/lib/posthog-server'
+import { normalEmail } from '@/lib/account/session'
 import { NOTRACK, cookieOf, sourceMetadata } from '@/site/source'
 
 const PLANS = ['pro'] as const
+const BUYER = 'dt_buyer'
 type Asked = (typeof PLANS)[number]
 
-export async function GET(req: Request, { params }: { params: Promise<{ plan: string }> }) {
+/* A guest who gave their email in BuyGate. The address arrives in the form body, never in a URL. */
+export async function POST(req: Request, ctx: { params: Promise<{ plan: string }> }) {
+  const form = await req.formData().catch(() => null)
+  return start(req, ctx, normalEmail(form?.get('email')))
+}
+
+export async function GET(req: Request, ctx: { params: Promise<{ plan: string }> }) {
+  return start(req, ctx, null)
+}
+
+async function start(req: Request, { params }: { params: Promise<{ plan: string }> }, guestEmail: string | null) {
   const asked = (await params).plan as Asked
   const to = (path: string) => Response.redirect(new URL(path, req.url), 303)
   if (!PLANS.includes(asked)) return to('/pro')
@@ -24,10 +36,15 @@ export async function GET(req: Request, { params }: { params: Promise<{ plan: st
   const session = await (await getAuth()).api.getSession({ headers: req.headers })
   const user = session?.user.emailVerified ? session.user : null
   if (!user) {
-    const store = checkoutFor(asked, null, meta)
+    /* That address already owns Pro: send them to sign in, not to pay twice */
+    if (guestEmail && (await planFor(guestEmail))) return to('/account?have=1')
+    const store = checkoutFor(asked, null, meta, guestEmail ?? undefined)
     if (!store) return to('/pro')
-    if (counted && meta.visitor) await capture(meta.visitor, 'checkout_redirected', { ...props, signed_in: false })
-    return Response.redirect(store, 303)
+    if (counted && meta.visitor) await capture(meta.visitor, 'checkout_redirected', { ...props, signed_in: false, email_first: !!guestEmail })
+    if (!guestEmail) return Response.redirect(store, 303)
+    /* The thank-you page names the address Pro went to. It reads it from here, not from the return link,
+       because the email is taken out of every URL before analytics runs. */
+    return new Response(null, { status: 303, headers: { Location: store, 'Set-Cookie': `${BUYER}=${encodeURIComponent(guestEmail)}; Path=/account; Max-Age=3600; HttpOnly; Secure; SameSite=Lax` } })
   }
   const email = user.email.toLowerCase()
   const owned = await planFor(email)

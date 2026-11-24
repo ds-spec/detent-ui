@@ -87,6 +87,22 @@ export const list = (name: string, items: { name: string; path: string }[]) => (
   itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, name: it.name, url: url(it.path) })),
 })
 
+/** One installable piece as code: what search engines and answer engines read to know this page is a component you can install, its licence and language. */
+export const sourceCode = ({ name, description, path, free, install }: { name: string; description: string; path: string; free: boolean; install: string }) => ({
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareSourceCode',
+  name,
+  description,
+  url: url(path),
+  programmingLanguage: ['TypeScript', 'React'],
+  runtimePlatform: 'React 19, Tailwind CSS v4, shadcn/ui',
+  isAccessibleForFree: free,
+  ...(free ? { license: 'https://opensource.org/licenses/MIT', codeRepository: 'https://github.com/ds-spec/detent-ui' } : {}),
+  text: install,
+  isPartOf: { '@type': 'SoftwareApplication', name: BRAND, url: url('/') },
+  publisher: { '@type': 'Organization', name: BRAND, url: url('/') },
+})
+
 export const crumbs = (trail: [string, string][]) => ({
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',

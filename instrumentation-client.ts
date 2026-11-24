@@ -22,6 +22,25 @@ function optedOut() {
   }
 }
 
+/* Checkout comes back to /account with the buyer's email in the link. The page has already read it on the
+   server, so take it out of the address bar before anything here records the URL. */
+const PRIVATE = ['email']
+const scrub = (value: string) => {
+  try {
+    const url = new URL(value)
+    let hit = false
+    for (const key of PRIVATE)
+      if (url.searchParams.has(key)) {
+        url.searchParams.delete(key)
+        hit = true
+      }
+    return hit ? url.toString() : value
+  } catch {
+    return value
+  }
+}
+if (PRIVATE.some((key) => new URLSearchParams(location.search).has(key))) history.replaceState(history.state, '', scrub(location.href))
+
 /* Runs on every full page load, tracked or not, so checkout can tell Dodo where the buyer came from. */
 const touch = rememberSource()
 
@@ -32,6 +51,12 @@ if (token && live && !optedOut()) {
     defaults: '2026-08-30',
     capture_exceptions: true,
     session_recording: { maskAllInputs: true },
+    /* And if an email ever rides in a URL property anyway, it never leaves the browser */
+    before_send: (event) => {
+      if (!event) return event
+      for (const [key, value] of Object.entries(event.properties ?? {})) if (typeof value === 'string' && value.includes('email=')) event.properties[key] = scrub(value)
+      return event
+    },
     debug: process.env.NODE_ENV === 'development',
     loaded: (ph) => {
       /* Every event carries where this visitor first and last came from. */

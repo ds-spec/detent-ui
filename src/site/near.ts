@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import type { RefObject } from 'react'
 
 export function useNear(ref: RefObject<Element | null>, enter = '160px 0px', leave = '360px 0px') {
@@ -63,4 +63,52 @@ function queue(job: () => void) {
     const i = jobs.indexOf(job)
     if (i >= 0) jobs.splice(i, 1)
   }
+}
+
+export function useSeen(ref: RefObject<Element | null>) {
+  const [seen, setSeen] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const panel = el.closest('[data-scroller]')
+    const root = panel && getComputedStyle(panel).overflowY !== 'visible' ? panel : null
+    const io = new IntersectionObserver(([e]) => setSeen(e.isIntersecting), { root })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [ref])
+  return seen
+}
+
+let scrolling = false
+let rest = 0
+const watchers = new Set<() => void>()
+const tell = () => watchers.forEach((w) => w())
+const onScroll = () => {
+  clearTimeout(rest)
+  rest = window.setTimeout(() => {
+    scrolling = false
+    tell()
+  }, 160)
+  if (scrolling) return
+  scrolling = true
+  tell()
+}
+function watch(w: () => void) {
+  if (!watchers.size) window.addEventListener('scroll', onScroll, { capture: true, passive: true })
+  watchers.add(w)
+  return () => {
+    watchers.delete(w)
+    if (watchers.size) return
+    window.removeEventListener('scroll', onScroll, { capture: true })
+    clearTimeout(rest)
+    scrolling = false
+  }
+}
+
+export function useScrolling() {
+  return useSyncExternalStore(
+    watch,
+    () => scrolling,
+    () => false,
+  )
 }

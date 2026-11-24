@@ -6,7 +6,7 @@ import { FILES, TEASER, locked, type SourceFile } from './source'
 
 const highlight = (code: string, f: string) =>
   codeToHtml(code, {
-    lang: f.endsWith('.ts') ? 'ts' : 'tsx',
+    lang: f.endsWith('.ts') ? 'ts' : f.endsWith('.md') ? 'md' : f.endsWith('.svg') ? 'xml' : 'tsx',
     themes: { light: 'github-light', dark: 'github-dark-default' },
     defaultColor: false,
   })

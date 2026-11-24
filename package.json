@@ -16,7 +16,8 @@
     "start:vinext": "wrangler dev --config dist/server/wrangler.json",
     "deploy": "node scripts/deploy.mjs",
     "deploy:dry": "node scripts/deploy.mjs --dry-run",
-    "deploy:secrets": "node scripts/deploy.mjs --secrets"
+    "deploy:secrets": "node scripts/deploy.mjs --secrets",
+    "feedback:ask": "npx tsx --env-file=.env.local --tsconfig tsconfig.json scripts/ask-feedback.ts"
   },
   "dependencies": {
     "@ai-sdk/react": "^4.0.157",

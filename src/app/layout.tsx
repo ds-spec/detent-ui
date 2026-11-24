@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { SITE } from '@/catalog/pro'
 import { Analytics } from '@/site/Analytics'
+import { BuyGate } from '@/site/BuyGate'
 import { Providers } from '@/site/Providers'
 import { DESCRIPTION, NAME, TAGLINE } from '@/site/seo'
 
@@ -63,6 +64,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       <body>
         <Providers>{children}</Providers>
         <Analytics />
+        <BuyGate />
       </body>
     </html>
   )

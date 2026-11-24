@@ -5,9 +5,9 @@ import { apiOf } from '@/catalog/api-of'
 import { ENTRIES, entry } from '@/catalog/meta'
 import { Example } from '@/site/bench/Example'
 import { PropsPanel } from '@/site/bench/Panel'
-import { isProComponent } from '@/catalog/pro'
+import { installCommand, isProComponent } from '@/catalog/pro'
 import { asset } from '@/lib/asset'
-import { JsonLd, crumbs, page, short } from '@/site/seo'
+import { JsonLd, crumbs, page, short, sourceCode } from '@/site/seo'
 import { SEARCH, searchDescription } from '@/catalog/search'
 
 export function generateStaticParams() {
@@ -38,6 +38,7 @@ async function Props({ params }: { params: PageProps<'/components/[slug]'>['para
   return (
     <>
       <JsonLd data={crumbs([[e.name, `/components/${e.id}`]])} />
+      <JsonLd data={sourceCode({ name: e.name, description: searchDescription(e.id, e.line, isProComponent(e.id)), path: `/components/${e.id}`, free: !isProComponent(e.id), install: installCommand(e.id, !isProComponent(e.id)) })} />
       {api?.props.length ? <PropsPanel id={slug} api={api} /> : null}
       {example ? <Example {...example} /> : null}
     </>

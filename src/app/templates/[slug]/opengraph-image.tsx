@@ -1,7 +1,7 @@
 import { CONTENT_TYPE, OG, pageImage } from '@/site/og'
 import { TEMPLATES, template } from '@/catalog/templates'
 
-export const alt = 'A Detent template for an AI product'
+export const alt = 'A Detent Pro template, a landing page or an app built in React'
 export const size = OG
 export const contentType = CONTENT_TYPE
 

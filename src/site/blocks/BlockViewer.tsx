@@ -12,7 +12,7 @@ import { useTheme } from '@/lab/lib/hooks'
 import { tap } from '@/lab/lib/feel'
 import { RollingText } from '@/lab/ui/RollingText'
 import { BLOCK_VIEWS } from '@pro'
-import { BLOCKS, BLOCK_GROUPS, BLOCK_ORDER, KINDS } from '@/catalog/blocks'
+import { BLOCKS, BLOCK_GROUPS, BLOCK_ORDER, KINDS, propsOf } from '@/catalog/blocks'
 import type { Block } from '@/catalog/blocks'
 import { Kbd } from '@/lab/ui/Kbd'
 import { Hover } from '@/lab/ui/Hover'
@@ -341,17 +341,21 @@ function Usage({ b }: { b: Block }) {
   const events = b.props.filter(isEvent).slice(0, 3)
   const lines = [...data.map((p) => `  ${p.name}={${p.name}}`), ...events.map((p) => `  ${p.name}={(${argsOf(p.type)}) => {}}`)]
   const text = lines.length ? `<${b.component}\n${lines.join('\n')}\n/>` : `<${b.component} />`
+  return <Snippet id={b.id} label="Usage" file="usage" text={text} />
+}
+
+function Snippet({ id, label, file, text }: { id: string; label: string; file: string; text: string }) {
   const [copied, setCopied] = useState(false)
   return (
     <div className="overflow-hidden rounded-[14px] bg-surface-2">
       <div className="flex h-10 items-center justify-between pl-4 pr-1.5 shadow-[inset_0_-1px_0_var(--line)]">
-        <span className="text-caption text-ink-3">Usage</span>
+        <span className="text-caption text-ink-3">{label}</span>
         <button
           type="button"
-          aria-label={copied ? 'Copied' : 'Copy usage'}
+          aria-label={copied ? 'Copied' : `Copy ${label.toLowerCase()}`}
           onClick={() => {
             navigator.clipboard?.writeText(text).catch(() => {})
-            track('copy_code', { item: b.id, file: 'usage' })
+            track('copy_code', { item: id, file })
             setCopied(true)
             setTimeout(() => setCopied(false), 1400)
           }}
@@ -373,12 +377,13 @@ function Usage({ b }: { b: Block }) {
 }
 
 function Props({ b }: { b: Block }) {
-  const data = b.props.filter((p) => !isEvent(p)).sort((x, y) => weight(x) - weight(y))
-  const events = b.props.filter(isEvent)
+  const data = propsOf(b).filter((p) => !isEvent(p)).sort((x, y) => weight(x) - weight(y))
+  const events = propsOf(b).filter(isEvent)
   return (
-    <PropsSection className="mt-6" title="Wire it up" blurb="All optional. With none, it plays exactly as it does here and hands over to whoever touches it.">
-      <div className="px-6 pb-5">
+    <PropsSection className="mt-6" title="Wire it up" blurb="All optional. Installed, it starts still and waits for your users; pass autoplay to play the demo you see here.">
+      <div className="flex flex-col gap-3 px-6 pb-5">
         <Usage b={b} />
+        {b.recipe && <Snippet id={b.id} label={b.recipe.label} file="recipe" text={b.recipe.code} />}
       </div>
       {data.length > 0 && <PropRows list={data} title="Your data" />}
       {events.length > 0 && (

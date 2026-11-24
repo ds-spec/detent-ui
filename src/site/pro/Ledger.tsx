@@ -1,5 +1,6 @@
 'use client'
 
+import { TemplateFrame } from '../templates/Frame'
 import { useRef, useState } from 'react'
 import type { PointerEvent, ReactNode } from 'react'
 import Link from 'next/link'
@@ -78,9 +79,11 @@ const GROUPS: { name: string; items: Item[] }[] = [
             <Backdrop tone="amber" />
             <div className="relative h-full" inert>
               <Window title={t.window} chrome="browser">
-                <div className="h-full overflow-hidden">
-                  <View />
-                </div>
+                <TemplateFrame>
+                  <div data-template-scroller className="h-full overflow-hidden">
+                    <View />
+                  </div>
+                </TemplateFrame>
               </Window>
             </div>
           </div>

@@ -16,7 +16,8 @@ import { ArrowUpRight } from '@/lab/icons'
 import { Mini } from '../Mini'
 import { ForPlan } from '../Owned'
 import { PriceNow } from '../Promo'
-import { useNear } from '../near'
+import { useNear, useScrolling, useSeen } from '../near'
+import { InPlay } from '@/lab/blocks/kit/director'
 import { TemplateCard } from '../templates/TemplateCard'
 import { wellOf } from '../wells'
 import type { Tone } from '../home/lights'
@@ -32,7 +33,7 @@ const SHELVES: { id: Shelf; name: string; href: string }[] = [
 const LINES: Record<Shelf, string> = {
   components: 'Every piece runs live on this page. Press, drag and type on any of them, then open one for its code.',
   blocks: 'Sections and app screens built from the components, playing live. Drop one in and it fits.',
-  templates: 'Whole apps to start from. Every screen live, in light and dark, at any width.',
+  templates: 'Landing pages and apps to start from. Every screen live, in light and dark, at any width.',
 }
 
 const FAMILY_TONE: Record<string, Tone> = { agents: 'blue', data: 'amber', inputs: 'rose', feedback: 'violet', essentials: 'violet', overlays: 'rose', marketing: 'amber' }
@@ -135,13 +136,15 @@ export function Library({ shelf }: { shelf: Shelf }) {
 function Tile({ card, shelf }: { card: Card; shelf: Shelf }) {
   const box = useRef<HTMLAnchorElement>(null)
   const near = useNear(box, '300px 0px', '600px 0px')
+  const seen = useSeen(box)
+  const scrolling = useScrolling()
   const reduce = useReducedMotion()
   return (
     <motion.div initial={reduce ? false : { opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-30px' }} transition={{ type: 'spring', stiffness: 260, damping: 32 }}>
       <Link ref={box} href={card.href} className="ring-focus group/tile block rounded-[16px] bg-[var(--mount)] p-2 shadow-[0_0_0_1px_var(--line)] transition-shadow duration-300 hover:shadow-[0_0_0_1px_var(--line-strong)]">
         <div className="relative isolate aspect-[4/3] overflow-clip rounded-[10px] shadow-[0_0_0_1px_var(--line)]" style={{ background: wellOf(card.tone) }}>
           <div aria-hidden inert className="pointer-events-none absolute inset-0 transition-transform duration-500 [transition-timing-function:cubic-bezier(0.2,0.9,0.25,1)] group-hover/tile:scale-[1.025]">
-            {near && (shelf === 'components' ? <ComponentPiece id={card.id} /> : <BlockPiece id={card.id} />)}
+            {near && <InPlay.Provider value={seen && !scrolling}>{shelf === 'components' ? <ComponentPiece id={card.id} /> : <BlockPiece id={card.id} />}</InPlay.Provider>}
           </div>
           {card.pro && <span className="absolute right-2.5 top-2.5 rounded-[6px] bg-ink px-1.5 text-[11px] font-medium leading-[20px] text-surface">Pro</span>}
         </div>
