@@ -53,3 +53,14 @@ next-env.d.ts
 .vinext/
 .wrangler/
 /public/_data/
+/archive/
+/research/
+/.agents/
+/CREATIVITY.md
+/TEMPLATES.md
+# the agent skill and Claude Code plugin, until they launch
+/skills/
+/plugin/
+/.claude-plugin/
+/public/.well-known/skills/
+/scripts/build-skill.mjs
