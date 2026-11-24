@@ -1,0 +1,134 @@
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
+import { MetricExplainer } from './metric-explainer'
+import type { Metric } from './metric-explainer'
+
+const usd = (n: number) => `$${Math.round(n).toLocaleString('en-US')}`
+
+const METRICS: Metric[] = [
+  {
+    id: 'burn',
+    name: 'Burn',
+    value: 184_320,
+    previous: 171_910,
+    format: usd,
+    vs: 'September',
+    reason: 'Most of it is infrastructure: the new AWS region costs more than planned, and payroll grew with two hires. Contractors and Figma brought it down a little.',
+    drivers: [
+      { name: 'AWS', note: 'the new eu-west region, live since Oct 9', amount: 8_920, phrase: 'the new AWS region' },
+      { name: 'Payroll', note: 'two engineers joined on Oct 1', amount: 6_200, phrase: 'payroll grew with two hires' },
+      { name: 'Contractors', note: 'the brand project wrapped up', amount: -1_880, phrase: 'Contractors' },
+      { name: 'Figma', note: 'seats moved to annual billing', amount: -830, phrase: 'Figma' },
+    ],
+    basis: 'From 1,284 transactions · 4 drivers explain 96% of the change',
+  },
+  {
+    id: 'revenue',
+    name: 'Revenue',
+    value: 212_904,
+    previous: 194_654,
+    format: usd,
+    vs: 'September',
+    reason: 'Expansion did the work: Okapi and Kestrel moved to the Team plan, and annual renewals landed early. One churned account took a little back.',
+    drivers: [
+      { name: 'Expansion', note: 'Okapi and Kestrel moved up to Team', amount: 11_640, phrase: 'Okapi and Kestrel moved to the Team plan' },
+      { name: 'New logos', note: '9 customers, 6 from the October webinar', amount: 7_380 },
+      { name: 'Renewals', note: 'three annual plans renewed a month early', amount: 2_410, phrase: 'annual renewals landed early' },
+      { name: 'Churn', note: 'Marlow Health left for an in-house tool', amount: -3_180, phrase: 'One churned account' },
+    ],
+    basis: 'From Stripe · 412 invoices · 4 drivers explain 99% of the change',
+  },
+  {
+    id: 'runway',
+    name: 'Runway',
+    value: 19.4,
+    previous: 20.5,
+    format: (n) => `${n.toFixed(1)} months`,
+    vs: 'last month',
+    reason: 'Runway is shorter because burn grew faster than revenue. At this pace the bank balance lasts until May 2028, a month earlier than in September.',
+    drivers: [
+      { name: 'Higher burn', note: 'AWS and the two hires, every month from here', amount: -1.4, phrase: 'burn grew faster than revenue' },
+      { name: 'More revenue', note: 'expansion revenue, if it holds', amount: 0.5 },
+      { name: 'FX', note: 'the euro balance lost 1.2% against the dollar', amount: -0.2 },
+    ],
+    basis: 'Cash $3.57M at Mercury and Brex · net burn averaged over 3 months',
+  },
+  {
+    id: 'margin',
+    name: 'Gross margin',
+    value: 71.8,
+    previous: 71.2,
+    format: (n) => `${n.toFixed(1)}%`,
+    vs: 'September',
+    reason: 'Margin edged up: revenue grew faster than hosting, and the support team handled more tickets without new hires. The new region pulled the other way.',
+    drivers: [
+      { name: 'Revenue mix', note: 'more Team plans, which cost less to serve', amount: 0.9, phrase: 'revenue grew faster than hosting' },
+      { name: 'Support', note: 'tickets per agent up 14%', amount: 0.4, phrase: 'the support team handled more tickets without new hires' },
+      { name: 'Hosting', note: 'eu-west runs at half load for now', amount: -0.7, phrase: 'The new region' },
+    ],
+    basis: 'Cost of revenue from the ledger · hosting, support, payment fees',
+  },
+]
+
+const TOUR: { at: string; aim: string | null; ms: number }[] = [
+  { at: 'burn', aim: null, ms: 2600 },
+  { at: 'burn', aim: 'AWS', ms: 2400 },
+  { at: 'burn', aim: null, ms: 1400 },
+  { at: 'revenue', aim: null, ms: 2600 },
+  { at: 'revenue', aim: 'Expansion', ms: 2400 },
+  { at: 'revenue', aim: null, ms: 1400 },
+  { at: 'runway', aim: null, ms: 4200 },
+  { at: 'margin', aim: null, ms: 4200 },
+]
+
+const TICK = 100
+
+export default function MetricExplainerDemo() {
+  const [at, setAt] = useState('burn')
+  const [aim, setAim] = useState<string | null>(null)
+  const held = useRef(false)
+  const [touched, setTouched] = useState(false)
+
+  useEffect(() => {
+    if (touched) return
+    let step = 0
+    let spent = 0
+    const loop = setInterval(() => {
+      if (held.current) return
+      spent += TICK
+      if (spent < TOUR[step].ms) return
+      spent = 0
+      step = (step + 1) % TOUR.length
+      setAt(TOUR[step].at)
+      setAim(TOUR[step].aim)
+    }, TICK)
+    return () => clearInterval(loop)
+  }, [touched])
+
+  const stop = () => {
+    if (touched) return
+    setTouched(true)
+    setAim(null)
+  }
+
+  return (
+    <div className="flex min-h-[560px] w-full items-center justify-center bg-background p-6">
+      <div
+        className="w-full max-w-[640px]"
+        onPointerEnter={(e) => {
+          if (e.pointerType !== 'mouse') return
+          held.current = true
+          setAim(null)
+        }}
+        onPointerLeave={() => {
+          held.current = false
+        }}
+        onPointerDownCapture={stop}
+        onKeyDownCapture={stop}
+      >
+        <MetricExplainer metrics={METRICS} metric={at} onMetricChange={setAt} highlight={aim} period="October · as of Oct 28" />
+      </div>
+    </div>
+  )
+}

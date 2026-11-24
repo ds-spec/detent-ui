@@ -1,0 +1,81 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { NEVER, Rewind } from './rewind'
+import type { RewindCell, RewindHistory, RewindStep } from './rewind'
+
+function session(): RewindHistory {
+  const living = (t: RewindCell[]) => t.filter((m) => m.died === NEVER)
+  let id = 0
+  let caret = 0
+  let t = 0
+  const tape: RewindCell[] = []
+  const steps: RewindStep[] = [{ text: '', caret, t }]
+  const push = (gap: number) => {
+    t += gap
+    steps.push({ text: living(tape).map((m) => m.c).join(''), caret, t })
+  }
+  const type = (s: string) => {
+    for (const c of s) {
+      const now = living(tape)
+      let at = caret ? tape.indexOf(now[caret - 1]) + 1 : 0
+      while (at < tape.length && tape[at].died !== NEVER) at++
+      tape.splice(at, 0, { id: id++, c, born: steps.length, died: NEVER })
+      caret++
+      push(0.09 + ((c.charCodeAt(0) * 7) % 10) / 90)
+    }
+  }
+  const back = (n: number) => {
+    for (let i = 0; i < n; i++) {
+      living(tape)[caret - 1].died = steps.length
+      caret--
+      push(0.06)
+    }
+  }
+  const wait = (s: number) => (t += s)
+  const go = (find: string, after = true) => {
+    const i = living(tape).map((m) => m.c).join('').indexOf(find)
+    caret = after ? i + find.length : i
+    wait(1.4)
+  }
+  type('The launch moves to Thursday.')
+  wait(9)
+  back(9)
+  type('Friday, after the review.')
+  wait(14)
+  type(' Maya will send the notes tonight.')
+  wait(6)
+  back(8)
+  type('in the morning.')
+  wait(21)
+  type('\n\nWe should cut the pricing page. Nobody reads it.')
+  wait(11)
+  back(16)
+  wait(3)
+  type('People skim it and leave.')
+  wait(32)
+  go('cut the pricing page')
+  back(20)
+  type('rewrite the pricing page')
+  wait(17)
+  go('People skim it and leave.')
+  type(' Start with the one question everyone asks.')
+  wait(26)
+  caret = living(tape).length
+  type('\n\nDecide by Wednesday.')
+  const shift = Date.now() / 1000 - t
+  return { tape, steps: steps.map((s) => ({ ...s, t: s.t + shift })) }
+}
+
+export default function RewindDemo() {
+  const [history, setHistory] = useState<RewindHistory | null>(null)
+  useEffect(() => setHistory(session()), [])
+  const intro = history ? history.steps.map((s) => s.text.includes('Nobody reads it')).lastIndexOf(true) : undefined
+  return (
+    <div className="flex min-h-[560px] w-full items-center justify-center bg-background p-6">
+      <div className="w-[640px] max-w-full text-[clamp(20px,2.8vw,25px)] font-medium leading-[1.36] tracking-[-.018em] text-foreground">
+        {history && <Rewind history={history} intro={intro} rows={8} maxHeight={330} />}
+      </div>
+    </div>
+  )
+}
