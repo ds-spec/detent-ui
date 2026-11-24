@@ -189,7 +189,6 @@ npm run dev
 | `src/catalog` | What every piece is, and the registry the shadcn CLI installs from |
 | `src/site` | The website around them: gallery, pages and code browser |
 | `src/app` | The Next.js routes |
-| `21st` | Standalone copies of the free components for [21st.dev](https://21st.dev) |
 
 ## Issues and feedback
 
