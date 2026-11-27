@@ -9,13 +9,13 @@ import { ArrowUpRight, ChevronRight, Close } from '@/lab/icons'
 import { useOwned } from './Owned'
 import { track } from './track'
 import { Face, QuoteMark } from './VoiceRail'
-import { VOICES, byline, source } from './quotes'
+import { DOCK, byline, source } from './quotes'
 import type { Voice } from './quotes'
 
 const SEEN = 'detent:voices'
 const FIRST = 'detent:voices-first'
 const AUTO = 1100
-const N = VOICES.length
+const N = DOCK.length
 const ease = [0.2, 0.9, 0.25, 1] as const
 const SPRING = { type: 'spring', stiffness: 520, damping: 44 } as const
 const FLY = { type: 'spring', stiffness: 380, damping: 34 } as const
@@ -87,7 +87,7 @@ const mark = () => {
 
 function fit(probe: HTMLElement, width: number, height: number) {
   probe.style.width = `${width}px`
-  return VOICES.map((p) => {
+  return DOCK.map((p) => {
     probe.textContent = say(p)
     let lo = MIN
     let hi = MAX
@@ -170,7 +170,7 @@ function DockFace({ p, i, cur, id, mx, fresh, onPick }: { p: Voice; i: number; c
 export function Voices({ peek, hideAt = 'footer', dodge, auto = false }: { peek?: Peek; hideAt?: string; dodge?: string; auto?: boolean }) {
   const start = Math.max(
     0,
-    VOICES.findIndex((v) => v.id === peek?.who),
+    DOCK.findIndex((v) => v.id === peek?.who),
   )
   const [open, setOpen] = useState(false)
   const [cur, setCur] = useState(start)
@@ -197,9 +197,9 @@ export function Voices({ peek, hideAt = 'footer', dodge, auto = false }: { peek?
   const stays = useRef(0)
 
   const at = peek?.at
-  const lead = VOICES[start]
+  const lead = DOCK[start]
   const studio = lead.role?.split(',')[0]
-  const v = VOICES[cur]
+  const v = DOCK[cur]
 
   useEffect(() => {
     live.current = { open, away }
@@ -464,7 +464,7 @@ export function Voices({ peek, hideAt = 'footer', dodge, auto = false }: { peek?
                     className="flex h-[58px] items-end justify-center pb-[11px]"
                     style={{ gap: GAP }}
                   >
-                    {VOICES.map((p, i) => (
+                    {DOCK.map((p, i) => (
                       <DockFace key={p.id} p={p} i={i} cur={cur} id={id} mx={mx} fresh={fresh} onPick={pick} />
                     ))}
                   </div>

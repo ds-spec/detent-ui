@@ -1,10 +1,10 @@
 import { Face, QuoteMark, VoiceRail } from '../VoiceRail'
 import { ArrowUpRight } from '@/lab/icons'
-import { VOICES, byline, source, voice } from '../quotes'
+import { RAIL, byline, source, voice } from '../quotes'
 
 const LEAD = voice('josh')
 const LINE = LEAD.short ?? LEAD.text
-const REST = VOICES.filter((v) => v.id !== LEAD.id)
+const REST = RAIL.filter((v) => v.id !== LEAD.id)
 
 export function Quotes() {
   return (
@@ -37,7 +37,30 @@ export function Quotes() {
           </span>
         </figcaption>
       </figure>
-      <div className="p-6 shadow-[inset_0_1px_0_var(--line)] sm:p-10 lg:py-12 lg:pl-10 lg:pr-12 lg:shadow-[inset_1px_0_0_var(--line)]">
+      <div className="py-6 shadow-[inset_0_1px_0_var(--line)] sm:py-10 lg:hidden">
+        <ul className="flex snap-x snap-mandatory scroll-px-6 gap-3 overflow-x-auto overscroll-x-contain px-6 [scrollbar-width:none] sm:scroll-px-10 sm:px-10 [&::-webkit-scrollbar]:hidden">
+          {REST.map((v) => (
+            <li key={v.id} className="flex w-[min(74vw,300px)] shrink-0 snap-start flex-col justify-between gap-5 rounded-[20px] bg-surface-2 p-5">
+              <p className="line-clamp-[8] whitespace-pre-line text-pretty text-[14px] leading-[21px] tracking-[-0.01em] text-ink">{v.short ?? v.text}</p>
+              <div className="flex min-w-0 items-center gap-2.5">
+                <Face v={v} size={28} />
+                <span className="min-w-0">
+                  <span className="flex items-center gap-1 text-[13px] leading-[18px] text-ink">
+                    <span className="truncate">{v.name}</span>
+                    {source(v) && (
+                      <a href={source(v)} target="_blank" rel="noopener noreferrer" aria-label={`${v.name} on X`} className="ring-focus -m-1.5 grid size-6 shrink-0 place-items-center rounded-full text-ink-3 transition-colors duration-150 hover:text-ink">
+                        <ArrowUpRight size={11} strokeWidth={2.2} />
+                      </a>
+                    )}
+                  </span>
+                  <span className="block truncate text-[12px] leading-4 text-ink-3">{byline(v)}</span>
+                </span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="hidden p-6 lg:block lg:py-12 lg:pl-10 lg:pr-12 lg:shadow-[inset_1px_0_0_var(--line)]">
         <VoiceRail items={REST} size="md" fact={false} />
       </div>
     </div>
