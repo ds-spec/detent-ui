@@ -43,7 +43,7 @@ export function Agencies() {
             </a>
           </div>
           <p className="rise mt-3 text-[13px] text-ink-3" style={{ animationDelay: '220ms' }}>
-            <PriceNow value={PRICE} /> + local tax · lifetime updates · all sales final. Try every Pro screen live first.
+            <PriceNow value={PRICE} /> once · lifetime updates · all sales final. Try every Pro screen live first.
           </p>
         </section>
       </Leaf>

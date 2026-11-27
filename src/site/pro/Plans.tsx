@@ -54,7 +54,7 @@ function PlanCard({ plan, compact }: { plan: Plan; compact: boolean }) {
           </span>
           <span className="text-[13px] text-ink-3">once</span>
         </p>
-        <p className="mt-2 text-[12.5px] text-ink-3">For {plan.seats}. Tax added at checkout.</p>
+        <p className="mt-2 text-[12.5px] text-ink-3">For {plan.seats}.</p>
         <PlanButton plan={plan} className="ring-focus mt-6 flex h-11 items-center justify-center rounded-full bg-ink text-[14px] font-medium text-surface transition-[opacity,transform] duration-150 hover:opacity-90 active:scale-[0.97]" />
         <ul className="mt-6 flex flex-col gap-2.5 pt-5 text-[12.5px] text-ink-2 shadow-[inset_0_1px_0_var(--line)]">
           {PROMISES.map(([icon, text]) => (

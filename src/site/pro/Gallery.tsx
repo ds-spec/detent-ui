@@ -1,18 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { PRO_BLOCKS } from '@/catalog/effort'
 import { ENTRIES } from '@/catalog/meta'
 import { PRO_COMPONENTS } from '@/catalog/pro'
 import { TEMPLATES } from '@/catalog/templates'
-import { ArrowRight, ArrowUpRight } from '@/lab/icons'
+import { ArrowLeft, ArrowRight, ArrowUpRight } from '@/lab/icons'
 import { InPlay } from '@/lab/blocks/kit/director'
 import { Piece } from '@/site/home/long/Home'
 import { Tabs } from '@/site/home/long/parts'
 import { BlockPiece, TemplatePiece } from '@/site/library/Library'
-import { wellOf } from '@/site/wells'
 import { BuyTerms, priceWith, usePromo } from '@/site/Promo'
 import { useChoice } from '@/site/pro/Buy'
 
@@ -42,64 +42,157 @@ const SHELVES = {
 } as const
 type Shelf = keyof typeof SHELVES
 
-/** Every Pro piece, one at a time at full size, with the buy button beside it. */
+const DWELL = 9000
+
+/** Every Pro piece on one lit stage, playing through on its own like a keynote, with a chapter rail to jump. */
 export function Gallery() {
+  const reduce = useReducedMotion()
   const [tab, setTab] = useState<Shelf>('templates')
   const items = SHELVES[tab].items()
-  const [pick, setPick] = useState<Record<Shelf, string>>({ templates: items[0]?.id ?? '', screens: SCREENS[0]?.id ?? '', components: PRO_COMPONENTS[0] ?? '' })
-  const it = items.find((x) => x.id === pick[tab]) ?? items[0]
-  const choose = (id: string) => setPick((p) => ({ ...p, [tab]: id }))
+  const [index, setIndex] = useState(0)
+  const [held, setHeld] = useState(false)
+  const [seen, setSeen] = useState(false)
+  const stage = useRef<HTMLDivElement>(null)
+  const rail = useRef<HTMLOListElement>(null)
+  const fill = useRef<HTMLSpanElement>(null)
+  const it = items[Math.min(index, items.length - 1)]
+  const playing = !reduce && seen && !held && items.length > 1
+
+  useEffect(() => {
+    const el = stage.current
+    if (!el) return
+    const io = new IntersectionObserver(([e]) => setSeen(!!e?.isIntersecting), { threshold: 0.35 })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const bar = fill.current
+    if (!playing) {
+      if (bar) bar.style.transform = held ? bar.style.transform : 'scaleX(0)'
+      return
+    }
+    let start = performance.now()
+    let raf = 0
+    const go = (now: number) => {
+      if (document.hidden) start += 16
+      const t = Math.min(1, (now - start) / DWELL)
+      if (fill.current) fill.current.style.transform = `scaleX(${t})`
+      if (t >= 1) setIndex((i) => (i + 1) % items.length)
+      else raf = requestAnimationFrame(go)
+    }
+    raf = requestAnimationFrame(go)
+    return () => cancelAnimationFrame(raf)
+  }, [playing, index, tab, items.length, held])
+
+  useEffect(() => {
+    const r = rail.current
+    const on = r?.querySelector<HTMLElement>('[aria-current="true"]')
+    if (!r || !on) return
+    const left = on.offsetLeft - r.clientWidth / 2 + on.clientWidth / 2
+    r.scrollTo({ left, behavior: reduce ? 'auto' : 'smooth' })
+  }, [index, tab, reduce])
+
+  const pickTab = (v: Shelf) => {
+    setTab(v)
+    setIndex(0)
+  }
+  const step = (d: number) => setIndex((i) => (i + d + items.length) % items.length)
 
   return (
     <div>
       <Tabs
         label="Everything in Pro"
         value={tab}
-        onChange={(v) => setTab(v as Shelf)}
+        onChange={(v) => pickTab(v as Shelf)}
         items={(Object.keys(SHELVES) as Shelf[]).map((k) => ({ id: k, label: `${SHELVES[k].label} ${SHELVES[k].items().length}` }))}
       />
 
-      <div className="mt-8 grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-6">
-        {/* The list: every piece in this shelf, by name. A row of chips on a phone. */}
-        <ul aria-label={SHELVES[tab].label} className="-mx-5 flex gap-1.5 overflow-x-auto px-5 [scrollbar-width:none] lg:mx-0 lg:max-h-[720px] lg:flex-col lg:gap-0.5 lg:overflow-y-auto lg:px-0">
-          {items.map((x) => (
-            <li key={x.id} className="shrink-0">
-              <button
-                type="button"
-                aria-pressed={x.id === it?.id}
-                onClick={() => choose(x.id)}
-                className={`ring-focus w-full whitespace-nowrap rounded-full px-3.5 py-2 text-left text-[14px] transition-colors duration-150 lg:rounded-[10px] lg:px-3 ${x.id === it?.id ? 'bg-surface text-ink shadow-[0_1px_2px_rgb(0_0_0/0.06),0_0_0_1px_var(--line)]' : 'text-ink-3 hover:bg-[color-mix(in_oklch,var(--ink)_4%,transparent)] hover:text-ink'}`}
-              >
-                {x.name}
-              </button>
-            </li>
-          ))}
-        </ul>
+      <div
+        ref={stage}
+        onPointerEnter={(e) => e.pointerType === 'mouse' && setHeld(true)}
+        onPointerLeave={() => setHeld(false)}
+        onFocusCapture={() => setHeld(true)}
+        onBlurCapture={() => setHeld(false)}
+        className="relative mt-8 overflow-hidden rounded-[26px] bg-[#f1f1f2] shadow-[var(--card-edge),0_40px_80px_-48px_rgb(0_0_0/0.5)] sm:rounded-[34px] dark:bg-[#0a0a0b]"
+      >
 
-        {/* The piece itself, large and live, with its name and the buy button under it. */}
+        <div className="relative flex items-center justify-between gap-3 px-4 pt-4 sm:px-6 sm:pt-5">
+          <p className="flex min-w-0 items-center gap-2 rounded-full bg-[color-mix(in_oklch,var(--surface)_72%,transparent)] py-1 pl-1 pr-3 text-[12.5px] text-ink-2 shadow-[0_0_0_1px_var(--line)] backdrop-blur-md">
+            <span className="grid h-6 min-w-6 place-items-center rounded-full bg-ink px-1.5 text-[11px] font-medium tabular-nums text-surface">{String(index + 1).padStart(2, '0')}</span>
+            <span className="tabular-nums text-ink-3">of {items.length}</span>
+            <span aria-hidden className="text-[var(--quiet)]">·</span>
+            <span className="truncate">{SHELVES[tab].label}</span>
+          </p>
+          <div className="flex shrink-0 items-center gap-1.5">
+            {[-1, 1].map((d) => (
+              <button
+                key={d}
+                type="button"
+                aria-label={d < 0 ? 'Previous' : 'Next'}
+                onClick={() => step(d)}
+                className="ring-focus grid size-9 place-items-center rounded-full bg-[color-mix(in_oklch,var(--surface)_72%,transparent)] text-ink-2 shadow-[0_0_0_1px_var(--line)] backdrop-blur-md transition-[color,transform] duration-150 hover:text-ink active:scale-95"
+              >
+                {d < 0 ? <ArrowLeft size={14} /> : <ArrowRight size={14} />}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="relative mx-2 mt-3 aspect-[5/4] overflow-hidden rounded-[18px] sm:mx-4 sm:aspect-[16/10] lg:mx-auto lg:aspect-auto lg:h-[700px] lg:w-[min(1100px,calc(100%-32px))] lg:rounded-[24px]">
+          <AnimatePresence initial={false} mode="popLayout">
+            {it && (
+              <motion.div
+                key={`${tab}-${it.id}`}
+                initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.985, filter: 'blur(6px)' }}
+                animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 1.01, filter: 'blur(6px)' }}
+                transition={{ duration: 0.55, ease: [0.2, 0.8, 0.2, 1] }}
+                className="absolute inset-0"
+              >
+                <InPlay.Provider value={true}>{it.piece()}</InPlay.Provider>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         {it && (
-          <div className="min-w-0">
-            <div key={it.id} className="relative isolate aspect-[4/5] overflow-hidden rounded-[22px] sm:aspect-[16/11] lg:aspect-auto lg:h-[720px] lg:rounded-[28px]" style={{ background: wellOf(tab === 'components' ? 'amber' : tab === 'screens' ? 'blue' : 'violet') }}>
-              <InPlay.Provider value={true}>
-                <div className="absolute inset-0">{it.piece()}</div>
-              </InPlay.Provider>
-            </div>
-            <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="min-w-0">
-                <p className="text-[17px] tracking-[-0.01em] text-ink">{it.name}</p>
-                <p className="mt-1 line-clamp-2 max-w-[560px] text-[14px] leading-[1.5] text-ink-3">{it.line}</p>
-              </div>
-              <div className="flex shrink-0 items-center gap-2">
-                <Link href={it.href} className="ring-focus inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-[14px] text-ink-2 transition-colors hover:text-ink">
-                  Open
-                  <ArrowUpRight size={12} />
-                </Link>
-                <BuyHere />
-              </div>
+          <div className="relative mx-2 mb-2 mt-2 flex flex-col gap-3 rounded-[20px] bg-[color-mix(in_oklch,var(--surface)_82%,transparent)] p-4 shadow-[0_0_0_1px_var(--line),0_10px_30px_-18px_rgb(0_0_0/0.35)] backdrop-blur-xl sm:mx-4 sm:mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:rounded-[24px] sm:py-3.5 sm:pl-5 sm:pr-3.5">
+            <AnimatePresence initial={false} mode="wait">
+              <motion.div key={`${tab}-${it.id}`} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: reduce ? 0 : 0.22 }} className="min-w-0">
+                <p className="text-[17px] tracking-[-0.02em] text-ink">{it.name}</p>
+                <p className="mt-0.5 line-clamp-2 max-w-[640px] text-[13.5px] leading-5 text-ink-3 sm:line-clamp-1">{it.line}</p>
+              </motion.div>
+            </AnimatePresence>
+            <div className="flex shrink-0 items-center gap-1.5">
+              <Link href={it.href} className="ring-focus inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[13.5px] text-ink-2 shadow-[inset_0_0_0_1px_var(--line-strong)] transition-colors hover:text-ink">
+                Try it
+                <ArrowUpRight size={12} />
+              </Link>
+              <BuyHere />
             </div>
           </div>
         )}
       </div>
+
+      <ol ref={rail} aria-label={SHELVES[tab].label} className="relative mt-4 flex gap-1.5 overflow-x-auto px-1 py-1 [scrollbar-width:none] sm:justify-center sm:flex-wrap">
+        {items.map((x, i) => {
+          const on = i === index
+          return (
+            <li key={x.id} aria-current={on} className="shrink-0">
+              <button
+                type="button"
+                onClick={() => setIndex(i)}
+                className={`ring-focus relative flex h-9 items-center gap-2 overflow-hidden rounded-full pl-2.5 pr-3.5 text-[13px] transition-[background-color,color,box-shadow] duration-200 ${on ? 'bg-surface text-ink shadow-[var(--card-edge)]' : 'text-ink-3 hover:bg-[color-mix(in_oklch,var(--ink)_5%,transparent)] hover:text-ink'}`}
+              >
+                <span className={`text-[11px] tabular-nums ${on ? 'text-accent' : 'text-[var(--quiet)]'}`}>{String(i + 1).padStart(2, '0')}</span>
+                {x.name}
+                {on && <span ref={fill} aria-hidden className="absolute inset-x-3 bottom-[3px] h-[2px] origin-left scale-x-0 rounded-full bg-accent" />}
+              </button>
+            </li>
+          )
+        })}
+      </ol>
     </div>
   )
 }
@@ -109,7 +202,7 @@ function BuyHere() {
   const promo = usePromo()
   if (!buyable) return null
   return (
-    <a href={plan.href} data-cta="pro-gallery" className="ring-focus group/buy inline-flex h-10 items-center gap-2 rounded-full bg-[var(--accent)] pl-4 pr-3.5 text-[14px] font-medium text-white transition-[background-color,transform] duration-150 hover:bg-[color-mix(in_oklch,var(--accent)_90%,black)] active:scale-[0.97]">
+    <a href={plan.href} data-cta="pro-gallery" className="ring-focus group/buy inline-flex h-9 items-center gap-2 rounded-full bg-[var(--accent)] pl-4 pr-3.5 text-[13.5px] font-medium text-white transition-[background-color,transform] duration-150 hover:bg-[color-mix(in_oklch,var(--accent)_90%,black)] active:scale-[0.97]">
       Get all of Pro, ${priceWith(promo, plan.price)} once
       <ArrowRight size={13} className="transition-transform duration-150 group-hover/buy:translate-x-0.5" />
     </a>

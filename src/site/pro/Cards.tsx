@@ -125,7 +125,7 @@ export function PricingCards({ cta = 'cards' }: { cta?: string }) {
             <ArrowRight size={15} className="transition-transform duration-150 group-hover/buy:translate-x-0.5" />
           </a>
         )}
-        <p className="relative mt-3 text-center text-[12.5px] text-ink-3">+ local tax · lifetime updates · all sales final</p>
+        <p className="relative mt-3 text-center text-[12.5px] text-ink-3">One payment · lifetime updates · all sales final</p>
       </div>
     </div>
   )

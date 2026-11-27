@@ -121,51 +121,90 @@ function Ask({ quiet }: { quiet: boolean }) {
   /* The card never changes size: both steps and the thank-you share one fixed body height, and only the content fades */
   const fade = { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: reduce ? 0 : 0.15, ease: UI } }
 
-  const box = (on: boolean) => (
-    <span className={`flex size-4 shrink-0 items-center justify-center rounded-[5px] transition-colors duration-150 ${on ? 'bg-ink text-surface' : 'shadow-[inset_0_0_0_1.5px_var(--line-strong)]'}`}>
-      <Check size={10} strokeWidth={3} className={on ? 'opacity-100' : 'opacity-0'} />
-    </span>
-  )
+  const glyph = (id: string) => {
+    const c = 'stroke-current fill-none'
+    if (id === 'components')
+      return (
+        <svg aria-hidden width="44" height="26" viewBox="0 0 44 26" className={c} strokeWidth="1.4">
+          <rect x="2" y="4" width="24" height="9" rx="4.5" className="fill-current opacity-[0.14]" stroke="none" />
+          <rect x="2" y="4" width="24" height="9" rx="4.5" />
+          <rect x="30" y="4.5" width="12" height="8" rx="4" />
+          <circle cx="38" cy="8.5" r="2.6" className="fill-current" stroke="none" />
+          <rect x="2" y="17" width="40" height="6" rx="3" className="opacity-50" />
+        </svg>
+      )
+    if (id === 'screens')
+      return (
+        <svg aria-hidden width="44" height="26" viewBox="0 0 44 26" className={c} strokeWidth="1.4">
+          <rect x="2" y="2" width="40" height="22" rx="3.5" />
+          <path d="M13 2v22" className="opacity-50" />
+          <path d="M5 7h5M5 11h5M5 15h4" className="opacity-50" strokeLinecap="round" />
+          <rect x="17" y="6" width="21" height="6" rx="1.5" className="fill-current opacity-[0.16]" stroke="none" />
+          <path d="M17 16h21M17 20h14" className="opacity-50" strokeLinecap="round" />
+        </svg>
+      )
+    if (id === 'templates')
+      return (
+        <svg aria-hidden width="44" height="26" viewBox="0 0 44 26" className={c} strokeWidth="1.4">
+          <rect x="12" y="1.5" width="24" height="17" rx="3" className="opacity-40" />
+          <rect x="8" y="4.5" width="24" height="17" rx="3" className="opacity-70" />
+          <rect x="4" y="7.5" width="24" height="17" rx="3" className="fill-[var(--leaf)]" />
+          <path d="M8 13h12M8 17h8" strokeLinecap="round" className="opacity-60" />
+        </svg>
+      )
+    return (
+      <svg aria-hidden width="44" height="26" viewBox="0 0 44 26" className={c} strokeWidth="1.4">
+        <path d="M3 24h38" className="opacity-40" strokeLinecap="round" />
+        <rect x="6" y="14" width="5" height="10" rx="1.5" className="fill-current opacity-30" stroke="none" />
+        <rect x="14" y="9" width="5" height="15" rx="1.5" className="fill-current opacity-30" stroke="none" />
+        <rect x="22" y="12" width="5" height="12" rx="1.5" className="fill-current opacity-30" stroke="none" />
+        <rect x="30" y="4" width="5" height="20" rx="1.5" className="fill-current" stroke="none" />
+        <path d="M8.5 11 16.5 6l8 3 8-7" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )
+  }
 
   return (
     <AnimatePresence>
       {shown && (
         <motion.aside
           aria-labelledby="wish-title"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 8 }}
-          transition={{ duration: reduce ? 0 : 0.28, ease: UI }}
+          initial={{ opacity: 0, y: 14, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 8, scale: 0.98 }}
+          transition={reduce ? { duration: 0 } : { type: 'spring', bounce: 0, duration: 0.4 }}
           style={{ background: 'var(--leaf)' }}
-          className="fixed bottom-3 left-3 right-3 z-40 rounded-[18px] p-4 shadow-[0_0_0_1px_var(--line),0_20px_50px_-20px_rgb(0_0_0/0.3)] sm:bottom-5 sm:left-auto sm:right-5 sm:w-[300px]"
+          className="fixed bottom-3 left-3 right-3 z-40 origin-bottom-right rounded-[20px] p-3 shadow-[0_0_0_1px_var(--line),0_24px_60px_-24px_rgb(0_0_0/0.4)] sm:bottom-5 sm:left-auto sm:right-5 sm:w-[316px]"
         >
           {step !== 'sent' && (
-            <button type="button" aria-label="Close" onClick={close} className="ring-focus absolute right-2.5 top-2.5 flex size-7 items-center justify-center rounded-full text-ink-3 transition-colors hover:text-ink">
+            <button type="button" aria-label="Close" onClick={close} className="ring-focus absolute right-2.5 top-2.5 z-10 flex size-7 items-center justify-center rounded-full text-ink-3 transition-colors hover:bg-[color-mix(in_oklch,var(--ink)_6%,transparent)] hover:text-ink pointer-coarse:size-9">
               <Close size={12} />
             </button>
           )}
 
-          <div className="relative h-[236px]">
+          <div className="relative h-[262px]">
             <AnimatePresence initial={false} mode="wait">
               {step === 'sent' ? (
                 <motion.div key="sent" {...fade} role="status" className="flex h-full flex-col items-center justify-center text-center">
-                  <span className="flex size-8 items-center justify-center rounded-full bg-ink text-surface">
-                    <Check size={14} strokeWidth={2.6} />
-                  </span>
-                  <p id="wish-title" className="mt-3 text-[14px] text-ink">
+                  <motion.span initial={reduce ? false : { scale: 0.6 }} animate={{ scale: 1 }} transition={{ type: 'spring', bounce: 0.4, duration: 0.5 }} className="flex size-10 items-center justify-center rounded-full bg-accent text-white shadow-[0_8px_20px_-8px_var(--accent)]">
+                    <Check size={16} strokeWidth={2.6} />
+                  </motion.span>
+                  <p id="wish-title" className="mt-3.5 text-[14px] text-ink">
                     Thanks, that helps.
                   </p>
                   <p className="mt-0.5 text-[13px] text-ink-3">It goes into what ships next.</p>
                 </motion.div>
               ) : (
                 <motion.div key={step} {...fade} className="flex h-full flex-col">
-                  <p id="wish-title" className="pr-8 text-[14px] leading-5 text-ink">
-                    {step === 1 ? 'What should I build next?' : 'For what kind of product?'}
-                  </p>
-                  <p className="mt-0.5 text-[13px] text-ink-3">{step === 1 ? 'Pick as many as you like.' : 'Optional.'}</p>
+                  <div className="px-1.5 pt-1">
+                    <p id="wish-title" className="pr-8 text-[14px] font-medium leading-5 tracking-[-0.01em] text-ink">
+                      {step === 1 ? 'What should I build next?' : 'For what kind of product?'}
+                    </p>
+                    <p className="mt-0.5 text-[13px] leading-[18px] text-ink-3">{step === 1 ? 'Tap everything you’d use.' : 'Optional, but it helps.'}</p>
+                  </div>
 
                   {step === 1 ? (
-                    <div className="-mx-1.5 mt-3">
+                    <div className="mt-3 grid grid-cols-2 gap-1.5">
                       {KINDS.map((k) => {
                         const on = kinds.includes(k.id)
                         return (
@@ -175,16 +214,19 @@ function Ask({ quiet }: { quiet: boolean }) {
                             role="checkbox"
                             aria-checked={on}
                             onClick={() => flip(setKinds, k.id)}
-                            className={`ring-focus flex h-9 w-full items-center gap-2.5 rounded-[9px] px-1.5 text-left text-[14px] transition-colors duration-150 hover:bg-[color-mix(in_oklch,var(--ink)_4%,transparent)] ${on ? 'text-ink' : 'text-ink-2'}`}
+                            className={`ring-focus group/k relative flex h-[78px] flex-col justify-between rounded-[13px] px-3 pb-2.5 pt-3 text-left transition-[background-color,box-shadow,transform] duration-150 active:scale-[0.97] ${on ? 'bg-surface shadow-[inset_0_0_0_1.5px_var(--accent),0_6px_16px_-10px_var(--accent)]' : 'bg-[color-mix(in_oklch,var(--ink)_3.5%,transparent)] shadow-[inset_0_0_0_1px_var(--line)] hover:bg-[color-mix(in_oklch,var(--ink)_6%,transparent)]'}`}
                           >
-                            {box(on)}
-                            {k.name}
+                            <span className={`transition-colors duration-150 ${on ? 'text-accent' : 'text-ink-3 group-hover/k:text-ink-2'}`}>{glyph(k.id)}</span>
+                            <span className={`text-[13px] leading-4 transition-colors duration-150 ${on ? 'text-ink' : 'text-ink-2'}`}>{k.name}</span>
+                            <span className={`absolute right-2 top-2 flex size-[18px] items-center justify-center rounded-full bg-accent text-white transition-[opacity,transform] duration-200 ${on ? 'scale-100 opacity-100' : 'scale-50 opacity-0'}`}>
+                              <Check size={10} strokeWidth={3} />
+                            </span>
                           </button>
                         )
                       })}
                     </div>
                   ) : (
-                    <div className="mt-3">
+                    <div className="mt-3 px-1.5">
                       <div className="flex flex-wrap gap-1.5">
                         {TOPICS.map(([id, name]) => {
                           const on = topics.includes(id)
@@ -224,11 +266,14 @@ function Ask({ quiet }: { quiet: boolean }) {
                     </div>
                   )}
 
-                  <div className="mt-auto flex items-center gap-2">
-                    <span className="text-[12px] tabular-nums text-ink-3">{step}/2</span>
+                  <div className="mt-auto flex items-center gap-2 pt-2">
+                    <span aria-label={`Step ${step} of 2`} className="flex items-center gap-1 pl-1.5">
+                      <span className={`h-1 rounded-full bg-ink transition-[width,opacity] duration-300 ${step === 1 ? 'w-4' : 'w-1.5 opacity-25'}`} />
+                      <span className={`h-1 rounded-full bg-ink transition-[width,opacity] duration-300 ${step === 2 ? 'w-4' : 'w-1.5 opacity-25'}`} />
+                    </span>
                     <span className="flex-1" />
                     {step === 2 && (
-                      <button type="button" onClick={() => setStep(1)} className="ring-focus h-8 rounded-full px-3 text-[13px] text-ink-2 transition-colors hover:text-ink">
+                      <button type="button" onClick={() => setStep(1)} className="ring-focus h-9 rounded-full px-3 text-[13px] text-ink-2 transition-colors hover:text-ink">
                         Back
                       </button>
                     )}
@@ -236,7 +281,7 @@ function Ask({ quiet }: { quiet: boolean }) {
                       type="button"
                       disabled={step === 1 && !kinds.length}
                       onClick={step === 1 ? () => setStep(2) : send}
-                      className="ring-focus h-8 rounded-full bg-ink px-4 text-[13px] text-surface transition-[opacity,transform] duration-150 active:scale-[0.97] disabled:opacity-25"
+                      className="ring-focus h-9 rounded-full bg-ink px-4 text-[13px] font-medium text-surface transition-[opacity,transform] duration-150 active:scale-[0.97] disabled:opacity-25"
                     >
                       {step === 1 ? 'Next' : 'Send'}
                     </button>

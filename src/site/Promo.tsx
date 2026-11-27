@@ -152,7 +152,7 @@ export function SaleClock({ className = '' }: { className?: string }) {
   if (!promo) return null
   return (
     <p className={`tnum text-balance text-[12.5px] leading-[1.4] text-ink-3 ${className}`}>
-      <span className="font-medium text-accent">
+      <span className="whitespace-nowrap font-medium text-accent">
         {promo.name ?? 'Sale'}
         {promo.off ? ` · ${promo.off} off` : ''}
         {promo.until ? ` · until ${promo.until}` : ''}
@@ -169,7 +169,7 @@ export function SaleClock({ className = '' }: { className?: string }) {
 export function BuyTerms({ className = '' }: { className?: string }) {
   return (
     <p className={`text-[13px] leading-[1.5] text-ink-3 ${className}`}>
-      <PriceNow value={PLANS[0].price} /> + local tax · lifetime updates · all sales final. Try every Pro screen live first.
+      <PriceNow value={PLANS[0].price} /> once · lifetime updates · all sales final. Try every Pro screen live first.
     </p>
   )
 }
