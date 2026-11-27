@@ -157,7 +157,7 @@ export function Gallery() {
         </div>
 
         {it && (
-          <div className="relative mx-2 mb-2 mt-2 flex flex-col gap-3 rounded-[20px] bg-[color-mix(in_oklch,var(--surface)_82%,transparent)] p-4 shadow-[0_0_0_1px_var(--line),0_10px_30px_-18px_rgb(0_0_0/0.35)] backdrop-blur-xl sm:mx-4 sm:mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:rounded-[24px] sm:py-3.5 sm:pl-5 sm:pr-3.5">
+          <div className="relative mx-2 mb-2 mt-2 flex flex-col gap-3 rounded-[20px] bg-white p-4 shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_10px_30px_-18px_rgb(0_0_0/0.25)] dark:bg-[#131315] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_0_1px_rgb(255_255_255/0.07)] sm:mx-4 sm:mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:rounded-[24px] sm:py-3.5 sm:pl-5 sm:pr-3.5">
             <AnimatePresence initial={false} mode="wait">
               <motion.div key={`${tab}-${it.id}`} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: reduce ? 0 : 0.22 }} className="min-w-0">
                 <p className="text-[17px] tracking-[-0.02em] text-ink">{it.name}</p>
