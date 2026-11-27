@@ -197,7 +197,9 @@ export const FILES: Record<string, string[]> = {
   ],
   'agent-screens': [
     '../pro/screens/agent/screens.tsx',
+    '../pro/screens/agent/pro-kit.css',
     '../pro/screens/agent/ai-agent-queue.tsx',
+    '../pro/screens/agent/agent-queue.css',
     '../pro/screens/agent/ai-agent-runs.tsx',
     '../pro/screens/agent/ai-agent-trace.tsx',
     '../pro/screens/agent/runs.css',
